@@ -36,34 +36,52 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
 git clone https://github.com/portzapp/portzapp-web.git
 ```
 
-2. Install PHP dependencies
+2. Setup .env file
+
+```bash
+cp .env.example .env
+```
+
+3. Generate an app key in the `.env` file
+
+```bash
+php artisan key:generate
+```
+
+4. Run the local development PostgreSQL database (using Docker)
+
+```bash
+docker compose up -d
+```
+
+5. Install PHP dependencies
 
 ```bash
 composer install
 ```
 
-3. Install Node.js dependencies
+6. Install Node.js dependencies
 
 ```bash
 npm install
 ```
 
-4. Build frontend
+7. Build frontend
 
 ```bash
 npm run build
 ```
 
-5. Run database migrations
+8. Run database migrations
 
 ```bash
 php artisan migrate
 ```
 
-6. Run web app
+9. Run web app
 
 ```bash
 composer run dev
 ```
 
-7. Head to [http://localhost:8000](http://localhost:8000) to start using the web app.
+10. Head to [http://localhost:8000](http://localhost:8000) to start using the web app.

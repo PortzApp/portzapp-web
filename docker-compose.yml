@@ -1,0 +1,23 @@
+name: portzapp-postgres
+
+services:
+  # This is your local Postgres database instance
+  # Connection URL: postgres://dev:dev@localhost:5400/portzapp
+  postgres-db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: portzapp
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: dev
+    volumes:
+      - ./.postgres-db-data:/var/lib/postgresql/data
+    ports:
+      - '5400:5432' # Access the DB at port 5400
+
+  # Use Adminer Evo to quickly view the database at localhost:8900
+  adminer:
+    image: ghcr.io/shyim/adminerevo:latest
+    restart: always
+    ports:
+      - '8900:8080'
