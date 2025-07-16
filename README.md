@@ -75,7 +75,7 @@ npm run build
 8. Run database migrations
 
 ```bash
-php artisan migrate
+php artisan migrate --seed # This will also seed the database with some test data
 ```
 
 9. Run web app
