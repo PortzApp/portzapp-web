@@ -1,5 +1,5 @@
-import { columns } from '@/components/data-table/columns';
-import { DataTable } from '@/components/data-table/data-table';
+import { servicesPageColumns } from '@/components/data-table/page-services/columns';
+import { ServicesPageDataTable } from '@/components/data-table/page-services/data-table';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import {
@@ -16,10 +16,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, type SharedData } from '@/types';
+import { type BreadcrumbItem } from '@/types';
 import { Service } from '@/types/service';
-import { Head, router, useForm, usePage } from '@inertiajs/react';
-import { LoaderCircle, Pencil, Plus, Trash2 } from 'lucide-react';
+import { ServiceForm } from '@/types/service-form';
+import { Head, useForm } from '@inertiajs/react';
+import { LoaderCircle, Plus } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -29,174 +30,8 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-type ServiceForm = {
-    name: string;
-    description: string;
-    price: string;
-    status: 'active' | 'inactive';
-};
-
-function EditServiceDialog({ service }: { service: Service }) {
-    const [editOpen, setEditOpen] = useState(false);
-
-    const { data, setData, put, processing, errors, reset } = useForm<ServiceForm>({
-        name: service.name,
-        description: service.description || '',
-        price: service.price,
-        status: service.status,
-    });
-
-    const handleSubmit: FormEventHandler = (e) => {
-        e.preventDefault();
-        put(route('services.update', service.id), {
-            onSuccess: () => {
-                setEditOpen(false);
-                reset();
-            },
-        });
-    };
-
-    return (
-        <Dialog open={editOpen} onOpenChange={setEditOpen}>
-            <DialogTrigger asChild>
-                <Button size="sm" variant="outline">
-                    <Pencil className="h-4 w-4" />
-                </Button>
-            </DialogTrigger>
-            <DialogContent>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <DialogHeader>
-                        <DialogTitle>Edit Service</DialogTitle>
-                        <DialogDescription>
-                            Update the service information below. Make changes to the service name, description, price, and status.
-                        </DialogDescription>
-                    </DialogHeader>
-
-                    <div className="space-y-2">
-                        <Label htmlFor="edit-name">Service Name</Label>
-                        <Input
-                            id="edit-name"
-                            type="text"
-                            value={data.name}
-                            onChange={(e) => setData('name', e.target.value)}
-                            placeholder="Enter service name"
-                            disabled={processing}
-                            required
-                        />
-                        <InputError message={errors.name} />
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label htmlFor="edit-description">Description</Label>
-                        <Input
-                            id="edit-description"
-                            type="text"
-                            value={data.description}
-                            onChange={(e) => setData('description', e.target.value)}
-                            placeholder="Enter service description (optional)"
-                            disabled={processing}
-                        />
-                        <InputError message={errors.description} />
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label htmlFor="edit-price">Price</Label>
-                        <Input
-                            id="edit-price"
-                            type="number"
-                            step="0.01"
-                            min="0"
-                            value={data.price}
-                            onChange={(e) => setData('price', e.target.value)}
-                            placeholder="0.00"
-                            disabled={processing}
-                            required
-                        />
-                        <InputError message={errors.price} />
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label htmlFor="edit-status">Status</Label>
-                        <Select value={data.status} onValueChange={(value: 'active' | 'inactive') => setData('status', value)}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Select status" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="active">Active</SelectItem>
-                                <SelectItem value="inactive">Inactive</SelectItem>
-                            </SelectContent>
-                        </Select>
-                        <InputError message={errors.status} />
-                    </div>
-
-                    <DialogFooter>
-                        <DialogClose asChild>
-                            <Button variant="outline" type="button" disabled={processing}>
-                                Cancel
-                            </Button>
-                        </DialogClose>
-                        <Button type="submit" disabled={processing}>
-                            {processing && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
-                            Update Service
-                        </Button>
-                    </DialogFooter>
-                </form>
-            </DialogContent>
-        </Dialog>
-    );
-}
-
-function DeleteServiceDialog({ service }: { service: Service }) {
-    const [deleteOpen, setDeleteOpen] = useState(false);
-    const [isDeleting, setIsDeleting] = useState(false);
-
-    const handleDelete = () => {
-        setIsDeleting(true);
-        router.delete(route('services.destroy', service.id), {
-            onSuccess: () => {
-                setDeleteOpen(false);
-                setIsDeleting(false);
-            },
-            onError: () => {
-                setIsDeleting(false);
-            },
-        });
-    };
-
-    return (
-        <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-            <DialogTrigger asChild>
-                <Button size="sm" variant="destructive">
-                    <Trash2 className="h-4 w-4" />
-                </Button>
-            </DialogTrigger>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Delete Service</DialogTitle>
-                    <DialogDescription>
-                        Are you sure you want to delete "{service.name}"? This action cannot be undone and will permanently remove the service from
-                        your account.
-                    </DialogDescription>
-                </DialogHeader>
-                <DialogFooter>
-                    <DialogClose asChild>
-                        <Button variant="outline" disabled={isDeleting}>
-                            Cancel
-                        </Button>
-                    </DialogClose>
-                    <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
-                        {isDeleting && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
-                        Delete Service
-                    </Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
-    );
-}
-
 export default function Services({ services }: { services: Service[] }) {
     const [open, setOpen] = useState(false);
-    const { auth } = usePage<SharedData>().props;
 
     const { data, setData, post, processing, errors, reset } = useForm<ServiceForm>({
         name: '',
@@ -314,37 +149,7 @@ export default function Services({ services }: { services: Service[] }) {
                     </Dialog>
                 </div>
 
-                <DataTable columns={columns} data={services} />
-
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    {services.map((service) => (
-                        <div key={service.id} className="rounded-lg border bg-card p-6 shadow-sm">
-                            <div className="mb-2 flex items-center justify-between">
-                                <div>
-                                    <h3 className="text-lg font-semibold">{service.name}</h3>
-                                    <p className="text-xs text-muted-foreground">by {service.user.name}</p>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <span
-                                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                                            service.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                                        }`}
-                                    >
-                                        {service.status}
-                                    </span>
-                                    {service.user_id === auth.user.id && (
-                                        <div className="flex items-center gap-1">
-                                            <EditServiceDialog service={service} />
-                                            <DeleteServiceDialog service={service} />
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                            {service.description && <p className="mb-4 text-sm text-muted-foreground">{service.description}</p>}
-                            <div className="text-2xl font-bold text-primary">${service.price}</div>
-                        </div>
-                    ))}
-                </div>
+                <ServicesPageDataTable columns={servicesPageColumns} data={services} />
 
                 {services.length === 0 && (
                     <div className="py-8 text-center">

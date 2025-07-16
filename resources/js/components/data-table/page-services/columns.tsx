@@ -1,20 +1,10 @@
-import { Button } from '@/components/ui/button';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-
 import { Checkbox } from '@/components/ui/checkbox';
 import { Service } from '@/types/service';
 import { ColumnDef } from '@tanstack/react-table';
-import { MoreHorizontal } from 'lucide-react';
-import { DataTableColumnHeader } from './data-table-column-header';
+import { DataTableColumnHeader } from '../primitives/data-table-column-header';
+import { ServicesPageColumnActions } from './column-actions';
 
-export const columns: ColumnDef<Service>[] = [
+export const servicesPageColumns: ColumnDef<Service>[] = [
     {
         id: 'select',
         header: ({ table }) => (
@@ -70,22 +60,9 @@ export const columns: ColumnDef<Service>[] = [
             const service = row.original;
 
             return (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem onClick={() => navigator.clipboard.writeText(service.id.toString())}>Copy service ID</DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem>View service</DropdownMenuItem>
-                        <DropdownMenuItem>Edit service</DropdownMenuItem>
-                        <DropdownMenuItem>Delete service</DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                <>
+                    <ServicesPageColumnActions service={service} />
+                </>
             );
         },
     },
