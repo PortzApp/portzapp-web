@@ -14,9 +14,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
-import { Head, useForm } from '@inertiajs/react';
-import { LoaderCircle, Plus } from 'lucide-react';
+import { type BreadcrumbItem, type SharedData } from '@/types';
+import { Head, router, useForm, usePage } from '@inertiajs/react';
+import { LoaderCircle, Plus, Trash2 } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -44,8 +44,58 @@ type ServiceForm = {
     status: 'active' | 'inactive';
 };
 
+function DeleteServiceDialog({ service }: { service: Service }) {
+    const [deleteOpen, setDeleteOpen] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
+
+    const handleDelete = () => {
+        setIsDeleting(true);
+        router.delete(route('services.destroy', service.id), {
+            onSuccess: () => {
+                setDeleteOpen(false);
+                setIsDeleting(false);
+            },
+            onError: () => {
+                setIsDeleting(false);
+            },
+        });
+    };
+
+    return (
+        <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+            <DialogTrigger asChild>
+                <Button size="sm" variant="destructive">
+                    <Trash2 className="h-4 w-4" />
+                </Button>
+            </DialogTrigger>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Delete Service</DialogTitle>
+                    <DialogDescription>
+                        Are you sure you want to delete "{service.name}"? This action cannot be undone and will permanently remove the service from
+                        your account.
+                    </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                    <DialogClose asChild>
+                        <Button variant="outline" disabled={isDeleting}>
+                            Cancel
+                        </Button>
+                    </DialogClose>
+                    <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
+                        {isDeleting && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
+                        Delete Service
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
+}
+
 export default function Services({ services }: { services: Service[] }) {
     const [open, setOpen] = useState(false);
+    const { auth } = usePage<SharedData>().props;
+
     const { data, setData, post, processing, errors, reset } = useForm<ServiceForm>({
         name: '',
         description: '',
@@ -167,13 +217,16 @@ export default function Services({ services }: { services: Service[] }) {
                         <div key={service.id} className="rounded-lg border bg-card p-6 shadow-sm">
                             <div className="mb-2 flex items-center justify-between">
                                 <h3 className="text-lg font-semibold">{service.name}</h3>
-                                <span
-                                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                                        service.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                                    }`}
-                                >
-                                    {service.status}
-                                </span>
+                                <div className="flex items-center gap-2">
+                                    <span
+                                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                                            service.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                                        }`}
+                                    >
+                                        {service.status}
+                                    </span>
+                                    {service.user_id === auth.user.id && <DeleteServiceDialog service={service} />}
+                                </div>
                             </div>
                             {service.description && <p className="mb-4 text-sm text-muted-foreground">{service.description}</p>}
                             <div className="text-2xl font-bold text-primary">${service.price}</div>

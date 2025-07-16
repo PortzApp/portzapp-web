@@ -29,4 +29,19 @@ class ServiceController extends Controller
 
         return to_route('services')->with('message', 'Service created successfully!');
     }
+
+    /**
+     * Remove the specified service from storage.
+     */
+    public function destroy(Service $service): RedirectResponse
+    {
+        // Ensure the service belongs to the authenticated user
+        if ($service->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $service->delete();
+
+        return to_route('services')->with('message', 'Service deleted successfully!');
+    }
 }
