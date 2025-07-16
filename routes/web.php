@@ -15,6 +15,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('services', [ServiceController::class, 'index'])->name('services');
     Route::post('services', [ServiceController::class, 'store'])->name('services.store');
+    Route::put('services/{service}', [ServiceController::class, 'update'])->name('services.update');
     Route::delete('services/{service}', [ServiceController::class, 'destroy'])->name('services.destroy');
 });
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ServiceCreateRequest;
+use App\Http\Requests\ServiceUpdateRequest;
 use App\Models\Service;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
@@ -28,6 +29,21 @@ class ServiceController extends Controller
         auth()->user()->services()->create($request->validated());
 
         return to_route('services')->with('message', 'Service created successfully!');
+    }
+
+    /**
+     * Update the specified service in storage.
+     */
+    public function update(ServiceUpdateRequest $request, Service $service): RedirectResponse
+    {
+        // Ensure the service belongs to the authenticated user
+        if ($service->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $service->update($request->validated());
+
+        return to_route('services')->with('message', 'Service updated successfully!');
     }
 
     /**

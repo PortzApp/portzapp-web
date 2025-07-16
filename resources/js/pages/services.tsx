@@ -16,7 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type SharedData } from '@/types';
 import { Head, router, useForm, usePage } from '@inertiajs/react';
-import { LoaderCircle, Plus, Trash2 } from 'lucide-react';
+import { LoaderCircle, Pencil, Plus, Trash2 } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -48,6 +48,116 @@ type ServiceForm = {
     price: string;
     status: 'active' | 'inactive';
 };
+
+function EditServiceDialog({ service }: { service: Service }) {
+    const [editOpen, setEditOpen] = useState(false);
+
+    const { data, setData, put, processing, errors, reset } = useForm<ServiceForm>({
+        name: service.name,
+        description: service.description || '',
+        price: service.price,
+        status: service.status,
+    });
+
+    const handleSubmit: FormEventHandler = (e) => {
+        e.preventDefault();
+        put(route('services.update', service.id), {
+            onSuccess: () => {
+                setEditOpen(false);
+                reset();
+            },
+        });
+    };
+
+    return (
+        <Dialog open={editOpen} onOpenChange={setEditOpen}>
+            <DialogTrigger asChild>
+                <Button size="sm" variant="outline">
+                    <Pencil className="h-4 w-4" />
+                </Button>
+            </DialogTrigger>
+            <DialogContent>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <DialogHeader>
+                        <DialogTitle>Edit Service</DialogTitle>
+                        <DialogDescription>
+                            Update the service information below. Make changes to the service name, description, price, and status.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="edit-name">Service Name</Label>
+                        <Input
+                            id="edit-name"
+                            type="text"
+                            value={data.name}
+                            onChange={(e) => setData('name', e.target.value)}
+                            placeholder="Enter service name"
+                            disabled={processing}
+                            required
+                        />
+                        <InputError message={errors.name} />
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="edit-description">Description</Label>
+                        <Input
+                            id="edit-description"
+                            type="text"
+                            value={data.description}
+                            onChange={(e) => setData('description', e.target.value)}
+                            placeholder="Enter service description (optional)"
+                            disabled={processing}
+                        />
+                        <InputError message={errors.description} />
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="edit-price">Price</Label>
+                        <Input
+                            id="edit-price"
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            value={data.price}
+                            onChange={(e) => setData('price', e.target.value)}
+                            placeholder="0.00"
+                            disabled={processing}
+                            required
+                        />
+                        <InputError message={errors.price} />
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="edit-status">Status</Label>
+                        <Select value={data.status} onValueChange={(value: 'active' | 'inactive') => setData('status', value)}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="active">Active</SelectItem>
+                                <SelectItem value="inactive">Inactive</SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <InputError message={errors.status} />
+                    </div>
+
+                    <DialogFooter>
+                        <DialogClose asChild>
+                            <Button variant="outline" type="button" disabled={processing}>
+                                Cancel
+                            </Button>
+                        </DialogClose>
+                        <Button type="submit" disabled={processing}>
+                            {processing && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
+                            Update Service
+                        </Button>
+                    </DialogFooter>
+                </form>
+            </DialogContent>
+        </Dialog>
+    );
+}
 
 function DeleteServiceDialog({ service }: { service: Service }) {
     const [deleteOpen, setDeleteOpen] = useState(false);
@@ -233,7 +343,12 @@ export default function Services({ services }: { services: Service[] }) {
                                     >
                                         {service.status}
                                     </span>
-                                    {service.user_id === auth.user.id && <DeleteServiceDialog service={service} />}
+                                    {service.user_id === auth.user.id && (
+                                        <div className="flex items-center gap-1">
+                                            <EditServiceDialog service={service} />
+                                            <DeleteServiceDialog service={service} />
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                             {service.description && <p className="mb-4 text-sm text-muted-foreground">{service.description}</p>}
