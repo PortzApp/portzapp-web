@@ -28,4 +28,4 @@ class ServiceCreateRequest extends FormRequest
             'status' => ['required', 'in:active,inactive'],
         ];
     }
-} 
+}

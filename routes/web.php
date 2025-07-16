@@ -1,8 +1,8 @@
 <?php
 
+use App\Http\Controllers\ServiceController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use App\Http\Controllers\ServiceController;
 
 Route::get('/', function () {
     return Inertia::render('welcome');
@@ -12,7 +12,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
-    
+
     Route::get('services', [ServiceController::class, 'index'])->name('services');
     Route::post('services', [ServiceController::class, 'store'])->name('services.store');
 });
