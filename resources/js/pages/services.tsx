@@ -33,6 +33,11 @@ type Service = {
     price: string;
     status: 'active' | 'inactive';
     user_id: number;
+    user: {
+        id: number;
+        name: string;
+        email: string;
+    };
     created_at: string;
     updated_at: string;
 };
@@ -216,7 +221,10 @@ export default function Services({ services }: { services: Service[] }) {
                     {services.map((service) => (
                         <div key={service.id} className="rounded-lg border bg-card p-6 shadow-sm">
                             <div className="mb-2 flex items-center justify-between">
-                                <h3 className="text-lg font-semibold">{service.name}</h3>
+                                <div>
+                                    <h3 className="text-lg font-semibold">{service.name}</h3>
+                                    <p className="text-xs text-muted-foreground">by {service.user.name}</p>
+                                </div>
                                 <div className="flex items-center gap-2">
                                     <span
                                         className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${

@@ -16,7 +16,7 @@ class ServiceController extends Controller
     public function index(): Response
     {
         return Inertia::render('services', [
-            'services' => auth()->user()->services()->latest()->get(),
+            'services' => Service::with('user')->latest()->get(),
         ]);
     }
 
