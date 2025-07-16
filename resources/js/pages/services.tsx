@@ -1,3 +1,5 @@
+import { columns } from '@/components/data-table/columns';
+import { DataTable } from '@/components/data-table/data-table';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import {
@@ -15,6 +17,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type SharedData } from '@/types';
+import { Service } from '@/types/service';
 import { Head, router, useForm, usePage } from '@inertiajs/react';
 import { LoaderCircle, Pencil, Plus, Trash2 } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
@@ -25,22 +28,6 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: '/services',
     },
 ];
-
-type Service = {
-    id: number;
-    name: string;
-    description: string | null;
-    price: string;
-    status: 'active' | 'inactive';
-    user_id: number;
-    user: {
-        id: number;
-        name: string;
-        email: string;
-    };
-    created_at: string;
-    updated_at: string;
-};
 
 type ServiceForm = {
     name: string;
@@ -326,6 +313,8 @@ export default function Services({ services }: { services: Service[] }) {
                         </DialogContent>
                     </Dialog>
                 </div>
+
+                <DataTable columns={columns} data={services} />
 
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {services.map((service) => (
