@@ -123,7 +123,6 @@ export default function Register() {
 
                     <div className="grid gap-2">
                         <Label htmlFor="role">Account Type</Label>
-                        <p className="text-xs text-muted-foreground">DEBUG: Current role = {data.role}</p>
                         <RadioGroup value={data.role} onValueChange={handleRoleChange} className="flex flex-col gap-2">
                             <div className="flex items-center space-x-2">
                                 <RadioGroupItem value={UserRoles.VESSEL_OWNER} id="vessel_owner" />
