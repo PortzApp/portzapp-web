@@ -85,3 +85,37 @@ composer run dev
 ```
 
 10. Head to [http://localhost:8000](http://localhost:8000) to start using the web app.
+
+## Running test suite
+
+### Prerequisites
+
+- [Aspell](https://aspell.net/) (for Peck's spellcheck)
+
+```bash
+# on Linux
+sudo apt-get install aspell aspell-en
+
+# on macOS
+brew install aspell
+
+# on Windows
+choco install aspell
+```
+
+### Running tests
+
+Run the following command to run the test suite:
+
+```bash
+composer test:all
+```
+
+This will run:
+
+- Unit tests (Pest)
+- Linting (Pint for backend, ESLint for frontend)
+- Formatting (Pint for backend, Prettier for frontend)
+- Spellcheck (Peck)
+- Types (PHPStan w/ LaraStan)
+- Refactoring (Rector)
