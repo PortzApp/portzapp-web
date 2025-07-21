@@ -26,6 +26,10 @@ class ServiceController extends Controller
      */
     public function store(ServiceCreateRequest $request): RedirectResponse
     {
+        if ($request->user()->cannot('create', Service::class)) {
+            abort(403, 'Unauthorized action.');
+        }
+
         auth()->user()->services()->create($request->validated());
 
         return to_route('services')->with('message', 'Service created successfully!');
@@ -36,8 +40,7 @@ class ServiceController extends Controller
      */
     public function update(ServiceUpdateRequest $request, Service $service): RedirectResponse
     {
-        // Ensure the service belongs to the authenticated user
-        if ($service->user_id !== auth()->id()) {
+        if ($request->user()->cannot('update', $service)) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -51,8 +54,7 @@ class ServiceController extends Controller
      */
     public function destroy(Service $service): RedirectResponse
     {
-        // Ensure the service belongs to the authenticated user
-        if ($service->user_id !== auth()->id()) {
+        if (auth()->user()->cannot('delete', $service)) {
             abort(403, 'Unauthorized action.');
         }
 
