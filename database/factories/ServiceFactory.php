@@ -18,7 +18,7 @@ class ServiceFactory extends Factory
     {
         $serviceTypes = [
             'Web Development',
-            'Mobile App Development', 
+            'Mobile App Development',
             'SEO Consulting',
             'Social Media Management',
             'Content Writing',
@@ -36,9 +36,9 @@ class ServiceFactory extends Factory
             'Email Marketing',
             'PPC Management',
             'Technical Writing',
-            'Website Maintenance'
+            'Website Maintenance',
         ];
-        
+
         $descriptions = [
             'Professional and reliable service with quick turnaround times.',
             'High-quality work tailored to your specific business needs.',
@@ -49,7 +49,7 @@ class ServiceFactory extends Factory
             'Creative and innovative approach to solve your business challenges.',
             'Proven track record of delivering successful projects on time.',
             'Comprehensive service package including consultation and support.',
-            'Results-driven approach with measurable outcomes for your business.'
+            'Results-driven approach with measurable outcomes for your business.',
         ];
 
         return [
