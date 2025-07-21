@@ -7,6 +7,7 @@ import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import AuthLayout from '@/layouts/auth-layout';
 
 type RegisterForm = {
@@ -14,7 +15,14 @@ type RegisterForm = {
     email: string;
     password: string;
     password_confirmation: string;
+    role: string;
 };
+
+enum UserRoles {
+    VESSEL_OWNER = 'vessel_owner',
+    SHIPPING_AGENCY = 'shipping_agency',
+    ADMIN = 'admin',
+}
 
 export default function Register() {
     const { data, setData, post, processing, errors, reset } = useForm<Required<RegisterForm>>({
@@ -22,13 +30,25 @@ export default function Register() {
         email: '',
         password: '',
         password_confirmation: '',
+        role: UserRoles.VESSEL_OWNER,
     });
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
+
         post(route('register'), {
             onFinish: () => reset('password', 'password_confirmation'),
+            onSuccess: () => {
+                console.log('Registration successful!');
+            },
+            onError: (errors) => {
+                console.log('Registration errors:', errors);
+            },
         });
+    };
+
+    const handleRoleChange = (value: string) => {
+        setData('role', value);
     };
 
     return (
@@ -99,6 +119,25 @@ export default function Register() {
                             placeholder="Confirm password"
                         />
                         <InputError message={errors.password_confirmation} />
+                    </div>
+
+                    <div className="grid gap-2">
+                        <Label htmlFor="role">Account Type</Label>
+                        <RadioGroup value={data.role} onValueChange={handleRoleChange} className="flex flex-col gap-2">
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value={UserRoles.VESSEL_OWNER} id="vessel_owner" />
+                                <Label htmlFor="vessel_owner">Vessel Owner</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value={UserRoles.SHIPPING_AGENCY} id="shipping_agency" />
+                                <Label htmlFor="shipping_agency">Shipping Agency</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value={UserRoles.ADMIN} id="admin" />
+                                <Label htmlFor="admin">Admin</Label>
+                            </div>
+                        </RadioGroup>
+                        <InputError message={errors.role} />
                     </div>
 
                     <Button type="submit" className="mt-2 w-full" tabIndex={5} disabled={processing}>
