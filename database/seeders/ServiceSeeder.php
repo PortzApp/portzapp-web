@@ -2,9 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use App\Models\Service;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class ServiceSeeder extends Seeder
@@ -21,7 +20,7 @@ class ServiceSeeder extends Seeder
         ]);
 
         $user2 = User::factory()->create([
-            'name' => 'Jane Smith', 
+            'name' => 'Jane Smith',
             'email' => 'jane@example.com',
         ]);
 
