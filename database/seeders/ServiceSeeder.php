@@ -15,13 +15,15 @@ class ServiceSeeder extends Seeder
     {
         // Create 2 test users
         $user1 = User::factory()->create([
-            'name' => 'John Doe',
-            'email' => 'john@example.com',
+            'first_name' => 'John',
+            'last_name' => 'Doe',
+            'email' => 'john.doe@example.com',
         ]);
 
         $user2 = User::factory()->create([
-            'name' => 'Jane Smith',
-            'email' => 'jane@example.com',
+            'first_name' => 'Jane',
+            'last_name' => 'Doe',
+            'email' => 'jane.doe@example.com',
         ]);
 
         // Create 10 services for user 1
