@@ -83,7 +83,7 @@ export default function Register() {
                                 type="text"
                                 required
                                 autoFocus
-                                tabIndex={1}
+                                tabIndex={2}
                                 autoComplete="family-name"
                                 value={data.last_name}
                                 onChange={(e) => setData('last_name', e.target.value)}
@@ -100,7 +100,7 @@ export default function Register() {
                             id="email"
                             type="email"
                             required
-                            tabIndex={2}
+                            tabIndex={3}
                             autoComplete="email"
                             value={data.email}
                             onChange={(e) => setData('email', e.target.value)}
@@ -116,7 +116,7 @@ export default function Register() {
                             id="password"
                             type="password"
                             required
-                            tabIndex={3}
+                            tabIndex={4}
                             autoComplete="new-password"
                             value={data.password}
                             onChange={(e) => setData('password', e.target.value)}
@@ -132,7 +132,7 @@ export default function Register() {
                             id="password_confirmation"
                             type="password"
                             required
-                            tabIndex={4}
+                            tabIndex={5}
                             autoComplete="new-password"
                             value={data.password_confirmation}
                             onChange={(e) => setData('password_confirmation', e.target.value)}
