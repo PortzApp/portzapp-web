@@ -29,7 +29,7 @@ class ServicePolicy
      */
     public function create(User $user): bool
     {
-         return $user->role === UserRoles::ADMIN || $user->role === UserRoles::SHIPPING_AGENCY;
+        return $user->role === UserRoles::ADMIN || $user->role === UserRoles::SHIPPING_AGENCY;
     }
 
     /**
