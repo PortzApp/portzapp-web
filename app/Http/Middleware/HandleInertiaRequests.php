@@ -48,7 +48,7 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
                 'can' => fn () => $request->user() ? [
                     'create_services' => $request->user()->can('create', Service::class),
-                ] : null
+                ] : null,
             ],
             'ziggy' => fn (): array => [
                 ...(new Ziggy)->toArray(),
