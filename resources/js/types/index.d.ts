@@ -34,6 +34,12 @@ export interface SharedData {
     [key: string]: unknown;
 }
 
+export enum UserRoles {
+    VESSEL_OWNER = 'vessel_owner',
+    SHIPPING_AGENCY = 'shipping_agency',
+    ADMIN = 'admin',
+}
+
 export interface User {
     id: number;
     first_name: string;
@@ -41,6 +47,7 @@ export interface User {
     email: string;
     avatar?: string;
     email_verified_at: string | null;
+    role: UserRoles;
     created_at: string;
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
