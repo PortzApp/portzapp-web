@@ -2,6 +2,7 @@
     "preset": "laravel",
     "ignore": {
         "words": [
+            "debugbar",
             "dropdown",
             "eslint",
             "favicon",
