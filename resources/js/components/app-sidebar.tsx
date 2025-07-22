@@ -2,12 +2,12 @@ import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
-import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/react';
+import { type NavItem, SharedData } from '@/types/index';
+import { Link, usePage } from '@inertiajs/react';
 import { BookOpen, Folder, LayoutGrid, Package } from 'lucide-react';
 import AppLogo from './app-logo';
 
-const mainNavItems: NavItem[] = [
+const mainNavItemsAsAnyRole: NavItem[] = [
     {
         title: 'Dashboard',
         href: '/dashboard',
@@ -15,6 +15,19 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: 'Services',
+        href: '/services',
+        icon: Package,
+    },
+];
+
+const mainNavItemsAsShippingAgencyRole: NavItem[] = [
+    {
+        title: 'Dashboard',
+        href: '/dashboard',
+        icon: LayoutGrid,
+    },
+    {
+        title: 'My Services',
         href: '/services',
         icon: Package,
     },
@@ -34,6 +47,8 @@ const footerNavItems: NavItem[] = [
 ];
 
 export function AppSidebar() {
+    const { role: currentRole } = usePage<SharedData>().props.auth.user;
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
@@ -49,7 +64,7 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={mainNavItems} />
+                <NavMain items={currentRole === 'shipping_agency' ? mainNavItemsAsShippingAgencyRole : mainNavItemsAsAnyRole} />
             </SidebarContent>
 
             <SidebarFooter>

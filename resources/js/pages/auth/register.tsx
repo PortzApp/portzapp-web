@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import AuthLayout from '@/layouts/auth-layout';
+import { UserRoles } from '@/types/user-roles';
 
 type RegisterForm = {
     first_name: string;
@@ -21,12 +22,6 @@ type RegisterForm = {
     password_confirmation: string;
     role: string;
 };
-
-enum UserRoles {
-    VESSEL_OWNER = 'vessel_owner',
-    SHIPPING_AGENCY = 'shipping_agency',
-    ADMIN = 'admin',
-}
 
 export default function Register() {
     const { data, setData, post, processing, errors, reset } = useForm<Required<RegisterForm>>({
