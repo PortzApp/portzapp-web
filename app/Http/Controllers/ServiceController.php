@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserRoles;
 use App\Http\Requests\ServiceCreateRequest;
 use App\Http\Requests\ServiceUpdateRequest;
 use App\Models\Service;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -16,8 +18,16 @@ class ServiceController extends Controller
      */
     public function index(): Response
     {
+        Gate::authorize('view-any', Service::class);
+
+        $services_query = Service::query()->with('user:id,first_name')->latest();
+
+        if (auth()->user()->role === UserRoles::SHIPPING_AGENCY) {
+            $services_query->where('user_id', auth()->id());
+        }
+
         return Inertia::render('services', [
-            'services' => Service::with('user')->latest()->get(),
+            'services' => $services_query->get(),
         ]);
     }
 
