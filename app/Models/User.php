@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Enums\UserRoles;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -13,6 +14,22 @@ class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
+
+    /**
+     * Get the services for the current user.
+     */
+    public function services(): HasMany
+    {
+        return $this->hasMany(Service::class);
+    }
+
+    /**
+     * Get the organization for the current user.
+     */
+    public function organization(): BelongsTo
+    {
+        return $this->belongsTo(Organization::class);
+    }
 
     /**
      * The attributes that are mass assignable.
@@ -25,6 +42,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'organization_id',
     ];
 
     /**
@@ -49,14 +67,6 @@ class User extends Authenticatable
             'password' => 'hashed',
             'role' => UserRoles::class,
         ];
-    }
-
-    /**
-     * Get the services for the current user.
-     */
-    public function services(): HasMany
-    {
-        return $this->hasMany(Service::class);
     }
 
     /**
