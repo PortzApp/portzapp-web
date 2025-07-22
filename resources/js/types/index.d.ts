@@ -1,3 +1,4 @@
+import { UserRoles } from '@/types/user-roles';
 import { LucideIcon } from 'lucide-react';
 import type { Config } from 'ziggy-js';
 
@@ -5,7 +6,7 @@ export interface Auth {
     user: User;
     can: {
         create_services: boolean;
-    }
+    };
 }
 
 export interface BreadcrumbItem {
@@ -32,12 +33,6 @@ export interface SharedData {
     ziggy: Config & { location: string };
     sidebarOpen: boolean;
     [key: string]: unknown;
-}
-
-export enum UserRoles {
-    VESSEL_OWNER = 'vessel_owner',
-    SHIPPING_AGENCY = 'shipping_agency',
-    ADMIN = 'admin',
 }
 
 export interface User {

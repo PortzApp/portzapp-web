@@ -2,7 +2,7 @@ import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
-import { type NavItem, SharedData } from '@/types';
+import { type NavItem, SharedData } from '@/types/index';
 import { Link, usePage } from '@inertiajs/react';
 import { BookOpen, Folder, LayoutGrid, Package } from 'lucide-react';
 import AppLogo from './app-logo';
@@ -64,8 +64,7 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain
-                    items={currentRole === 'shipping_agency' ? mainNavItemsAsShippingAgencyRole : mainNavItemsAsAnyRole} />
+                <NavMain items={currentRole === 'shipping_agency' ? mainNavItemsAsShippingAgencyRole : mainNavItemsAsAnyRole} />
             </SidebarContent>
 
             <SidebarFooter>
