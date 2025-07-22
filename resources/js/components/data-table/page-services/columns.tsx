@@ -50,7 +50,7 @@ export const servicesPageColumns: ColumnDef<Service>[] = [
         header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
     },
     {
-        accessorKey: 'user.name',
+        accessorKey: 'user.first_name',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Created By" />,
     },
     {
