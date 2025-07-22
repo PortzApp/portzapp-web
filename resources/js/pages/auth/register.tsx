@@ -58,38 +58,40 @@ export default function Register() {
             <Head title="Register" />
             <form className="flex flex-col gap-6" onSubmit={submit}>
                 <div className="grid gap-6">
-                    <div className="grid gap-2">
-                        <Label htmlFor="name">First Name</Label>
-                        <Input
-                            id="first_name"
-                            type="text"
-                            required
-                            autoFocus
-                            tabIndex={1}
-                            autoComplete="given-name"
-                            value={data.first_name}
-                            onChange={(e) => setData('first_name', e.target.value)}
-                            disabled={processing}
-                            placeholder="First name"
-                        />
-                        <InputError message={errors.first_name} className="mt-2" />
-                    </div>
+                    <div className="flex gap-4">
+                        <div className="grid gap-2">
+                            <Label htmlFor="first_name">First name</Label>
+                            <Input
+                                id="first_name"
+                                type="text"
+                                required
+                                autoFocus
+                                tabIndex={1}
+                                autoComplete="given-name"
+                                value={data.first_name}
+                                onChange={(e) => setData('first_name', e.target.value)}
+                                disabled={processing}
+                                placeholder="First name"
+                            />
+                            <InputError message={errors.first_name} className="mt-2" />
+                        </div>
 
-                    <div className="grid gap-2">
-                        <Label htmlFor="name">Last Name</Label>
-                        <Input
-                            id="last_name"
-                            type="text"
-                            required
-                            autoFocus
-                            tabIndex={1}
-                            autoComplete="family-name"
-                            value={data.last_name}
-                            onChange={(e) => setData('last_name', e.target.value)}
-                            disabled={processing}
-                            placeholder="Last name"
-                        />
-                        <InputError message={errors.last_name} className="mt-2" />
+                        <div className="grid gap-2">
+                            <Label htmlFor="last_name">Last name</Label>
+                            <Input
+                                id="last_name"
+                                type="text"
+                                required
+                                autoFocus
+                                tabIndex={1}
+                                autoComplete="family-name"
+                                value={data.last_name}
+                                onChange={(e) => setData('last_name', e.target.value)}
+                                disabled={processing}
+                                placeholder="Last name"
+                            />
+                            <InputError message={errors.last_name} className="mt-2" />
+                        </div>
                     </div>
 
                     <div className="grid gap-2">
