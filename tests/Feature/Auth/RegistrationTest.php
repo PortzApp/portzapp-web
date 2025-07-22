@@ -11,6 +11,7 @@ test('new users can register', function (): void {
         'first_name' => 'Test First Name',
         'last_name' => 'Test Last Name',
         'email' => 'test@example.com',
+        'phone_number' => '+971 55 1234567',
         'company_name' => 'Test Company Name',
         'company_registration_code' => 'REG-TEST001',
         'password' => 'password',

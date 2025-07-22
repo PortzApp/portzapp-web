@@ -14,6 +14,7 @@ type RegisterForm = {
     first_name: string;
     last_name: string;
     email: string;
+    phone_number: string;
     company_name: string;
     company_registration_code: string;
     password: string;
@@ -32,6 +33,7 @@ export default function Register() {
         first_name: '',
         last_name: '',
         email: '',
+        phone_number: '',
         company_name: '',
         company_registration_code: '',
         password: '',
@@ -115,12 +117,28 @@ export default function Register() {
                     </div>
 
                     <div className="grid gap-2">
+                        <Label htmlFor="phone_number">Phone number</Label>
+                        <Input
+                            id="phone_number"
+                            type="tel"
+                            required
+                            tabIndex={4}
+                            autoComplete="tel"
+                            value={data.phone_number}
+                            onChange={(e) => setData('phone_number', e.target.value)}
+                            disabled={processing}
+                            placeholder="+971 55 123 4567"
+                        />
+                        <InputError message={errors.phone_number} />
+                    </div>
+
+                    <div className="grid gap-2">
                         <Label htmlFor="company_name">Company name</Label>
                         <Input
                             id="company_name"
                             type="text"
                             required
-                            tabIndex={4}
+                            tabIndex={5}
                             autoComplete="organization"
                             value={data.company_name}
                             onChange={(e) => setData('company_name', e.target.value)}
@@ -136,7 +154,7 @@ export default function Register() {
                             id="company_registration_code"
                             type="text"
                             required
-                            tabIndex={5}
+                            tabIndex={6}
                             value={data.company_registration_code}
                             onChange={(e) => setData('company_registration_code', e.target.value)}
                             disabled={processing}
@@ -151,7 +169,7 @@ export default function Register() {
                             id="password"
                             type="password"
                             required
-                            tabIndex={6}
+                            tabIndex={7}
                             autoComplete="new-password"
                             value={data.password}
                             onChange={(e) => setData('password', e.target.value)}
@@ -167,7 +185,7 @@ export default function Register() {
                             id="password_confirmation"
                             type="password"
                             required
-                            tabIndex={7}
+                            tabIndex={8}
                             autoComplete="new-password"
                             value={data.password_confirmation}
                             onChange={(e) => setData('password_confirmation', e.target.value)}
