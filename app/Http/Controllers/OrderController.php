@@ -6,6 +6,7 @@ use App\Http\Requests\StoreOrderRequest;
 use App\Http\Requests\UpdateOrderRequest;
 use App\Models\Order;
 use App\Models\Service;
+use Illuminate\Support\Facades\Gate;
 
 class OrderController extends Controller
 {
@@ -30,6 +31,8 @@ class OrderController extends Controller
      */
     public function store(StoreOrderRequest $request)
     {
+        Gate::authorize('create', Order::class);
+
         $validated = $request->validated();
 
         $service = Service::findOrFail($validated['service_id']);
