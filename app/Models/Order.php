@@ -20,7 +20,7 @@ class Order extends Model
         'vessel_owner_id',
         'price',
         'notes',
-        'status'
+        'status',
     ];
 
     public function service(): BelongsTo
