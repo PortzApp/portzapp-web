@@ -4,10 +4,10 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem, SharedData } from '@/types/index';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, Package } from 'lucide-react';
+import { ClipboardCheck, LayoutGrid, Package } from 'lucide-react';
 import AppLogo from './app-logo';
 
-const mainNavItemsAsAnyRole: NavItem[] = [
+const mainNavItemsAsAdmin: NavItem[] = [
     {
         title: 'Dashboard',
         href: '/dashboard',
@@ -17,6 +17,24 @@ const mainNavItemsAsAnyRole: NavItem[] = [
         title: 'Services',
         href: '/services',
         icon: Package,
+    },
+];
+
+const mainNavItemsAsVesselOwnerRole: NavItem[] = [
+    {
+        title: 'Dashboard',
+        href: '/dashboard',
+        icon: LayoutGrid,
+    },
+    {
+        title: 'Services',
+        href: '/services',
+        icon: Package,
+    },
+    {
+        title: 'Orders',
+        href: '/orders',
+        icon: ClipboardCheck,
     },
 ];
 
@@ -34,16 +52,16 @@ const mainNavItemsAsShippingAgencyRole: NavItem[] = [
 ];
 
 const footerNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: Folder,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
-        icon: BookOpen,
-    },
+    // {
+    //     title: 'Repository',
+    //     href: 'https://github.com/laravel/react-starter-kit',
+    //     icon: Folder,
+    // },
+    // {
+    //     title: 'Documentation',
+    //     href: 'https://laravel.com/docs/starter-kits#react',
+    //     icon: BookOpen,
+    // },
 ];
 
 export function AppSidebar() {
@@ -64,7 +82,9 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={currentRole === 'shipping_agency' ? mainNavItemsAsShippingAgencyRole : mainNavItemsAsAnyRole} />
+                <NavMain items={currentRole === 'admin' ? mainNavItemsAsAdmin :
+                    currentRole === 'vessel_owner' ?
+                        mainNavItemsAsVesselOwnerRole : mainNavItemsAsShippingAgencyRole} />
             </SidebarContent>
 
             <SidebarFooter>
