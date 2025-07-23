@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateOrderRequest;
 use App\Models\Order;
 use App\Models\Service;
 use Illuminate\Support\Facades\Gate;
+use Inertia\Inertia;
 
 class OrderController extends Controller
 {
@@ -15,7 +16,12 @@ class OrderController extends Controller
      */
     public function index()
     {
-        //
+        return Inertia::render('orders', [
+            'orders' => Order::with(['service.user.organization'])
+                ->where('vessel_owner_id', auth()->id())
+                ->latest()
+                ->get(),
+        ]);
     }
 
     /**
