@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ServiceController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -17,6 +18,11 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::post('services', [ServiceController::class, 'store'])->name('services.store');
     Route::put('services/{service}', [ServiceController::class, 'update'])->name('services.update');
     Route::delete('services/{service}', [ServiceController::class, 'destroy'])->name('services.destroy');
+
+    Route::get('orders', [OrderController::class, 'index'])->name('orders');
+    Route::post('orders', [OrderController::class, 'store'])->name('orders.store');
+    Route::put('orders/{order}', [OrderController::class, 'update'])->name('orders.update');
+    Route::delete('orders/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
 });
 
 require __DIR__.'/settings.php';
