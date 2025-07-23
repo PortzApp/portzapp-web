@@ -119,3 +119,15 @@ This will run:
 - Spellcheck (Peck)
 - Types (PHPStan w/ LaraStan)
 - Refactoring (Rector)
+
+### Running Mailpit for testing emails locally
+
+```bash
+docker-compose up -d mailpit
+```
+
+Then, head to [http://localhost:8025](http://localhost:8025) to view the emails sent by the web app.
+
+For testing purposes, create a new account to send verification emails, which can be viewed within Mailpit.
+
+If emails aren't being sent, check if `MAIL_` related `.env` variables are set correctly according to the `.env.example` file.
