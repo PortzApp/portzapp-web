@@ -3,7 +3,7 @@ import { DataTableColumnHeader } from '@/components/data-table/primitives/data-t
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
-import { Order, OrderWithServiceUserOrganization } from '@/types/core';
+import { Order, OrderWithFullRelations } from '@/types/core';
 import { ColumnDef } from '@tanstack/react-table';
 
 export const ordersPageColumnsAsVesselOwnerRole: ColumnDef<Order>[] = [
@@ -132,7 +132,7 @@ export const ordersPageColumnsAsShippingAgencyRole: ColumnDef<Order>[] = [
         accessorKey: `vessel_owner_id`,
         header: ({ column }) => <DataTableColumnHeader column={column} title="Customer" />,
         cell: ({ row }) => {
-            const order = row.original as OrderWithServiceUserOrganization;
+            const order = row.original as OrderWithFullRelations;
 
             return (
                 <div>

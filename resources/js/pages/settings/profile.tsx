@@ -1,4 +1,4 @@
-import { type SharedData } from '@/types/core';
+import type { BreadcrumbItem, SharedData } from '@/types';
 import { Transition } from '@headlessui/react';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
