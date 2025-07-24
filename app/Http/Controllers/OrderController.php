@@ -81,7 +81,11 @@ class OrderController extends Controller
      */
     public function update(UpdateOrderRequest $request, Order $order)
     {
-        //
+        $validated = $request->validated();
+
+        $order->update($validated);
+
+        return back()->with('message', 'Order updated successfully!');
     }
 
     /**
