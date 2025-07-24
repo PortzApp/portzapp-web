@@ -59,7 +59,13 @@ class OrderController extends Controller
      */
     public function show(Order $order)
     {
-        //
+        Gate::authorize('view', $order);
+
+        $order->load(['service.user.organization']);
+
+        return Inertia::render('order-detail', [
+            'order' => $order,
+        ]);
     }
 
     /**
