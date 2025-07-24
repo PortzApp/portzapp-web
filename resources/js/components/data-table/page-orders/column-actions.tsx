@@ -8,14 +8,43 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-import { Link } from '@inertiajs/react';
-import { Eye, MoreHorizontal } from 'lucide-react';
+import { Link, router } from '@inertiajs/react';
+import { Ban, Eye, MoreHorizontal } from 'lucide-react';
 import { useState } from 'react';
 
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog';
 import { Order } from '@/types/order';
+import { toast } from 'sonner';
 
 export function OrdersPageColumnActions({ order }: { order: Order }) {
     const [openDropdown, setOpenDropdown] = useState(false);
+    const [openCancelOrderDialog, setOpenCancelOrderDialog] = useState(false);
+
+    function handleCancelOrder() {
+        setOpenCancelOrderDialog(false);
+        setOpenDropdown(false);
+
+        router.put(
+            route('orders.update', order.id),
+            {
+                status: 'cancelled',
+            },
+            {
+                onSuccess: () => {
+                    toast(`Order #${order.id} cancelled successfully!`);
+                },
+            },
+        );
+    }
 
     return (
         <DropdownMenu open={openDropdown} onOpenChange={setOpenDropdown}>
@@ -36,6 +65,31 @@ export function OrdersPageColumnActions({ order }: { order: Order }) {
                         View details
                     </Link>
                 </DropdownMenuItem>
+
+                <Dialog open={openCancelOrderDialog} onOpenChange={setOpenCancelOrderDialog}>
+                    <DialogTrigger asChild>
+                        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                            <Ban />
+                            Cancel order
+                        </DropdownMenuItem>
+                    </DialogTrigger>
+
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Cancel order</DialogTitle>
+                            <DialogDescription>Are you sure you want to cancel this order?</DialogDescription>
+                        </DialogHeader>
+
+                        <DialogFooter>
+                            <DialogClose asChild>
+                                <Button variant="outline">Cancel</Button>
+                            </DialogClose>
+                            <Button type="submit" onClick={handleCancelOrder}>
+                                Cancel order
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
             </DropdownMenuContent>
         </DropdownMenu>
     );
