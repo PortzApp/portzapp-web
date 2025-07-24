@@ -14,16 +14,16 @@ class ServiceSeeder extends Seeder
     public function run(): void
     {
         // Create 2 test users
-        $user1 = User::factory()->create([
-            'first_name' => 'John',
-            'last_name' => 'Doe',
-            'email' => 'john.doe@example.com',
+        $user1 = User::factory()->isVesselOwner()->create([
+            'first_name' => 'Vessel',
+            'last_name' => 'Owner',
+            'email' => 'owner@test.com',
         ]);
 
-        $user2 = User::factory()->create([
-            'first_name' => 'Jane',
-            'last_name' => 'Doe',
-            'email' => 'jane.doe@example.com',
+        $user2 = User::factory()->isShippingAgency()->create([
+            'first_name' => 'Shipping',
+            'last_name' => 'Agency',
+            'email' => 'agency@test.com',
         ]);
 
         // Create 10 services for user 1
