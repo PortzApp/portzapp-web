@@ -27,4 +27,9 @@ class Order extends Model
     {
         return $this->belongsTo(Service::class);
     }
+
+    public function vesselOwner(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'vessel_owner_id');
+    }
 }
