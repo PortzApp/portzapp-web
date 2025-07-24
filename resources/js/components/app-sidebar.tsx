@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem, SharedData } from '@/types/index';
 import { Link, usePage } from '@inertiajs/react';
-import { ClipboardCheck, LayoutGrid, Package } from 'lucide-react';
+import { ClipboardCheck, LayoutGrid, ListCheck, Package } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItemsAsAdmin: NavItem[] = [
@@ -49,6 +49,11 @@ const mainNavItemsAsShippingAgencyRole: NavItem[] = [
         href: '/services',
         icon: Package,
     },
+    {
+        title: 'Order Requests',
+        href: '/orders',
+        icon: ListCheck,
+    },
 ];
 
 const footerNavItems: NavItem[] = [
@@ -82,9 +87,15 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={currentRole === 'admin' ? mainNavItemsAsAdmin :
-                    currentRole === 'vessel_owner' ?
-                        mainNavItemsAsVesselOwnerRole : mainNavItemsAsShippingAgencyRole} />
+                <NavMain
+                    items={
+                        currentRole === 'admin'
+                            ? mainNavItemsAsAdmin
+                            : currentRole === 'vessel_owner'
+                              ? mainNavItemsAsVesselOwnerRole
+                              : mainNavItemsAsShippingAgencyRole
+                    }
+                />
             </SidebarContent>
 
             <SidebarFooter>

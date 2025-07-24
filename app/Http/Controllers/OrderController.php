@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserRoles;
 use App\Http\Requests\StoreOrderRequest;
 use App\Http\Requests\UpdateOrderRequest;
 use App\Models\Order;
@@ -16,20 +17,26 @@ class OrderController extends Controller
      */
     public function index()
     {
-        return Inertia::render('orders', [
-            'orders' => Order::with(['service.user.organization'])
-                ->where('vessel_owner_id', auth()->id())
-                ->latest()
-                ->get(),
+        $query = Order::with([
+            'service.user.organization',
+            'vesselOwner.organization.members',
         ]);
-    }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        if (auth()->user()->role === UserRoles::VESSEL_OWNER) {
+            $query->where('vessel_owner_id', auth()->id());
+        }
+
+        if (auth()->user()->role === UserRoles::SHIPPING_AGENCY) {
+            $query->whereHas('service', function ($q): void {
+                $q->where('user_id', auth()->id());
+            });
+        }
+
+        $orders = $query->latest()->get();
+
+        return Inertia::render('orders', [
+            'orders' => $orders,
+        ]);
     }
 
     /**
@@ -52,6 +59,14 @@ class OrderController extends Controller
         ]);
 
         return back()->with('message', 'Order placed successfully');
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        //
     }
 
     /**
