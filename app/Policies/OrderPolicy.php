@@ -37,7 +37,7 @@ class OrderPolicy
      */
     public function update(User $user, Order $order): bool
     {
-        return false;
+        return ($user->role === UserRoles::VESSEL_OWNER && $order->vessel_owner_id === $user->id) || $user->role === UserRoles::ADMIN;
     }
 
     /**
