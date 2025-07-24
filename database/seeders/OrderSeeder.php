@@ -37,6 +37,6 @@ class OrderSeeder extends Seeder
         });
 
         $total_orders = $vessel_owners->count() * $MAX_ORDER_COUNT_PER_VESSEL_OWNER;
-        $this->command->info("Created {$total_orders} orders for {$vessel_owners->count()}");
+        $this->command->info("Created $total_orders orders for {$vessel_owners->count()}");
     }
 }
