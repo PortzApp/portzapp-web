@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import AuthLayout from '@/layouts/auth-layout';
-import { UserRoles } from '@/types/user-roles';
+import { UserRoles } from '@/types/core';
 
 type RegisterForm = {
     first_name: string;

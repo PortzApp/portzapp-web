@@ -3,7 +3,7 @@ import { DataTableColumnHeader } from '@/components/data-table/primitives/data-t
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
-import { Order, OrderWithServiceUserOrganization } from '@/types/order';
+import { Order, OrderWithServiceUserOrganization } from '@/types/core';
 import { ColumnDef } from '@tanstack/react-table';
 
 export const ordersPageColumnsAsVesselOwnerRole: ColumnDef<Order>[] = [

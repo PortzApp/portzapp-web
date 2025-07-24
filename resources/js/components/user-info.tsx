@@ -1,5 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { type User } from '@/types';
+import { type User } from '@/types/core';
 
 export function UserInfo({ user, showEmail = false }: { user: User; showEmail?: boolean }) {
     return (

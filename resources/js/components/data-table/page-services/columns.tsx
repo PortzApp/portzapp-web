@@ -1,5 +1,5 @@
 import { Checkbox } from '@/components/ui/checkbox';
-import { Service } from '@/types/service';
+import { Service } from '@/types/core';
 import { ColumnDef } from '@tanstack/react-table';
 import { DataTableColumnHeader } from '../primitives/data-table-column-header';
 import { ServicesPageColumnActions } from './column-actions';

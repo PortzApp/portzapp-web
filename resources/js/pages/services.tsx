@@ -16,9 +16,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
-import { Service } from '@/types/service';
-import { ServiceForm } from '@/types/service-form';
+import type { BreadcrumbItem } from '@/types';
+import { Service } from '@/types/core';
 import { Head, useForm } from '@inertiajs/react';
 import { LoaderCircle, Plus } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
@@ -29,6 +28,13 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: '/services',
     },
 ];
+
+export type ServiceForm = {
+    name: string;
+    description: string;
+    price: string;
+    status: 'active' | 'inactive';
+};
 
 export default function Services({ services }: { services: Service[] }) {
     const [open, setOpen] = useState(false);

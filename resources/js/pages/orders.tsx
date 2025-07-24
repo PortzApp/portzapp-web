@@ -2,7 +2,7 @@ import { ordersPageColumnsAsShippingAgencyRole, ordersPageColumnsAsVesselOwnerRo
 import { OrdersPageDataTable } from '@/components/data-table/page-orders/data-table';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, SharedData } from '@/types';
-import { Order } from '@/types/order';
+import { Order } from '@/types/core';
 import { Head, usePage } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [
