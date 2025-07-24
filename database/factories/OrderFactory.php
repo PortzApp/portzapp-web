@@ -3,8 +3,6 @@
 namespace Database\Factories;
 
 use App\Models\Order;
-use App\Models\Service;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -20,10 +18,20 @@ class OrderFactory extends Factory
     public function definition(): array
     {
         return [
-            'service_id' => Service::factory(),
-            //            'vessel_owner_id' => User::factory()->isVesselOwner(),
-            'price' => fake()->randomFloat(2, 500, 50000),
-            'status' => fake()->randomElement(['pending', 'accepted', 'in_progress', 'completed', 'cancelled']),
+            'notes' => fake()->optional(0.7)->sentence(),
+            'status' => fake()->randomElement([
+                'pending',      // 30%
+                'pending',
+                'pending',
+                'accepted',     // 20%
+                'accepted',
+                'in_progress',  // 20%
+                'in_progress',
+                'completed',    // 20%
+                'completed',
+                'cancelled',     // 10%
+            ]),
+            'created_at' => fake()->dateTimeBetween('-1 month', 'now'),
         ];
     }
 }
