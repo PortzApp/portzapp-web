@@ -22,7 +22,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
-import { Order } from '@/types/order';
+import { Order } from '@/types/core';
 import { toast } from 'sonner';
 
 export function OrdersPageColumnActions({ order }: { order: Order }) {

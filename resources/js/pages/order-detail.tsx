@@ -1,31 +1,39 @@
-import { Order, OrderWithServiceUserOrganization } from '@/types/order';
-import { Head } from '@inertiajs/react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem } from '@/types';
+import { BreadcrumbItem } from '@/types';
+import { OrderWithFullRelations } from '@/types/core';
+import { Head } from '@inertiajs/react';
 
-export default function OrderDetail({ order }: { order: OrderWithServiceUserOrganization }) {
+export default function OrderDetail({ order }: { order: OrderWithFullRelations }) {
+    console.log(order);
+
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Orders',
-            href: '/orders'
+            href: '/orders',
         },
         {
             title: `Order ${order.id}`,
-            href: `/orders/${order.id}`
-        }
+            href: `/orders/${order.id}`,
+        },
     ];
 
     const getStatusVariant = (status: string) => {
         switch (status) {
-            case 'pending': return 'secondary';
-            case 'accepted': return 'default';
-            case 'in_progress': return 'outline';
-            case 'completed': return 'default';
-            case 'cancelled': return 'destructive';
-            default: return 'secondary';
+            case 'pending':
+                return 'secondary';
+            case 'accepted':
+                return 'default';
+            case 'in_progress':
+                return 'outline';
+            case 'completed':
+                return 'default';
+            case 'cancelled':
+                return 'destructive';
+            default:
+                return 'secondary';
         }
     };
 
@@ -35,7 +43,7 @@ export default function OrderDetail({ order }: { order: OrderWithServiceUserOrga
             month: 'long',
             day: 'numeric',
             hour: '2-digit',
-            minute: '2-digit'
+            minute: '2-digit',
         });
     };
 
@@ -43,13 +51,11 @@ export default function OrderDetail({ order }: { order: OrderWithServiceUserOrga
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Order #${order.id}`} />
 
-            <div className="container mx-auto py-8 px-4 max-w-4xl">
+            <div className="container mx-auto max-w-4xl px-4 py-8">
                 {/* Header */}
                 <div className="mb-6 flex items-center justify-between">
                     <h1 className="text-3xl font-bold">Order #{order.id}</h1>
-                    <Badge variant={getStatusVariant(order.status)}>
-                        {order.status.toUpperCase()}
-                    </Badge>
+                    <Badge variant={getStatusVariant(order.status)}>{order.status.toUpperCase()}</Badge>
                 </div>
 
                 {/* Order Summary Card */}
@@ -59,7 +65,7 @@ export default function OrderDetail({ order }: { order: OrderWithServiceUserOrga
                         <CardDescription>Placed on {formatDate(order.created_at)}</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                             <div>
                                 <p className="text-sm text-muted-foreground">Total Price</p>
                                 <p className="text-2xl font-bold">${order.price.toFixed(2)}</p>
@@ -71,7 +77,7 @@ export default function OrderDetail({ order }: { order: OrderWithServiceUserOrga
                         </div>
                         {order.notes && (
                             <div className="mt-4">
-                                <p className="text-sm text-muted-foreground mb-1">Notes</p>
+                                <p className="mb-1 text-sm text-muted-foreground">Notes</p>
                                 <p className="text-sm">{order.notes}</p>
                             </div>
                         )}
@@ -85,8 +91,8 @@ export default function OrderDetail({ order }: { order: OrderWithServiceUserOrga
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div>
-                            <h3 className="font-semibold text-lg">{order.service.name}</h3>
-                            <p className="text-sm text-muted-foreground mt-1">{order.service.description}</p>
+                            <h3 className="text-lg font-semibold">{order.service.name}</h3>
+                            <p className="mt-1 text-sm text-muted-foreground">{order.service.description}</p>
                         </div>
                         <Separator />
                         <div className="grid grid-cols-2 gap-4 text-sm">
@@ -96,9 +102,7 @@ export default function OrderDetail({ order }: { order: OrderWithServiceUserOrga
                             </div>
                             <div>
                                 <p className="text-muted-foreground">Service Status</p>
-                                <Badge variant={order.service.status === 'active' ? 'default' : 'secondary'}>
-                                    {order.service.status}
-                                </Badge>
+                                <Badge variant={order.service.status === 'active' ? 'default' : 'secondary'}>{order.service.status}</Badge>
                             </div>
                         </div>
                     </CardContent>
@@ -113,11 +117,13 @@ export default function OrderDetail({ order }: { order: OrderWithServiceUserOrga
                         <div className="space-y-4">
                             {/* Contact Person */}
                             <div>
-                                <h4 className="font-semibold mb-2">Contact Person</h4>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                                <h4 className="mb-2 font-semibold">Contact Person</h4>
+                                <div className="grid grid-cols-1 gap-2 text-sm md:grid-cols-2">
                                     <div>
                                         <p className="text-muted-foreground">Name</p>
-                                        <p>{order.service.user.first_name} {order.service.user.last_name}</p>
+                                        <p>
+                                            {order.service.user.first_name} {order.service.user.last_name}
+                                        </p>
                                     </div>
                                     <div>
                                         <p className="text-muted-foreground">Email</p>
@@ -138,8 +144,8 @@ export default function OrderDetail({ order }: { order: OrderWithServiceUserOrga
 
                             {/* Organization */}
                             <div>
-                                <h4 className="font-semibold mb-2">Organization</h4>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                                <h4 className="mb-2 font-semibold">Organization</h4>
+                                <div className="grid grid-cols-1 gap-2 text-sm md:grid-cols-2">
                                     <div>
                                         <p className="text-muted-foreground">Company Name</p>
                                         <p>{order.service.user.organization.name}</p>

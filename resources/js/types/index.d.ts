@@ -1,7 +1,6 @@
 import { UserRoles } from '@/types/user-roles';
 import { LucideIcon } from 'lucide-react';
 import type { Config } from 'ziggy-js';
-import { Organization } from '@/types/organization';
 
 export interface Auth {
     user: User;
@@ -48,18 +47,4 @@ export interface User {
     created_at: string;
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
-}
-
-export interface UserWithOrganization {
-    id: number;
-    first_name: string;
-    last_name: string;
-    email: string;
-    phone_number: string;
-    avatar?: string;
-    email_verified_at: string | null;
-    role: UserRoles;
-    created_at: string;
-    updated_at: string;
-    organization: Organization;
 }

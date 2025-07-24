@@ -1,4 +1,4 @@
-import { Service } from '@/types/service';
+import { Service } from '@/types/core';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -20,8 +20,6 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-import { OrderForm } from '@/types/order-form';
-import { ServiceForm } from '@/types/service-form';
 import { router, useForm } from '@inertiajs/react';
 import { LoaderCircle, MoreHorizontal, Pencil, ShoppingCart, Trash2 } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
@@ -30,6 +28,18 @@ import InputError from '../../input-error';
 import { Input } from '../../ui/input';
 import { Label } from '../../ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
+
+type OrderForm = {
+    service_id: number;
+    notes?: string;
+};
+
+type ServiceForm = {
+    name: string;
+    description: string;
+    price: string;
+    status: 'active' | 'inactive';
+};
 
 export function ServicesPageColumnActions({ service }: { service: Service }) {
     const [openDropdown, setOpenDropdown] = useState(false);
@@ -78,16 +88,13 @@ export function ServicesPageColumnActions({ service }: { service: Service }) {
     const handleCreateOrder: FormEventHandler = (e) => {
         e.preventDefault();
 
-        orderForm.post(
-            route('orders.store'),
-            {
-                onSuccess: () => {
-                    orderForm.reset();
-                    setOpenDropdown(false);
-                    toast('Order placed successfully!');
-                },
+        orderForm.post(route('orders.store'), {
+            onSuccess: () => {
+                orderForm.reset();
+                setOpenDropdown(false);
+                toast('Order placed successfully!');
             },
-        );
+        });
     };
 
     return (
