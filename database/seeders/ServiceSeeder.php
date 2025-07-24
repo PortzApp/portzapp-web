@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\UserRoles;
 use App\Models\Service;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -13,29 +14,19 @@ class ServiceSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create 2 test users
-        $user1 = User::factory()->isVesselOwner()->create([
-            'first_name' => 'Vessel',
-            'last_name' => 'Owner',
-            'email' => 'owner@test.com',
-        ]);
+        // Get all 2 users with shipping agency role
+        $agencies = User::where('role', UserRoles::SHIPPING_AGENCY)->get();
 
-        $user2 = User::factory()->isShippingAgency()->create([
-            'first_name' => 'Shipping',
-            'last_name' => 'Agency',
-            'email' => 'agency@test.com',
-        ]);
+        // Create 10 services for each agency (20 total services)
+        $agencies->each(function ($agency) {
+            Service::factory()
+                ->count(10)
+                ->create([
+                    'user_id' => $agency->id,
+                ]);
+        });
 
-        // Create 10 services for user 1
-        Service::factory(10)->create([
-            'user_id' => $user1->id,
-        ]);
-
-        // Create 10 services for user 2
-        Service::factory(10)->create([
-            'user_id' => $user2->id,
-        ]);
-
-        $this->command->info('Created 2 users and 20 services (10 per user)');
+        $totalServices = $agencies->count() * 10;
+        $this->command->info("Created {$totalServices} services for {$agencies->count()}");
     }
 }

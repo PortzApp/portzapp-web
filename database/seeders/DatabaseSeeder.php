@@ -14,7 +14,9 @@ class DatabaseSeeder extends Seeder
     {
         // Call the ServiceSeeder which creates users and services
         $this->call([
+            UserSeeder::class,
             ServiceSeeder::class,
+            OrderSeeder::class,
         ]);
     }
 }
