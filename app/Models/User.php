@@ -17,22 +17,6 @@ class User extends Authenticatable implements MustVerifyEmail
     use HasFactory, Notifiable;
 
     /**
-     * Get the services for the current user.
-     */
-    public function services(): HasMany
-    {
-        return $this->hasMany(Service::class);
-    }
-
-    /**
-     * Get the organization for the current user.
-     */
-    public function organization(): BelongsTo
-    {
-        return $this->belongsTo(Organization::class);
-    }
-
-    /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
@@ -46,7 +30,6 @@ class User extends Authenticatable implements MustVerifyEmail
         'role',
         'organization_id',
     ];
-
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -58,17 +41,27 @@ class User extends Authenticatable implements MustVerifyEmail
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
+     * Get the services for the current user.
      */
-    protected function casts(): array
+    public function services(): HasMany
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-            'role' => UserRoles::class,
-        ];
+        return $this->hasMany(Service::class);
+    }
+
+    /**
+     * Get the vessels for the current user.
+     */
+    public function vessels(): HasMany
+    {
+        return $this->hasMany(Vessel::class);
+    }
+
+    /**
+     * Get the organization for the current user.
+     */
+    public function organization(): BelongsTo
+    {
+        return $this->belongsTo(Organization::class);
     }
 
     /**
@@ -93,5 +86,19 @@ class User extends Authenticatable implements MustVerifyEmail
     public function isAdmin(): bool
     {
         return $this->role === UserRoles::ADMIN;
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+            'role' => UserRoles::class,
+        ];
     }
 }

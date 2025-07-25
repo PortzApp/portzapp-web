@@ -7,6 +7,7 @@ use App\Enums\VesselType;
 use Database\Factories\VesselFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @method static create(string[] $array)
@@ -23,6 +24,14 @@ class Vessel extends Model
         'status',
         'vessel_type',
     ];
+
+    /**
+     * Get the user that owns the vessel.
+     */
+    public function owner(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 
     /**
      * Get the attributes that should be cast.
