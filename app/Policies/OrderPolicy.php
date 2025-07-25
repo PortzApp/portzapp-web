@@ -21,7 +21,7 @@ class OrderPolicy
      */
     public function view(User $user, Order $order): bool
     {
-        return ($user->role === UserRoles::VESSEL_OWNER && $order->vessel_owner_id === $user->id) || $user->role === UserRoles::ADMIN;
+        return $user->role === UserRoles::VESSEL_OWNER || $user->role === UserRoles::ADMIN;
     }
 
     /**
