@@ -51,6 +51,17 @@ export interface Vessel extends BaseModel {
     status: 'active' | 'inactive' | 'maintenance';
 }
 
+export interface Port extends BaseModel {
+    name: string;
+    code: string;
+    status: string;
+    country: string;
+    city: string;
+    latitude: number;
+    longitude: number;
+    timezone: string;
+}
+
 // Generic type for adding relationships
 export type WithRelation<T, K extends string, R> = T & Record<K, R>;
 
