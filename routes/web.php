@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\VesselController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -24,7 +25,13 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::post('orders', [OrderController::class, 'store'])->name('orders.store');
     Route::put('orders/{order}', [OrderController::class, 'update'])->name('orders.update');
     Route::delete('orders/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
+
+    Route::get('vessels', [VesselController::class, 'index'])->name('vessels');
+    Route::get('vessels/{vessel}', [VesselController::class, 'show'])->name('vessels.show');
+    Route::post('vessels', [VesselController::class, 'store'])->name('vessels.store');
+    Route::put('vessels/{vessel}', [VesselController::class, 'update'])->name('vessels.update');
+    Route::delete('vessels/{vessel}', [VesselController::class, 'destroy'])->name('vessels.destroy');
 });
 
-require __DIR__.'/settings.php';
-require __DIR__.'/auth.php';
+require __DIR__ . '/settings.php';
+require __DIR__ . '/auth.php';
