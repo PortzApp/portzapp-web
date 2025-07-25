@@ -2,9 +2,9 @@
 
 namespace App\Policies;
 
+use App\Enums\UserRoles;
 use App\Models\Port;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class PortPolicy
 {
@@ -13,7 +13,7 @@ class PortPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return $user->role === UserRoles::ADMIN;
     }
 
     /**
