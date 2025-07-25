@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\PortController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\VesselController;
 use Illuminate\Support\Facades\Route;
@@ -31,6 +32,12 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::post('vessels', [VesselController::class, 'store'])->name('vessels.store');
     Route::put('vessels/{vessel}', [VesselController::class, 'update'])->name('vessels.update');
     Route::delete('vessels/{vessel}', [VesselController::class, 'destroy'])->name('vessels.destroy');
+
+    Route::get('ports', [PortController::class, 'index'])->name('ports');
+    Route::get('ports/{port}', [PortController::class, 'show'])->name('ports.show');
+    Route::post('ports', [PortController::class, 'store'])->name('ports.store');
+    Route::put('ports/{port}', [PortController::class, 'update'])->name('ports.update');
+    Route::delete('ports/{vessel}', [PortController::class, 'destroy'])->name('ports.destroy');
 });
 
 require __DIR__ . '/settings.php';

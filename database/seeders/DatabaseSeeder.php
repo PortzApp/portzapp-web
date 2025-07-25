@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             VesselSeeder::class,
             ServiceSeeder::class,
             OrderSeeder::class,
+            PortSeeder::class,
         ]);
     }
 }
