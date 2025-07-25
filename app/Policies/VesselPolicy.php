@@ -2,9 +2,9 @@
 
 namespace App\Policies;
 
+use App\Enums\UserRoles;
 use App\Models\User;
 use App\Models\Vessel;
-use Illuminate\Auth\Access\Response;
 
 class VesselPolicy
 {
@@ -13,7 +13,7 @@ class VesselPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return $user->role === UserRoles::VESSEL_OWNER || $user->role === UserRoles::ADMIN;
     }
 
     /**
