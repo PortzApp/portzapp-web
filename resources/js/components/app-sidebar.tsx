@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import type { NavItem, SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { ClipboardCheck, LayoutGrid, ListCheck, Package } from 'lucide-react';
+import { ClipboardCheck, LayoutGrid, ListCheck, Package, Ship } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItemsAsAdmin: NavItem[] = [
@@ -35,6 +35,11 @@ const mainNavItemsAsVesselOwnerRole: NavItem[] = [
         title: 'Orders',
         href: '/orders',
         icon: ClipboardCheck,
+    },
+    {
+        title: 'Vessels',
+        href: '/vessels',
+        icon: Ship,
     },
 ];
 
