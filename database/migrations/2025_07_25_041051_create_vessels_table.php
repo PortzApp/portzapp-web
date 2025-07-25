@@ -12,6 +12,14 @@ return new class extends Migration {
     {
         Schema::create('vessels', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('owner_id')->constrained(
+                table: 'users',
+                column: 'id',
+            )->onUpdate('cascade')->onDelete('cascade');
+            $table->string('name');
+            $table->string('imo_number', 7)->unique();
+            $table->string('vessel_type', 50);
+            $table->string('status', 50);
             $table->timestamps();
         });
     }
