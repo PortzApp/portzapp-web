@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreVesselRequest;
 use App\Http\Requests\UpdateVesselRequest;
 use App\Models\Vessel;
+use Illuminate\Support\Facades\Gate;
+use Inertia\Inertia;
 
 class VesselController extends Controller
 {
@@ -13,21 +15,35 @@ class VesselController extends Controller
      */
     public function index()
     {
-        //
-    }
+        Gate::authorize('view-any', Vessel::class);
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        return Inertia::render('vessels', [
+            'vessels' => Vessel::query()->latest()->get(),
+        ]);
     }
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(StoreVesselRequest $request)
+    {
+        $validated = $request->validated();
+
+        Vessel::create([
+            'name' => $validated['name'],
+            'owner_id' => auth()->id(),
+            'imo_number' => $validated['imo_number'],
+            'vessel_type' => $validated['vessel_type'],
+            'status' => $validated['status'],
+        ]);
+
+        return back()->with('message', 'Vessel created successfully!');
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
     {
         //
     }
