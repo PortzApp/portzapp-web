@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Port;
 use Illuminate\Database\Seeder;
 
 class PortSeeder extends Seeder
@@ -12,6 +12,6 @@ class PortSeeder extends Seeder
      */
     public function run(): void
     {
-        //
+        Port::factory(10)->create();
     }
 }
