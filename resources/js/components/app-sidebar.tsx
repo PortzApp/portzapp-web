@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import type { NavItem, SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { ClipboardCheck, LayoutGrid, ListCheck, Package, Ship } from 'lucide-react';
+import { ClipboardCheck, LayoutGrid, ListCheck, MapPin, Package, Ship } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItemsAsAdmin: NavItem[] = [
@@ -17,6 +17,11 @@ const mainNavItemsAsAdmin: NavItem[] = [
         title: 'Services',
         href: '/services',
         icon: Package,
+    },
+    {
+        title: 'Ports',
+        href: '/ports',
+        icon: MapPin,
     },
 ];
 
