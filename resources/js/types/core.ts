@@ -43,6 +43,14 @@ export interface Order extends BaseModel {
     status: 'pending' | 'accepted' | 'in_progress' | 'completed' | 'cancelled';
 }
 
+export interface Vessel extends BaseModel {
+    owner_id: number;
+    name: string;
+    imo_number: string;
+    vessel_type: 'cargo' | 'tanker' | 'container';
+    status: 'active' | 'inactive' | 'maintenance';
+}
+
 // Generic type for adding relationships
 export type WithRelation<T, K extends string, R> = T & Record<K, R>;
 
