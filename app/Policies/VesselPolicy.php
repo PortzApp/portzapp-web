@@ -3,25 +3,25 @@
 namespace App\Policies;
 
 use App\Enums\UserRoles;
-use App\Models\Order;
 use App\Models\User;
+use App\Models\Vessel;
 
-class OrderPolicy
+class VesselPolicy
 {
     /**
      * Determine whether the user can view any models.
      */
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->role === UserRoles::VESSEL_OWNER || $user->role === UserRoles::ADMIN;
     }
 
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Order $order): bool
+    public function view(User $user, Vessel $vessel): bool
     {
-        return $user->role === UserRoles::VESSEL_OWNER || $user->role === UserRoles::ADMIN;
+        return false;
     }
 
     /**
@@ -29,21 +29,21 @@ class OrderPolicy
      */
     public function create(User $user): bool
     {
-        return $user->role === UserRoles::VESSEL_OWNER || $user->role === UserRoles::ADMIN;
+        return false;
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Order $order): bool
+    public function update(User $user, Vessel $vessel): bool
     {
-        return ($user->role === UserRoles::VESSEL_OWNER && $order->vessel_owner_id === $user->id) || $user->role === UserRoles::ADMIN;
+        return false;
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Order $order): bool
+    public function delete(User $user, Vessel $vessel): bool
     {
         return false;
     }
@@ -51,7 +51,7 @@ class OrderPolicy
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, Order $order): bool
+    public function restore(User $user, Vessel $vessel): bool
     {
         return false;
     }
@@ -59,7 +59,7 @@ class OrderPolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, Order $order): bool
+    public function forceDelete(User $user, Vessel $vessel): bool
     {
         return false;
     }
