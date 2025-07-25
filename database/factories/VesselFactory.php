@@ -17,7 +17,25 @@ class VesselFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'name' => fake()->name(),
+            'imo_number' => fake()->unique()->randomNumber(7, true),
+            'vessel_type' => fake()->randomElement([
+                'cargo',
+                'tanker',
+                'container',
+            ]),
+            'status' => fake()->randomElement([
+                'active',
+                'active',
+                'active',
+                'active',
+                'active',
+                'active',
+                'active',
+                'active',
+                'inactive',
+                'maintenance',
+            ]),
         ];
     }
 }
