@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StorePortRequest;
 use App\Http\Requests\UpdatePortRequest;
 use App\Models\Port;
+use Illuminate\Support\Facades\Gate;
+use Inertia\Inertia;
 
 class PortController extends Controller
 {
@@ -13,21 +15,29 @@ class PortController extends Controller
      */
     public function index()
     {
-        //
-    }
+        Gate::authorize('view-any', Port::class);
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        $ports = Port::query()->latest()->get();
+
+        return Inertia::render('ports', [
+            'ports' => $ports,
+        ]);
     }
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(StorePortRequest $request)
+    {
+        $port = Port::create($request->validated());
+
+        return back()->with('message', 'Port created successfully');
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
     {
         //
     }
