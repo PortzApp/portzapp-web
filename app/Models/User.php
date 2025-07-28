@@ -6,7 +6,7 @@ use App\Enums\UserRoles;
 use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -27,9 +27,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'email',
         'phone_number',
         'password',
-        'role',
-        'organization_id',
     ];
+    
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -59,9 +58,9 @@ class User extends Authenticatable implements MustVerifyEmail
     /**
      * Get the organization for the current user.
      */
-    public function organization(): BelongsTo
+    public function organizations(): BelongsToMany
     {
-        return $this->belongsTo(Organization::class);
+        return $this->belongsToMany(Organization::class);
     }
 
     /**
