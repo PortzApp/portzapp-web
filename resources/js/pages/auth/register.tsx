@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import AuthLayout from '@/layouts/auth-layout';
-import { UserRoles } from '@/types/core';
+import { OrganizationBusinessType, UserRoles } from '@/types/core';
 
 type RegisterForm = {
     first_name: string;
@@ -20,7 +20,8 @@ type RegisterForm = {
     company_registration_code: string;
     password: string;
     password_confirmation: string;
-    role: string;
+    user_role: string;
+    organization_business_type: string;
 };
 
 export default function Register() {
@@ -33,7 +34,8 @@ export default function Register() {
         company_registration_code: '',
         password: '',
         password_confirmation: '',
-        role: UserRoles.VESSEL_OWNER,
+        user_role: UserRoles.ADMIN,
+        organization_business_type: OrganizationBusinessType.VESSEL_OWNER,
     });
 
     const submit: FormEventHandler = (e) => {
@@ -50,8 +52,12 @@ export default function Register() {
         });
     };
 
-    const handleRoleChange = (value: string) => {
-        setData('role', value);
+    const handleUserRoleChange = (value: string) => {
+        setData('user_role', value);
+    };
+
+    const handleOrganizationBusinessTypeChange = (value: string) => {
+        setData('organization_business_type', value);
     };
 
     return (
@@ -191,25 +197,40 @@ export default function Register() {
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="role">Account Type</Label>
-                        <RadioGroup value={data.role} onValueChange={handleRoleChange} className="flex flex-col gap-2">
+                        <Label htmlFor="organization_business_type">Company Type</Label>
+                        <RadioGroup
+                            value={data.organization_business_type}
+                            onValueChange={handleOrganizationBusinessTypeChange}
+                            className="flex flex-col gap-2"
+                        >
                             <div className="flex items-center space-x-2">
-                                <RadioGroupItem value={UserRoles.VESSEL_OWNER} id="vessel_owner" />
-                                <Label htmlFor="vessel_owner">Vessel Owner</Label>
+                                <RadioGroupItem value={OrganizationBusinessType.VESSEL_OWNER} id="vessel_owner_business" />
+                                <Label htmlFor="vessel_owner_business">Vessel Owner Company</Label>
                             </div>
                             <div className="flex items-center space-x-2">
-                                <RadioGroupItem value={UserRoles.SHIPPING_AGENCY} id="shipping_agency" />
-                                <Label htmlFor="shipping_agency">Shipping Agency</Label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                                <RadioGroupItem value={UserRoles.ADMIN} id="admin" />
-                                <Label htmlFor="admin">Admin</Label>
+                                <RadioGroupItem value={OrganizationBusinessType.SHIPPING_AGENCY} id="shipping_agency_business" />
+                                <Label htmlFor="shipping_agency_business">Shipping Agency</Label>
                             </div>
                         </RadioGroup>
-                        <InputError message={errors.role} />
+                        <InputError message={errors.organization_business_type} />
                     </div>
 
-                    <Button type="submit" className="mt-2 w-full" tabIndex={5} disabled={processing}>
+                    <div className="grid gap-2">
+                        <Label htmlFor="user_role">Your Role in Company</Label>
+                        <RadioGroup value={data.user_role} onValueChange={handleUserRoleChange} className="flex flex-col gap-2">
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value={UserRoles.ADMIN} id="admin_role" />
+                                <Label htmlFor="admin_role">Admin (Company Owner/Manager)</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value={UserRoles.MEMBER} id="member_role" />
+                                <Label htmlFor="member_role">Member (Employee)</Label>
+                            </div>
+                        </RadioGroup>
+                        <InputError message={errors.user_role} />
+                    </div>
+
+                    <Button type="submit" className="mt-2 w-full" tabIndex={9} disabled={processing}>
                         {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
                         Create account
                     </Button>
@@ -217,7 +238,7 @@ export default function Register() {
 
                 <div className="text-center text-sm text-muted-foreground">
                     Already have an account?{' '}
-                    <TextLink href={route('login')} tabIndex={6}>
+                    <TextLink href={route('login')} tabIndex={10}>
                         Log in
                     </TextLink>
                 </div>
