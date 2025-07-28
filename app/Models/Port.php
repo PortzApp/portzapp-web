@@ -6,6 +6,9 @@ use Database\Factories\PortFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @method static create(mixed $validated)
+ */
 class Port extends Model
 {
     /** @use HasFactory<PortFactory> */
