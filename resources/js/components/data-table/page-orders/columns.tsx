@@ -31,7 +31,7 @@ export const ordersPageColumnsAsVesselOwnerRole: ColumnDef<Order>[] = [
         header: ({ column }) => <DataTableColumnHeader column={column} title="Service" />,
     },
     {
-        accessorKey: 'service.user.organization.name',
+        accessorKey: 'providing_organization.name',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Agency" />,
     },
     {
@@ -134,11 +134,7 @@ export const ordersPageColumnsAsShippingAgencyRole: ColumnDef<Order>[] = [
         cell: ({ row }) => {
             const order = row.original as OrderWithFullRelations;
 
-            return (
-                <div>
-                    {order.vessel_owner.first_name} {order.vessel_owner.last_name}
-                </div>
-            );
+            return <div>{order.requesting_organization.name}</div>;
         },
     },
     {
