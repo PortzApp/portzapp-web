@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('services', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
+            $table->foreignId('organization_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('name');
             $table->text('description')->nullable();
             $table->decimal('price', total: 10, places: 2);
             $table->enum('status', ['active', 'inactive']);
-            $table->foreignId('user_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->timestamps();
         });
     }
 

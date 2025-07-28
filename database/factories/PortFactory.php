@@ -12,8 +12,6 @@ class PortFactory extends Factory
 {
     /**
      * A list of real-world port data.
-     *
-     * @var array
      */
     protected array $ports = [
         [
@@ -107,7 +105,6 @@ class PortFactory extends Factory
             'timezone' => 'Asia/Kuwait',
         ],
     ];
-
 
     /**
      * Define the model's default state.

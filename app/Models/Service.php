@@ -21,15 +21,15 @@ class Service extends Model
         'description',
         'price',
         'status',
-        'user_id',
+        'organization_id',
     ];
 
     /**
-     * Get the user that created the service.
+     * Get the organization that created the service.
      */
-    public function user(): BelongsTo
+    public function organization(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Organization::class);
     }
 
     /**

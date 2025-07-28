@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('registration_code')->unique();
+            $table->string('business_type');
             $table->timestamps();
         });
     }

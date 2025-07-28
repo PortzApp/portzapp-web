@@ -2,11 +2,10 @@
 
 namespace App\Models;
 
-use App\Enums\UserRoles;
 use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -27,9 +26,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'email',
         'phone_number',
         'password',
-        'role',
-        'organization_id',
     ];
+
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -49,43 +47,35 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
-     * Get the vessels for the current user.
+     * Get the organizations for the current user.
      */
-    public function vessels(): HasMany
+    public function organizations(): BelongsToMany
     {
-        return $this->hasMany(Vessel::class);
+        return $this->belongsToMany(Organization::class)->withPivot('role')->withTimestamps();
     }
 
     /**
-     * Get the organization for the current user.
+     * Check if the user has a specific role in any organization.
      */
-    public function organization(): BelongsTo
+    public function hasRoleInOrganization(string $role, ?int $organizationId = null): bool
     {
-        return $this->belongsTo(Organization::class);
+        $query = $this->organizations()->wherePivot('role', $role);
+
+        if ($organizationId) {
+            $query->where('organizations.id', $organizationId);
+        }
+
+        return $query->exists();
     }
 
     /**
-     * Check if the user is a vessel owner.
+     * Get the user's role in a specific organization.
      */
-    public function isVesselOwner(): bool
+    public function getRoleInOrganization(int $organizationId): ?string
     {
-        return $this->role === UserRoles::VESSEL_OWNER;
-    }
+        $organization = $this->organizations()->where('organizations.id', $organizationId)->first();
 
-    /**
-     * Check if the user is a shipping agency.
-     */
-    public function isShippingAgency(): bool
-    {
-        return $this->role === UserRoles::SHIPPING_AGENCY;
-    }
-
-    /**
-     * Check if the user is an admin.
-     */
-    public function isAdmin(): bool
-    {
-        return $this->role === UserRoles::ADMIN;
+        return $organization?->pivot->role;
     }
 
     /**
@@ -98,7 +88,6 @@ class User extends Authenticatable implements MustVerifyEmail
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'role' => UserRoles::class,
         ];
     }
 }

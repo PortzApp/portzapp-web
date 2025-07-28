@@ -3,6 +3,8 @@
 namespace Database\Factories;
 
 use App\Models\Order;
+use App\Models\Organization;
+use App\Models\Service;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -18,6 +20,10 @@ class OrderFactory extends Factory
     public function definition(): array
     {
         return [
+            'service_id' => Service::factory(),
+            'requesting_organization_id' => Organization::factory(),
+            'providing_organization_id' => Organization::factory(),
+            'price' => fake()->randomFloat(2, 1000, 100000), // Between $1,000 and $100,000 for maritime services
             'notes' => fake()->optional(0.7)->sentence(),
             'status' => fake()->randomElement([
                 'pending',      // 30%

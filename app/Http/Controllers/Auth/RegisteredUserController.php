@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Enums\OrganizationBusinessType;
 use App\Enums\UserRoles;
 use App\Http\Controllers\Controller;
 use App\Models\Organization;
@@ -43,24 +44,33 @@ class RegisteredUserController extends Controller
             'company_name' => 'required|string|max:255',
             'company_registration_code' => 'required|string|max:255',
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'role' => [Rule::enum(UserRoles::class)],
+            'user_role' => [Rule::enum(UserRoles::class)],
+            'organization_business_type' => [Rule::enum(OrganizationBusinessType::class)],
         ]);
 
         $user = DB::transaction(function () use ($validated) {
+            // Create the organization with business type
             $organization = Organization::create([
                 'name' => $validated['company_name'],
                 'registration_code' => $validated['company_registration_code'],
+                'business_type' => $validated['organization_business_type'],
             ]);
 
-            return User::create([
+            // Create the user without role field
+            $user = User::create([
                 'first_name' => $validated['first_name'],
                 'last_name' => $validated['last_name'],
                 'email' => $validated['email'],
                 'phone_number' => $validated['phone_number'],
                 'password' => Hash::make($validated['password']),
-                'role' => $validated['role'],
-                'organization_id' => $organization->id,
             ]);
+
+            // Attach user to organization with their role in the pivot table
+            $user->organizations()->attach($organization->id, [
+                'role' => $validated['user_role'],
+            ]);
+
+            return $user;
         });
 
         event(new Registered($user));

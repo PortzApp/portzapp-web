@@ -1,7 +1,12 @@
 export enum UserRoles {
+    MEMBER = 'member',
+    ADMIN = 'admin',
+}
+
+export enum OrganizationBusinessType {
     VESSEL_OWNER = 'vessel_owner',
     SHIPPING_AGENCY = 'shipping_agency',
-    ADMIN = 'admin',
+    PLATFORM_ADMIN = 'platform_admin',
 }
 
 export interface BaseModel {
@@ -17,7 +22,6 @@ export interface User extends BaseModel {
     phone_number: string;
     avatar?: string;
     email_verified_at: string | null;
-    role: UserRoles;
 
     [key: string]: unknown;
 }
@@ -25,6 +29,15 @@ export interface User extends BaseModel {
 export interface Organization extends BaseModel {
     name: string;
     registration_code: string;
+    business_type: OrganizationBusinessType;
+}
+
+export interface OrganizationUser {
+    user_id: number;
+    organization_id: number;
+    role: UserRoles;
+    created_at: string;
+    updated_at: string;
 }
 
 export interface Service extends BaseModel {
@@ -32,19 +45,20 @@ export interface Service extends BaseModel {
     description: string | null;
     price: string;
     status: 'active' | 'inactive';
-    user_id: number;
+    organization_id: number;
 }
 
 export interface Order extends BaseModel {
     service_id: number;
-    vessel_owner_id: number;
+    requesting_organization_id: number;
+    providing_organization_id: number;
     price: number;
     notes?: string;
     status: 'pending' | 'accepted' | 'in_progress' | 'completed' | 'cancelled';
 }
 
 export interface Vessel extends BaseModel {
-    owner_id: number;
+    organization_id: number;
     name: string;
     imo_number: string;
     vessel_type: 'cargo' | 'tanker' | 'container';
@@ -66,12 +80,15 @@ export interface Port extends BaseModel {
 export type WithRelation<T, K extends string, R> = T & Record<K, R>;
 
 // Specific relationship types
-export type UserWithOrganization = WithRelation<User, 'organization', Organization>;
-export type ServiceWithUser<U = User> = WithRelation<Service, 'user', U>;
+export type UserWithOrganizations = WithRelation<User, 'organizations', Organization[]>;
+export type UserWithPivot = User & { pivot: { role: UserRoles } };
+export type OrganizationWithUsers = WithRelation<Organization, 'users', UserWithPivot[]>;
+export type ServiceWithOrganization = WithRelation<Service, 'organization', Organization>;
 export type OrderWithService<S = Service> = WithRelation<Order, 'service', S>;
-export type OrderWithVesselOwner<U = User> = WithRelation<Order, 'vessel_owner', U>;
+export type OrderWithRequestingOrganization = WithRelation<Order, 'requesting_organization', Organization>;
+export type OrderWithProvidingOrganization = WithRelation<Order, 'providing_organization', Organization>;
+export type VesselWithOrganization = WithRelation<Vessel, 'organization', Organization>;
 
 // Complex compositions
-export type ServiceWithUserAndOrganization = ServiceWithUser<UserWithOrganization>;
-export type OrderWithFullService = OrderWithService<ServiceWithUserAndOrganization>;
-export type OrderWithFullRelations = OrderWithFullService & OrderWithVesselOwner<UserWithOrganization>;
+export type ServiceWithFullOrganization = ServiceWithOrganization;
+export type OrderWithFullRelations = OrderWithService<ServiceWithFullOrganization> & OrderWithRequestingOrganization & OrderWithProvidingOrganization;

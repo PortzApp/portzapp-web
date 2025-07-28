@@ -22,6 +22,6 @@ class Port extends Model
         'city',
         'latitude',
         'longitude',
-        'timezone'
+        'timezone',
     ];
 }

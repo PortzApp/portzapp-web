@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Organization;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,47 +18,47 @@ class ServiceFactory extends Factory
     public function definition(): array
     {
         $serviceTypes = [
-            'Web Development',
-            'Mobile App Development',
-            'SEO Consulting',
-            'Social Media Management',
-            'Content Writing',
-            'Graphic Design',
-            'Digital Marketing',
-            'Photography',
-            'Video Editing',
-            'UI/UX Design',
-            'Database Management',
-            'Cloud Setup',
-            'E-commerce Solutions',
-            'WordPress Development',
-            'Logo Design',
-            'Brand Consulting',
-            'Email Marketing',
-            'PPC Management',
-            'Technical Writing',
-            'Website Maintenance',
+            'Port Agency Services',
+            'Ship Chandling',
+            'Crew Management',
+            'Cargo Handling',
+            'Vessel Documentation',
+            'Maritime Consulting',
+            'Port Clearance',
+            'Bunkering Services',
+            'Ship Supply',
+            'Maritime Logistics',
+            'Freight Forwarding',
+            'Container Services',
+            'Stevedoring',
+            'Pilotage Services',
+            'Tugboat Services',
+            'Ship Repair & Maintenance',
+            'Maritime Security',
+            'Customs Clearance',
+            'Waste Management',
+            'Fresh Water Supply',
         ];
 
         $descriptions = [
-            'Professional and reliable service with quick turnaround times.',
-            'High-quality work tailored to your specific business needs.',
-            'Experienced specialist offering competitive rates and excellent results.',
-            'Custom solutions designed to help your business grow and succeed.',
-            'Affordable service without compromising on quality or delivery.',
-            'Expert-level work with a focus on modern best practices.',
-            'Creative and innovative approach to solve your business challenges.',
-            'Proven track record of delivering successful projects on time.',
-            'Comprehensive service package including consultation and support.',
-            'Results-driven approach with measurable outcomes for your business.',
+            'Professional maritime services with 24/7 support and experienced crew.',
+            'Comprehensive port services tailored to your vessel requirements.',
+            'Reliable shipping solutions with competitive rates and timely delivery.',
+            'Expert maritime consulting to optimize your shipping operations.',
+            'Full-service port agency with local expertise and global reach.',
+            'Efficient cargo handling with modern equipment and skilled personnel.',
+            'Complete vessel support services from arrival to departure.',
+            'Trusted maritime partner with proven track record in the industry.',
+            'Streamlined port operations to minimize vessel turnaround time.',
+            'Professional shipping services designed to reduce operational costs.',
         ];
 
         return [
+            'organization_id' => Organization::factory(),
             'name' => fake()->randomElement($serviceTypes),
             'description' => fake()->randomElement($descriptions),
-            'price' => fake()->randomFloat(2, 50, 5000), // Between $50 and $5000
+            'price' => fake()->randomFloat(2, 500, 50000), // Between $500 and $50,000 for maritime services
             'status' => fake()->randomElement(['active', 'active', 'active', 'inactive']), // 75% active, 25% inactive
-            // user_id will be set when creating the service
         ];
     }
 }

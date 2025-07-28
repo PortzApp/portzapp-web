@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('vessels', function (Blueprint $table) {
+        Schema::create('organization_user', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('organization_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
-            $table->string('name');
-            $table->string('imo_number', 7)->unique();
-            $table->string('vessel_type', 50);
-            $table->string('status', 50);
+            $table->foreignId('organization_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->string('role');
             $table->timestamps();
+
+            $table->unique(['organization_id', 'user_id']);
         });
     }
 
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('vessels');
+        Schema::dropIfExists('organization_user');
     }
 };
