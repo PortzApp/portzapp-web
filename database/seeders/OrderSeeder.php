@@ -4,8 +4,8 @@ namespace Database\Seeders;
 
 use App\Enums\OrganizationBusinessType;
 use App\Models\Order;
+use App\Models\Organization;
 use App\Models\Service;
-use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class OrderSeeder extends Seeder
@@ -15,31 +15,38 @@ class OrderSeeder extends Seeder
      */
     public function run(): void
     {
-        // Get all users who belong to vessel owner organizations
-        $vesselOwners = User::whereHas('organizations', function ($query) {
-            $query->where('business_type', OrganizationBusinessType::VESSEL_OWNER);
-        })->get();
+        // Get vessel owner organizations (requesting services)
+        $vesselOwnerOrganizations = Organization::where('business_type', OrganizationBusinessType::VESSEL_OWNER)->get();
+        
+        // Get shipping agency organizations (providing services)
+        $shippingAgencyOrganizations = Organization::where('business_type', OrganizationBusinessType::SHIPPING_AGENCY)->get();
+        
+        // Get all active services
+        $activeServices = Service::where('status', 'active')->get();
 
-        $active_services = Service::where('status', 'active')->get();
+        if ($activeServices->isEmpty()) {
+            $this->command->warn('No active services found. Skipping order creation.');
+            return;
+        }
 
-        // Each vessel owner places 5 orders
-        $MAX_ORDER_COUNT_PER_VESSEL_OWNER = 5;
+        // Each vessel owner organization places orders
+        $MAX_ORDER_COUNT_PER_ORGANIZATION = 5;
 
-        $vesselOwners->each(function ($owner) use ($active_services, $MAX_ORDER_COUNT_PER_VESSEL_OWNER) {
-            for ($i = 0; $i < $MAX_ORDER_COUNT_PER_VESSEL_OWNER; $i++) {
-                $chosen_service = $active_services->random();
+        $vesselOwnerOrganizations->each(function ($requestingOrg) use ($shippingAgencyOrganizations, $activeServices, $MAX_ORDER_COUNT_PER_ORGANIZATION) {
+            for ($i = 0; $i < $MAX_ORDER_COUNT_PER_ORGANIZATION; $i++) {
+                $chosenService = $activeServices->random();
+                $providingOrg = $shippingAgencyOrganizations->random();
 
-                Order::factory()
-                    ->count($MAX_ORDER_COUNT_PER_VESSEL_OWNER)
-                    ->create([
-                        'vessel_owner_id' => $owner->id,
-                        'service_id' => fn () => $chosen_service->id,
-                        'price' => fn () => $chosen_service->price,
-                    ]);
+                Order::factory()->create([
+                    'service_id' => $chosenService->id,
+                    'requesting_organization_id' => $requestingOrg->id,
+                    'providing_organization_id' => $providingOrg->id,
+                    'price' => $chosenService->price,
+                ]);
             }
         });
 
-        $total_orders = $vesselOwners->count() * $MAX_ORDER_COUNT_PER_VESSEL_OWNER;
-        $this->command->info("Created $total_orders orders for {$vesselOwners->count()} vessel owner users");
+        $totalOrders = $vesselOwnerOrganizations->count() * $MAX_ORDER_COUNT_PER_ORGANIZATION;
+        $this->command->info("Created {$totalOrders} orders between {$vesselOwnerOrganizations->count()} vessel owner organizations and {$shippingAgencyOrganizations->count()} shipping agency organizations");
     }
 }
