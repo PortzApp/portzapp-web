@@ -40,14 +40,47 @@ class HandleInertiaRequests extends Middleware
     {
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
+        $user = $request->user();
+        $userAuth = null;
+        $currentOrganization = null;
+        $userRole = null;
+
+        if ($user) {
+            // Get user's first organization (primary organization)
+            // In a more complex system, you might want to track a "current" organization preference
+            $currentOrganization = $user->organizations()->first();
+            
+            if ($currentOrganization) {
+                $userRole = $user->getRoleInOrganization($currentOrganization->id);
+            }
+
+            $userAuth = [
+                'id' => $user->id,
+                'first_name' => $user->first_name,
+                'last_name' => $user->last_name,
+                'email' => $user->email,
+                'phone_number' => $user->phone_number,
+                'email_verified_at' => $user->email_verified_at,
+                'created_at' => $user->created_at,
+                'updated_at' => $user->updated_at,
+                'role' => $userRole,
+                'organization' => $currentOrganization ? [
+                    'id' => $currentOrganization->id,
+                    'name' => $currentOrganization->name,
+                    'business_type' => $currentOrganization->business_type,
+                    'registration_code' => $currentOrganization->registration_code,
+                ] : null,
+            ];
+        }
+
         return [
             ...parent::share($request),
             'name' => config('app.name'),
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
-                'user' => $request->user(),
-                'can' => fn () => $request->user() ? [
-                    'create_services' => $request->user()->can('create', Service::class),
+                'user' => $userAuth,
+                'can' => fn () => $user ? [
+                    'create_services' => $user->can('create', Service::class),
                 ] : null,
             ],
             'ziggy' => fn (): array => [
