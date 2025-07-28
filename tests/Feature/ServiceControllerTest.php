@@ -68,10 +68,9 @@ test('shipping agency admin can view services index', function (): void {
         ->get(route('services.index'));
 
     $response->assertStatus(200);
-    $response->assertInertia(fn ($page) => 
-        $page->component('services')
-            ->has('services', 1)
-            ->where('services.0.id', $this->service->id)
+    $response->assertInertia(fn ($page) => $page->component('services')
+        ->has('services', 1)
+        ->where('services.0.id', $this->service->id)
     );
 });
 
@@ -80,9 +79,8 @@ test('shipping agency member can view services index', function (): void {
         ->get(route('services.index'));
 
     $response->assertStatus(200);
-    $response->assertInertia(fn ($page) => 
-        $page->component('services')
-            ->has('services', 1)
+    $response->assertInertia(fn ($page) => $page->component('services')
+        ->has('services', 1)
     );
 });
 
@@ -92,9 +90,8 @@ test('vessel owner can view all services', function (): void {
 
     $response->assertStatus(200);
     // Vessel owners should see all services, not filtered by organization
-    $response->assertInertia(fn ($page) => 
-        $page->component('services')
-            ->has('services', 2) // Should see both services
+    $response->assertInertia(fn ($page) => $page->component('services')
+        ->has('services', 2) // Should see both services
     );
 });
 
@@ -219,7 +216,7 @@ test('vessel owner cannot update service', function (): void {
         ->put(route('services.update', $this->service), $updateData);
 
     $response->assertStatus(403);
-    
+
     $this->assertDatabaseMissing('services', [
         'id' => $this->service->id,
         'name' => 'Unauthorized Update',
@@ -257,7 +254,7 @@ test('shipping agency member cannot delete service', function (): void {
         ->delete(route('services.destroy', $this->service));
 
     $response->assertStatus(403);
-    
+
     $this->assertDatabaseHas('services', [
         'id' => $this->service->id,
     ]);
@@ -268,7 +265,7 @@ test('vessel owner cannot delete service', function (): void {
         ->delete(route('services.destroy', $this->service));
 
     $response->assertStatus(403);
-    
+
     $this->assertDatabaseHas('services', [
         'id' => $this->service->id,
     ]);
@@ -279,7 +276,7 @@ test('user cannot delete service from different organization', function (): void
         ->delete(route('services.destroy', $this->serviceFromOtherOrg));
 
     $response->assertStatus(403);
-    
+
     $this->assertDatabaseHas('services', [
         'id' => $this->serviceFromOtherOrg->id,
     ]);
@@ -296,12 +293,11 @@ test('services are filtered by user organization', function (): void {
         ->get(route('services.index'));
 
     $response->assertStatus(200);
-    
+
     // Should only see services from their own organization
-    $response->assertInertia(fn ($page) => 
-        $page->component('services')
-            ->has('services', 1)
-            ->where('services.0.id', $this->serviceFromOtherOrg->id)
+    $response->assertInertia(fn ($page) => $page->component('services')
+        ->has('services', 1)
+        ->where('services.0.id', $this->serviceFromOtherOrg->id)
     );
 });
 
@@ -315,10 +311,9 @@ test('user in multiple shipping agencies sees all their services', function (): 
         ->get(route('services.index'));
 
     $response->assertStatus(200);
-    
+
     // Should see services from both organizations
-    $response->assertInertia(fn ($page) => 
-        $page->component('services')
-            ->has('services', 2)
+    $response->assertInertia(fn ($page) => $page->component('services')
+        ->has('services', 2)
     );
-}); 
+});

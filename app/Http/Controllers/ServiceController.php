@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Enums\OrganizationBusinessType;
-use App\Enums\UserRoles;
 use App\Http\Requests\ServiceCreateRequest;
 use App\Http\Requests\ServiceUpdateRequest;
 use App\Models\Service;
@@ -52,7 +51,7 @@ class ServiceController extends Controller
             ->where('business_type', OrganizationBusinessType::SHIPPING_AGENCY)
             ->first();
 
-        if (!$shippingAgencyOrg) {
+        if (! $shippingAgencyOrg) {
             abort(403, 'You must belong to a shipping agency organization to create services.');
         }
 

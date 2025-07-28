@@ -46,7 +46,7 @@ class ServicePolicy
             ->where('business_type', OrganizationBusinessType::SHIPPING_AGENCY)
             ->pluck('organizations.id');
 
-        if (!$userOrganizationIds->contains($service->organization_id)) {
+        if (! $userOrganizationIds->contains($service->organization_id)) {
             return false;
         }
 
@@ -70,7 +70,7 @@ class ServicePolicy
             ->where('business_type', OrganizationBusinessType::SHIPPING_AGENCY)
             ->pluck('organizations.id');
 
-        if (!$userOrganizationIds->contains($service->organization_id)) {
+        if (! $userOrganizationIds->contains($service->organization_id)) {
             return false;
         }
 
