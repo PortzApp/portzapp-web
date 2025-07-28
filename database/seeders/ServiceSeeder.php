@@ -3,8 +3,8 @@
 namespace Database\Seeders;
 
 use App\Enums\OrganizationBusinessType;
+use App\Models\Organization;
 use App\Models\Service;
-use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class ServiceSeeder extends Seeder
@@ -14,21 +14,19 @@ class ServiceSeeder extends Seeder
      */
     public function run(): void
     {
-        // Get all users who belong to shipping agency organizations
-        $shippingUsers = User::whereHas('organizations', function ($query) {
-            $query->where('business_type', OrganizationBusinessType::SHIPPING_AGENCY);
-        })->get();
+        // Get all shipping agency organizations
+        $shippingAgencyOrganizations = Organization::where('business_type', OrganizationBusinessType::SHIPPING_AGENCY)->get();
 
-        // Create 10 services for each shipping user
-        $shippingUsers->each(function ($user) {
+        // Create 10 services for each shipping agency organization
+        $shippingAgencyOrganizations->each(function ($organization) {
             Service::factory()
                 ->count(10)
                 ->create([
-                    'user_id' => $user->id,
+                    'organization_id' => $organization->id,
                 ]);
         });
 
-        $totalServices = $shippingUsers->count() * 10;
-        $this->command->info("Created {$totalServices} services for {$shippingUsers->count()} shipping agency users");
+        $totalServices = $shippingAgencyOrganizations->count() * 10;
+        $this->command->info("Created {$totalServices} services for {$shippingAgencyOrganizations->count()} shipping agency organizations");
     }
 }
