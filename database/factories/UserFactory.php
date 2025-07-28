@@ -2,8 +2,6 @@
 
 namespace Database\Factories;
 
-use App\Enums\UserRoles;
-use App\Models\Organization;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -43,27 +41,6 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
-        ]);
-    }
-
-    public function isVesselOwner(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'role' => UserRoles::VESSEL_OWNER,
-        ]);
-    }
-
-    public function isShippingAgency(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'role' => UserRoles::SHIPPING_AGENCY,
-        ]);
-    }
-
-    public function isAdmin(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'role' => UserRoles::ADMIN,
         ]);
     }
 }

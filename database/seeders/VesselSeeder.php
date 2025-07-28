@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Enums\UserRoles;
+use App\Enums\OrganizationBusinessType;
 use App\Models\User;
 use App\Models\Vessel;
 use Illuminate\Database\Seeder;
@@ -14,14 +14,19 @@ class VesselSeeder extends Seeder
      */
     public function run(): void
     {
-        $owners = User::where('role', UserRoles::VESSEL_OWNER)->get();
+        // Get all users who belong to vessel owner organizations
+        $vesselOwners = User::whereHas('organizations', function ($query) {
+            $query->where('business_type', OrganizationBusinessType::VESSEL_OWNER);
+        })->get();
 
-        $owners->each(function ($owner) {
+        $vesselOwners->each(function ($owner) {
             Vessel::factory()
                 ->count(5)
                 ->create([
                     'owner_id' => $owner->id,
                 ]);
         });
+
+        $this->command->info("Created vessels for {$vesselOwners->count()} vessel owner users");
     }
 }

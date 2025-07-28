@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Enums\UserRoles;
 use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -56,35 +55,35 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
-     * Get the organization for the current user.
+     * Get the organizations for the current user.
      */
     public function organizations(): BelongsToMany
     {
-        return $this->belongsToMany(Organization::class);
+        return $this->belongsToMany(Organization::class)->withPivot('role')->withTimestamps();
     }
 
     /**
-     * Check if the user is a vessel owner.
+     * Check if the user has a specific role in any organization.
      */
-    public function isVesselOwner(): bool
+    public function hasRoleInOrganization(string $role, ?int $organizationId = null): bool
     {
-        return $this->role === UserRoles::VESSEL_OWNER;
+        $query = $this->organizations()->wherePivot('role', $role);
+        
+        if ($organizationId) {
+            $query->where('organizations.id', $organizationId);
+        }
+        
+        return $query->exists();
     }
 
     /**
-     * Check if the user is a shipping agency.
+     * Get the user's role in a specific organization.
      */
-    public function isShippingAgency(): bool
+    public function getRoleInOrganization(int $organizationId): ?string
     {
-        return $this->role === UserRoles::SHIPPING_AGENCY;
-    }
-
-    /**
-     * Check if the user is an admin.
-     */
-    public function isAdmin(): bool
-    {
-        return $this->role === UserRoles::ADMIN;
+        $organization = $this->organizations()->where('organizations.id', $organizationId)->first();
+        
+        return $organization?->pivot->role;
     }
 
     /**
@@ -97,7 +96,6 @@ class User extends Authenticatable implements MustVerifyEmail
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'role' => UserRoles::class,
         ];
     }
 }
