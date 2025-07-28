@@ -17,15 +17,16 @@ class OrderSeeder extends Seeder
     {
         // Get vessel owner organizations (requesting services)
         $vesselOwnerOrganizations = Organization::where('business_type', OrganizationBusinessType::VESSEL_OWNER)->get();
-        
+
         // Get shipping agency organizations (providing services)
         $shippingAgencyOrganizations = Organization::where('business_type', OrganizationBusinessType::SHIPPING_AGENCY)->get();
-        
+
         // Get all active services
         $activeServices = Service::where('status', 'active')->get();
 
         if ($activeServices->isEmpty()) {
             $this->command->warn('No active services found. Skipping order creation.');
+
             return;
         }
 
