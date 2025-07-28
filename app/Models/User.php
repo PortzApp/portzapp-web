@@ -47,14 +47,6 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
-     * Get the vessels for the current user.
-     */
-    public function vessels(): HasMany
-    {
-        return $this->hasMany(Vessel::class);
-    }
-
-    /**
      * Get the organizations for the current user.
      */
     public function organizations(): BelongsToMany

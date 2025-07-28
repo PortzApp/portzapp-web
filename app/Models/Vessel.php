@@ -18,7 +18,7 @@ class Vessel extends Model
     use HasFactory;
 
     protected $fillable = [
-        'owner_id',
+        'organization_id',
         'name',
         'imo_number',
         'status',
@@ -26,11 +26,11 @@ class Vessel extends Model
     ];
 
     /**
-     * Get the user that owns the vessel.
+     * Get the organization that owns the vessel.
      */
-    public function owner(): BelongsTo
+    public function organization(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Organization::class);
     }
 
     /**

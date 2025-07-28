@@ -6,6 +6,7 @@ use App\Enums\OrganizationBusinessType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Organization extends Model
 {
@@ -28,6 +29,14 @@ class Organization extends Model
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class);
+    }
+
+    /**
+     * Get the vessels for the current organization.
+     */
+    public function vessels(): HasMany
+    {
+        return $this->hasMany(Vessel::class);
     }
 
     /**

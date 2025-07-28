@@ -2,6 +2,9 @@
 
 namespace Database\Factories;
 
+use App\Enums\VesselStatus;
+use App\Enums\VesselType;
+use App\Models\Organization;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,24 +20,21 @@ class VesselFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
+            'name' => fake()->words(2, true) . ' ' . fake()->randomElement(['Vessel', 'Ship', 'Carrier', 'Express']),
+            'organization_id' => Organization::factory(),
             'imo_number' => fake()->unique()->randomNumber(7, true),
-            'vessel_type' => fake()->randomElement([
-                'cargo',
-                'tanker',
-                'container',
-            ]),
+            'vessel_type' => fake()->randomElement(VesselType::cases()),
             'status' => fake()->randomElement([
-                'active',
-                'active',
-                'active',
-                'active',
-                'active',
-                'active',
-                'active',
-                'active',
-                'inactive',
-                'maintenance',
+                VesselStatus::ACTIVE,
+                VesselStatus::ACTIVE,
+                VesselStatus::ACTIVE,
+                VesselStatus::ACTIVE,
+                VesselStatus::ACTIVE,
+                VesselStatus::ACTIVE,
+                VesselStatus::ACTIVE,
+                VesselStatus::ACTIVE,
+                VesselStatus::INACTIVE,
+                VesselStatus::MAINTENANCE,
             ]),
         ];
     }

@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use App\Enums\OrganizationBusinessType;
-use App\Models\User;
+use App\Models\Organization;
 use App\Models\Vessel;
 use Illuminate\Database\Seeder;
 
@@ -14,19 +14,18 @@ class VesselSeeder extends Seeder
      */
     public function run(): void
     {
-        // Get all users who belong to vessel owner organizations
-        $vesselOwners = User::whereHas('organizations', function ($query) {
-            $query->where('business_type', OrganizationBusinessType::VESSEL_OWNER);
-        })->get();
+        // Get all vessel owner organizations
+        $vesselOwnerOrganizations = Organization::where('business_type', OrganizationBusinessType::VESSEL_OWNER)->get();
 
-        $vesselOwners->each(function ($owner) {
+        $vesselOwnerOrganizations->each(function ($organization) {
             Vessel::factory()
                 ->count(5)
                 ->create([
-                    'owner_id' => $owner->id,
+                    'organization_id' => $organization->id,
                 ]);
         });
 
-        $this->command->info("Created vessels for {$vesselOwners->count()} vessel owner users");
+        $totalVessels = $vesselOwnerOrganizations->count() * 5;
+        $this->command->info("Created {$totalVessels} vessels for {$vesselOwnerOrganizations->count()} vessel owner organizations");
     }
 }
