@@ -40,6 +40,14 @@ class Organization extends Model
     }
 
     /**
+     * Get the services for the current organization.
+     */
+    public function services(): HasMany
+    {
+        return $this->hasMany(Service::class);
+    }
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>

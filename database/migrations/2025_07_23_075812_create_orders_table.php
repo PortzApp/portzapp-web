@@ -13,8 +13,9 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('service_id')->constrained()->onDelete('cascade');
-            $table->foreignId('vessel_owner_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('service_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('requesting_organization_id')->constrained('organizations')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('providing_organization_id')->constrained('organizations')->cascadeOnUpdate()->cascadeOnDelete();
             $table->decimal('price', 12, 2);
             $table->text('notes')->nullable();
             $table->enum('status', ['pending', 'accepted', 'in_progress', 'completed', 'cancelled'])->default('pending');

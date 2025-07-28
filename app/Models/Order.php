@@ -17,7 +17,9 @@ class Order extends Model
 
     protected $fillable = [
         'service_id',
-        'vessel_owner_id',
+        'vessel_id',
+        'requesting_organization_id',
+        'providing_organization_id',
         'price',
         'notes',
         'status',
@@ -28,8 +30,13 @@ class Order extends Model
         return $this->belongsTo(Service::class);
     }
 
-    public function vesselOwner(): BelongsTo
+    public function requestingOrganization(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'vessel_owner_id');
+        return $this->belongsTo(Organization::class, 'requesting_organization_id');
+    }
+
+    public function providingOrganization(): BelongsTo
+    {
+        return $this->belongsTo(Organization::class, 'providing_organization_id');
     }
 }
