@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\OrganizationBusinessType;
 use App\Enums\UserRoles;
 use App\Models\Service;
 use App\Models\User;
@@ -29,8 +30,10 @@ class ServicePolicy
      */
     public function create(User $user): bool
     {
-        // return $user->role === UserRoles::ADMIN || $user->role === UserRoles::SHIPPING_AGENCY;
-        return true;
+        // User must belong to at least one shipping agency organization
+        return $user->organizations()
+            ->where('business_type', OrganizationBusinessType::SHIPPING_AGENCY)
+            ->exists();
     }
 
     /**
@@ -38,8 +41,23 @@ class ServicePolicy
      */
     public function update(User $user, Service $service): bool
     {
-        // return $user->role === UserRoles::ADMIN || ($user->role === UserRoles::SHIPPING_AGENCY && $user->id === $service->user_id);
-        return true;
+        // Check if user belongs to the organization that owns this service
+        $userOrganizationIds = $user->organizations()
+            ->where('business_type', OrganizationBusinessType::SHIPPING_AGENCY)
+            ->pluck('organizations.id');
+
+        if (! $userOrganizationIds->contains($service->organization_id)) {
+            return false;
+        }
+
+        // Check user's role within the organization
+        $userRoleInOrg = $user->organizations()
+            ->where('organizations.id', $service->organization_id)
+            ->first()?->pivot?->role;
+
+        // Admins can update any service in their organization
+        // Members can also update services (you might want to restrict this further)
+        return in_array($userRoleInOrg, [UserRoles::ADMIN->value, UserRoles::MEMBER->value]);
     }
 
     /**
@@ -47,8 +65,22 @@ class ServicePolicy
      */
     public function delete(User $user, Service $service): bool
     {
-        // return $user->role === UserRoles::ADMIN || ($user->role === UserRoles::SHIPPING_AGENCY && $user->id === $service->user_id);
-        return true;
+        // Check if user belongs to the organization that owns this service
+        $userOrganizationIds = $user->organizations()
+            ->where('business_type', OrganizationBusinessType::SHIPPING_AGENCY)
+            ->pluck('organizations.id');
+
+        if (! $userOrganizationIds->contains($service->organization_id)) {
+            return false;
+        }
+
+        // Check user's role within the organization
+        $userRoleInOrg = $user->organizations()
+            ->where('organizations.id', $service->organization_id)
+            ->first()?->pivot?->role;
+
+        // Only admins can delete services
+        return $userRoleInOrg === UserRoles::ADMIN->value;
     }
 
     /**

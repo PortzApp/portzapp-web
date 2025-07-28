@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\UserRoles;
+use App\Enums\OrganizationBusinessType;
 use App\Http\Requests\ServiceCreateRequest;
 use App\Http\Requests\ServiceUpdateRequest;
 use App\Models\Service;
@@ -20,10 +20,15 @@ class ServiceController extends Controller
     {
         Gate::authorize('view-any', Service::class);
 
-        $services_query = Service::query()->with('user:id,first_name')->latest();
+        $services_query = Service::query()->with('organization:id,name,business_type')->latest();
 
-        if (auth()->user()->role === UserRoles::SHIPPING_AGENCY) {
-            $services_query->where('user_id', auth()->id());
+        // Check if user belongs to shipping agency organizations
+        $userShippingAgencyOrgs = auth()->user()->organizations()
+            ->where('business_type', OrganizationBusinessType::SHIPPING_AGENCY)
+            ->pluck('organizations.id');
+
+        if ($userShippingAgencyOrgs->isNotEmpty()) {
+            $services_query->whereIn('organization_id', $userShippingAgencyOrgs);
         }
 
         return Inertia::render('services', [
@@ -40,9 +45,21 @@ class ServiceController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
-        auth()->user()->services()->create($request->validated());
+        // Get the user's first shipping agency organization (for simplicity)
+        // In a more complex scenario, you might want to let the user choose which organization
+        $shippingAgencyOrg = auth()->user()->organizations()
+            ->where('business_type', OrganizationBusinessType::SHIPPING_AGENCY)
+            ->first();
 
-        return to_route('services')->with('message', 'Service created successfully!');
+        if (! $shippingAgencyOrg) {
+            abort(403, 'You must belong to a shipping agency organization to create services.');
+        }
+
+        Service::create(array_merge($request->validated(), [
+            'organization_id' => $shippingAgencyOrg->id,
+        ]));
+
+        return to_route('services.index')->with('message', 'Service created successfully!');
     }
 
     /**
@@ -56,7 +73,7 @@ class ServiceController extends Controller
 
         $service->update($request->validated());
 
-        return to_route('services')->with('message', 'Service updated successfully!');
+        return to_route('services.index')->with('message', 'Service updated successfully!');
     }
 
     /**
@@ -70,6 +87,6 @@ class ServiceController extends Controller
 
         $service->delete();
 
-        return to_route('services')->with('message', 'Service deleted successfully!');
+        return to_route('services.index')->with('message', 'Service deleted successfully!');
     }
 }
