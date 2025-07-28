@@ -29,7 +29,8 @@ class ServicePolicy
      */
     public function create(User $user): bool
     {
-        return $user->role === UserRoles::ADMIN || $user->role === UserRoles::SHIPPING_AGENCY;
+        // return $user->role === UserRoles::ADMIN || $user->role === UserRoles::SHIPPING_AGENCY;
+        return true;
     }
 
     /**
@@ -37,7 +38,8 @@ class ServicePolicy
      */
     public function update(User $user, Service $service): bool
     {
-        return $user->role === UserRoles::ADMIN || ($user->role === UserRoles::SHIPPING_AGENCY && $user->id === $service->user_id);
+        // return $user->role === UserRoles::ADMIN || ($user->role === UserRoles::SHIPPING_AGENCY && $user->id === $service->user_id);
+        return true;
     }
 
     /**
@@ -45,7 +47,8 @@ class ServicePolicy
      */
     public function delete(User $user, Service $service): bool
     {
-        return $user->role === UserRoles::ADMIN || ($user->role === UserRoles::SHIPPING_AGENCY && $user->id === $service->user_id);
+        // return $user->role === UserRoles::ADMIN || ($user->role === UserRoles::SHIPPING_AGENCY && $user->id === $service->user_id);
+        return true;
     }
 
     /**
