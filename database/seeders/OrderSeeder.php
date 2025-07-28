@@ -19,7 +19,7 @@ class OrderSeeder extends Seeder
         $vesselOwners = User::whereHas('organizations', function ($query) {
             $query->where('business_type', OrganizationBusinessType::VESSEL_OWNER);
         })->get();
-        
+
         $active_services = Service::where('status', 'active')->get();
 
         // Each vessel owner places 5 orders

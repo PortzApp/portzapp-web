@@ -27,7 +27,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'phone_number',
         'password',
     ];
-    
+
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -60,11 +60,11 @@ class User extends Authenticatable implements MustVerifyEmail
     public function hasRoleInOrganization(string $role, ?int $organizationId = null): bool
     {
         $query = $this->organizations()->wherePivot('role', $role);
-        
+
         if ($organizationId) {
             $query->where('organizations.id', $organizationId);
         }
-        
+
         return $query->exists();
     }
 
@@ -74,7 +74,7 @@ class User extends Authenticatable implements MustVerifyEmail
     public function getRoleInOrganization(int $organizationId): ?string
     {
         $organization = $this->organizations()->where('organizations.id', $organizationId)->first();
-        
+
         return $organization?->pivot->role;
     }
 

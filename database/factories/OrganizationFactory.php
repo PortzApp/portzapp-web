@@ -31,7 +31,7 @@ class OrganizationFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'business_type' => OrganizationBusinessType::SHIPPING_AGENCY,
-            'name' => fake()->company() . ' Shipping',
+            'name' => fake()->company().' Shipping',
         ]);
     }
 
@@ -42,7 +42,7 @@ class OrganizationFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'business_type' => OrganizationBusinessType::VESSEL_OWNER,
-            'name' => fake()->company() . ' Vessels',
+            'name' => fake()->company().' Vessels',
         ]);
     }
 

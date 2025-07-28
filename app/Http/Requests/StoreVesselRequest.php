@@ -26,7 +26,7 @@ class StoreVesselRequest extends FormRequest
             'name' => 'required|max:255',
             'imo_number' => 'required|min:7|max:7',
             'vessel_type' => 'required|in:cargo,tanker,container',
-            'status' => 'required|in:active,inactive,maintenance'
+            'status' => 'required|in:active,inactive,maintenance',
         ];
     }
 }

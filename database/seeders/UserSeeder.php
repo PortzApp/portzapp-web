@@ -18,7 +18,7 @@ class UserSeeder extends Seeder
         $shippingOrg1 = Organization::factory()->shippingAgency()->create();
         $shippingOrg2 = Organization::factory()->shippingAgency()->create();
 
-        // Create vessel owner organizations  
+        // Create vessel owner organizations
         $vesselOrg1 = Organization::factory()->vesselOwner()->create();
         $vesselOrg2 = Organization::factory()->vesselOwner()->create();
 

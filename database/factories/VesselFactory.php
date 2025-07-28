@@ -20,7 +20,7 @@ class VesselFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->words(2, true) . ' ' . fake()->randomElement(['Vessel', 'Ship', 'Carrier', 'Express']),
+            'name' => fake()->words(2, true).' '.fake()->randomElement(['Vessel', 'Ship', 'Carrier', 'Express']),
             'organization_id' => Organization::factory(),
             'imo_number' => fake()->unique()->randomNumber(7, true),
             'vessel_type' => fake()->randomElement(VesselType::cases()),
