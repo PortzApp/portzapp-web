@@ -46,6 +46,7 @@ export interface Service extends BaseModel {
     price: string;
     status: 'active' | 'inactive';
     organization_id: number;
+    port_id: number;
 }
 
 export interface Order extends BaseModel {
