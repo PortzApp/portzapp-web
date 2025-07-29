@@ -17,6 +17,7 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     })->name('dashboard');
 
     Route::get('services', [ServiceController::class, 'index'])->name('services.index');
+    Route::get('services/create', [ServiceController::class, 'create'])->name('services.create');
     Route::post('services', [ServiceController::class, 'store'])->name('services.store');
     Route::put('services/{service}', [ServiceController::class, 'update'])->name('services.update');
     Route::delete('services/{service}', [ServiceController::class, 'destroy'])->name('services.destroy');
@@ -40,5 +41,5 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::delete('ports/{vessel}', [PortController::class, 'destroy'])->name('ports.destroy');
 });
 
-require __DIR__.'/settings.php';
-require __DIR__.'/auth.php';
+require __DIR__ . '/settings.php';
+require __DIR__ . '/auth.php';
