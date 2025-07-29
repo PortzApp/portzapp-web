@@ -41,5 +41,5 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::delete('ports/{vessel}', [PortController::class, 'destroy'])->name('ports.destroy');
 });
 
-require __DIR__ . '/settings.php';
-require __DIR__ . '/auth.php';
+require __DIR__.'/settings.php';
+require __DIR__.'/auth.php';

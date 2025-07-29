@@ -49,7 +49,7 @@ class HandleInertiaRequests extends Middleware
             // Get user's first organization (primary organization)
             // In a more complex system, you might want to track a "current" organization preference
             $currentOrganization = $user->organizations()->first();
-            
+
             if ($currentOrganization) {
                 $userRole = $user->getRoleInOrganization($currentOrganization->id);
             }
