@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\OrganizationBusinessType;
 use App\Http\Requests\ServiceCreateRequest;
 use App\Http\Requests\ServiceUpdateRequest;
+use App\Models\Port;
 use App\Models\Service;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
@@ -51,15 +52,28 @@ class ServiceController extends Controller
             ->where('business_type', OrganizationBusinessType::SHIPPING_AGENCY)
             ->first();
 
-        if (! $shippingAgencyOrg) {
+        if (!$shippingAgencyOrg) {
             abort(403, 'You must belong to a shipping agency organization to create services.');
         }
 
-        Service::create(array_merge($request->validated(), [
-            'organization_id' => $shippingAgencyOrg->id,
-        ]));
+        Service::create(
+            array_merge(
+                $request->validated(),
+                ['organization_id' => $shippingAgencyOrg->id],
+            )
+        );
 
         return to_route('services.index')->with('message', 'Service created successfully!');
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        return Inertia::render('services/create', [
+            'ports' => Port::query()->get(),
+        ]);
     }
 
     /**
