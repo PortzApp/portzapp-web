@@ -31,7 +31,7 @@ class ServiceController extends Controller
             $services_query->whereIn('organization_id', $userShippingAgencyOrgs);
         }
 
-        return Inertia::render('services', [
+        return Inertia::render('services/index', [
             'services' => $services_query->get(),
         ]);
     }
@@ -51,7 +51,7 @@ class ServiceController extends Controller
             ->where('business_type', OrganizationBusinessType::SHIPPING_AGENCY)
             ->first();
 
-        if (! $shippingAgencyOrg) {
+        if (!$shippingAgencyOrg) {
             abort(403, 'You must belong to a shipping agency organization to create services.');
         }
 
