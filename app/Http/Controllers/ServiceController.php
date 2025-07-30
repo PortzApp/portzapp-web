@@ -21,7 +21,7 @@ class ServiceController extends Controller
     {
         Gate::authorize('view-any', Service::class);
 
-        $services_query = Service::query()->with('organization:id,name,business_type')->latest();
+        $services_query = Service::query()->with(['organization:id,name,business_type', 'port:id,name'])->latest();
 
         // Check if user belongs to shipping agency organizations
         $userShippingAgencyOrgs = auth()->user()->organizations()
