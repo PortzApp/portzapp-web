@@ -45,7 +45,7 @@ class VesselController extends Controller
      */
     public function create()
     {
-        //
+        return Inertia::render('vessels/create');
     }
 
     /**
