@@ -1,3 +1,4 @@
+import { PortsPageColumnActions } from '@/components/data-table/page-ports/column-actions';
 import { DataTableColumnHeader } from '@/components/data-table/primitives/data-table-column-header';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -35,7 +36,7 @@ export const columns: ColumnDef<Port>[] = [
         cell: ({ row }) => {
             const port = row.original;
 
-            return <p className="tabular-nums">{port.code}</p>;
+            return <p className="font-mono">{port.code}</p>;
         },
     },
     {
@@ -47,9 +48,9 @@ export const columns: ColumnDef<Port>[] = [
             return (
                 <Badge
                     className={cn(
-                        port.status === 'active' && 'bg-blue-200 text-blue-950 uppercase',
-                        port.status === 'inactive' && 'bg-red-200 text-red-950 uppercase',
-                        port.status === 'maintenance' && 'bg-yellow-200 text-yellow-950 uppercase',
+                        port.status === 'active' && 'bg-blue-200 text-blue-950 uppercase dark:bg-blue-900 dark:text-blue-50',
+                        port.status === 'inactive' && 'bg-red-200 text-red-950 uppercase dark:bg-red-900 dark:text-red-50',
+                        port.status === 'maintenance' && 'bg-yellow-200 text-yellow-950 uppercase dark:bg-yellow-900 dark:text-yellow-50',
                     )}
                 >
                     {port.status}
@@ -65,33 +66,33 @@ export const columns: ColumnDef<Port>[] = [
         accessorKey: 'city',
         header: ({ column }) => <DataTableColumnHeader column={column} title="City" />,
     },
-    {
-        accessorKey: 'latitude',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Latitude" />,
-        cell: ({ row }) => {
-            const port = row.original;
-
-            return <p className="tabular-nums">{port.latitude}</p>;
-        },
-    },
-    {
-        accessorKey: 'longitude',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Longitude" />,
-        cell: ({ row }) => {
-            const port = row.original;
-
-            return <p className="tabular-nums">{port.longitude}</p>;
-        },
-    },
-    {
-        accessorKey: 'timezone',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Timezone" />,
-        cell: ({ row }) => {
-            const port = row.original;
-
-            return <p className="tabular-nums">{port.timezone}</p>;
-        },
-    },
+    // {
+    //     accessorKey: 'latitude',
+    //     header: ({ column }) => <DataTableColumnHeader column={column} title="Latitude" />,
+    //     cell: ({ row }) => {
+    //         const port = row.original;
+    //
+    //         return <p className="tabular-nums">{port.latitude}</p>;
+    //     },
+    // },
+    // {
+    //     accessorKey: 'longitude',
+    //     header: ({ column }) => <DataTableColumnHeader column={column} title="Longitude" />,
+    //     cell: ({ row }) => {
+    //         const port = row.original;
+    //
+    //         return <p className="tabular-nums">{port.longitude}</p>;
+    //     },
+    // },
+    // {
+    //     accessorKey: 'timezone',
+    //     header: ({ column }) => <DataTableColumnHeader column={column} title="Timezone" />,
+    //     cell: ({ row }) => {
+    //         const port = row.original;
+    //
+    //         return <p className="tabular-nums">{port.timezone}</p>;
+    //     },
+    // },
     {
         accessorKey: 'created_at',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Created on" />,
@@ -113,17 +114,17 @@ export const columns: ColumnDef<Port>[] = [
             );
         },
     },
-    // {
-    //     id: 'actions',
-    //     header: () => null,
-    //     cell: ({ row }) => {
-    //         const order = row.original;
-    //
-    //         return (
-    //             <>
-    //                 <VesselsPageColumnActions order={order} />
-    //             </>
-    //         );
-    //     },
-    // },
+    {
+        id: 'actions',
+        header: () => null,
+        cell: ({ row }) => {
+            const port = row.original;
+
+            return (
+                <>
+                    <PortsPageColumnActions port={port} />
+                </>
+            );
+        },
+    },
 ];
