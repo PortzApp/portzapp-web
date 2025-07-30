@@ -17,7 +17,7 @@ class VesselController extends Controller
     {
         Gate::authorize('view-any', Vessel::class);
 
-        return Inertia::render('vessels', [
+        return Inertia::render('vessels/index', [
             'vessels' => Vessel::query()->latest()->get(),
         ]);
     }
@@ -27,17 +27,19 @@ class VesselController extends Controller
      */
     public function store(StoreVesselRequest $request)
     {
+        Gate::authorize('create', Vessel::class);
+
         $validated = $request->validated();
 
         Vessel::create([
+            'organization_id' => $request->user()->organizations->first()?->id,
             'name' => $validated['name'],
-            'owner_id' => auth()->id(),
             'imo_number' => $validated['imo_number'],
             'vessel_type' => $validated['vessel_type'],
             'status' => $validated['status'],
         ]);
 
-        return back()->with('message', 'Vessel created successfully!');
+        return to_route('vessels.index')->with('message', 'Vessel created successfully!');
     }
 
     /**
@@ -45,7 +47,9 @@ class VesselController extends Controller
      */
     public function create()
     {
-        //
+        Gate::authorize('create', Vessel::class);
+
+        return Inertia::render('vessels/create');
     }
 
     /**
@@ -53,7 +57,11 @@ class VesselController extends Controller
      */
     public function show(Vessel $vessel)
     {
-        //
+        Gate::authorize('view', $vessel);
+
+        return Inertia::render('vessels/show', [
+            'vessel' => $vessel,
+        ]);
     }
 
     /**
@@ -61,7 +69,11 @@ class VesselController extends Controller
      */
     public function edit(Vessel $vessel)
     {
-        //
+        Gate::authorize('update', $vessel);
+
+        return Inertia::render('vessels/edit', [
+            'vessel' => $vessel,
+        ]);
     }
 
     /**
@@ -69,7 +81,18 @@ class VesselController extends Controller
      */
     public function update(UpdateVesselRequest $request, Vessel $vessel)
     {
-        //
+        Gate::authorize('update', $vessel);
+
+        $validated = $request->validated();
+
+        $vessel->update([
+            'name' => $validated['name'],
+            'imo_number' => $validated['imo_number'],
+            'vessel_type' => $validated['vessel_type'],
+            'status' => $validated['status'],
+        ]);
+
+        return to_route('vessels.index')->with('message', 'Vessel updated successfully!');
     }
 
     /**
@@ -77,6 +100,10 @@ class VesselController extends Controller
      */
     public function destroy(Vessel $vessel)
     {
-        //
+        Gate::authorize('delete', $vessel);
+
+        $vessel->delete();
+
+        return to_route('vessels.index')->with('message', 'Vessel deleted successfully!');
     }
 }

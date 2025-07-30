@@ -2,7 +2,6 @@
 
 namespace App\Policies;
 
-use App\Enums\UserRoles;
 use App\Models\User;
 use App\Models\Vessel;
 
@@ -13,7 +12,7 @@ class VesselPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->role === UserRoles::VESSEL_OWNER || $user->role === UserRoles::ADMIN;
+        return true;
     }
 
     /**
@@ -21,7 +20,7 @@ class VesselPolicy
      */
     public function view(User $user, Vessel $vessel): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -29,7 +28,7 @@ class VesselPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -37,7 +36,7 @@ class VesselPolicy
      */
     public function update(User $user, Vessel $vessel): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -45,7 +44,7 @@ class VesselPolicy
      */
     public function delete(User $user, Vessel $vessel): bool
     {
-        return false;
+        return true;
     }
 
     /**

@@ -28,9 +28,11 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::put('orders/{order}', [OrderController::class, 'update'])->name('orders.update');
     Route::delete('orders/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
 
-    Route::get('vessels', [VesselController::class, 'index'])->name('vessels');
+    Route::get('vessels', [VesselController::class, 'index'])->name('vessels.index');
+    Route::get('vessels/create', [VesselController::class, 'create'])->name('vessels.create');
     Route::get('vessels/{vessel}', [VesselController::class, 'show'])->name('vessels.show');
     Route::post('vessels', [VesselController::class, 'store'])->name('vessels.store');
+    Route::get('vessels/{vessel}/edit', [VesselController::class, 'edit'])->name('vessels.edit');
     Route::put('vessels/{vessel}', [VesselController::class, 'update'])->name('vessels.update');
     Route::delete('vessels/{vessel}', [VesselController::class, 'destroy'])->name('vessels.destroy');
 
@@ -41,5 +43,5 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::delete('ports/{vessel}', [PortController::class, 'destroy'])->name('ports.destroy');
 });
 
-require __DIR__.'/settings.php';
-require __DIR__.'/auth.php';
+require __DIR__ . '/settings.php';
+require __DIR__ . '/auth.php';
