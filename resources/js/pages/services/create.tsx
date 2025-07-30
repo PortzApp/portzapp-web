@@ -8,6 +8,7 @@ import AppLayout from '@/layouts/app-layout';
 import { LoaderCircle } from 'lucide-react';
 
 import type { BreadcrumbItem } from '@/types';
+import { Port } from '@/types/core';
 import { Head, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
 
@@ -27,14 +28,16 @@ export type ServiceForm = {
     description: string;
     price: string;
     status: 'active' | 'inactive';
+    port_id: number;
 };
 
-export default function CreateServicePage() {
+export default function CreateServicePage({ ports }: { ports: Port[] }) {
     const { data, setData, post, processing, errors, reset } = useForm<ServiceForm>({
         name: '',
         description: '',
         price: '',
         status: 'active',
+        port_id: 0,
     });
 
     const submit: FormEventHandler = (e) => {
@@ -114,6 +117,29 @@ export default function CreateServicePage() {
                             </SelectContent>
                         </Select>
                         <InputError message={errors.status} />
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                        <Label htmlFor="port">Port</Label>
+                        <Select
+                            value={data.port_id.toString()}
+                            onValueChange={(value) => {
+                                const currentValue = parseInt(value);
+                                setData('port_id', currentValue);
+                            }}
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select port" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {ports.map((port) => (
+                                    <SelectItem key={port.id} value={port.id.toString()}>
+                                        {port.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        <InputError message={errors.port_id} />
                     </div>
                 </div>
 

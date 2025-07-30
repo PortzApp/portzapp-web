@@ -22,6 +22,7 @@ class Service extends Model
         'price',
         'status',
         'organization_id',
+        'port_id',
     ];
 
     /**
@@ -38,5 +39,13 @@ class Service extends Model
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
+    }
+
+    /**
+     * Get the port assigned to the service.
+     */
+    public function port(): BelongsTo
+    {
+        return $this->belongsTo(Port::class);
     }
 }

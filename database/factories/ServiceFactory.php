@@ -3,10 +3,12 @@
 namespace Database\Factories;
 
 use App\Models\Organization;
+use App\Models\Port;
+use App\Models\Service;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Service>
+ * @extends Factory<Service>
  */
 class ServiceFactory extends Factory
 {
@@ -55,6 +57,7 @@ class ServiceFactory extends Factory
 
         return [
             'organization_id' => Organization::factory(),
+            'port_id' => Port::factory(),
             'name' => fake()->randomElement($serviceTypes),
             'description' => fake()->randomElement($descriptions),
             'price' => fake()->randomFloat(2, 500, 50000), // Between $500 and $50,000 for maritime services

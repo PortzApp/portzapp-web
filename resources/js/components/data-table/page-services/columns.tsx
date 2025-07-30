@@ -1,3 +1,4 @@
+import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Service } from '@/types/core';
 import { ColumnDef } from '@tanstack/react-table';
@@ -48,9 +49,17 @@ export const servicesPageColumns: ColumnDef<Service>[] = [
     {
         accessorKey: 'status',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
+        cell: ({ row }) => {
+            const status = row.getValue('status') as string;
+            return <Badge variant="default" className="text-left font-medium">{status}</Badge>;
+        },
     },
     {
-        accessorKey: 'user.first_name',
+        accessorKey: 'port.name',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Port" />,
+    },
+    {
+        accessorKey: 'organization.name',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Created By" />,
     },
     {
