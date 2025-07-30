@@ -7,6 +7,7 @@ use App\Http\Requests\StoreOrderRequest;
 use App\Http\Requests\UpdateOrderRequest;
 use App\Models\Order;
 use App\Models\Service;
+use App\Models\Vessel;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
@@ -19,6 +20,7 @@ class OrderController extends Controller
     {
         $query = Order::with([
             'service.organization:id,name,business_type',
+            'vessel:id,name,imo_number,organization_id',
             'requestingOrganization:id,name,business_type',
             'providingOrganization:id,name,business_type',
         ]);
@@ -47,7 +49,7 @@ class OrderController extends Controller
 
         $orders = $query->latest()->get();
 
-        return Inertia::render('orders', [
+        return Inertia::render('orders/index', [
             'orders' => $orders,
         ]);
     }
@@ -68,12 +70,13 @@ class OrderController extends Controller
             ->where('business_type', OrganizationBusinessType::VESSEL_OWNER)
             ->first();
 
-        if (! $vesselOwnerOrg) {
+        if (!$vesselOwnerOrg) {
             abort(403, 'You must belong to a vessel owner organization to place orders.');
         }
 
         $order = Order::create([
             'service_id' => $validated['service_id'],
+            'vessel_id' => $validated['vessel_id'],
             'requesting_organization_id' => $vesselOwnerOrg->id,
             'providing_organization_id' => $service->organization_id,
             'price' => $service->price,
@@ -81,7 +84,7 @@ class OrderController extends Controller
             'status' => 'pending',
         ]);
 
-        return back()->with('message', 'Order placed successfully');
+        return to_route('orders.index')->with('message', 'Order created successfully!');
     }
 
     /**
@@ -89,7 +92,31 @@ class OrderController extends Controller
      */
     public function create()
     {
-        //
+        Gate::authorize('create', Order::class);
+
+        // Get user's vessel owner organizations
+        $vesselOwnerOrgs = auth()->user()->organizations()
+            ->where('business_type', OrganizationBusinessType::VESSEL_OWNER)
+            ->get();
+
+        if ($vesselOwnerOrgs->isEmpty()) {
+            abort(403, 'You must belong to a vessel owner organization to create orders.');
+        }
+
+        // Get all vessels from user's vessel owner organizations
+        $vessels = Vessel::whereIn('organization_id', $vesselOwnerOrgs->pluck('id'))
+            ->with('organization:id,name')
+            ->get();
+
+        // Get all active services
+        $services = Service::where('status', 'active')
+            ->with('organization:id,name')
+            ->get();
+
+        return Inertia::render('orders/create', [
+            'vessels' => $vessels,
+            'services' => $services,
+        ]);
     }
 
     /**
@@ -101,11 +128,12 @@ class OrderController extends Controller
 
         $order->load([
             'service.organization:id,name,business_type',
+            'vessel:id,name,imo_number,organization_id',
             'requestingOrganization:id,name,business_type',
             'providingOrganization:id,name,business_type',
         ]);
 
-        return Inertia::render('order-detail', [
+        return Inertia::render('orders/show', [
             'order' => $order,
         ]);
     }
@@ -115,7 +143,30 @@ class OrderController extends Controller
      */
     public function edit(Order $order)
     {
-        //
+        Gate::authorize('update', $order);
+
+        // Get user's vessel owner organizations
+        $vesselOwnerOrgs = auth()->user()->organizations()
+            ->where('business_type', OrganizationBusinessType::VESSEL_OWNER)
+            ->get();
+
+        // Get all vessels from user's vessel owner organizations
+        $vessels = Vessel::whereIn('organization_id', $vesselOwnerOrgs->pluck('id'))
+            ->with('organization:id,name')
+            ->get();
+
+        // Get all active services
+        $services = Service::where('status', 'active')
+            ->with('organization:id,name')
+            ->get();
+
+        $order->load(['service', 'vessel']);
+
+        return Inertia::render('orders/edit', [
+            'order' => $order,
+            'vessels' => $vessels,
+            'services' => $services,
+        ]);
     }
 
     /**
@@ -129,7 +180,7 @@ class OrderController extends Controller
 
         $order->update($validated);
 
-        return back()->with('message', 'Order updated successfully!');
+        return to_route('orders.index')->with('message', 'Order updated successfully!');
     }
 
     /**
@@ -141,6 +192,6 @@ class OrderController extends Controller
 
         $order->delete();
 
-        return back()->with('message', 'Order deleted successfully!');
+        return to_route('orders.index')->with('message', 'Order deleted successfully!');
     }
 }
