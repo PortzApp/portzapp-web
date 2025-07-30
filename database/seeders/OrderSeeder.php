@@ -6,6 +6,7 @@ use App\Enums\OrganizationBusinessType;
 use App\Models\Order;
 use App\Models\Organization;
 use App\Models\Service;
+use App\Models\Vessel;
 use Illuminate\Database\Seeder;
 
 class OrderSeeder extends Seeder
@@ -34,12 +35,22 @@ class OrderSeeder extends Seeder
         $MAX_ORDER_COUNT_PER_ORGANIZATION = 5;
 
         $vesselOwnerOrganizations->each(function ($requestingOrg) use ($shippingAgencyOrganizations, $activeServices, $MAX_ORDER_COUNT_PER_ORGANIZATION) {
+            // Get vessels for this organization
+            $orgVessels = Vessel::where('organization_id', $requestingOrg->id)->get();
+            
+            if ($orgVessels->isEmpty()) {
+                $this->command->warn("No vessels found for organization {$requestingOrg->name}. Skipping orders for this organization.");
+                return;
+            }
+
             for ($i = 0; $i < $MAX_ORDER_COUNT_PER_ORGANIZATION; $i++) {
                 $chosenService = $activeServices->random();
                 $providingOrg = $shippingAgencyOrganizations->random();
+                $chosenVessel = $orgVessels->random();
 
                 Order::factory()->create([
                     'service_id' => $chosenService->id,
+                    'vessel_id' => $chosenVessel->id,
                     'requesting_organization_id' => $requestingOrg->id,
                     'providing_organization_id' => $providingOrg->id,
                     'price' => $chosenService->price,

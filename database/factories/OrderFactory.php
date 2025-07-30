@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\Order;
 use App\Models\Organization;
 use App\Models\Service;
+use App\Models\Vessel;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -21,6 +22,7 @@ class OrderFactory extends Factory
     {
         return [
             'service_id' => Service::factory(),
+            'vessel_id' => Vessel::factory(),
             'requesting_organization_id' => Organization::factory(),
             'providing_organization_id' => Organization::factory(),
             'price' => fake()->randomFloat(2, 1000, 100000), // Between $1,000 and $100,000 for maritime services
