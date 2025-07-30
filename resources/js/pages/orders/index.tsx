@@ -1,10 +1,10 @@
-import { columns } from '@/components/data-table/page-orders/columns';
-import { OrdersPageDataTable } from '@/components/data-table/page-orders/data-table';
-import { buttonVariants } from '@/components/ui/button';
-import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import { OrderWithFullRelations } from '@/types/core';
+import AppLayout from '@/layouts/app-layout';
 import { Head, Link } from '@inertiajs/react';
+import { buttonVariants } from '@/components/ui/button';
+import { OrdersPageDataTable } from '@/components/data-table/page-orders/data-table';
+import { columns } from '@/components/data-table/page-orders/columns';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -36,3 +36,7 @@ export default function OrdersIndexPage({ orders }: { orders: Array<OrderWithFul
         </AppLayout>
     );
 }
+
+// export default function Page() {
+//     return <p>Hello world</p>;
+// }
