@@ -52,7 +52,7 @@ class ServiceController extends Controller
             ->where('business_type', OrganizationBusinessType::SHIPPING_AGENCY)
             ->first();
 
-        if (!$shippingAgencyOrg) {
+        if (! $shippingAgencyOrg) {
             abort(403, 'You must belong to a shipping agency organization to create services.');
         }
 

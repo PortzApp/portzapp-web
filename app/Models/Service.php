@@ -22,7 +22,7 @@ class Service extends Model
         'price',
         'status',
         'organization_id',
-        'port_id'
+        'port_id',
     ];
 
     /**
