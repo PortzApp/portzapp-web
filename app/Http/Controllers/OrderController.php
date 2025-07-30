@@ -84,7 +84,7 @@ class OrderController extends Controller
             'status' => 'pending',
         ]);
 
-        return to_route('orders.index')->with('message', 'Order created successfully!');
+        return to_route('orders')->with('message', 'Order created successfully!');
     }
 
     /**
@@ -180,7 +180,7 @@ class OrderController extends Controller
 
         $order->update($validated);
 
-        return to_route('orders.index')->with('message', 'Order updated successfully!');
+        return to_route('orders')->with('message', 'Order updated successfully!');
     }
 
     /**
@@ -192,6 +192,6 @@ class OrderController extends Controller
 
         $order->delete();
 
-        return to_route('orders.index')->with('message', 'Order deleted successfully!');
+        return to_route('orders')->with('message', 'Order deleted successfully!');
     }
 }

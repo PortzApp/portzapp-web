@@ -22,7 +22,7 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::put('services/{service}', [ServiceController::class, 'update'])->name('services.update');
     Route::delete('services/{service}', [ServiceController::class, 'destroy'])->name('services.destroy');
 
-    Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::get('orders', [OrderController::class, 'index'])->name('orders');
     Route::get('orders/create', [OrderController::class, 'create'])->name('orders.create');
     Route::get('orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::post('orders', [OrderController::class, 'store'])->name('orders.store');
