@@ -24,6 +24,7 @@ class StoreOrderRequest extends FormRequest
     {
         return [
             'service_id' => ['required', 'exists:services,id'],
+            'vessel_id' => ['required', 'exists:vessels,id'],
             'notes' => ['nullable', 'string', 'max:1000'],
         ];
     }
