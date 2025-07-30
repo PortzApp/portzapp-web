@@ -32,6 +32,7 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::get('vessels/create', [VesselController::class, 'create'])->name('vessels.create');
     Route::get('vessels/{vessel}', [VesselController::class, 'show'])->name('vessels.show');
     Route::post('vessels', [VesselController::class, 'store'])->name('vessels.store');
+    Route::get('vessels/{vessel}/edit', [VesselController::class, 'edit'])->name('vessels.edit');
     Route::put('vessels/{vessel}', [VesselController::class, 'update'])->name('vessels.update');
     Route::delete('vessels/{vessel}', [VesselController::class, 'destroy'])->name('vessels.destroy');
 
