@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 import { Link, router } from '@inertiajs/react';
-import { Ban, Eye, MoreHorizontal } from 'lucide-react';
+import { Edit, Eye, MoreHorizontal, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
 import {
@@ -22,28 +22,21 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
-import { Order } from '@/types/core';
+import { OrderWithFullRelations } from '@/types/core';
 import { toast } from 'sonner';
 
-export function OrdersPageColumnActions({ order }: { order: Order }) {
+export function OrdersPageColumnActions({ order }: { order: OrderWithFullRelations }) {
     const [openDropdown, setOpenDropdown] = useState(false);
-    const [openCancelOrderDialog, setOpenCancelOrderDialog] = useState(false);
+    const [openDeleteOrderDialog, setOpenDeleteOrderDialog] = useState(false);
 
-    function handleCancelOrder() {
-        setOpenCancelOrderDialog(false);
-        setOpenDropdown(false);
-
-        router.put(
-            route('orders.update', order.id),
-            {
-                status: 'cancelled',
+    function handleDeleteOrder() {
+        router.delete(route('orders.destroy', order.id), {
+            onSuccess: () => {
+                setOpenDeleteOrderDialog(false);
+                setOpenDropdown(false);
+                toast(`Order #${order.id} deleted successfully!`);
             },
-            {
-                onSuccess: () => {
-                    toast(`Order #${order.id} cancelled successfully!`);
-                },
-            },
-        );
+        });
     }
 
     return (
@@ -60,32 +53,39 @@ export function OrdersPageColumnActions({ order }: { order: Order }) {
                 <DropdownMenuSeparator />
 
                 <DropdownMenuItem asChild>
-                    <Link href={`/orders/${order.id}`} className="flex">
+                    <Link href={route('orders.show', order.id)} className="flex">
                         <Eye />
-                        View details
+                        View order
                     </Link>
                 </DropdownMenuItem>
 
-                <Dialog open={openCancelOrderDialog} onOpenChange={setOpenCancelOrderDialog}>
+                <DropdownMenuItem asChild>
+                    <Link href={route('orders.edit', order.id)} className="flex">
+                        <Edit />
+                        Edit order
+                    </Link>
+                </DropdownMenuItem>
+
+                <Dialog open={openDeleteOrderDialog} onOpenChange={setOpenDeleteOrderDialog}>
                     <DialogTrigger asChild>
                         <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                            <Ban />
-                            Cancel order
+                            <Trash2 />
+                            Delete order
                         </DropdownMenuItem>
                     </DialogTrigger>
 
                     <DialogContent>
                         <DialogHeader>
-                            <DialogTitle>Cancel order</DialogTitle>
-                            <DialogDescription>Are you sure you want to cancel this order?</DialogDescription>
+                            <DialogTitle>Delete order</DialogTitle>
+                            <DialogDescription>Are you sure you want to delete this order?</DialogDescription>
                         </DialogHeader>
 
                         <DialogFooter>
                             <DialogClose asChild>
                                 <Button variant="outline">Cancel</Button>
                             </DialogClose>
-                            <Button type="submit" onClick={handleCancelOrder}>
-                                Cancel order
+                            <Button type="submit" variant="destructive" onClick={handleDeleteOrder}>
+                                Delete order
                             </Button>
                         </DialogFooter>
                     </DialogContent>

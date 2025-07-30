@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->foreignId('service_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('vessel_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignId('requesting_organization_id')->constrained('organizations')->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignId('providing_organization_id')->constrained('organizations')->cascadeOnUpdate()->cascadeOnDelete();
             $table->decimal('price', 12, 2);

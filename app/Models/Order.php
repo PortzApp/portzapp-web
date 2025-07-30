@@ -39,4 +39,9 @@ class Order extends Model
     {
         return $this->belongsTo(Organization::class, 'providing_organization_id');
     }
+
+    public function vessel(): BelongsTo
+    {
+        return $this->belongsTo(Vessel::class);
+    }
 }
