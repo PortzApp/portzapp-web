@@ -17,7 +17,7 @@ class VesselController extends Controller
     {
         Gate::authorize('view-any', Vessel::class);
 
-        return Inertia::render('vessels', [
+        return Inertia::render('vessels/index', [
             'vessels' => Vessel::query()->latest()->get(),
         ]);
     }
@@ -30,14 +30,14 @@ class VesselController extends Controller
         $validated = $request->validated();
 
         Vessel::create([
+            'organization_id' => $request->user()->organizations->first()?->id,
             'name' => $validated['name'],
-            'owner_id' => auth()->id(),
             'imo_number' => $validated['imo_number'],
             'vessel_type' => $validated['vessel_type'],
             'status' => $validated['status'],
         ]);
 
-        return back()->with('message', 'Vessel created successfully!');
+        return to_route('vessels.index')->with('message', 'Vessel created successfully!');
     }
 
     /**
