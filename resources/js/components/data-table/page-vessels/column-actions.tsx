@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 import { Link, router } from '@inertiajs/react';
-import { Ban, Eye, MoreHorizontal } from 'lucide-react';
+import { Edit, Eye, MoreHorizontal, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
 import {
@@ -22,28 +22,21 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
-import { Order } from '@/types/core';
+import { Vessel } from '@/types/core';
 import { toast } from 'sonner';
 
-export function VesselsPageColumnActions({ order }: { order: Order }) {
+export function VesselsPageColumnActions({ vessel }: { vessel: Vessel }) {
     const [openDropdown, setOpenDropdown] = useState(false);
-    const [openCancelOrderDialog, setOpenCancelOrderDialog] = useState(false);
+    const [openDeleteVesselDialog, setOpenDeleteVesselDialog] = useState(false);
 
-    function handleCancelOrder() {
-        setOpenCancelOrderDialog(false);
-        setOpenDropdown(false);
-
-        router.put(
-            route('orders.update', order.id),
-            {
-                status: 'cancelled',
+    function handleDeleteVessel() {
+        router.delete(route('vessels.destroy', vessel.id), {
+            onSuccess: () => {
+                setOpenDeleteVesselDialog(false);
+                setOpenDropdown(false);
+                toast(`Vessel #${vessel.id} deleted successfully!`);
             },
-            {
-                onSuccess: () => {
-                    toast(`Order #${order.id} cancelled successfully!`);
-                },
-            },
-        );
+        });
     }
 
     return (
@@ -60,32 +53,39 @@ export function VesselsPageColumnActions({ order }: { order: Order }) {
                 <DropdownMenuSeparator />
 
                 <DropdownMenuItem asChild>
-                    <Link href={`/orders/${order.id}`} className="flex">
+                    <Link href={route('vessels.show', vessel.id)} className="flex">
                         <Eye />
-                        View details
+                        View vessel
                     </Link>
                 </DropdownMenuItem>
 
-                <Dialog open={openCancelOrderDialog} onOpenChange={setOpenCancelOrderDialog}>
+                <DropdownMenuItem asChild>
+                    <Link href={route('vessels.edit', vessel.id)} className="flex">
+                        <Edit />
+                        Edit vessel
+                    </Link>
+                </DropdownMenuItem>
+
+                <Dialog open={openDeleteVesselDialog} onOpenChange={setOpenDeleteVesselDialog}>
                     <DialogTrigger asChild>
                         <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                            <Ban />
-                            Cancel order
+                            <Trash2 />
+                            Delete vessel
                         </DropdownMenuItem>
                     </DialogTrigger>
 
                     <DialogContent>
                         <DialogHeader>
-                            <DialogTitle>Cancel order</DialogTitle>
-                            <DialogDescription>Are you sure you want to cancel this order?</DialogDescription>
+                            <DialogTitle>Delete vessel</DialogTitle>
+                            <DialogDescription>Are you sure you want to delete this vessel?</DialogDescription>
                         </DialogHeader>
 
                         <DialogFooter>
                             <DialogClose asChild>
                                 <Button variant="outline">Cancel</Button>
                             </DialogClose>
-                            <Button type="submit" onClick={handleCancelOrder}>
-                                Cancel order
+                            <Button type="submit" onClick={handleDeleteVessel}>
+                                Delete vessel
                             </Button>
                         </DialogFooter>
                     </DialogContent>

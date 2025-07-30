@@ -1,3 +1,4 @@
+import { VesselsPageColumnActions } from '@/components/data-table/page-vessels/column-actions';
 import { DataTableColumnHeader } from '@/components/data-table/primitives/data-table-column-header';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -99,17 +100,17 @@ export const columns: ColumnDef<Vessel>[] = [
             );
         },
     },
-    // {
-    //     id: 'actions',
-    //     header: () => null,
-    //     cell: ({ row }) => {
-    //         const order = row.original;
-    //
-    //         return (
-    //             <>
-    //                 <VesselsPageColumnActions order={order} />
-    //             </>
-    //         );
-    //     },
-    // },
+    {
+        id: 'actions',
+        header: () => null,
+        cell: ({ row }) => {
+            const vessel = row.original;
+
+            return (
+                <>
+                    <VesselsPageColumnActions vessel={vessel} />
+                </>
+            );
+        },
+    },
 ];
