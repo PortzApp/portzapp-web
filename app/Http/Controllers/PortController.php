@@ -19,7 +19,7 @@ class PortController extends Controller
 
         $ports = Port::query()->latest()->get();
 
-        return Inertia::render('ports', [
+        return Inertia::render('ports/index', [
             'ports' => $ports,
         ]);
     }
@@ -29,9 +29,11 @@ class PortController extends Controller
      */
     public function store(StorePortRequest $request)
     {
+        Gate::authorize('create', Port::class);
+
         $port = Port::create($request->validated());
 
-        return back()->with('message', 'Port created successfully');
+        return to_route('ports.index')->with('message', 'Port created successfully!');
     }
 
     /**
@@ -39,7 +41,9 @@ class PortController extends Controller
      */
     public function create()
     {
-        //
+        Gate::authorize('create', Port::class);
+
+        return Inertia::render('ports/create');
     }
 
     /**
@@ -47,7 +51,11 @@ class PortController extends Controller
      */
     public function show(Port $port)
     {
-        //
+        Gate::authorize('view', $port);
+
+        return Inertia::render('ports/show', [
+            'port' => $port,
+        ]);
     }
 
     /**
@@ -55,7 +63,11 @@ class PortController extends Controller
      */
     public function edit(Port $port)
     {
-        //
+        Gate::authorize('update', $port);
+
+        return Inertia::render('ports/edit', [
+            'port' => $port,
+        ]);
     }
 
     /**
@@ -63,7 +75,13 @@ class PortController extends Controller
      */
     public function update(UpdatePortRequest $request, Port $port)
     {
-        //
+        Gate::authorize('update', $port);
+
+        $validated = $request->validated();
+
+        $port->update($validated);
+
+        return to_route('ports.index')->with('message', 'Port updated successfully!');
     }
 
     /**
@@ -71,6 +89,10 @@ class PortController extends Controller
      */
     public function destroy(Port $port)
     {
-        //
+        Gate::authorize('delete', $port);
+
+        $port->delete();
+
+        return to_route('ports.index')->with('message', 'Port deleted successfully!');
     }
 }
