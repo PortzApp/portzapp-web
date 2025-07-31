@@ -4,10 +4,11 @@ import { buttonVariants } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import { Service } from '@/types/core';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { useEcho } from '@laravel/echo-react';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -45,6 +46,16 @@ export default function Services({ services: initialServices }: { services: Serv
     // Listen for service created events
     useEcho<ServiceCreatedEvent>('services', 'ServiceCreated', ({ service: newService }) => {
         setServices((prevServices) => [newService, ...prevServices]);
+
+        toast('Service created', {
+            description: `ID: #${newService.id} — "${newService.name}"`,
+            action: {
+                label: 'View Service',
+                onClick: () => {
+                    router.visit(route('services.show', newService.id));
+                },
+            },
+        });
     });
 
     // Listen for service updated events
@@ -52,11 +63,31 @@ export default function Services({ services: initialServices }: { services: Serv
         setServices((prevServices) =>
             prevServices.map((prevService) => (prevService.id === updatedService.id ? { ...prevService, ...updatedService } : prevService)),
         );
+
+        toast('Service updated', {
+            description: `ID: #${updatedService.id} — "${updatedService.name}"`,
+            action: {
+                label: 'View Service',
+                onClick: () => {
+                    router.visit(route('services.show', updatedService.id));
+                },
+            },
+        });
     });
 
     // Listen for service deleted events
     useEcho<ServiceDeletedEvent>('services', 'ServiceDeleted', ({ serviceId }) => {
         setServices((prevServices) => prevServices.filter((service) => service.id !== serviceId));
+
+        toast('Service deleted', {
+            description: `ID: #${serviceId}`,
+            action: {
+                label: 'View All',
+                onClick: () => {
+                    router.visit(route('services.index'));
+                },
+            },
+        });
     });
 
     return (

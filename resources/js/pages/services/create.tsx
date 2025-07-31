@@ -9,7 +9,7 @@ import { LoaderCircle } from 'lucide-react';
 
 import type { BreadcrumbItem } from '@/types';
 import { Port, Service } from '@/types/core';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, router, useForm } from '@inertiajs/react';
 import { useEcho } from '@laravel/echo-react';
 import { FormEventHandler } from 'react';
 import { toast } from 'sonner';
@@ -66,16 +66,40 @@ export default function CreateServicePage({ ports }: { ports: Port[] }) {
     });
 
     // Listen for service events to show real-time updates
-    useEcho<ServiceCreatedEvent>('services', 'ServiceCreated', ({ service, user }) => {
-        toast(`New service "${service.name}" created by ${user.name}`);
+    useEcho<ServiceCreatedEvent>('services', 'ServiceCreated', ({ service }) => {
+        toast('Service created', {
+            description: `ID: #${service.id} — "${service.name}"`,
+            action: {
+                label: 'View Service',
+                onClick: () => {
+                    router.visit(route('services.show', service.id));
+                },
+            },
+        });
     });
 
-    useEcho<ServiceUpdatedEvent>('services', 'ServiceUpdated', ({ service, user }) => {
-        toast(`Service "${service.name}" updated by ${user.name}`);
+    useEcho<ServiceUpdatedEvent>('services', 'ServiceUpdated', ({ service }) => {
+        toast('Service updated', {
+            description: `ID: #${service.id} — "${service.name}"`,
+            action: {
+                label: 'View Service',
+                onClick: () => {
+                    router.visit(route('services.show', service.id));
+                },
+            },
+        });
     });
 
-    useEcho<ServiceDeletedEvent>('services', 'ServiceDeleted', ({ serviceName, user }) => {
-        toast(`Service "${serviceName}" deleted by ${user.name}`);
+    useEcho<ServiceDeletedEvent>('services', 'ServiceDeleted', ({ serviceId, serviceName }) => {
+        toast('Service deleted', {
+            description: `ID: #${serviceId} — "${serviceName}"`,
+            action: {
+                label: 'View All',
+                onClick: () => {
+                    router.visit(route('services.index'));
+                },
+            },
+        });
     });
 
     const submit: FormEventHandler = (e) => {

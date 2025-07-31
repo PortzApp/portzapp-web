@@ -70,11 +70,19 @@ export default function ServiceEditPage({ service: initialService, ports }: { se
     });
 
     // Listen for service events
-    useEcho<ServiceCreatedEvent>('services', 'ServiceCreated', ({ service: newService, user }) => {
-        toast(`New service "${newService.name}" created by ${user.name}`);
+    useEcho<ServiceCreatedEvent>('services', 'ServiceCreated', ({ service: newService }) => {
+        toast('Service created', {
+            description: `ID: #${newService.id} — "${newService.name}"`,
+            action: {
+                label: 'View Service',
+                onClick: () => {
+                    router.visit(route('services.show', newService.id));
+                },
+            },
+        });
     });
 
-    useEcho<ServiceUpdatedEvent>('services', 'ServiceUpdated', ({ service: updatedService, user }) => {
+    useEcho<ServiceUpdatedEvent>('services', 'ServiceUpdated', ({ service: updatedService }) => {
         if (updatedService.id === service.id) {
             setService({ ...service, ...updatedService });
             // Update form data if this service was updated
@@ -85,19 +93,29 @@ export default function ServiceEditPage({ service: initialService, ports }: { se
                 status: updatedService.status,
                 port_id: updatedService.port_id,
             });
-            toast(`This service was updated by ${user.name}`);
-        } else {
-            toast(`Service "${updatedService.name}" updated by ${user.name}`);
         }
+
+        toast('Service updated', {
+            description: `ID: #${updatedService.id} — "${updatedService.name}"`,
+            action: {
+                label: 'View Service',
+                onClick: () => {
+                    router.visit(route('services.show', updatedService.id));
+                },
+            },
+        });
     });
 
-    useEcho<ServiceDeletedEvent>('services', 'ServiceDeleted', ({ serviceId, serviceName, user }) => {
-        if (serviceId === service.id) {
-            toast(`This service was deleted by ${user.name}`);
-            router.visit(route('services.index'));
-        } else {
-            toast(`Service "${serviceName}" deleted by ${user.name}`);
-        }
+    useEcho<ServiceDeletedEvent>('services', 'ServiceDeleted', ({ serviceId, serviceName }) => {
+        toast('Service deleted', {
+            description: `ID: #${serviceId} — "${serviceName}"`,
+            action: {
+                label: 'View All',
+                onClick: () => {
+                    router.visit(route('services.index'));
+                },
+            },
+        });
     });
 
     const submit: FormEventHandler = (e) => {

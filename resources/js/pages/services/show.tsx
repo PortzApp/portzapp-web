@@ -31,6 +31,10 @@ interface ServiceEvent {
     timestamp: string;
 }
 
+interface ServiceCreatedEvent extends ServiceEvent {
+    service: Service;
+}
+
 interface ServiceUpdatedEvent extends ServiceEvent {
     service: Service;
 }
@@ -45,17 +49,46 @@ export default function ServiceShowPage({ service: initialService }: { service: 
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
     // Listen for service updated events
+    useEcho<ServiceCreatedEvent>('services', 'ServiceCreated', ({ service: newService }) => {
+        toast('Service created', {
+            description: `ID: #${newService.id} — "${newService.name}"`,
+            action: {
+                label: 'View Service',
+                onClick: () => {
+                    router.visit(route('services.show', newService.id));
+                },
+            },
+        });
+    });
+
     useEcho<ServiceUpdatedEvent>('services', 'ServiceUpdated', ({ service: updatedService }) => {
         if (updatedService.id === service.id) {
             setService({ ...service, ...updatedService });
         }
+
+        toast('Service updated', {
+            description: `ID: #${updatedService.id} — "${updatedService.name}"`,
+            action: {
+                label: 'View Service',
+                onClick: () => {
+                    router.visit(route('services.show', updatedService.id));
+                },
+            },
+        });
     });
 
     // Listen for service deleted events
     useEcho<ServiceDeletedEvent>('services', 'ServiceDeleted', ({ serviceId, serviceName }) => {
         if (serviceId === service.id) {
-            toast(`Service "${serviceName}" was deleted`);
-            router.visit(route('services.index'));
+            toast('Service deleted', {
+                description: `ID: #${serviceId} — "${serviceName}"`,
+                action: {
+                    label: 'View All',
+                    onClick: () => {
+                        router.visit(route('services.index'));
+                    },
+                },
+            });
         }
     });
 
