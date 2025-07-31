@@ -16,12 +16,48 @@ import { cn } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
 import { Service } from '@/types/core';
 import { Head, Link, router } from '@inertiajs/react';
+import { useEcho } from '@laravel/echo-react';
 import { Dot, Edit, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
-export default function ServiceShowPage({ service }: { service: Service }) {
+interface ServiceEvent {
+    message: string;
+    user: {
+        id: number;
+        name: string;
+        email: string;
+    };
+    timestamp: string;
+}
+
+interface ServiceUpdatedEvent extends ServiceEvent {
+    service: Service;
+}
+
+interface ServiceDeletedEvent extends ServiceEvent {
+    serviceId: number;
+    serviceName: string;
+}
+
+export default function ServiceShowPage({ service: initialService }: { service: Service }) {
+    const [service, setService] = useState(initialService);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+
+    // Listen for service updated events
+    useEcho<ServiceUpdatedEvent>('services', 'ServiceUpdated', ({ service: updatedService }) => {
+        if (updatedService.id === service.id) {
+            setService({ ...service, ...updatedService });
+        }
+    });
+
+    // Listen for service deleted events
+    useEcho<ServiceDeletedEvent>('services', 'ServiceDeleted', ({ serviceId, serviceName }) => {
+        if (serviceId === service.id) {
+            toast(`Service "${serviceName}" was deleted`);
+            router.visit(route('services.index'));
+        }
+    });
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -129,13 +165,21 @@ export default function ServiceShowPage({ service }: { service: Service }) {
                             <div className="flex justify-between">
                                 <span className="text-sm font-medium text-muted-foreground">Port:</span>
                                 <span className="text-sm font-medium">
-                                    {(service as Service & { port?: { name: string } }).port?.name || 'No port assigned'}
+                                    {(
+                                        service as Service & {
+                                            port?: { name: string };
+                                        }
+                                    ).port?.name || 'No port assigned'}
                                 </span>
                             </div>
                             <div className="flex justify-between">
                                 <span className="text-sm font-medium text-muted-foreground">Organization:</span>
                                 <span className="text-sm font-medium">
-                                    {(service as Service & { organization?: { name: string } }).organization?.name || 'No organization'}
+                                    {(
+                                        service as Service & {
+                                            organization?: { name: string };
+                                        }
+                                    ).organization?.name || 'No organization'}
                                 </span>
                             </div>
                         </CardContent>
