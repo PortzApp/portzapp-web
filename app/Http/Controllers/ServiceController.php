@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
-
+use App\Events\ServiceCreated;
+use App\Events\ServiceDeleted;
+use App\Events\ServiceUpdated;
 use App\Http\Requests\ServiceCreateRequest;
 use App\Http\Requests\ServiceUpdateRequest;
 use App\Models\Port;
@@ -37,7 +39,7 @@ class ServiceController extends Controller
 
         $validated = $request->validated();
 
-        Service::create([
+        $service = Service::create([
             'organization_id' => $request->user()->organizations->first()?->id,
             'name' => $validated['name'],
             'description' => $validated['description'],
@@ -45,6 +47,11 @@ class ServiceController extends Controller
             'status' => $validated['status'],
             'port_id' => $validated['port_id'],
         ]);
+
+        // Load relationships for the created service
+        $service->load(['organization:id,name', 'port:id,name']);
+
+        ServiceCreated::dispatch($request->user(), $service);
 
         return to_route('services.index')->with('message', 'Service created successfully!');
     }
@@ -107,6 +114,11 @@ class ServiceController extends Controller
             'port_id' => $validated['port_id'],
         ]);
 
+        // Refresh the service with relationships to get the latest data
+        $service->refresh()->load(['organization:id,name', 'port:id,name']);
+
+        ServiceUpdated::dispatch($request->user(), $service);
+
         return to_route('services.index')->with('message', 'Service updated successfully!');
     }
 
@@ -117,7 +129,12 @@ class ServiceController extends Controller
     {
         Gate::authorize('delete', $service);
 
+        $serviceId = $service->id;
+        $serviceName = $service->name;
+
         $service->delete();
+
+        ServiceDeleted::dispatch(request()->user(), $serviceId, $serviceName);
 
         return to_route('services.index')->with('message', 'Service deleted successfully!');
     }
