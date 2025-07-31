@@ -8,9 +8,11 @@ import AppLayout from '@/layouts/app-layout';
 import { LoaderCircle } from 'lucide-react';
 
 import type { BreadcrumbItem } from '@/types';
-import { Port } from '@/types/core';
+import { Port, Service } from '@/types/core';
 import { Head, useForm } from '@inertiajs/react';
+import { useEcho } from '@laravel/echo-react';
 import { FormEventHandler } from 'react';
+import { toast } from 'sonner';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -31,6 +33,29 @@ export type ServiceForm = {
     port_id: number;
 };
 
+interface ServiceEvent {
+    message: string;
+    user: {
+        id: number;
+        name: string;
+        email: string;
+    };
+    timestamp: string;
+}
+
+interface ServiceCreatedEvent extends ServiceEvent {
+    service: Service;
+}
+
+interface ServiceUpdatedEvent extends ServiceEvent {
+    service: Service;
+}
+
+interface ServiceDeletedEvent extends ServiceEvent {
+    serviceId: number;
+    serviceName: string;
+}
+
 export default function CreateServicePage({ ports }: { ports: Port[] }) {
     const { data, setData, post, processing, errors, reset } = useForm<ServiceForm>({
         name: '',
@@ -38,6 +63,19 @@ export default function CreateServicePage({ ports }: { ports: Port[] }) {
         price: '',
         status: 'active',
         port_id: 0,
+    });
+
+    // Listen for service events to show real-time updates
+    useEcho<ServiceCreatedEvent>('services', 'ServiceCreated', ({ service, user }) => {
+        toast(`New service "${service.name}" created by ${user.name}`);
+    });
+
+    useEcho<ServiceUpdatedEvent>('services', 'ServiceUpdated', ({ service, user }) => {
+        toast(`Service "${service.name}" updated by ${user.name}`);
+    });
+
+    useEcho<ServiceDeletedEvent>('services', 'ServiceDeleted', ({ serviceName, user }) => {
+        toast(`Service "${serviceName}" deleted by ${user.name}`);
     });
 
     const submit: FormEventHandler = (e) => {
