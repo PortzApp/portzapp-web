@@ -51,6 +51,7 @@ export interface Service extends BaseModel {
 
 export interface Order extends BaseModel {
     service_id: number;
+    vessel_id: number;
     requesting_organization_id: number;
     providing_organization_id: number;
     price: number;
@@ -86,10 +87,15 @@ export type UserWithPivot = User & { pivot: { role: UserRoles } };
 export type OrganizationWithUsers = WithRelation<Organization, 'users', UserWithPivot[]>;
 export type ServiceWithOrganization = WithRelation<Service, 'organization', Organization>;
 export type OrderWithService<S = Service> = WithRelation<Order, 'service', S>;
+export type OrderWithVessel<V = Vessel> = WithRelation<Order, 'vessel', V>;
 export type OrderWithRequestingOrganization = WithRelation<Order, 'requesting_organization', Organization>;
 export type OrderWithProvidingOrganization = WithRelation<Order, 'providing_organization', Organization>;
 export type VesselWithOrganization = WithRelation<Vessel, 'organization', Organization>;
 
 // Complex compositions
 export type ServiceWithFullOrganization = ServiceWithOrganization;
-export type OrderWithFullRelations = OrderWithService<ServiceWithFullOrganization> & OrderWithRequestingOrganization & OrderWithProvidingOrganization;
+export type VesselWithFullOrganization = VesselWithOrganization;
+export type OrderWithFullRelations = OrderWithService<ServiceWithFullOrganization> &
+    OrderWithVessel<VesselWithFullOrganization> &
+    OrderWithRequestingOrganization &
+    OrderWithProvidingOrganization;

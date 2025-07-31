@@ -2,7 +2,7 @@
 
 namespace App\Policies;
 
-use App\Enums\UserRoles;
+
 use App\Models\Port;
 use App\Models\User;
 
@@ -13,7 +13,7 @@ class PortPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->role === UserRoles::ADMIN;
+        return true;
     }
 
     /**
@@ -21,7 +21,7 @@ class PortPolicy
      */
     public function view(User $user, Port $port): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -29,7 +29,7 @@ class PortPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -37,7 +37,7 @@ class PortPolicy
      */
     public function update(User $user, Port $port): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -45,7 +45,7 @@ class PortPolicy
      */
     public function delete(User $user, Port $port): bool
     {
-        return false;
+        return true;
     }
 
     /**

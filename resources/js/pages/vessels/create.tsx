@@ -1,62 +1,28 @@
-import { columns } from '@/components/data-table/page-vessels/columns';
-import { VesselsPageDataTable } from '@/components/data-table/page-vessels/data-table';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
-import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import { Vessel } from '@/types/core';
-import { Head, useForm } from '@inertiajs/react';
-import { LoaderCircle, Plus } from 'lucide-react';
-import { FormEventHandler, useState } from 'react';
+import { Head, router, useForm } from '@inertiajs/react';
+import { LoaderCircle } from 'lucide-react';
+import { FormEventHandler } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Vessels',
         href: '/vessels',
     },
+    {
+        title: 'Create Vessel',
+        href: '/vessels/create',
+    },
 ];
 
-export default function OrdersPage({ vessels }: { vessels: Array<Vessel> }) {
-    // const { role: currentRole } = usePage<SharedData>().props.auth.user;
-
-    return (
-        <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Vessels Page" />
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-                <div className="flex items-center justify-between">
-                    <h1 className="text-2xl font-bold">My Vessels</h1>
-                    <CreateVesselDialog />
-                </div>
-
-                <VesselsPageDataTable columns={columns} data={vessels} />
-
-                {vessels.length === 0 && (
-                    <div className="py-8 text-center">
-                        <p className="text-muted-foreground">No vessels found. Create your first vessel!</p>
-                    </div>
-                )}
-            </div>
-        </AppLayout>
-    );
-}
-
-function CreateVesselDialog() {
-    const [openDialog, setOpenDialog] = useState(false);
-
-    type VesselForm = Omit<Vessel, 'id' | 'owner_id' | 'created_at' | 'updated_at'>;
+export default function VesselsCreatePage() {
+    type VesselForm = Omit<Vessel, 'id' | 'owner_id' | 'created_at' | 'updated_at' | 'organization_id'>;
 
     const { data, setData, post, processing, errors, reset } = useForm<VesselForm>({
         name: '',
@@ -70,30 +36,27 @@ function CreateVesselDialog() {
         post(route('vessels.store'), {
             onSuccess: () => {
                 reset();
-                setOpenDialog(false);
+                router.visit(route('vessels.index'), {
+                    only: ['vessels'],
+                });
             },
         });
     };
 
     return (
-        <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-            <DialogTrigger asChild>
-                <Button variant="outline">
-                    <Plus className="h-4 w-4" />
-                    Add Vessel
-                </Button>
-            </DialogTrigger>
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Head title="Vessels Page" />
 
-            <DialogContent>
-                <form onSubmit={submit} className="space-y-4">
-                    <DialogHeader>
-                        <DialogTitle>Create New Vessel</DialogTitle>
-                        <DialogDescription>
-                            Fill out the form below to create a new vessel. You can specify the vessel name, IMO number, vessel type, and status.
-                        </DialogDescription>
-                    </DialogHeader>
+            <form onSubmit={submit} className="flex flex-col gap-8 p-8">
+                <div className="flex flex-col gap-1">
+                    <h1 className="text-xl font-semibold">Create Vessel</h1>
+                    <p className="text-base text-muted-foreground">
+                        Fill out the form below to create a new vessel. You can specify the vessel name, IMO number, vessel type, and status.
+                    </p>
+                </div>
 
-                    <div className="space-y-2">
+                <div className="flex max-w-md flex-col gap-4">
+                    <div className="flex flex-col gap-2">
                         <Label htmlFor="name">Vessel Name</Label>
                         <Input
                             id="name"
@@ -107,7 +70,7 @@ function CreateVesselDialog() {
                         <InputError message={errors.name} />
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="flex flex-col gap-2">
                         <Label htmlFor="imo_number">IMO Number</Label>
                         <Input
                             id="imo_number"
@@ -120,7 +83,7 @@ function CreateVesselDialog() {
                         <InputError message={errors.imo_number} />
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="flex flex-col gap-2">
                         <Label htmlFor="vessel_type">Vessel Type</Label>
                         <Select value={data.vessel_type} onValueChange={(value: 'cargo' | 'tanker' | 'container') => setData('vessel_type', value)}>
                             <SelectTrigger>
@@ -135,7 +98,7 @@ function CreateVesselDialog() {
                         <InputError message={errors.vessel_type} />
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="flex flex-col gap-2">
                         <Label htmlFor="status">Vessel Status</Label>
                         <Select value={data.status} onValueChange={(value: 'active' | 'inactive' | 'maintenance') => setData('status', value)}>
                             <SelectTrigger>
@@ -149,21 +112,13 @@ function CreateVesselDialog() {
                         </Select>
                         <InputError message={errors.status} />
                     </div>
+                </div>
 
-                    <DialogFooter>
-                        <DialogClose asChild>
-                            <Button variant="outline" type="button">
-                                Cancel
-                            </Button>
-                        </DialogClose>
-
-                        <Button type="submit" disabled={processing} className="w-full">
-                            {processing && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
-                            Create Vessel
-                        </Button>
-                    </DialogFooter>
-                </form>
-            </DialogContent>
-        </Dialog>
+                <Button type="submit" disabled={processing} className="w-fit">
+                    {processing && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
+                    Create Vessel
+                </Button>
+            </form>
+        </AppLayout>
     );
 }

@@ -1,191 +1,98 @@
 import { OrdersPageColumnActions } from '@/components/data-table/page-orders/column-actions';
 import { DataTableColumnHeader } from '@/components/data-table/primitives/data-table-column-header';
 import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
-import { Order, OrderWithFullRelations } from '@/types/core';
+import { OrderWithFullRelations } from '@/types/core';
 import { ColumnDef } from '@tanstack/react-table';
 
-export const ordersPageColumnsAsVesselOwnerRole: ColumnDef<Order>[] = [
-    {
-        id: 'select',
-        header: ({ table }) => (
-            <Checkbox
-                checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
-                onCheckedChange={(value: boolean) => table.toggleAllPageRowsSelected(value)}
-                aria-label="Select all"
-            />
-        ),
-        cell: ({ row }) => (
-            <Checkbox checked={row.getIsSelected()} onCheckedChange={(value: boolean) => row.toggleSelected(value)} aria-label="Select row" />
-        ),
-        enableSorting: false,
-        enableHiding: false,
-    },
+export const columns: ColumnDef<OrderWithFullRelations>[] = [
     {
         accessorKey: 'id',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Order ID" />,
+        header: ({ column }) => <DataTableColumnHeader column={column} title="ID" />,
     },
     {
         accessorKey: 'service.name',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Service" />,
+        cell: ({ row }) => {
+            const order = row.original;
+            return <span className="font-medium">{order.service.name}</span>;
+        },
+    },
+    {
+        accessorKey: 'vessel.name',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Vessel" />,
+        cell: ({ row }) => {
+            const order = row.original;
+            return (
+                <div>
+                    <p className="font-medium">{order.vessel.name}</p>
+                    <p className="text-xs text-muted-foreground">IMO: {order.vessel.imo_number}</p>
+                </div>
+            );
+        },
+    },
+    {
+        accessorKey: 'status',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
+        cell: ({ row }) => {
+            const order = row.original;
+
+            return (
+                <Badge
+                    className={cn(
+                        order.status === 'pending' && 'bg-yellow-200 text-yellow-950 uppercase dark:bg-yellow-900 dark:text-yellow-50',
+                        order.status === 'accepted' && 'bg-blue-200 text-blue-950 uppercase dark:bg-blue-900 dark:text-blue-50',
+                        order.status === 'in_progress' && 'bg-purple-200 text-purple-950 uppercase dark:bg-purple-900 dark:text-purple-50',
+                        order.status === 'completed' && 'bg-green-200 text-green-950 uppercase dark:bg-green-900 dark:text-green-50',
+                        order.status === 'cancelled' && 'bg-red-200 text-red-950 uppercase dark:bg-red-900 dark:text-red-50',
+                    )}
+                >
+                    {order.status.replace('_', ' ')}
+                </Badge>
+            );
+        },
+    },
+    {
+        accessorKey: 'price',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Price" />,
+        cell: ({ row }) => {
+            const order = row.original;
+
+            return <span className="font-mono">${order.price.toLocaleString()}</span>;
+        },
+    },
+    {
+        accessorKey: 'requesting_organization.name',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Requesting Org" />,
+        cell: ({ row }) => {
+            const order = row.original;
+
+            return <span className="text-sm">{order.requesting_organization.name}</span>;
+        },
     },
     {
         accessorKey: 'providing_organization.name',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Agency" />,
-    },
-    {
-        accessorKey: 'price',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Price" />,
-        cell: ({ row }) => {
-            const amount = parseFloat(row.getValue('price'));
-            const formatted = new Intl.NumberFormat('en-US', {
-                style: 'currency',
-                currency: 'USD',
-            }).format(amount);
-
-            return <div className="text-left font-medium tabular-nums">{formatted}</div>;
-        },
-    },
-    {
-        accessorKey: 'status',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Providing Org" />,
         cell: ({ row }) => {
             const order = row.original;
 
-            return (
-                <Badge
-                    className={cn(
-                        order.status === 'pending' && 'bg-neutral-500 text-neutral-950 uppercase',
-                        order.status === 'accepted' && 'bg-blue-500 text-blue-950 uppercase',
-                        order.status === 'in_progress' && 'bg-amber-500 text-amber-950 uppercase',
-                        order.status === 'completed' && 'bg-green-500 text-green-950 uppercase',
-                        order.status === 'cancelled' && 'bg-red-500 text-red-950 uppercase',
-                    )}
-                >
-                    {order.status}
-                </Badge>
-            );
+            return <span className="text-sm">{order.providing_organization.name}</span>;
         },
     },
     {
         accessorKey: 'created_at',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Ordered on" />,
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Created on" />,
         cell: ({ row }) => {
             const order = row.original;
 
             return (
-                <p className="tabular-nums">
+                <p className="text-sm tabular-nums">
                     {new Date(order.created_at).toLocaleDateString('en-US', {
                         year: 'numeric',
-                        month: 'long',
+                        month: 'short',
                         day: 'numeric',
                         hour: '2-digit',
                         minute: '2-digit',
-                        second: '2-digit',
-                        hour12: false,
-                    })}
-                </p>
-            );
-        },
-    },
-    {
-        id: 'actions',
-        header: () => null,
-        cell: ({ row }) => {
-            const order = row.original;
-
-            return (
-                <>
-                    <OrdersPageColumnActions order={order} />
-                </>
-            );
-        },
-    },
-];
-
-export const ordersPageColumnsAsShippingAgencyRole: ColumnDef<Order>[] = [
-    {
-        id: 'select',
-        header: ({ table }) => (
-            <Checkbox
-                checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
-                onCheckedChange={(value: boolean) => table.toggleAllPageRowsSelected(value)}
-                aria-label="Select all"
-            />
-        ),
-        cell: ({ row }) => (
-            <Checkbox checked={row.getIsSelected()} onCheckedChange={(value: boolean) => row.toggleSelected(value)} aria-label="Select row" />
-        ),
-        enableSorting: false,
-        enableHiding: false,
-    },
-    {
-        accessorKey: 'id',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Order ID" />,
-    },
-    {
-        accessorKey: 'service.name',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Service" />,
-    },
-    {
-        accessorKey: `vessel_owner_id`,
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Customer" />,
-        cell: ({ row }) => {
-            const order = row.original as OrderWithFullRelations;
-
-            return <div>{order.requesting_organization.name}</div>;
-        },
-    },
-    {
-        accessorKey: 'price',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Price" />,
-        cell: ({ row }) => {
-            const amount = parseFloat(row.getValue('price'));
-            const formatted = new Intl.NumberFormat('en-US', {
-                style: 'currency',
-                currency: 'USD',
-            }).format(amount);
-
-            return <div className="text-left font-medium tabular-nums">{formatted}</div>;
-        },
-    },
-    {
-        accessorKey: 'status',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
-        cell: ({ row }) => {
-            const order = row.original;
-
-            return (
-                <Badge
-                    className={cn(
-                        order.status === 'pending' && 'bg-neutral-500 text-neutral-950 uppercase',
-                        order.status === 'accepted' && 'bg-blue-500 text-blue-950 uppercase',
-                        order.status === 'in_progress' && 'bg-amber-500 text-amber-950 uppercase',
-                        order.status === 'completed' && 'bg-green-500 text-green-950 uppercase',
-                        order.status === 'cancelled' && 'bg-red-500 text-red-950 uppercase',
-                    )}
-                >
-                    {order.status}
-                </Badge>
-            );
-        },
-    },
-    {
-        accessorKey: 'created_at',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Requested on" />,
-        cell: ({ row }) => {
-            const order = row.original;
-
-            return (
-                <p className="tabular-nums">
-                    {new Date(order.created_at).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        second: '2-digit',
                         hour12: false,
                     })}
                 </p>
