@@ -22,7 +22,6 @@ import { Service } from '@/types/core';
 import { Link, router } from '@inertiajs/react';
 import { Edit, Eye, MoreHorizontal, Trash2 } from 'lucide-react';
 import { useState } from 'react';
-import { toast } from 'sonner';
 
 export function ServicesPageColumnActions({ service }: { service: Service }) {
     const [openDropdown, setOpenDropdown] = useState(false);
@@ -33,7 +32,6 @@ export function ServicesPageColumnActions({ service }: { service: Service }) {
             onSuccess: () => {
                 setOpenDeleteServiceDialog(false);
                 setOpenDropdown(false);
-                toast(`Service #${service.id} deleted successfully!`);
             },
         });
     }
