@@ -8,10 +8,36 @@ import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import { Port, Service } from '@/types/core';
 import { Head, router, useForm } from '@inertiajs/react';
+import { useEcho } from '@laravel/echo-react';
 import { LoaderCircle } from 'lucide-react';
-import { FormEventHandler } from 'react';
+import { FormEventHandler, useState } from 'react';
+import { toast } from 'sonner';
 
-export default function ServiceEditPage({ service, ports }: { service: Service; ports: Port[] }) {
+interface ServiceEvent {
+    message: string;
+    user: {
+        id: number;
+        name: string;
+        email: string;
+    };
+    timestamp: string;
+}
+
+interface ServiceCreatedEvent extends ServiceEvent {
+    service: Service;
+}
+
+interface ServiceUpdatedEvent extends ServiceEvent {
+    service: Service;
+}
+
+interface ServiceDeletedEvent extends ServiceEvent {
+    serviceId: number;
+    serviceName: string;
+}
+
+export default function ServiceEditPage({ service: initialService, ports }: { service: Service; ports: Port[] }) {
+    const [service, setService] = useState(initialService);
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Services',
@@ -41,6 +67,37 @@ export default function ServiceEditPage({ service, ports }: { service: Service; 
         price: typeof service.price === 'string' ? parseFloat(service.price) : service.price,
         status: service.status,
         port_id: service.port_id,
+    });
+
+    // Listen for service events
+    useEcho<ServiceCreatedEvent>('services', 'ServiceCreated', ({ service: newService, user }) => {
+        toast(`New service "${newService.name}" created by ${user.name}`);
+    });
+
+    useEcho<ServiceUpdatedEvent>('services', 'ServiceUpdated', ({ service: updatedService, user }) => {
+        if (updatedService.id === service.id) {
+            setService({ ...service, ...updatedService });
+            // Update form data if this service was updated
+            setData({
+                name: updatedService.name,
+                description: updatedService.description || '',
+                price: typeof updatedService.price === 'string' ? parseFloat(updatedService.price) : updatedService.price,
+                status: updatedService.status,
+                port_id: updatedService.port_id,
+            });
+            toast(`This service was updated by ${user.name}`);
+        } else {
+            toast(`Service "${updatedService.name}" updated by ${user.name}`);
+        }
+    });
+
+    useEcho<ServiceDeletedEvent>('services', 'ServiceDeleted', ({ serviceId, serviceName, user }) => {
+        if (serviceId === service.id) {
+            toast(`This service was deleted by ${user.name}`);
+            router.visit(route('services.index'));
+        } else {
+            toast(`Service "${serviceName}" deleted by ${user.name}`);
+        }
     });
 
     const submit: FormEventHandler = (e) => {
