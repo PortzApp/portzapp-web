@@ -1,13 +1,16 @@
-import { servicesPageColumns } from '@/components/data-table/page-services/columns';
-import { ServicesPageDataTable } from '@/components/data-table/page-services/data-table';
-import { buttonVariants } from '@/components/ui/button';
+import { ServicesPageColumnActions } from '@/components/data-table/page-services/column-actions';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-import { Service } from '@/types/core';
+import { Port, ServiceWithRelations } from '@/types/core';
 import { Head, Link, router } from '@inertiajs/react';
 import { useEcho } from '@laravel/echo-react';
-import { Plus } from 'lucide-react';
-import { useState } from 'react';
+import { Plus, Star } from 'lucide-react';
+import { parseAsString, useQueryState } from 'nuqs';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -28,11 +31,11 @@ interface ServiceEvent {
 }
 
 interface ServiceCreatedEvent extends ServiceEvent {
-    service: Service;
+    service: ServiceWithRelations;
 }
 
 interface ServiceUpdatedEvent extends ServiceEvent {
-    service: Service;
+    service: ServiceWithRelations;
 }
 
 interface ServiceDeletedEvent extends ServiceEvent {
@@ -40,8 +43,31 @@ interface ServiceDeletedEvent extends ServiceEvent {
     serviceName: string;
 }
 
-export default function Services({ services: initialServices }: { services: Service[] }) {
+interface ServicesPageProps {
+    services: ServiceWithRelations[];
+    ports: Port[];
+}
+
+export default function Services({ services: initialServices, ports }: ServicesPageProps) {
     const [services, setServices] = useState(initialServices);
+
+    const [portFilter, setPortFilter] = useQueryState(
+        'port',
+        parseAsString.withDefault('').withOptions({
+            shallow: false,
+            history: 'push',
+        }),
+    );
+
+    // Sync new props back to local state after server refetch
+    useEffect(() => {
+        setServices(initialServices);
+    }, [initialServices]);
+
+    const handlePortFilterChange = async (value: string) => {
+        await setPortFilter(value);
+        router.reload({ only: ['services'] });
+    };
 
     // Listen for service created events
     useEcho<ServiceCreatedEvent>('services', 'ServiceCreated', ({ service: newService }) => {
@@ -93,17 +119,45 @@ export default function Services({ services: initialServices }: { services: Serv
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Services Page" />
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+            <div className="mx-auto flex h-full w-full max-w-6xl flex-1 flex-col gap-12 overflow-x-auto rounded-xl p-8">
                 <div className="flex items-center justify-between">
                     <h1 className="text-2xl font-bold">Services</h1>
 
-                    <Link href={'/services/create'} className={buttonVariants({ variant: 'default' })}>
+                    {/* <Link href={'/services/create'} className={buttonVariants({ variant: 'default' })}>
                         <Plus className="mr-2 h-4 w-4" />
                         Add Service
-                    </Link>
+                    </Link> */}
                 </div>
 
-                <ServicesPageDataTable columns={servicesPageColumns} data={services} />
+                {/*<ServicesPageDataTable columns={servicesPageColumns} data={services} />*/}
+
+                <div className="grid grid-cols-12 gap-16">
+                    <div className="col-span-3 flex flex-col">
+                        <div className="flex items-center justify-between">
+                            <h1 className="font-medium">Filters</h1>
+                        </div>
+
+                        <Accordion type="single" collapsible className="w-full">
+                            <AccordionItem value="filter_ports" className="py-2">
+                                <AccordionTrigger className="py-4 text-[15px] leading-6 hover:no-underline">
+                                    <span className="text-sm font-semibold uppercase">Ports</span>
+                                </AccordionTrigger>
+                                <AccordionContent className="pb-2 text-muted-foreground">
+                                    <RadioGroup value={portFilter} onValueChange={handlePortFilterChange}>
+                                        {ports.map((port) => (
+                                            <div className="flex items-center gap-2" key={port.id}>
+                                                <RadioGroupItem value={port.name} id={port.id.toString()} />
+                                                <Label htmlFor={port.id.toString()}>{port.name}</Label>
+                                            </div>
+                                        ))}
+                                    </RadioGroup>
+                                </AccordionContent>
+                            </AccordionItem>
+                        </Accordion>
+                    </div>
+
+                    </Link>
+                </div>
 
                 {services.length === 0 && (
                     <div className="py-8 text-center">
