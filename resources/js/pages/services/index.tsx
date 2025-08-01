@@ -156,7 +156,64 @@ export default function Services({ services: initialServices, ports }: ServicesP
                         </Accordion>
                     </div>
 
-                    </Link>
+                    <div className="col-span-9 grid grid-cols-1 gap-4">
+                        {services.map((service) => (
+                            <div
+                                key={service.id}
+                                className="flex flex-col gap-2 rounded-xl border bg-card p-6 text-card-foreground shadow-md transition-shadow hover:shadow-lg"
+                            >
+                                <div className="flex items-start gap-6">
+                                    <div className="size-12 rounded-md bg-neutral-200" />
+                                    <div className="flex flex-1 flex-col gap-4">
+                                        <div className="flex justify-between">
+                                            <div className="flex flex-col gap-2">
+                                                <Link
+                                                    href={route('services.show', service.id)}
+                                                    className="text-lg font-semibold hover:underline hover:underline-offset-4"
+                                                >
+                                                    {service.name}
+                                                </Link>
+                                                <h3 className="inline-flex items-center gap-2 text-sm font-normal">
+                                                    <div className="size-4 rounded-full bg-neutral-200" />
+                                                    <span>{service.organization.name}</span>
+                                                </h3>
+                                            </div>
+                                            <ServicesPageColumnActions service={service} />
+                                        </div>
+
+                                        <div className="flex items-center gap-2">
+                                            <div className="flex gap-1">
+                                                <Star fill="#eab308" className="size-4 text-yellow-500" />
+                                                <Star fill="#eab308" className="size-4 text-yellow-500" />
+                                                <Star fill="#eab308" className="size-4 text-yellow-500" />
+                                                <Star fill="#eab308" className="size-4 text-yellow-500" />
+                                                <Star className="size-4 text-yellow-500" />
+                                            </div>
+                                            <span className="text-sm font-normal">(4.0)</span>
+                                        </div>
+
+                                        <p className="line-clamp-2 text-sm text-muted-foreground">{service.description || 'No description.'}</p>
+
+                                        <div className="flex justify-between">
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-xl font-medium text-primary">
+                                                    {new Intl.NumberFormat('en-US', {
+                                                        style: 'currency',
+                                                        currency: 'USD',
+                                                    }).format(Number(service.price))}
+                                                </span>
+                                            </div>
+
+                                            <Button variant="outline" size="sm">
+                                                <Plus className="size-4" />
+                                                Add
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
 
                 {services.length === 0 && (
