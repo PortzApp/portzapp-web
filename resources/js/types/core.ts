@@ -86,6 +86,8 @@ export type UserWithOrganizations = WithRelation<User, 'organizations', Organiza
 export type UserWithPivot = User & { pivot: { role: UserRoles } };
 export type OrganizationWithUsers = WithRelation<Organization, 'users', UserWithPivot[]>;
 export type ServiceWithOrganization = WithRelation<Service, 'organization', Organization>;
+export type ServiceWithPort = WithRelation<Service, 'port', Port>;
+export type ServiceWithRelations = ServiceWithOrganization & ServiceWithPort;
 export type OrderWithService<S = Service> = WithRelation<Order, 'service', S>;
 export type OrderWithVessel<V = Vessel> = WithRelation<Order, 'vessel', V>;
 export type OrderWithRequestingOrganization = WithRelation<Order, 'requesting_organization', Organization>;

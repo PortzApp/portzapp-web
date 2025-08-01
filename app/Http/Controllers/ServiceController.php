@@ -23,10 +23,23 @@ class ServiceController extends Controller
     {
         Gate::authorize('view-any', Service::class);
 
-        $services = Service::query()->with(['organization:id,name', 'port:id,name'])->latest()->get();
+        $query = Service::query()->with(['organization', 'port']);
+
+        // Filter by port if provided
+        if (request()->has('port') && request()->get('port') !== '') {
+            $portFilter = request()->get('port');
+
+            // Filter by port name
+            $query->whereHas('port', function ($q) use ($portFilter) {
+                $q->where('name', 'like', '%' . $portFilter . '%');
+            });
+        }
+
+        $services = $query->latest()->get();
 
         return Inertia::render('services/index', [
-            'services' => $services,
+            'services' => Inertia::always($services),
+            'ports' => Port::query()->orderBy('name')->get(),
         ]);
     }
 
