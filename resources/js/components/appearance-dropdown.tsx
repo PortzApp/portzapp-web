@@ -1,4 +1,3 @@
-import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useAppearance } from '@/hooks/use-appearance';
 import { Monitor, Moon, Sun } from 'lucide-react';
@@ -10,11 +9,11 @@ export default function AppearanceToggleDropdown({ className = '', ...props }: H
     const getCurrentIcon = () => {
         switch (appearance) {
             case 'dark':
-                return <Moon className="h-5 w-5" />;
+                return <Moon className="mr-2" />;
             case 'light':
-                return <Sun className="h-5 w-5" />;
+                return <Sun className="mr-2" />;
             default:
-                return <Monitor className="h-5 w-5" />;
+                return <Monitor className="mr-2" />;
         }
     };
 
@@ -22,10 +21,12 @@ export default function AppearanceToggleDropdown({ className = '', ...props }: H
         <div className={className} {...props}>
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-9 w-9 rounded-md">
-                        {getCurrentIcon()}
-                        <span className="sr-only">Toggle theme</span>
-                    </Button>
+                    <DropdownMenuItem asChild>
+                        <button type="button" className="block w-full">
+                            {getCurrentIcon()}
+                            Switch theme
+                        </button>
+                    </DropdownMenuItem>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                     <DropdownMenuItem onClick={() => updateAppearance('light')}>
