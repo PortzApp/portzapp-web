@@ -10,10 +10,8 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('service_categories', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->timestamps();
+        Schema::table('services', function (Blueprint $table) {
+            $table->foreignId('service_category_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
         });
     }
 
@@ -22,6 +20,8 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('service_categories');
+        Schema::table('services', function (Blueprint $table) {
+            $table->dropColumn('service_category_id');
+        });
     }
 };
