@@ -1,7 +1,11 @@
 import { VesselsPageColumnActions } from '@/components/data-table/page-vessels/column-actions';
 import { DataTableColumnHeader } from '@/components/data-table/primitives/data-table-column-header';
+import BulkCarrierIcon from '@/components/icons/vessel-type-bulk-carrier-icon';
+import ContainerShipIcon from '@/components/icons/vessel-type-container-ship-icon';
+import TankerShipIcon from '@/components/icons/vessel-type-tanker-ship-icon';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import { Vessel } from '@/types/core';
 import { ColumnDef } from '@tanstack/react-table';
@@ -46,16 +50,23 @@ export const columns: ColumnDef<Vessel>[] = [
         cell: ({ row }) => {
             const vessel = row.original;
 
+            const IconComponent = {
+                cargo: BulkCarrierIcon,
+                tanker: TankerShipIcon,
+                container: ContainerShipIcon,
+            }[vessel.vessel_type] || BulkCarrierIcon;
+
             return (
-                <Badge
-                    className={cn(
-                        vessel.vessel_type === 'cargo' && 'bg-neutral-100 text-neutral-800 uppercase',
-                        vessel.vessel_type === 'tanker' && 'bg-neutral-100 text-neutral-800 uppercase',
-                        vessel.vessel_type === 'container' && 'bg-neutral-100 text-neutral-800 uppercase',
-                    )}
-                >
-                    {vessel.vessel_type}
-                </Badge>
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger>
+                                <IconComponent className="h-15 w-15 text-neutral-600"/>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p className="capitalize">{vessel.vessel_type} Vessel</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
             );
         },
     },
