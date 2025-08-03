@@ -1,6 +1,7 @@
 import { VesselsPageColumnActions } from '@/components/data-table/page-vessels/column-actions';
 import { DataTableColumnHeader } from '@/components/data-table/primitives/data-table-column-header';
 import { Badge } from '@/components/ui/badge';
+import { VesselTypeBadge } from '@/components/badges';
 import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
 import { Vessel } from '@/types/core';
@@ -45,18 +46,7 @@ export const columns: ColumnDef<Vessel>[] = [
         header: ({ column }) => <DataTableColumnHeader column={column} title="Type" />,
         cell: ({ row }) => {
             const vessel = row.original;
-
-            return (
-                <Badge
-                    className={cn(
-                        vessel.vessel_type === 'cargo' && 'bg-neutral-100 text-neutral-800 uppercase',
-                        vessel.vessel_type === 'tanker' && 'bg-neutral-100 text-neutral-800 uppercase',
-                        vessel.vessel_type === 'container' && 'bg-neutral-100 text-neutral-800 uppercase',
-                    )}
-                >
-                    {vessel.vessel_type}
-                </Badge>
-            );
+            return <VesselTypeBadge type={vessel.vessel_type} iconOnly />;
         },
     },
     {
