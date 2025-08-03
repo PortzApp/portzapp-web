@@ -44,8 +44,6 @@ class ServiceController extends Controller
             $query->whereHas('category', function ($q) use ($categoryFilter) {
                 $q->where('name', 'like', '%' . $categoryFilter . '%');
             });
-
-            dd($query);
         }
 
         $services = $query->latest()->get();
