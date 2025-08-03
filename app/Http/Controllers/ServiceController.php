@@ -9,6 +9,7 @@ use App\Http\Requests\ServiceCreateRequest;
 use App\Http\Requests\ServiceUpdateRequest;
 use App\Models\Port;
 use App\Models\Service;
+use App\Models\ServiceCategory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
@@ -23,7 +24,7 @@ class ServiceController extends Controller
     {
         Gate::authorize('view-any', Service::class);
 
-        $query = Service::query()->with(['organization', 'port']);
+        $query = Service::query()->with(['organization', 'port', 'category', 'orders']);
 
         // Filter by port if provided
         if (request()->has('port') && request()->get('port') !== '') {
@@ -35,11 +36,22 @@ class ServiceController extends Controller
             });
         }
 
+        // Filter by category if provided
+        if (request()->has('category') && request()->get('category') !== '') {
+            $categoryFilter = request()->get('category');
+
+            // Filter by category name
+            $query->whereHas('category', function ($q) use ($categoryFilter) {
+                $q->where('name', 'like', '%' . $categoryFilter . '%');
+            });
+        }
+
         $services = $query->latest()->get();
 
         return Inertia::render('services/index', [
             'services' => Inertia::always($services),
             'ports' => Port::query()->orderBy('name')->get(),
+            'service_categories' => ServiceCategory::query()->orderBy('service_categories.name')->get(),
         ]);
     }
 
@@ -62,7 +74,7 @@ class ServiceController extends Controller
         ]);
 
         // Load relationships for the created service
-        $service->load(['organization:id,name', 'port:id,name']);
+        $service->load(['organization:id,name', 'port:id,name', 'category:id,name', 'orders']);
 
         ServiceCreated::dispatch($request->user(), $service);
 
@@ -88,7 +100,7 @@ class ServiceController extends Controller
     {
         Gate::authorize('view', $service);
 
-        $service->load(['organization:id,name', 'port:id,name']);
+        $service->load(['organization:id,name', 'port:id,name', 'category:id,name', 'orders']);
 
         return Inertia::render('services/show', [
             'service' => $service,
@@ -102,7 +114,7 @@ class ServiceController extends Controller
     {
         Gate::authorize('update', $service);
 
-        $service->load(['organization:id,name', 'port:id,name']);
+        $service->load(['organization:id,name', 'port:id,name', 'orders']);
 
         return Inertia::render('services/edit', [
             'service' => $service,
@@ -128,7 +140,7 @@ class ServiceController extends Controller
         ]);
 
         // Refresh the service with relationships to get the latest data
-        $service->refresh()->load(['organization:id,name', 'port:id,name']);
+        $service->refresh()->load(['organization:id,name', 'port:id,name', 'orders']);
 
         ServiceUpdated::dispatch($request->user(), $service);
 
@@ -150,5 +162,102 @@ class ServiceController extends Controller
         ServiceDeleted::dispatch(request()->user(), $serviceId, $serviceName);
 
         return to_route('services.index')->with('message', 'Service deleted successfully!');
+    }
+
+    /**
+     * Display orders for a specific service.
+     */
+    public function orders(Service $service)
+    {
+        Gate::authorize('view', $service);
+
+        // Load the service with its orders and related data
+        $service->load([
+            'orders' => function ($query) {
+                $query->with([
+                    'vessel:id,name,imo_number',
+                    'requestingOrganization:id,name,business_type',
+                    'providingOrganization:id,name,business_type'
+                ])->latest();
+            },
+            'organization:id,name',
+            'port:id,name'
+        ]);
+
+        return Inertia::render('services/orders', [
+            'service' => $service,
+            'orders' => $service->orders,
+        ]);
+    }
+
+    /**
+     * Attach an order to a service (for many-to-many relationship).
+     */
+    public function attachOrder(Service $service, int $orderId): RedirectResponse
+    {
+        Gate::authorize('update', $service);
+
+        // Attach the order to the service using the pivot table
+        $service->orders()->attach($orderId);
+
+        return back()->with('message', 'Order attached to service successfully!');
+    }
+
+    /**
+     * Detach an order from a service (for many-to-many relationship).
+     */
+    public function detachOrder(Service $service, int $orderId): RedirectResponse
+    {
+        Gate::authorize('update', $service);
+
+        // Detach the order from the service using the pivot table
+        $service->orders()->detach($orderId);
+
+        return back()->with('message', 'Order detached from service successfully!');
+    }
+
+    /**
+     * Get order count for a service.
+     */
+    public function getOrderCount(Service $service): int
+    {
+        return $service->orders()->count();
+    }
+
+    /**
+     * Check if a service has a specific order.
+     */
+    public function hasOrder(Service $service, int $orderId): bool
+    {
+        return $service->orders()->where('orders.id', $orderId)->exists();
+    }
+
+    /**
+     * Sync orders for a service (replace all current orders with new ones).
+     */
+    public function syncOrders(Service $service, array $orderIds): RedirectResponse
+    {
+        Gate::authorize('update', $service);
+
+        // Sync orders using the pivot table (removes old associations and adds new ones)
+        $service->orders()->sync($orderIds);
+
+        return back()->with('message', 'Service orders synchronized successfully!');
+    }
+
+    /**
+     * Get services with order counts for reporting purposes.
+     */
+    public function servicesWithOrderCounts()
+    {
+        Gate::authorize('view-any', Service::class);
+
+        $services = Service::with(['organization:id,name', 'port:id,name', 'category:id,name'])
+            ->withCount('orders')
+            ->get();
+
+        return response()->json([
+            'services' => $services
+        ]);
     }
 }

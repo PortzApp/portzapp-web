@@ -19,7 +19,7 @@ class OrderController extends Controller
     public function index()
     {
         $query = Order::with([
-            'service.organization:id,name,business_type',
+            'services.organization:id,name,business_type',
             'vessel:id,name,imo_number,organization_id',
             'requestingOrganization:id,name,business_type',
             'providingOrganization:id,name,business_type',
@@ -75,7 +75,6 @@ class OrderController extends Controller
         }
 
         $order = Order::create([
-            'service_id' => $validated['service_id'],
             'vessel_id' => $validated['vessel_id'],
             'requesting_organization_id' => $vesselOwnerOrg->id,
             'providing_organization_id' => $service->organization_id,
@@ -83,6 +82,9 @@ class OrderController extends Controller
             'notes' => $validated['notes'] ?? null,
             'status' => 'pending',
         ]);
+
+        // Attach the service using pivot relationship
+        $order->services()->attach($validated['service_id']);
 
         return to_route('orders')->with('message', 'Order created successfully!');
     }
@@ -127,7 +129,7 @@ class OrderController extends Controller
         Gate::authorize('view', $order);
 
         $order->load([
-            'service.organization:id,name,business_type',
+            'services.organization:id,name,business_type',
             'vessel:id,name,imo_number,organization_id',
             'requestingOrganization:id,name,business_type',
             'providingOrganization:id,name,business_type',
@@ -160,7 +162,7 @@ class OrderController extends Controller
             ->with('organization:id,name')
             ->get();
 
-        $order->load(['service', 'vessel']);
+        $order->load(['services', 'vessel']);
 
         return Inertia::render('orders/edit', [
             'order' => $order,
@@ -177,6 +179,20 @@ class OrderController extends Controller
         Gate::authorize('update', $order);
 
         $validated = $request->validated();
+
+        // Handle service updates if service_id is provided
+        if (isset($validated['service_id'])) {
+            // Sync to maintain single service functionality
+            $order->services()->sync([$validated['service_id']]);
+            
+            // Update the order's providing organization based on the new service
+            $service = Service::findOrFail($validated['service_id']);
+            $validated['providing_organization_id'] = $service->organization_id;
+            $validated['price'] = $service->price;
+            
+            // Remove service_id from validated data as it's not a direct column
+            unset($validated['service_id']);
+        }
 
         $order->update($validated);
 

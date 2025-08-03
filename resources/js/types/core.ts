@@ -47,6 +47,7 @@ export interface Service extends BaseModel {
     status: 'active' | 'inactive';
     organization_id: number;
     port_id: number;
+    service_category_id: number;
 }
 
 export interface Order extends BaseModel {
@@ -78,6 +79,10 @@ export interface Port extends BaseModel {
     timezone: string;
 }
 
+export interface ServiceCategory extends BaseModel {
+    name: string;
+}
+
 // Generic type for adding relationships
 export type WithRelation<T, K extends string, R> = T & Record<K, R>;
 
@@ -87,7 +92,8 @@ export type UserWithPivot = User & { pivot: { role: UserRoles } };
 export type OrganizationWithUsers = WithRelation<Organization, 'users', UserWithPivot[]>;
 export type ServiceWithOrganization = WithRelation<Service, 'organization', Organization>;
 export type ServiceWithPort = WithRelation<Service, 'port', Port>;
-export type ServiceWithRelations = ServiceWithOrganization & ServiceWithPort;
+export type ServiceWithCategory = WithRelation<Service, 'category', ServiceCategory>;
+export type ServiceWithRelations = ServiceWithOrganization & ServiceWithPort & ServiceWithCategory;
 export type OrderWithService<S = Service> = WithRelation<Order, 'service', S>;
 export type OrderWithVessel<V = Vessel> = WithRelation<Order, 'vessel', V>;
 export type OrderWithRequestingOrganization = WithRelation<Order, 'requesting_organization', Organization>;

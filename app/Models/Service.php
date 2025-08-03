@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Service extends Model
 {
@@ -23,6 +23,7 @@ class Service extends Model
         'status',
         'organization_id',
         'port_id',
+        'service_category_id'
     ];
 
     /**
@@ -32,20 +33,27 @@ class Service extends Model
     {
         return $this->belongsTo(Organization::class);
     }
-
-    /**
-     * Get the orders for the current service.
-     */
-    public function orders(): HasMany
-    {
-        return $this->hasMany(Order::class);
-    }
-
+    
     /**
      * Get the port assigned to the service.
      */
     public function port(): BelongsTo
     {
         return $this->belongsTo(Port::class);
+    }
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(ServiceCategory::class, 'service_category_id');
+    }
+
+    /**
+     * Get the orders for the current service.
+     */
+    public function orders(): BelongsToMany
+    {
+        return $this->belongsToMany(Order::class, 'order_service')
+            ->as('orderService')
+            ->withTimestamps();
     }
 }
