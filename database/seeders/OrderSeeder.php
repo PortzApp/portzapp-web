@@ -48,13 +48,14 @@ class OrderSeeder extends Seeder
                 $providingOrg = $shippingAgencyOrganizations->random();
                 $chosenVessel = $orgVessels->random();
 
-                Order::factory()->create([
-                    'service_id' => $chosenService->id,
+                $order = Order::factory()->create([
                     'vessel_id' => $chosenVessel->id,
                     'requesting_organization_id' => $requestingOrg->id,
                     'providing_organization_id' => $providingOrg->id,
                     'price' => $chosenService->price,
                 ]);
+
+                $order->services()->attach($chosenService->id);
             }
         });
 
