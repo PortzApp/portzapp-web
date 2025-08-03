@@ -25,6 +25,7 @@ class UpdateOrderRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'service_id' => ['sometimes', 'exists:services,id'],
             'vessel_id' => ['sometimes', 'exists:vessels,id'],
             'status' => 'sometimes|in:pending,accepted,in_progress,completed,cancelled',
             'notes' => 'sometimes|string|nullable',

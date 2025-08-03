@@ -21,7 +21,6 @@ class OrderFactory extends Factory
     public function definition(): array
     {
         return [
-            'service_id' => Service::factory(),
             'vessel_id' => Vessel::factory(),
             'requesting_organization_id' => Organization::factory(),
             'providing_organization_id' => Organization::factory(),
