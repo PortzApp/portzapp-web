@@ -9,8 +9,8 @@ import type { BreadcrumbItem, SharedData } from '@/types';
 import { Port, ServiceWithRelations } from '@/types/core';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { useEcho } from '@laravel/echo-react';
-import { Box, MapPin, Plus, Star } from 'lucide-react';
-import { parseAsString, useQueryState } from 'nuqs';
+import { Box, MapPin, Plus, RotateCcw, Star } from 'lucide-react';
+import { parseAsString, useQueryState, useQueryStates } from 'nuqs';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -75,6 +75,24 @@ export default function Services({ services: initialServices, ports, service_cat
             history: 'push',
         }),
     );
+
+    // Alternative approach using useQueryStates for batch operations
+    const [, setFilters] = useQueryStates(
+        {
+            port: parseAsString.withDefault(''),
+            category: parseAsString.withDefault(''),
+        },
+        {
+            shallow: false,
+            history: 'push',
+        },
+    );
+
+    const resetAllFilters = async () => {
+        // Clear all filters by setting them to null
+        await setFilters(null);
+        router.reload({ only: ['services'] });
+    };
 
     // Sync new props back to local state after server refetch
     useEffect(() => {
@@ -149,6 +167,10 @@ export default function Services({ services: initialServices, ports, service_cat
                     <div className="col-span-3 flex flex-col">
                         <div className="flex items-center justify-between">
                             <h1 className="font-medium">Filters</h1>
+                            <Button variant="ghost" size="sm" onClick={resetAllFilters} className="text-xs">
+                                <RotateCcw className="mr-1 h-3 w-3" />
+                                Reset
+                            </Button>
                         </div>
 
                         <Accordion type="multiple" defaultValue={['filter_ports', 'filter_categories']} className="w-full">
