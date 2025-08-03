@@ -150,7 +150,7 @@ export default function Services({ services: initialServices, ports, service_cat
                             <h1 className="font-medium">Filters</h1>
                         </div>
 
-                        <Accordion type="single" collapsible className="w-full">
+                        <Accordion type="multiple" defaultValue={['filter_ports', 'filter_categories']} className="w-full">
                             <AccordionItem value="filter_ports" className="py-2">
                                 <AccordionTrigger className="py-4 text-[15px] leading-6 hover:no-underline">
                                     <span className="text-sm font-semibold uppercase">Ports</span>
@@ -172,9 +172,7 @@ export default function Services({ services: initialServices, ports, service_cat
                                     </RadioGroup>
                                 </AccordionContent>
                             </AccordionItem>
-                        </Accordion>
 
-                        <Accordion type="single" collapsible className="w-full">
                             <AccordionItem value="filter_categories" className="py-2">
                                 <AccordionTrigger className="py-4 text-[15px] leading-6 hover:no-underline">
                                     <span className="text-sm font-semibold uppercase">Categories</span>
