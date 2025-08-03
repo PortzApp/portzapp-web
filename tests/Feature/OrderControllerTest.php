@@ -6,6 +6,7 @@ use App\Models\Order;
 use App\Models\Organization;
 use App\Models\Service;
 use App\Models\User;
+use App\Models\Vessel;
 
 beforeEach(function (): void {
     // Create organizations
@@ -60,6 +61,19 @@ beforeEach(function (): void {
         'role' => UserRoles::ADMIN->value,
     ]);
 
+    // Create vessels
+    $this->vessel = Vessel::factory()->create([
+        'organization_id' => $this->vesselOwnerOrg->id,
+        'name' => 'Test Vessel 1',
+        'imo_number' => '1234567',
+    ]);
+
+    $this->vessel2 = Vessel::factory()->create([
+        'organization_id' => $this->vesselOwnerOrg2->id,
+        'name' => 'Test Vessel 2',
+        'imo_number' => '7654321',
+    ]);
+
     // Create services
     $this->service = Service::factory()->create([
         'organization_id' => $this->shippingAgencyOrg->id,
@@ -79,22 +93,26 @@ beforeEach(function (): void {
 
     // Create orders
     $this->order = Order::factory()->create([
-        'service_id' => $this->service->id,
+        'vessel_id' => $this->vessel->id,
         'requesting_organization_id' => $this->vesselOwnerOrg->id,
         'providing_organization_id' => $this->shippingAgencyOrg->id,
         'price' => 5000.00,
         'status' => 'pending',
         'notes' => 'Test order',
     ]);
+    // Attach the service via pivot table
+    $this->order->services()->attach($this->service->id);
 
     $this->orderFromOtherOrgs = Order::factory()->create([
-        'service_id' => $this->serviceFromOtherOrg->id,
+        'vessel_id' => $this->vessel2->id,
         'requesting_organization_id' => $this->vesselOwnerOrg2->id,
         'providing_organization_id' => $this->shippingAgencyOrg2->id,
         'price' => 3000.00,
         'status' => 'accepted',
         'notes' => 'Another test order',
     ]);
+    // Attach the service via pivot table
+    $this->orderFromOtherOrgs->services()->attach($this->serviceFromOtherOrg->id);
 });
 
 test('vessel owner admin can view orders index', function (): void {
@@ -102,7 +120,7 @@ test('vessel owner admin can view orders index', function (): void {
         ->get(route('orders'));
 
     $response->assertStatus(200);
-    $response->assertInertia(fn ($page) => $page->component('orders')
+    $response->assertInertia(fn ($page) => $page->component('orders/index')
         ->has('orders', 1)
         ->where('orders.0.id', $this->order->id)
     );
@@ -113,7 +131,7 @@ test('vessel owner member can view orders index', function (): void {
         ->get(route('orders'));
 
     $response->assertStatus(200);
-    $response->assertInertia(fn ($page) => $page->component('orders')
+    $response->assertInertia(fn ($page) => $page->component('orders/index')
         ->has('orders', 1)
     );
 });
@@ -123,7 +141,7 @@ test('shipping agency admin can view orders index', function (): void {
         ->get(route('orders'));
 
     $response->assertStatus(200);
-    $response->assertInertia(fn ($page) => $page->component('orders')
+    $response->assertInertia(fn ($page) => $page->component('orders/index')
         ->has('orders', 1)
         ->where('orders.0.id', $this->order->id)
     );
@@ -134,7 +152,7 @@ test('shipping agency member can view orders index', function (): void {
         ->get(route('orders'));
 
     $response->assertStatus(200);
-    $response->assertInertia(fn ($page) => $page->component('orders')
+    $response->assertInertia(fn ($page) => $page->component('orders/index')
         ->has('orders', 1)
     );
 });
@@ -144,7 +162,7 @@ test('platform admin can view all orders', function (): void {
         ->get(route('orders'));
 
     $response->assertStatus(200);
-    $response->assertInertia(fn ($page) => $page->component('orders')
+    $response->assertInertia(fn ($page) => $page->component('orders/index')
         ->has('orders', 2) // Should see both orders
     );
 });
@@ -162,7 +180,7 @@ test('orders are filtered by user organization involvement', function (): void {
     $response->assertStatus(200);
 
     // Should only see orders from their organization
-    $response->assertInertia(fn ($page) => $page->component('orders')
+    $response->assertInertia(fn ($page) => $page->component('orders/index')
         ->has('orders', 1)
         ->where('orders.0.id', $this->orderFromOtherOrgs->id)
     );
@@ -171,6 +189,7 @@ test('orders are filtered by user organization involvement', function (): void {
 test('vessel owner admin can create order', function (): void {
     $orderData = [
         'service_id' => $this->service->id,
+        'vessel_id' => $this->vessel->id,
         'notes' => 'New test order',
     ];
 
@@ -178,19 +197,24 @@ test('vessel owner admin can create order', function (): void {
         ->post(route('orders.store'), $orderData);
 
     $response->assertRedirect();
-    $response->assertSessionHas('message', 'Order placed successfully');
+    $response->assertSessionHas('message', 'Order created successfully!');
 
     $this->assertDatabaseHas('orders', [
-        'service_id' => $this->service->id,
         'requesting_organization_id' => $this->vesselOwnerOrg->id,
         'providing_organization_id' => $this->shippingAgencyOrg->id,
         'notes' => 'New test order',
     ]);
+    
+    // Check that the service is attached via pivot table
+    $newOrder = Order::where('notes', 'New test order')->first();
+    expect($newOrder->services)->toHaveCount(1);
+    expect($newOrder->services->first()->id)->toBe($this->service->id);
 });
 
 test('vessel owner member can create order', function (): void {
     $orderData = [
         'service_id' => $this->service->id,
+        'vessel_id' => $this->vessel->id,
         'notes' => 'Member created order',
     ];
 
@@ -198,18 +222,24 @@ test('vessel owner member can create order', function (): void {
         ->post(route('orders.store'), $orderData);
 
     $response->assertRedirect();
-    $response->assertSessionHas('message', 'Order placed successfully');
+    $response->assertSessionHas('message', 'Order created successfully!');
 
     $this->assertDatabaseHas('orders', [
-        'service_id' => $this->service->id,
         'requesting_organization_id' => $this->vesselOwnerOrg->id,
+        'providing_organization_id' => $this->shippingAgencyOrg->id,
         'notes' => 'Member created order',
     ]);
+    
+    // Check that the service is attached via pivot table
+    $newOrder = Order::where('notes', 'Member created order')->first();
+    expect($newOrder->services)->toHaveCount(1);
+    expect($newOrder->services->first()->id)->toBe($this->service->id);
 });
 
 test('shipping agency user cannot create order', function (): void {
     $orderData = [
         'service_id' => $this->service->id,
+        'vessel_id' => $this->vessel->id,
         'notes' => 'Unauthorized order',
     ];
 
@@ -227,6 +257,7 @@ test('user without vessel owner org cannot create order', function (): void {
 
     $orderData = [
         'service_id' => $this->service->id,
+        'vessel_id' => $this->vessel->id,
         'notes' => 'Unauthorized order',
     ];
 
@@ -241,7 +272,7 @@ test('vessel owner admin can view own order details', function (): void {
         ->get(route('orders.show', $this->order));
 
     $response->assertStatus(200);
-    $response->assertInertia(fn ($page) => $page->component('order-detail')
+    $response->assertInertia(fn ($page) => $page->component('orders/show')
         ->where('order.id', $this->order->id)
     );
 });
@@ -251,7 +282,7 @@ test('shipping agency admin can view order details for their services', function
         ->get(route('orders.show', $this->order));
 
     $response->assertStatus(200);
-    $response->assertInertia(fn ($page) => $page->component('order-detail')
+    $response->assertInertia(fn ($page) => $page->component('orders/show')
         ->where('order.id', $this->order->id)
     );
 });
@@ -413,7 +444,7 @@ test('user in multiple organizations sees orders from all their orgs', function 
     $response->assertStatus(200);
 
     // Should see orders from both organizations
-    $response->assertInertia(fn ($page) => $page->component('orders')
+    $response->assertInertia(fn ($page) => $page->component('orders/index')
         ->has('orders', 1) // Still only one order involves their organizations
     );
 });
