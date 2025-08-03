@@ -1,12 +1,12 @@
 import { ServicesPageColumnActions } from '@/components/data-table/page-services/column-actions';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem } from '@/types';
+import type { BreadcrumbItem, SharedData } from '@/types';
 import { Port, ServiceWithRelations } from '@/types/core';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { useEcho } from '@laravel/echo-react';
 import { Plus, Star } from 'lucide-react';
 import { parseAsString, useQueryState } from 'nuqs';
@@ -46,9 +46,17 @@ interface ServiceDeletedEvent extends ServiceEvent {
 interface ServicesPageProps {
     services: ServiceWithRelations[];
     ports: Port[];
+    service_categories: {
+        id: number;
+        name: string;
+        created_at: string;
+        updated_at: string;
+    }[];
 }
 
-export default function Services({ services: initialServices, ports }: ServicesPageProps) {
+export default function Services({ services: initialServices, ports, service_categories }: ServicesPageProps) {
+    const { auth } = usePage<SharedData>().props;
+
     const [services, setServices] = useState(initialServices);
 
     const [portFilter, setPortFilter] = useQueryState(
@@ -59,15 +67,18 @@ export default function Services({ services: initialServices, ports }: ServicesP
         }),
     );
 
+    const [categoryFilter, setCategoryFilter] = useQueryState(
+        'category',
+        parseAsString.withDefault('').withOptions({
+            shallow: false,
+            history: 'push',
+        }),
+    );
+
     // Sync new props back to local state after server refetch
     useEffect(() => {
         setServices(initialServices);
     }, [initialServices]);
-
-    const handlePortFilterChange = async (value: string) => {
-        await setPortFilter(value);
-        router.reload({ only: ['services'] });
-    };
 
     // Listen for service created events
     useEcho<ServiceCreatedEvent>('services', 'ServiceCreated', ({ service: newService }) => {
@@ -123,13 +134,15 @@ export default function Services({ services: initialServices, ports }: ServicesP
                 <div className="flex items-center justify-between">
                     <h1 className="text-2xl font-bold">Services</h1>
 
-                    {/* <Link href={'/services/create'} className={buttonVariants({ variant: 'default' })}>
-                        <Plus className="mr-2 h-4 w-4" />
-                        Add Service
-                    </Link> */}
+                    {auth.user.organization?.business_type === 'shipping_agency' && (
+                        <Link href={'/services/create'} className={buttonVariants({ variant: 'default' })}>
+                            <Plus className="mr-2 h-4 w-4" />
+                            Add Service
+                        </Link>
+                    )}
                 </div>
-
                 {/*<ServicesPageDataTable columns={servicesPageColumns} data={services} />*/}
+                {/*<pre>{JSON.stringify(services, null, 2)}</pre>*/}
 
                 <div className="grid grid-cols-12 gap-16">
                     <div className="col-span-3 flex flex-col">
@@ -143,11 +156,41 @@ export default function Services({ services: initialServices, ports }: ServicesP
                                     <span className="text-sm font-semibold uppercase">Ports</span>
                                 </AccordionTrigger>
                                 <AccordionContent className="pb-2 text-muted-foreground">
-                                    <RadioGroup value={portFilter} onValueChange={handlePortFilterChange}>
+                                    <RadioGroup
+                                        value={portFilter}
+                                        onValueChange={async (value) => {
+                                            await setPortFilter(value);
+                                            router.reload({ only: ['services'] });
+                                        }}
+                                    >
                                         {ports.map((port) => (
                                             <div className="flex items-center gap-2" key={port.id}>
                                                 <RadioGroupItem value={port.name} id={port.id.toString()} />
                                                 <Label htmlFor={port.id.toString()}>{port.name}</Label>
+                                            </div>
+                                        ))}
+                                    </RadioGroup>
+                                </AccordionContent>
+                            </AccordionItem>
+                        </Accordion>
+
+                        <Accordion type="single" collapsible className="w-full">
+                            <AccordionItem value="filter_categories" className="py-2">
+                                <AccordionTrigger className="py-4 text-[15px] leading-6 hover:no-underline">
+                                    <span className="text-sm font-semibold uppercase">Categories</span>
+                                </AccordionTrigger>
+                                <AccordionContent className="pb-2 text-muted-foreground">
+                                    <RadioGroup
+                                        value={categoryFilter}
+                                        onValueChange={async (value) => {
+                                            await setCategoryFilter(value);
+                                            router.reload({ only: ['services'] });
+                                        }}
+                                    >
+                                        {service_categories.map((category) => (
+                                            <div className="flex items-center gap-2" key={category.id}>
+                                                <RadioGroupItem value={category.name} id={category.id.toString()} />
+                                                <Label htmlFor={category.id.toString()}>{category.name}</Label>
                                             </div>
                                         ))}
                                     </RadioGroup>
@@ -215,7 +258,6 @@ export default function Services({ services: initialServices, ports }: ServicesP
                         ))}
                     </div>
                 </div>
-
                 {services.length === 0 && (
                     <div className="py-8 text-center">
                         <p className="text-muted-foreground">No services found. Create your first service!</p>
