@@ -1,5 +1,6 @@
 import { ServicesPageColumnActions } from '@/components/data-table/page-services/column-actions';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -8,7 +9,7 @@ import type { BreadcrumbItem, SharedData } from '@/types';
 import { Port, ServiceWithRelations } from '@/types/core';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { useEcho } from '@laravel/echo-react';
-import { Plus, Star } from 'lucide-react';
+import { Box, MapPin, Plus, Star } from 'lucide-react';
 import { parseAsString, useQueryState } from 'nuqs';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
@@ -201,7 +202,7 @@ export default function Services({ services: initialServices, ports, service_cat
                         {services.map((service) => (
                             <div
                                 key={service.id}
-                                className="flex flex-col gap-2 rounded-xl border bg-card p-6 text-card-foreground shadow-md transition-shadow hover:shadow-lg"
+                                className="flex h-fit flex-col gap-2 rounded-xl border bg-card p-6 text-card-foreground shadow-md transition-shadow hover:shadow-lg"
                             >
                                 <div className="flex items-start gap-6">
                                     <div className="size-12 rounded-md bg-neutral-200" />
@@ -214,12 +215,24 @@ export default function Services({ services: initialServices, ports, service_cat
                                                 >
                                                     {service.name}
                                                 </Link>
+
                                                 <h3 className="inline-flex items-center gap-2 text-sm font-normal">
                                                     <div className="size-4 rounded-full bg-neutral-200" />
                                                     <span>{service.organization.name}</span>
                                                 </h3>
                                             </div>
                                             <ServicesPageColumnActions service={service} />
+                                        </div>
+
+                                        <div className="flex gap-2">
+                                            <Badge variant="secondary">
+                                                <Box />
+                                                {service.category.name}
+                                            </Badge>
+                                            <Badge variant="secondary">
+                                                <MapPin />
+                                                {service.port.name} ({service.port.country}, {service.port.city})
+                                            </Badge>
                                         </div>
 
                                         <div className="flex items-center gap-2">
