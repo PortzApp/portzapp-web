@@ -9,6 +9,7 @@ use App\Http\Requests\ServiceCreateRequest;
 use App\Http\Requests\ServiceUpdateRequest;
 use App\Models\Port;
 use App\Models\Service;
+use App\Models\ServiceCategory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
@@ -23,7 +24,7 @@ class ServiceController extends Controller
     {
         Gate::authorize('view-any', Service::class);
 
-        $query = Service::query()->with(['organization', 'port']);
+        $query = Service::query()->with(['organization', 'port', 'category']);
 
         // Filter by port if provided
         if (request()->has('port') && request()->get('port') !== '') {
@@ -35,11 +36,24 @@ class ServiceController extends Controller
             });
         }
 
+        // Filter by category if provided
+        if (request()->has('category') && request()->get('category') !== '') {
+            $categoryFilter = request()->get('category');
+
+            // Filter by category name
+            $query->whereHas('category', function ($q) use ($categoryFilter) {
+                $q->where('name', 'like', '%' . $categoryFilter . '%');
+            });
+
+            dd($query);
+        }
+
         $services = $query->latest()->get();
 
         return Inertia::render('services/index', [
             'services' => Inertia::always($services),
             'ports' => Port::query()->orderBy('name')->get(),
+            'service_categories' => ServiceCategory::query()->orderBy('service_categories.name')->get(),
         ]);
     }
 
@@ -62,7 +76,7 @@ class ServiceController extends Controller
         ]);
 
         // Load relationships for the created service
-        $service->load(['organization:id,name', 'port:id,name']);
+        $service->load(['organization:id,name', 'port:id,name', 'category:id,name']);
 
         ServiceCreated::dispatch($request->user(), $service);
 
@@ -88,7 +102,7 @@ class ServiceController extends Controller
     {
         Gate::authorize('view', $service);
 
-        $service->load(['organization:id,name', 'port:id,name']);
+        $service->load(['organization:id,name', 'port:id,name', 'category:id,name']);
 
         return Inertia::render('services/show', [
             'service' => $service,

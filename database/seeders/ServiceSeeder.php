@@ -6,6 +6,7 @@ use App\Enums\OrganizationBusinessType;
 use App\Models\Organization;
 use App\Models\Port;
 use App\Models\Service;
+use App\Models\ServiceCategory;
 use Illuminate\Database\Seeder;
 
 class ServiceSeeder extends Seeder
@@ -21,14 +22,22 @@ class ServiceSeeder extends Seeder
         // Get all ports
         $ports = Port::query()->latest()->get();
 
+        // Get all service categories
+        $serviceCategories = ServiceCategory::query()->latest()->get();
+
         // Create 10 services for each shipping agency organization
-        $shippingAgencyOrganizations->each(function ($organization) use ($ports) {
-            Service::factory()
-                ->count(10)
-                ->create([
-                    'organization_id' => $organization->id,
-                    'port_id' => fake()->randomElement($ports->pluck('id')),
-                ]);
+        $shippingAgencyOrganizations->each(function ($organization) use ($ports, $serviceCategories) {
+            // Shuffle the categories and take 10 unique ones (or less if not enough categories)
+            $categories = $serviceCategories->shuffle()->take(10)->values();
+
+            foreach ($categories as $category) {
+                Service::factory()
+                    ->create([
+                        'organization_id' => $organization->id,
+                        'port_id' => fake()->randomElement($ports->pluck('id')),
+                        'service_category_id' => $category->id,
+                    ]);
+            }
         });
 
         $totalServices = $shippingAgencyOrganizations->count() * 10;

@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             VesselSeeder::class,
             PortSeeder::class,
+            ServiceCategorySeeder::class,
             ServiceSeeder::class,
             OrderSeeder::class,
         ]);
