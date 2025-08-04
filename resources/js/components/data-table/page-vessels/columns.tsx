@@ -1,12 +1,9 @@
 import { VesselsPageColumnActions } from '@/components/data-table/page-vessels/column-actions';
 import { DataTableColumnHeader } from '@/components/data-table/primitives/data-table-column-header';
-import { Badge } from '@/components/ui/badge';
-import { VesselTypeBadge } from '@/components/badges';
+import { VesselStatusBadge, VesselTypeBadge } from '@/components/badges';
 import { Checkbox } from '@/components/ui/checkbox';
-import { cn } from '@/lib/utils';
 import { Vessel } from '@/types/core';
 import { ColumnDef } from '@tanstack/react-table';
-import { Dot } from 'lucide-react';
 
 export const columns: ColumnDef<Vessel>[] = [
     {
@@ -55,18 +52,7 @@ export const columns: ColumnDef<Vessel>[] = [
         cell: ({ row }) => {
             const vessel = row.original;
 
-            return (
-                <Badge
-                    className={cn(
-                        vessel.status === 'active' && 'bg-blue-200 text-blue-950 uppercase',
-                        vessel.status === 'inactive' && 'bg-red-200 text-red-950 uppercase',
-                        vessel.status === 'maintenance' && 'bg-yellow-200 text-yellow-950 uppercase',
-                    )}
-                >
-                    <Dot />
-                    {vessel.status}
-                </Badge>
-            );
+            return <VesselStatusBadge status={vessel.status} className="capitalize" />;
         },
     },
     {
