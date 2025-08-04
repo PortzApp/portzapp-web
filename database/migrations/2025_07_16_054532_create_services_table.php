@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -15,6 +14,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('organization_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignId('port_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('service_category_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('name');
             $table->text('description')->nullable();
             $table->decimal('price', total: 10, places: 2);
