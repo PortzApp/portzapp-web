@@ -1,3 +1,4 @@
+import { VesselStatusBadge } from '@/components/badges';
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,7 +17,7 @@ import { cn } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
 import { Vessel } from '@/types/core';
 import { Head, Link, router } from '@inertiajs/react';
-import { Dot, Edit, Trash2 } from 'lucide-react';
+import { Edit, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -115,16 +116,7 @@ export default function VesselShowPage({ vessel }: { vessel: Vessel }) {
                             </div>
                             <div className="flex justify-between">
                                 <span className="text-sm font-medium text-muted-foreground">Status:</span>
-                                <Badge
-                                    className={cn(
-                                        vessel.status === 'active' && 'bg-blue-200 text-blue-950 uppercase',
-                                        vessel.status === 'inactive' && 'bg-red-200 text-red-950 uppercase',
-                                        vessel.status === 'maintenance' && 'bg-yellow-200 text-yellow-950 uppercase',
-                                    )}
-                                >
-                                    <Dot />
-                                    {vessel.status}
-                                </Badge>
+                                <VesselStatusBadge status={vessel.status} className="capitalize" />
                             </div>
                         </CardContent>
                     </Card>
