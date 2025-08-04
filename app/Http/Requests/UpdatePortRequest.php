@@ -24,7 +24,7 @@ class UpdatePortRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'code' => 'required|string|max:255|unique:ports,code,' . $this->route('port')->id,
+            'code' => 'required|string|max:255|unique:ports,code,'.$this->route('port')->id,
             'status' => 'required|in:active,inactive,maintenance',
             'country' => 'required|string|max:255',
             'city' => 'required|string|max:255',

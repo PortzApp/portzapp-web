@@ -32,7 +32,7 @@ class ServiceController extends Controller
 
             // Filter by port name
             $query->whereHas('port', function ($q) use ($portFilter) {
-                $q->where('name', 'like', '%' . $portFilter . '%');
+                $q->where('name', 'like', '%'.$portFilter.'%');
             });
         }
 
@@ -42,7 +42,7 @@ class ServiceController extends Controller
 
             // Filter by category name
             $query->whereHas('category', function ($q) use ($categoryFilter) {
-                $q->where('name', 'like', '%' . $categoryFilter . '%');
+                $q->where('name', 'like', '%'.$categoryFilter.'%');
             });
         }
 
@@ -177,11 +177,11 @@ class ServiceController extends Controller
                 $query->with([
                     'vessel:id,name,imo_number',
                     'requestingOrganization:id,name,business_type',
-                    'providingOrganization:id,name,business_type'
+                    'providingOrganization:id,name,business_type',
                 ])->latest();
             },
             'organization:id,name',
-            'port:id,name'
+            'port:id,name',
         ]);
 
         return Inertia::render('services/orders', [
@@ -257,7 +257,7 @@ class ServiceController extends Controller
             ->get();
 
         return response()->json([
-            'services' => $services
+            'services' => $services,
         ]);
     }
 }

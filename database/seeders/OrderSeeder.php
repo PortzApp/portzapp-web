@@ -37,9 +37,10 @@ class OrderSeeder extends Seeder
         $vesselOwnerOrganizations->each(function ($requestingOrg) use ($shippingAgencyOrganizations, $activeServices, $MAX_ORDER_COUNT_PER_ORGANIZATION) {
             // Get vessels for this organization
             $orgVessels = Vessel::where('organization_id', $requestingOrg->id)->get();
-            
+
             if ($orgVessels->isEmpty()) {
                 $this->command->warn("No vessels found for organization {$requestingOrg->name}. Skipping orders for this organization.");
+
                 return;
             }
 

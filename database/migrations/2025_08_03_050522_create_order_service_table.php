@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('order_id')->constrained()->cascadeOnDelete();
             $table->foreignId('service_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
-            
+
             // Unique composite index to prevent duplicate entries
             $table->unique(['order_id', 'service_id']);
         });

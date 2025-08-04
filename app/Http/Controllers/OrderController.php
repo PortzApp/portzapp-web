@@ -70,7 +70,7 @@ class OrderController extends Controller
             ->where('business_type', OrganizationBusinessType::VESSEL_OWNER)
             ->first();
 
-        if (!$vesselOwnerOrg) {
+        if (! $vesselOwnerOrg) {
             abort(403, 'You must belong to a vessel owner organization to place orders.');
         }
 
@@ -184,12 +184,12 @@ class OrderController extends Controller
         if (isset($validated['service_id'])) {
             // Sync to maintain single service functionality
             $order->services()->sync([$validated['service_id']]);
-            
+
             // Update the order's providing organization based on the new service
             $service = Service::findOrFail($validated['service_id']);
             $validated['providing_organization_id'] = $service->organization_id;
             $validated['price'] = $service->price;
-            
+
             // Remove service_id from validated data as it's not a direct column
             unset($validated['service_id']);
         }

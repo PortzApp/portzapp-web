@@ -13,7 +13,7 @@ class ServiceCategory extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name'
+        'name',
     ];
 
     public function services(): HasMany

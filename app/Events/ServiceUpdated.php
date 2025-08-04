@@ -18,11 +18,9 @@ class ServiceUpdated implements ShouldBroadcastNow
      * Create a new event instance.
      */
     public function __construct(
-        public User    $user,
+        public User $user,
         public Service $service,
-    )
-    {
-    }
+    ) {}
 
     /**
      * Get the channels the event should broadcast on.
@@ -47,7 +45,7 @@ class ServiceUpdated implements ShouldBroadcastNow
             'message' => 'Service updated successfully',
             'user' => [
                 'id' => $this->user->id,
-                'name' => $this->user->first_name . ' ' . $this->user->last_name,
+                'name' => $this->user->first_name.' '.$this->user->last_name,
                 'email' => $this->user->email,
             ],
             'service' => $this->service->toArray(),

@@ -23,7 +23,7 @@ class Service extends Model
         'status',
         'organization_id',
         'port_id',
-        'service_category_id'
+        'service_category_id',
     ];
 
     /**
@@ -33,7 +33,7 @@ class Service extends Model
     {
         return $this->belongsTo(Organization::class);
     }
-    
+
     /**
      * Get the port assigned to the service.
      */
