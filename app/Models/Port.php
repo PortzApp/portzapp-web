@@ -9,6 +9,35 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @method static create(mixed $validated)
+ * @property int $id
+ * @property string $name
+ * @property string $code
+ * @property string $status
+ * @property string $country
+ * @property string $city
+ * @property string|null $latitude
+ * @property string|null $longitude
+ * @property string $timezone
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Service> $services
+ * @property-read int|null $services_count
+ * @method static \Database\Factories\PortFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Port newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Port newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Port query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Port whereCity($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Port whereCode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Port whereCountry($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Port whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Port whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Port whereLatitude($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Port whereLongitude($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Port whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Port whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Port whereTimezone($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Port whereUpdatedAt($value)
+ * @mixin \Eloquent
  */
 class Port extends Model
 {

@@ -12,6 +12,30 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @method static create(string[] $array)
+ * @property int $id
+ * @property int $organization_id
+ * @property string $name
+ * @property string $imo_number
+ * @property VesselType $vessel_type
+ * @property VesselStatus $status
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Order> $orders
+ * @property-read int|null $orders_count
+ * @property-read \App\Models\Organization $organization
+ * @method static \Database\Factories\VesselFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Vessel newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Vessel newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Vessel query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Vessel whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Vessel whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Vessel whereImoNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Vessel whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Vessel whereOrganizationId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Vessel whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Vessel whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Vessel whereVesselType($value)
+ * @mixin \Eloquent
  */
 class Vessel extends Model
 {
