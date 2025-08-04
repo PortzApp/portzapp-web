@@ -31,7 +31,7 @@ class ServiceCategoryFactory extends Factory
                 'Medical Assistance',
                 'Spare Parts Delivery',
                 'Crew Change',
-            ])
+            ]),
         ];
     }
 }

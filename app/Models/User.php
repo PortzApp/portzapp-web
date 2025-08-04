@@ -2,14 +2,55 @@
 
 namespace App\Models;
 
+use App\Enums\UserRoles;
 use Database\Factories\UserFactory;
+use Eloquent;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\DatabaseNotification;
+use Illuminate\Notifications\DatabaseNotificationCollection;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property int $id
+ * @property string $email
+ * @property Carbon|null $email_verified_at
+ * @property string $password
+ * @property string|null $remember_token
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property string $first_name
+ * @property string|null $last_name
+ * @property string $phone_number
+ * @property-read DatabaseNotificationCollection<int, DatabaseNotification> $notifications
+ * @property-read int|null $notifications_count
+ * @property-read Collection<int, Organization> $organizations
+ * @property-read int|null $organizations_count
+ * @property-read Collection<int, Service> $services
+ * @property-read int|null $services_count
+ *
+ * @method static \Database\Factories\UserFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereEmail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereEmailVerifiedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereFirstName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereLastName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User wherePassword($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User wherePhoneNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereRememberToken($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereUpdatedAt($value)
+ *
+ * @mixin Eloquent
+ */
 class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
@@ -47,14 +88,6 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
-     * Get the organizations for the current user.
-     */
-    public function organizations(): BelongsToMany
-    {
-        return $this->belongsToMany(Organization::class)->withPivot('role')->withTimestamps();
-    }
-
-    /**
      * Check if the user has a specific role in any organization.
      */
     public function hasRoleInOrganization(string $role, ?int $organizationId = null): bool
@@ -69,13 +102,33 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Get the organizations for the current user.
+     */
+    public function organizations(): BelongsToMany
+    {
+        return $this->belongsToMany(Organization::class)
+            ->using(OrganizationUser::class)
+            ->withPivot('role')
+            ->withTimestamps();
+    }
+
+    /**
      * Get the user's role in a specific organization.
      */
-    public function getRoleInOrganization(int $organizationId): ?string
+    public function getRoleInOrganization(int $organizationId): ?UserRoles
     {
-        $organization = $this->organizations()->where('organizations.id', $organizationId)->first();
+        $organization = $this->organizations()
+            ->where('organizations.id', $organizationId)
+            ->first();
 
-        return $organization?->pivot->role;
+        if (! $organization) {
+            return null;
+        }
+
+        /** @var object{role: UserRoles} $pivot */
+        $pivot = $organization->pivot;
+
+        return $pivot->role;
     }
 
     /**

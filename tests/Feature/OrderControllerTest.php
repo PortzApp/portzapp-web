@@ -204,7 +204,7 @@ test('vessel owner admin can create order', function (): void {
         'providing_organization_id' => $this->shippingAgencyOrg->id,
         'notes' => 'New test order',
     ]);
-    
+
     // Check that the service is attached via pivot table
     $newOrder = Order::where('notes', 'New test order')->first();
     expect($newOrder->services)->toHaveCount(1);
@@ -229,7 +229,7 @@ test('vessel owner member can create order', function (): void {
         'providing_organization_id' => $this->shippingAgencyOrg->id,
         'notes' => 'Member created order',
     ]);
-    
+
     // Check that the service is attached via pivot table
     $newOrder = Order::where('notes', 'Member created order')->first();
     expect($newOrder->services)->toHaveCount(1);

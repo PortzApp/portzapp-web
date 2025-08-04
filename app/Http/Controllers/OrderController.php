@@ -6,6 +6,7 @@ use App\Enums\OrganizationBusinessType;
 use App\Http\Requests\StoreOrderRequest;
 use App\Http\Requests\UpdateOrderRequest;
 use App\Models\Order;
+use App\Models\Organization;
 use App\Models\Service;
 use App\Models\Vessel;
 use Illuminate\Support\Facades\Gate;
@@ -35,7 +36,7 @@ class OrderController extends Controller
             ->pluck('organizations.id');
 
         // Filter orders based on user's organization involvement
-        $query->where(function ($q) use ($userVesselOwnerOrgs, $userShippingAgencyOrgs) {
+        $query->where(function ($q) use ($userVesselOwnerOrgs, $userShippingAgencyOrgs): void {
             // Show orders where user's vessel owner org is requesting
             if ($userVesselOwnerOrgs->isNotEmpty()) {
                 $q->whereIn('requesting_organization_id', $userVesselOwnerOrgs);
@@ -66,11 +67,12 @@ class OrderController extends Controller
         $service = Service::findOrFail($validated['service_id']);
 
         // Get the user's first vessel owner organization (for simplicity)
+        /** @var Organization|null $vesselOwnerOrg */
         $vesselOwnerOrg = auth()->user()->organizations()
             ->where('business_type', OrganizationBusinessType::VESSEL_OWNER)
             ->first();
 
-        if (!$vesselOwnerOrg) {
+        if (! $vesselOwnerOrg) {
             abort(403, 'You must belong to a vessel owner organization to place orders.');
         }
 
@@ -184,12 +186,12 @@ class OrderController extends Controller
         if (isset($validated['service_id'])) {
             // Sync to maintain single service functionality
             $order->services()->sync([$validated['service_id']]);
-            
+
             // Update the order's providing organization based on the new service
             $service = Service::findOrFail($validated['service_id']);
             $validated['providing_organization_id'] = $service->organization_id;
             $validated['price'] = $service->price;
-            
+
             // Remove service_id from validated data as it's not a direct column
             unset($validated['service_id']);
         }

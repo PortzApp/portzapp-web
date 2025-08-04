@@ -17,23 +17,17 @@ class ServiceDeleted implements ShouldBroadcastNow
      * Create a new event instance.
      */
     public function __construct(
-        public User   $user,
-        public int    $serviceId,
+        public User $user,
+        public int $serviceId,
         public string $serviceName,
-    )
-    {
-    }
+    ) {}
 
     /**
      * Get the channels the event should broadcast on.
-     *
-     * @return array<int, Channel>
      */
-    public function broadcastOn(): array
+    public function broadcastOn(): PrivateChannel
     {
-        return [
-            new PrivateChannel('services'),
-        ];
+        return new PrivateChannel('services');
     }
 
     /**
@@ -47,7 +41,7 @@ class ServiceDeleted implements ShouldBroadcastNow
             'message' => 'Service deleted successfully',
             'user' => [
                 'id' => $this->user->id,
-                'name' => $this->user->first_name . ' ' . $this->user->last_name,
+                'name' => $this->user->first_name.' '.$this->user->last_name,
                 'email' => $this->user->email,
             ],
             'serviceId' => $this->serviceId,

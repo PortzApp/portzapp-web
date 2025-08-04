@@ -4,7 +4,6 @@ namespace Database\Factories;
 
 use App\Models\Order;
 use App\Models\Organization;
-use App\Models\Service;
 use App\Models\Vessel;
 use Illuminate\Database\Eloquent\Factories\Factory;
 

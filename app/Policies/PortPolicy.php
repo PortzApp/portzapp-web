@@ -2,7 +2,6 @@
 
 namespace App\Policies;
 
-
 use App\Models\Port;
 use App\Models\User;
 

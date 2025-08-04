@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Organization;
 use App\Models\Service;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
@@ -48,6 +49,7 @@ class HandleInertiaRequests extends Middleware
         if ($user) {
             // Get user's first organization (primary organization)
             // In a more complex system, you might want to track a "current" organization preference
+            /** @var Organization $currentOrganization */
             $currentOrganization = $user->organizations()->first();
 
             if ($currentOrganization) {

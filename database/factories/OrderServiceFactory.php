@@ -21,7 +21,7 @@ class OrderServiceFactory extends Factory
     {
         $unitPrice = fake()->randomFloat(2, 100, 5000); // Between $100 and $5,000 per unit
         $quantity = fake()->numberBetween(1, 10); // Between 1 and 10 units
-        
+
         return [
             'order_id' => Order::factory(),
             'service_id' => Service::factory(),
@@ -81,7 +81,7 @@ class OrderServiceFactory extends Factory
     /**
      * Create a factory state with notes.
      */
-    public function withNotes(string $notes = null): static
+    public function withNotes(?string $notes = null): static
     {
         return $this->state([
             'notes' => $notes ?? fake()->paragraph(),
