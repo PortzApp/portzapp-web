@@ -31,8 +31,8 @@ class ServiceController extends Controller
             $portFilter = request()->get('port');
 
             // Filter by port name
-            $query->whereHas('port', function ($q) use ($portFilter) {
-                $q->where('name', 'like', '%'.$portFilter.'%');
+            $query->whereHas('port', function ($q) use ($portFilter): void {
+                $q->where('name', 'like', '%' . $portFilter . '%');
             });
         }
 
@@ -41,8 +41,8 @@ class ServiceController extends Controller
             $categoryFilter = request()->get('category');
 
             // Filter by category name
-            $query->whereHas('category', function ($q) use ($categoryFilter) {
-                $q->where('name', 'like', '%'.$categoryFilter.'%');
+            $query->whereHas('category', function ($q) use ($categoryFilter): void {
+                $q->where('name', 'like', '%' . $categoryFilter . '%');
             });
         }
 

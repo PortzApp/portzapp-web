@@ -36,7 +36,7 @@ class OrderController extends Controller
             ->pluck('organizations.id');
 
         // Filter orders based on user's organization involvement
-        $query->where(function ($q) use ($userVesselOwnerOrgs, $userShippingAgencyOrgs) {
+        $query->where(function ($q) use ($userVesselOwnerOrgs, $userShippingAgencyOrgs): void {
             // Show orders where user's vessel owner org is requesting
             if ($userVesselOwnerOrgs->isNotEmpty()) {
                 $q->whereIn('requesting_organization_id', $userVesselOwnerOrgs);
@@ -72,7 +72,7 @@ class OrderController extends Controller
             ->where('business_type', OrganizationBusinessType::VESSEL_OWNER)
             ->first();
 
-        if (! $vesselOwnerOrg) {
+        if (!$vesselOwnerOrg) {
             abort(403, 'You must belong to a vessel owner organization to place orders.');
         }
 
