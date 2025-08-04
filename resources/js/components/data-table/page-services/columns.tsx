@@ -51,7 +51,11 @@ export const servicesPageColumns: ColumnDef<Service>[] = [
         header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
         cell: ({ row }) => {
             const status = row.getValue('status') as string;
-            return <Badge variant="default" className="text-left font-medium">{status}</Badge>;
+            return (
+                <Badge variant="default" className="text-left font-medium">
+                    {status}
+                </Badge>
+            );
         },
     },
     {

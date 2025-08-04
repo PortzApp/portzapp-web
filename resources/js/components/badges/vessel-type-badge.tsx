@@ -1,9 +1,9 @@
-import { Badge } from '@/components/ui/badge';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { cn } from '@/lib/utils';
 import BulkCarrierIcon from '@/components/icons/vessel-type-bulk-carrier-icon';
 import ContainerShipIcon from '@/components/icons/vessel-type-container-ship-icon';
 import TankerShipIcon from '@/components/icons/vessel-type-tanker-ship-icon';
+import { Badge } from '@/components/ui/badge';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { cn } from '@/lib/utils';
 
 type VesselType = 'cargo' | 'tanker' | 'container';
 
@@ -33,7 +33,7 @@ export function VesselTypeBadge({ type, iconOnly = false, className }: VesselTyp
             <TooltipProvider>
                 <Tooltip>
                     <TooltipTrigger>
-                        <Icon className={cn("h-15 w-15 text-neutral-600", className)} />
+                        <Icon className={cn('h-15 w-15 text-neutral-600', className)} />
                     </TooltipTrigger>
                     <TooltipContent>
                         <p className="capitalize">{type} Vessel</p>
@@ -43,15 +43,5 @@ export function VesselTypeBadge({ type, iconOnly = false, className }: VesselTyp
         );
     }
 
-    return (
-        <Badge
-            className={cn(
-                vesselTypeStyles[type],
-                'uppercase',
-                className
-            )}
-        >
-            {type}
-        </Badge>
-    );
+    return <Badge className={cn(vesselTypeStyles[type], 'uppercase', className)}>{type}</Badge>;
 }

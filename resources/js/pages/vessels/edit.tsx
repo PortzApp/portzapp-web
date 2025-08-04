@@ -28,7 +28,7 @@ export default function VesselEditPage({ vessel }: { vessel: Vessel }) {
 
     type VesselForm = Omit<Vessel, 'id' | 'owner_id' | 'created_at' | 'updated_at' | 'organization_id'>;
 
-    const { data, setData, put, processing, errors, reset } = useForm<VesselForm>({
+    const { data, setData, put, processing, errors } = useForm<VesselForm>({
         name: vessel.name,
         imo_number: vessel.imo_number,
         vessel_type: vessel.vessel_type,
@@ -41,6 +41,7 @@ export default function VesselEditPage({ vessel }: { vessel: Vessel }) {
             onSuccess: () => {
                 router.visit(route('vessels.index'), {
                     only: ['vessels'],
+                    preserveScroll: true,
                 });
             },
         });

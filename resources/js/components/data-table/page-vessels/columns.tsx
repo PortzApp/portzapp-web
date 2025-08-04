@@ -1,7 +1,7 @@
+import { VesselTypeBadge } from '@/components/badges';
 import { VesselsPageColumnActions } from '@/components/data-table/page-vessels/column-actions';
 import { DataTableColumnHeader } from '@/components/data-table/primitives/data-table-column-header';
 import { Badge } from '@/components/ui/badge';
-import { VesselTypeBadge } from '@/components/badges';
 import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
 import { Vessel } from '@/types/core';
