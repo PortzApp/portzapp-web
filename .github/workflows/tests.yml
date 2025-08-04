@@ -1,17 +1,15 @@
-name: tests
+name: test
 
 on:
   push:
     branches:
-      - develop
       - main
   pull_request:
     branches:
-      - develop
       - main
 
 jobs:
-  ci:
+  test:
     runs-on: ubuntu-latest
 
     steps:
@@ -37,7 +35,7 @@ jobs:
       - name: Build Assets
         run: npm run build
 
-      - name: Install Dependencies
+      - name: Install PHP Dependencies (full install)
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
       - name: Copy Environment File
@@ -49,7 +47,7 @@ jobs:
       - name: Install Aspell
         shell: bash
         run: |
-            sudo apt-get update && sudo apt-get install -y aspell aspell-en
+          sudo apt-get update && sudo apt-get install -y aspell aspell-en
 
       - name: Test all (unit, lint, spellcheck, types, refactor)
         run: composer test:all
