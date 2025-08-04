@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\UserRoles;
 use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -23,7 +24,7 @@ use Illuminate\Notifications\Notifiable;
  * @property string $phone_number
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Organization> $organizations
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Organization> $organizations
  * @property-read int|null $organizations_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Service> $services
  * @property-read int|null $services_count
@@ -80,14 +81,6 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
-     * Get the organizations for the current user.
-     */
-    public function organizations(): BelongsToMany
-    {
-        return $this->belongsToMany(Organization::class)->withPivot('role')->withTimestamps();
-    }
-
-    /**
      * Check if the user has a specific role in any organization.
      */
     public function hasRoleInOrganization(string $role, ?int $organizationId = null): bool
@@ -102,13 +95,35 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
-     * Get the user's role in a specific organization.
+     * Get the organizations for the current user.
      */
-    public function getRoleInOrganization(int $organizationId): ?string
+    public function organizations(): BelongsToMany
     {
-        $organization = $this->organizations()->where('organizations.id', $organizationId)->first();
+        return $this->belongsToMany(Organization::class)
+            ->using(OrganizationUser::class)
+            ->withPivot('role')
+            ->withTimestamps();
+    }
 
-        return $organization?->pivot->role;
+    /**
+     * Get the user's role in a specific organization.
+     * @param int $organizationId
+     * @return UserRoles|null
+     */
+    public function getRoleInOrganization(int $organizationId): ?UserRoles
+    {
+        $organization = $this->organizations()
+            ->where('organizations.id', $organizationId)
+            ->first();
+
+        if (!$organization) {
+            return null;
+        }
+
+        /** @var object{role: UserRoles} $pivot */
+        $pivot = $organization->pivot;
+
+        return $pivot->role;
     }
 
     /**

@@ -6,6 +6,7 @@ use App\Enums\OrganizationBusinessType;
 use App\Http\Requests\StoreOrderRequest;
 use App\Http\Requests\UpdateOrderRequest;
 use App\Models\Order;
+use App\Models\Organization;
 use App\Models\Service;
 use App\Models\Vessel;
 use Illuminate\Support\Facades\Gate;
@@ -66,11 +67,12 @@ class OrderController extends Controller
         $service = Service::findOrFail($validated['service_id']);
 
         // Get the user's first vessel owner organization (for simplicity)
+        /** @var Organization|null $vesselOwnerOrg */
         $vesselOwnerOrg = auth()->user()->organizations()
             ->where('business_type', OrganizationBusinessType::VESSEL_OWNER)
             ->first();
 
-        if (! $vesselOwnerOrg) {
+        if (!$vesselOwnerOrg) {
             abort(403, 'You must belong to a vessel owner organization to place orders.');
         }
 
