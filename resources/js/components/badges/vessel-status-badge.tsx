@@ -25,13 +25,7 @@ export function VesselStatusBadge({ status, className }: VesselStatusBadgeProps)
     const Icon = vesselStatusIcons[status];
 
     return (
-        <Badge
-            className={cn(
-                vesselStatusStyles[status],
-                'uppercase inline-flex items-center gap-1',
-                className
-            )}
-        >
+        <Badge className={cn(vesselStatusStyles[status], 'inline-flex items-center gap-1 uppercase', className)}>
             <Icon className="h-3 w-3" />
             {status}
         </Badge>
