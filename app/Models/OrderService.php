@@ -14,6 +14,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $updated_at
  * @property-read Order $order
  * @property-read Service $service
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderService newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderService newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderService query()
@@ -22,6 +23,7 @@ use Illuminate\Support\Carbon;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderService whereOrderId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderService whereServiceId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderService whereUpdatedAt($value)
+ *
  * @mixin Eloquent
  */
 class OrderService extends Pivot

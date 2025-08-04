@@ -15,6 +15,7 @@ use Illuminate\Support\Carbon;
 
 /**
  * @method static create(string[] $array)
+ *
  * @property int $id
  * @property int $organization_id
  * @property string $name
@@ -26,6 +27,7 @@ use Illuminate\Support\Carbon;
  * @property-read Collection<int, Order> $orders
  * @property-read int|null $orders_count
  * @property-read Organization $organization
+ *
  * @method static \Database\Factories\VesselFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vessel newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vessel newQuery()
@@ -38,6 +40,7 @@ use Illuminate\Support\Carbon;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vessel whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vessel whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vessel whereVesselType($value)
+ *
  * @mixin Eloquent
  */
 class Vessel extends Model

@@ -33,6 +33,7 @@ use Illuminate\Support\Carbon;
  * @property-read int|null $organizations_count
  * @property-read Collection<int, Service> $services
  * @property-read int|null $services_count
+ *
  * @method static \Database\Factories\UserFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User newQuery()
@@ -47,6 +48,7 @@ use Illuminate\Support\Carbon;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User wherePhoneNumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereRememberToken($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereUpdatedAt($value)
+ *
  * @mixin Eloquent
  */
 class User extends Authenticatable implements MustVerifyEmail
@@ -112,8 +114,6 @@ class User extends Authenticatable implements MustVerifyEmail
 
     /**
      * Get the user's role in a specific organization.
-     * @param int $organizationId
-     * @return UserRoles|null
      */
     public function getRoleInOrganization(int $organizationId): ?UserRoles
     {
@@ -121,7 +121,7 @@ class User extends Authenticatable implements MustVerifyEmail
             ->where('organizations.id', $organizationId)
             ->first();
 
-        if (!$organization) {
+        if (! $organization) {
             return null;
         }
 

@@ -12,6 +12,7 @@ use Illuminate\Support\Carbon;
 
 /**
  * @method static create(mixed $validated)
+ *
  * @property int $id
  * @property string $name
  * @property string $code
@@ -25,6 +26,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $updated_at
  * @property-read Collection<int, Service> $services
  * @property-read int|null $services_count
+ *
  * @method static \Database\Factories\PortFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Port newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Port newQuery()
@@ -40,6 +42,7 @@ use Illuminate\Support\Carbon;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Port whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Port whereTimezone($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Port whereUpdatedAt($value)
+ *
  * @mixin Eloquent
  */
 class Port extends Model

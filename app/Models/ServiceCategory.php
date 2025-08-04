@@ -17,6 +17,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $updated_at
  * @property-read Collection<int, Service> $services
  * @property-read int|null $services_count
+ *
  * @method static \Database\Factories\ServiceCategoryFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ServiceCategory newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ServiceCategory newQuery()
@@ -25,6 +26,7 @@ use Illuminate\Support\Carbon;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ServiceCategory whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ServiceCategory whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ServiceCategory whereUpdatedAt($value)
+ *
  * @mixin Eloquent
  */
 class ServiceCategory extends Model

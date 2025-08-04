@@ -24,6 +24,7 @@ use Illuminate\Support\Carbon;
  * @property-read int|null $users_count
  * @property-read Collection<int, Vessel> $vessels
  * @property-read int|null $vessels_count
+ *
  * @method static \Database\Factories\OrganizationFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Organization newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Organization newQuery()
@@ -34,6 +35,7 @@ use Illuminate\Support\Carbon;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Organization whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Organization whereRegistrationCode($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Organization whereUpdatedAt($value)
+ *
  * @mixin Eloquent
  */
 class Organization extends Model

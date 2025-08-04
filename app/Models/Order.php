@@ -13,6 +13,7 @@ use Illuminate\Support\Carbon;
 
 /**
  * @method static create(array $array)
+ *
  * @property int $id
  * @property int $vessel_id
  * @property int $requesting_organization_id
@@ -27,6 +28,7 @@ use Illuminate\Support\Carbon;
  * @property-read Collection<int, Service> $services
  * @property-read int|null $services_count
  * @property-read Vessel $vessel
+ *
  * @method static \Database\Factories\OrderFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Order newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Order newQuery()
@@ -40,6 +42,7 @@ use Illuminate\Support\Carbon;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Order whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Order whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Order whereVesselId($value)
+ *
  * @mixin Eloquent
  */
 class Order extends Model
