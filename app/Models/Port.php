@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Database\Factories\PortFactory;
+use Eloquent;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 
 /**
  * @method static create(mixed $validated)
@@ -18,9 +21,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string|null $latitude
  * @property string|null $longitude
  * @property string $timezone
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Service> $services
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Collection<int, Service> $services
  * @property-read int|null $services_count
  * @method static \Database\Factories\PortFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Port newModelQuery()
@@ -37,7 +40,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Port whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Port whereTimezone($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Port whereUpdatedAt($value)
- * @mixin \Eloquent
+ * @mixin Eloquent
  */
 class Port extends Model
 {

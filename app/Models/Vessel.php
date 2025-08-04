@@ -5,10 +5,13 @@ namespace App\Models;
 use App\Enums\VesselStatus;
 use App\Enums\VesselType;
 use Database\Factories\VesselFactory;
+use Eloquent;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 
 /**
  * @method static create(string[] $array)
@@ -18,11 +21,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $imo_number
  * @property VesselType $vessel_type
  * @property VesselStatus $status
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Order> $orders
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Collection<int, Order> $orders
  * @property-read int|null $orders_count
- * @property-read \App\Models\Organization $organization
+ * @property-read Organization $organization
  * @method static \Database\Factories\VesselFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vessel newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vessel newQuery()
@@ -35,7 +38,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vessel whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vessel whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vessel whereVesselType($value)
- * @mixin \Eloquent
+ * @mixin Eloquent
  */
 class Vessel extends Model
 {

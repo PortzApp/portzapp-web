@@ -3,16 +3,19 @@
 namespace App\Models;
 
 use Database\Factories\ServiceCategoryFactory;
+use Eloquent;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
  * @property string $name
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Service> $services
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Collection<int, Service> $services
  * @property-read int|null $services_count
  * @method static \Database\Factories\ServiceCategoryFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ServiceCategory newModelQuery()
@@ -22,7 +25,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ServiceCategory whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ServiceCategory whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ServiceCategory whereUpdatedAt($value)
- * @mixin \Eloquent
+ * @mixin Eloquent
  */
 class ServiceCategory extends Model
 {
