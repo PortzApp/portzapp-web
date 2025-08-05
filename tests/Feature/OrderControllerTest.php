@@ -32,7 +32,7 @@ beforeEach(function (): void {
     ]);
 
     $this->platformAdminOrg = Organization::factory()->create([
-        'business_type' => OrganizationBusinessType::PLATFORM_ADMIN,
+        'business_type' => OrganizationBusinessType::PORTZAPP_TEAM,
         'name' => 'PortzApp Admin',
     ]);
 
@@ -44,7 +44,7 @@ beforeEach(function (): void {
 
     $this->vesselOwnerMember = User::factory()->create();
     $this->vesselOwnerMember->organizations()->attach($this->vesselOwnerOrg, [
-        'role' => UserRoles::MEMBER->value,
+        'role' => UserRoles::VIEWER->value,
     ]);
 
     $this->shippingAgencyAdmin = User::factory()->create();
@@ -54,7 +54,7 @@ beforeEach(function (): void {
 
     $this->shippingAgencyMember = User::factory()->create();
     $this->shippingAgencyMember->organizations()->attach($this->shippingAgencyOrg, [
-        'role' => UserRoles::MEMBER->value,
+        'role' => UserRoles::VIEWER->value,
     ]);
 
     $this->platformAdmin = User::factory()->create();
@@ -121,7 +121,7 @@ test('vessel owner admin can view orders index', function (): void {
         ->get(route('orders'));
 
     $response->assertStatus(200);
-    $response->assertInertia(fn ($page) => $page->component('orders/index')
+    $response->assertInertia(fn($page) => $page->component('orders/index')
         ->has('orders', 1)
         ->where('orders.0.id', $this->order->id)
     );
@@ -132,7 +132,7 @@ test('vessel owner member can view orders index', function (): void {
         ->get(route('orders'));
 
     $response->assertStatus(200);
-    $response->assertInertia(fn ($page) => $page->component('orders/index')
+    $response->assertInertia(fn($page) => $page->component('orders/index')
         ->has('orders', 1)
     );
 });
@@ -142,7 +142,7 @@ test('shipping agency admin can view orders index', function (): void {
         ->get(route('orders'));
 
     $response->assertStatus(200);
-    $response->assertInertia(fn ($page) => $page->component('orders/index')
+    $response->assertInertia(fn($page) => $page->component('orders/index')
         ->has('orders', 1)
         ->where('orders.0.id', $this->order->id)
     );
@@ -153,7 +153,7 @@ test('shipping agency member can view orders index', function (): void {
         ->get(route('orders'));
 
     $response->assertStatus(200);
-    $response->assertInertia(fn ($page) => $page->component('orders/index')
+    $response->assertInertia(fn($page) => $page->component('orders/index')
         ->has('orders', 1)
     );
 });
@@ -163,7 +163,7 @@ test('platform admin can view all orders', function (): void {
         ->get(route('orders'));
 
     $response->assertStatus(200);
-    $response->assertInertia(fn ($page) => $page->component('orders/index')
+    $response->assertInertia(fn($page) => $page->component('orders/index')
         ->has('orders', 2) // Should see both orders
     );
 });
@@ -181,7 +181,7 @@ test('orders are filtered by user organization involvement', function (): void {
     $response->assertStatus(200);
 
     // Should only see orders from their organization
-    $response->assertInertia(fn ($page) => $page->component('orders/index')
+    $response->assertInertia(fn($page) => $page->component('orders/index')
         ->has('orders', 1)
         ->where('orders.0.id', $this->orderFromOtherOrgs->id)
     );
@@ -273,7 +273,7 @@ test('vessel owner admin can view own order details', function (): void {
         ->get(route('orders.show', $this->order));
 
     $response->assertStatus(200);
-    $response->assertInertia(fn ($page) => $page->component('orders/show')
+    $response->assertInertia(fn($page) => $page->component('orders/show')
         ->where('order.id', $this->order->id)
     );
 });
@@ -283,7 +283,7 @@ test('shipping agency admin can view order details for their services', function
         ->get(route('orders.show', $this->order));
 
     $response->assertStatus(200);
-    $response->assertInertia(fn ($page) => $page->component('orders/show')
+    $response->assertInertia(fn($page) => $page->component('orders/show')
         ->where('order.id', $this->order->id)
     );
 });
@@ -436,7 +436,7 @@ test('user cannot delete order from different organization', function (): void {
 test('user in multiple organizations sees orders from all their orgs', function (): void {
     // Attach the vessel owner admin to a shipping agency as well
     $this->vesselOwnerAdmin->organizations()->attach($this->shippingAgencyOrg, [
-        'role' => UserRoles::MEMBER->value,
+        'role' => UserRoles::VIEWER->value,
     ]);
 
     $response = $this->actingAs($this->vesselOwnerAdmin)
@@ -445,7 +445,7 @@ test('user in multiple organizations sees orders from all their orgs', function 
     $response->assertStatus(200);
 
     // Should see orders from both organizations
-    $response->assertInertia(fn ($page) => $page->component('orders/index')
+    $response->assertInertia(fn($page) => $page->component('orders/index')
         ->has('orders', 1) // Still only one order involves their organizations
     );
 });
