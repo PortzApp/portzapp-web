@@ -12,9 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('order_service', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('order_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('service_id')->constrained()->cascadeOnDelete();
+            $table->foreignUlid('order_id')->constrained()->cascadeOnDelete();
+            $table->foreignUlid('service_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
 
             // Unique composite index to prevent duplicate entries

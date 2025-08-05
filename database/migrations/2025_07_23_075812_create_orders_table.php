@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('orders', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('vessel_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignId('requesting_organization_id')->constrained('organizations')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignId('providing_organization_id')->constrained('organizations')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->ulid('id')->primary();
+            $table->foreignUlid('vessel_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignUlid('requesting_organization_id')->constrained('organizations')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignUlid('providing_organization_id')->constrained('organizations')->cascadeOnUpdate()->cascadeOnDelete();
             $table->decimal('price', 12, 2);
             $table->text('notes')->nullable();
             $table->enum('status', ['pending', 'accepted', 'in_progress', 'completed', 'cancelled'])->default('pending');
