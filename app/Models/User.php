@@ -116,13 +116,13 @@ class User extends Authenticatable implements MustVerifyEmail
     /**
      * Get the user's role in a specific organization.
      */
-    public function getRoleInOrganization(int $organizationId): ?UserRoles
+    public function getRoleInOrganization(string $organizationId): ?UserRoles
     {
         $organization = $this->organizations()
             ->where('organizations.id', $organizationId)
             ->first();
 
-        if (! $organization) {
+        if (!$organization) {
             return null;
         }
 
