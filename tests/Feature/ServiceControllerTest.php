@@ -69,7 +69,7 @@ test('shipping agency admin can view services index', function (): void {
         ->get(route('services.index'));
 
     $response->assertStatus(200);
-    $response->assertInertia(fn($page) => $page->component('services/index')
+    $response->assertInertia(fn ($page) => $page->component('services/index')
         ->has('services', 1)
         ->where('services.0.id', $this->service->id)
     );
@@ -80,7 +80,7 @@ test('shipping agency member can view services index', function (): void {
         ->get(route('services.index'));
 
     $response->assertStatus(200);
-    $response->assertInertia(fn($page) => $page->component('services/index')
+    $response->assertInertia(fn ($page) => $page->component('services/index')
         ->has('services', 1)
     );
 });
@@ -91,7 +91,7 @@ test('vessel owner can view all services', function (): void {
 
     $response->assertStatus(200);
     // Vessel owners should see all services, not filtered by organization
-    $response->assertInertia(fn($page) => $page->component('services/index')
+    $response->assertInertia(fn ($page) => $page->component('services/index')
         ->has('services', 2) // Should see both services
     );
 });
@@ -296,7 +296,7 @@ test('services are filtered by user organization', function (): void {
     $response->assertStatus(200);
 
     // Should only see services from their own organization
-    $response->assertInertia(fn($page) => $page->component('services/index')
+    $response->assertInertia(fn ($page) => $page->component('services/index')
         ->has('services', 1)
         ->where('services.0.id', $this->serviceFromOtherOrg->id)
     );
@@ -314,7 +314,7 @@ test('user in multiple shipping agencies sees all their services', function (): 
     $response->assertStatus(200);
 
     // Should see services from both organizations
-    $response->assertInertia(fn($page) => $page->component('services/index')
+    $response->assertInertia(fn ($page) => $page->component('services/index')
         ->has('services', 2)
     );
 });
