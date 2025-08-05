@@ -4,6 +4,8 @@ namespace App\Models;
 
 use App\Enums\OrganizationBusinessType;
 use Eloquent;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -24,6 +26,9 @@ use Illuminate\Support\Carbon;
  * @property-read int|null $users_count
  * @property-read Collection<int, Vessel> $vessels
  * @property-read int|null $vessels_count
+ *
+ * @method static vesselOwners()
+ * @method static shippingAgencies()
  *
  * @method static \Database\Factories\OrganizationFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Organization newModelQuery()
@@ -75,6 +80,24 @@ class Organization extends Model
     public function services(): HasMany
     {
         return $this->hasMany(Service::class);
+    }
+
+    /**
+     * Scope a query to only include organizations of Vessel Owner type.
+     */
+    #[Scope]
+    protected function vesselOwners(Builder $query): Builder
+    {
+        return $query->where('business_type', OrganizationBusinessType::VESSEL_OWNER);
+    }
+
+    /**
+     * Scope a query to only include organizations of Shipping Agency type.
+     */
+    #[Scope]
+    protected function shippingAgencies(Builder $query): Builder
+    {
+        return $query->where('business_type', OrganizationBusinessType::SHIPPING_AGENCY);
     }
 
     /**
