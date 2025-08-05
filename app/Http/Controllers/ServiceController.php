@@ -32,7 +32,7 @@ class ServiceController extends Controller
 
             // Filter by port name
             $query->whereHas('port', function ($q) use ($portFilter): void {
-                $q->where('name', 'like', '%'.$portFilter.'%');
+                $q->where('name', 'like', '%' . $portFilter . '%');
             });
         }
 
@@ -42,7 +42,7 @@ class ServiceController extends Controller
 
             // Filter by category name
             $query->whereHas('category', function ($q) use ($categoryFilter): void {
-                $q->where('name', 'like', '%'.$categoryFilter.'%');
+                $q->where('name', 'like', '%' . $categoryFilter . '%');
             });
         }
 
