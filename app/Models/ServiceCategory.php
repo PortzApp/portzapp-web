@@ -5,6 +5,7 @@ namespace App\Models;
 use Database\Factories\ServiceCategoryFactory;
 use Eloquent;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -32,7 +33,7 @@ use Illuminate\Support\Carbon;
 class ServiceCategory extends Model
 {
     /** @use HasFactory<ServiceCategoryFactory> */
-    use HasFactory;
+    use HasFactory, HasUlids;
 
     protected $fillable = [
         'name',

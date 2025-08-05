@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Carbon;
 
 /**
- * @property int $id
  * @property int $organization_id
  * @property int $user_id
  * @property UserRoles $role
@@ -19,7 +18,6 @@ use Illuminate\Support\Carbon;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrganizationUser newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrganizationUser query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrganizationUser whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|OrganizationUser whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrganizationUser whereOrganizationId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrganizationUser whereRole($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrganizationUser whereUpdatedAt($value)
