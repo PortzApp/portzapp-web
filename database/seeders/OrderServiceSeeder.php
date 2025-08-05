@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\ServiceStatus;
 use App\Models\Order;
 use App\Models\Service;
 use Illuminate\Database\Seeder;
@@ -26,7 +27,7 @@ class OrderServiceSeeder extends Seeder
         }
 
         // Get all active services
-        $activeServices = Service::where('status', 'active')->get();
+        $activeServices = Service::where('status', ServiceStatus::ACTIVE)->get();
 
         if ($activeServices->isEmpty()) {
             $this->command->warn('No active services found. Please run ServiceSeeder first.');
@@ -120,7 +121,7 @@ class OrderServiceSeeder extends Seeder
         $this->command->info("Creating test pivot relationships for {$orderCount} orders...");
 
         $orders = Order::limit($orderCount)->get();
-        $activeServices = Service::where('status', 'active')->get();
+        $activeServices = Service::where('status', ServiceStatus::ACTIVE)->get();
 
         if ($activeServices->isEmpty()) {
             $this->command->error('No active services available for testing.');

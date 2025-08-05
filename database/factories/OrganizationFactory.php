@@ -49,11 +49,11 @@ class OrganizationFactory extends Factory
     /**
      * Indicate that the organization is a platform admin.
      */
-    public function platformAdmin(): static
+    public function portzappTeam(): static
     {
         return $this->state(fn (array $attributes) => [
-            'business_type' => OrganizationBusinessType::PLATFORM_ADMIN,
-            'name' => 'PortzApp Admin',
+            'business_type' => OrganizationBusinessType::PORTZAPP_TEAM,
+            'name' => 'PortzApp Team',
         ]);
     }
 }

@@ -35,7 +35,7 @@ class UserSeeder extends Seeder
             'last_name' => 'Doe',
             'email' => 'jane.doe@shipping1.com',
         ]);
-        $shippingMember1->organizations()->attach($shippingOrg1, ['role' => UserRoles::MEMBER->value]);
+        $shippingMember1->organizations()->attach($shippingOrg1, ['role' => UserRoles::VIEWER->value]);
 
         $shippingAdmin2 = User::factory()->create([
             'first_name' => 'Mike',
@@ -57,7 +57,7 @@ class UserSeeder extends Seeder
             'last_name' => 'Brown',
             'email' => 'tom.brown@vessels1.com',
         ]);
-        $vesselMember1->organizations()->attach($vesselOrg1, ['role' => UserRoles::MEMBER->value]);
+        $vesselMember1->organizations()->attach($vesselOrg1, ['role' => UserRoles::VIEWER->value]);
 
         $vesselAdmin2 = User::factory()->create([
             'first_name' => 'Lisa',
