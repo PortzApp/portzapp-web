@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\ServiceStatus;
 use App\Models\Port;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -118,8 +119,10 @@ class PortFactory extends Factory
         return [
             'name' => $port['name'],
             'status' => fake()->randomElement([
-                'active',
-                'inactive',
+                ServiceStatus::ACTIVE,
+                ServiceStatus::ACTIVE,
+                ServiceStatus::ACTIVE,
+                ServiceStatus::INACTIVE,
             ]),
             'city' => $port['city'],
             'country' => $port['country'],

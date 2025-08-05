@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\OrganizationBusinessType;
+use App\Enums\ServiceStatus;
 use App\Enums\UserRoles;
 use App\Models\Order;
 use App\Models\Organization;
@@ -80,7 +81,7 @@ beforeEach(function (): void {
         'name' => 'Port Agency Services',
         'description' => 'Professional port services',
         'price' => 5000.00,
-        'status' => 'active',
+        'status' => ServiceStatus::ACTIVE,
     ]);
 
     $this->serviceFromOtherOrg = Service::factory()->create([
@@ -88,7 +89,7 @@ beforeEach(function (): void {
         'name' => 'Cargo Handling',
         'description' => 'Expert cargo handling services',
         'price' => 3000.00,
-        'status' => 'active',
+        'status' => ServiceStatus::ACTIVE,
     ]);
 
     // Create orders
@@ -120,7 +121,7 @@ test('vessel owner admin can view orders index', function (): void {
         ->get(route('orders'));
 
     $response->assertStatus(200);
-    $response->assertInertia(fn ($page) => $page->component('orders/index')
+    $response->assertInertia(fn($page) => $page->component('orders/index')
         ->has('orders', 1)
         ->where('orders.0.id', $this->order->id)
     );
@@ -131,7 +132,7 @@ test('vessel owner member can view orders index', function (): void {
         ->get(route('orders'));
 
     $response->assertStatus(200);
-    $response->assertInertia(fn ($page) => $page->component('orders/index')
+    $response->assertInertia(fn($page) => $page->component('orders/index')
         ->has('orders', 1)
     );
 });
@@ -141,7 +142,7 @@ test('shipping agency admin can view orders index', function (): void {
         ->get(route('orders'));
 
     $response->assertStatus(200);
-    $response->assertInertia(fn ($page) => $page->component('orders/index')
+    $response->assertInertia(fn($page) => $page->component('orders/index')
         ->has('orders', 1)
         ->where('orders.0.id', $this->order->id)
     );
@@ -152,7 +153,7 @@ test('shipping agency member can view orders index', function (): void {
         ->get(route('orders'));
 
     $response->assertStatus(200);
-    $response->assertInertia(fn ($page) => $page->component('orders/index')
+    $response->assertInertia(fn($page) => $page->component('orders/index')
         ->has('orders', 1)
     );
 });
@@ -162,7 +163,7 @@ test('platform admin can view all orders', function (): void {
         ->get(route('orders'));
 
     $response->assertStatus(200);
-    $response->assertInertia(fn ($page) => $page->component('orders/index')
+    $response->assertInertia(fn($page) => $page->component('orders/index')
         ->has('orders', 2) // Should see both orders
     );
 });
@@ -180,7 +181,7 @@ test('orders are filtered by user organization involvement', function (): void {
     $response->assertStatus(200);
 
     // Should only see orders from their organization
-    $response->assertInertia(fn ($page) => $page->component('orders/index')
+    $response->assertInertia(fn($page) => $page->component('orders/index')
         ->has('orders', 1)
         ->where('orders.0.id', $this->orderFromOtherOrgs->id)
     );
@@ -272,7 +273,7 @@ test('vessel owner admin can view own order details', function (): void {
         ->get(route('orders.show', $this->order));
 
     $response->assertStatus(200);
-    $response->assertInertia(fn ($page) => $page->component('orders/show')
+    $response->assertInertia(fn($page) => $page->component('orders/show')
         ->where('order.id', $this->order->id)
     );
 });
@@ -282,7 +283,7 @@ test('shipping agency admin can view order details for their services', function
         ->get(route('orders.show', $this->order));
 
     $response->assertStatus(200);
-    $response->assertInertia(fn ($page) => $page->component('orders/show')
+    $response->assertInertia(fn($page) => $page->component('orders/show')
         ->where('order.id', $this->order->id)
     );
 });
@@ -444,7 +445,7 @@ test('user in multiple organizations sees orders from all their orgs', function 
     $response->assertStatus(200);
 
     // Should see orders from both organizations
-    $response->assertInertia(fn ($page) => $page->component('orders/index')
+    $response->assertInertia(fn($page) => $page->component('orders/index')
         ->has('orders', 1) // Still only one order involves their organizations
     );
 });

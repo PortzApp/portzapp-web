@@ -29,9 +29,9 @@ class OrganizationFactory extends Factory
      */
     public function shippingAgency(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'business_type' => OrganizationBusinessType::SHIPPING_AGENCY,
-            'name' => fake()->company().' Shipping',
+            'name' => fake()->company() . ' Shipping',
         ]);
     }
 
@@ -40,20 +40,20 @@ class OrganizationFactory extends Factory
      */
     public function vesselOwner(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'business_type' => OrganizationBusinessType::VESSEL_OWNER,
-            'name' => fake()->company().' Vessels',
+            'name' => fake()->company() . ' Vessels',
         ]);
     }
 
     /**
      * Indicate that the organization is a platform admin.
      */
-    public function platformAdmin(): static
+    public function portzappTeam(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'business_type' => OrganizationBusinessType::PLATFORM_ADMIN,
-            'name' => 'PortzApp Admin',
+        return $this->state(fn(array $attributes) => [
+            'business_type' => OrganizationBusinessType::PORTZAPP_TEAM,
+            'name' => 'PortzApp Team',
         ]);
     }
 }

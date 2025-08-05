@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\OrganizationBusinessType;
+use App\Enums\ServiceStatus;
 use App\Enums\UserRoles;
 use App\Models\Organization;
 use App\Models\Service;
@@ -51,7 +52,7 @@ beforeEach(function (): void {
         'name' => 'Port Agency Services',
         'description' => 'Professional port services',
         'price' => 5000.00,
-        'status' => 'active',
+        'status' => ServiceStatus::ACTIVE,
     ]);
 
     $this->serviceFromOtherOrg = Service::factory()->create([
@@ -59,7 +60,7 @@ beforeEach(function (): void {
         'name' => 'Cargo Handling',
         'description' => 'Expert cargo handling services',
         'price' => 3000.00,
-        'status' => 'active',
+        'status' => ServiceStatus::ACTIVE,
     ]);
 });
 
@@ -68,7 +69,7 @@ test('shipping agency admin can view services index', function (): void {
         ->get(route('services.index'));
 
     $response->assertStatus(200);
-    $response->assertInertia(fn ($page) => $page->component('services/index')
+    $response->assertInertia(fn($page) => $page->component('services/index')
         ->has('services', 1)
         ->where('services.0.id', $this->service->id)
     );
@@ -79,7 +80,7 @@ test('shipping agency member can view services index', function (): void {
         ->get(route('services.index'));
 
     $response->assertStatus(200);
-    $response->assertInertia(fn ($page) => $page->component('services/index')
+    $response->assertInertia(fn($page) => $page->component('services/index')
         ->has('services', 1)
     );
 });
@@ -90,7 +91,7 @@ test('vessel owner can view all services', function (): void {
 
     $response->assertStatus(200);
     // Vessel owners should see all services, not filtered by organization
-    $response->assertInertia(fn ($page) => $page->component('services/index')
+    $response->assertInertia(fn($page) => $page->component('services/index')
         ->has('services', 2) // Should see both services
     );
 });
@@ -100,7 +101,7 @@ test('shipping agency admin can create service', function (): void {
         'name' => 'New Maritime Service',
         'description' => 'A new professional service',
         'price' => 7500.00,
-        'status' => 'active',
+        'status' => ServiceStatus::ACTIVE,
     ];
 
     $response = $this->actingAs($this->shippingAgencyAdmin)
@@ -120,7 +121,7 @@ test('shipping agency member can create service', function (): void {
         'name' => 'Member Created Service',
         'description' => 'Service created by member',
         'price' => 2500.00,
-        'status' => 'active',
+        'status' => ServiceStatus::ACTIVE,
     ];
 
     $response = $this->actingAs($this->shippingAgencyMember)
@@ -140,7 +141,7 @@ test('vessel owner cannot create service', function (): void {
         'name' => 'Unauthorized Service',
         'description' => 'This should not be created',
         'price' => 1000.00,
-        'status' => 'active',
+        'status' => ServiceStatus::ACTIVE,
     ];
 
     $response = $this->actingAs($this->vesselOwnerAdmin)
@@ -159,7 +160,7 @@ test('user without shipping agency org cannot create service', function (): void
         'name' => 'Unauthorized Service',
         'description' => 'This should not be created',
         'price' => 1000.00,
-        'status' => 'active',
+        'status' => ServiceStatus::ACTIVE,
     ];
 
     $response = $this->actingAs($userWithoutOrg)
@@ -194,7 +195,7 @@ test('shipping agency member can update own service', function (): void {
         'name' => 'Member Updated Service',
         'description' => 'Updated by member',
         'price' => 4500.00,
-        'status' => 'active',
+        'status' => ServiceStatus::ACTIVE,
     ];
 
     $response = $this->actingAs($this->shippingAgencyMember)
@@ -209,7 +210,7 @@ test('vessel owner cannot update service', function (): void {
         'name' => 'Unauthorized Update',
         'description' => 'This should not work',
         'price' => 1000.00,
-        'status' => 'active',
+        'status' => ServiceStatus::ACTIVE,
     ];
 
     $response = $this->actingAs($this->vesselOwnerAdmin)
@@ -228,7 +229,7 @@ test('user cannot update service from different organization', function (): void
         'name' => 'Cross-Org Update Attempt',
         'description' => 'This should not work',
         'price' => 1000.00,
-        'status' => 'active',
+        'status' => ServiceStatus::ACTIVE,
     ];
 
     $response = $this->actingAs($this->shippingAgencyAdmin)
@@ -295,7 +296,7 @@ test('services are filtered by user organization', function (): void {
     $response->assertStatus(200);
 
     // Should only see services from their own organization
-    $response->assertInertia(fn ($page) => $page->component('services/index')
+    $response->assertInertia(fn($page) => $page->component('services/index')
         ->has('services', 1)
         ->where('services.0.id', $this->serviceFromOtherOrg->id)
     );
@@ -313,7 +314,7 @@ test('user in multiple shipping agencies sees all their services', function (): 
     $response->assertStatus(200);
 
     // Should see services from both organizations
-    $response->assertInertia(fn ($page) => $page->component('services/index')
+    $response->assertInertia(fn($page) => $page->component('services/index')
         ->has('services', 2)
     );
 });

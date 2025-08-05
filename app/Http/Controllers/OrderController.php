@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\OrganizationBusinessType;
+use App\Enums\ServiceStatus;
 use App\Http\Requests\StoreOrderRequest;
 use App\Http\Requests\UpdateOrderRequest;
 use App\Models\Order;
@@ -72,7 +73,7 @@ class OrderController extends Controller
             ->where('business_type', OrganizationBusinessType::VESSEL_OWNER)
             ->first();
 
-        if (! $vesselOwnerOrg) {
+        if (!$vesselOwnerOrg) {
             abort(403, 'You must belong to a vessel owner organization to place orders.');
         }
 
@@ -113,7 +114,7 @@ class OrderController extends Controller
             ->get();
 
         // Get all active services
-        $services = Service::where('status', 'active')
+        $services = Service::where('status', ServiceStatus::ACTIVE)
             ->with('organization:id,name')
             ->get();
 
@@ -160,7 +161,7 @@ class OrderController extends Controller
             ->get();
 
         // Get all active services
-        $services = Service::where('status', 'active')
+        $services = Service::where('status', ServiceStatus::ACTIVE)
             ->with('organization:id,name')
             ->get();
 
