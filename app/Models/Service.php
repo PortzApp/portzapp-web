@@ -7,6 +7,7 @@ use Eloquent;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -50,7 +51,7 @@ use Illuminate\Support\Carbon;
  */
 class Service extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUlids;
 
     /**
      * The attributes that are mass assignable.

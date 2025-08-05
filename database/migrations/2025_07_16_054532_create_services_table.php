@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('services', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('organization_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignId('port_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignId('service_category_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->ulid('id')->primary();
+            $table->foreignUlid('organization_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignUlid('port_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignUlid('service_category_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('name');
             $table->text('description')->nullable();
             $table->decimal('price', total: 10, places: 2);
