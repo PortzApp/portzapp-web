@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Enums\OrganizationBusinessType;
+use App\Enums\ServiceStatus;
 use App\Models\Order;
 use App\Models\Organization;
 use App\Models\Service;
@@ -23,7 +24,7 @@ class OrderSeeder extends Seeder
         $shippingAgencyOrganizations = Organization::where('business_type', OrganizationBusinessType::SHIPPING_AGENCY)->get();
 
         // Get all active services
-        $activeServices = Service::where('status', 'active')->get();
+        $activeServices = Service::where('status', ServiceStatus::ACTIVE)->get();
 
         if ($activeServices->isEmpty()) {
             $this->command->warn('No active services found. Skipping order creation.');

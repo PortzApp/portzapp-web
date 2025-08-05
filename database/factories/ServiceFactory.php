@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\ServiceStatus;
 use App\Models\Organization;
 use App\Models\Port;
 use App\Models\Service;
@@ -63,7 +64,12 @@ class ServiceFactory extends Factory
             'name' => fake()->randomElement($serviceTypes),
             'description' => fake()->randomElement($descriptions),
             'price' => fake()->randomFloat(2, 500, 50000), // Between $500 and $50,000 for maritime services
-            'status' => fake()->randomElement(['active', 'active', 'active', 'inactive']), // 75% active, 25% inactive
+            'status' => fake()->randomElement([
+                ServiceStatus::ACTIVE,
+                ServiceStatus::ACTIVE,
+                ServiceStatus::ACTIVE,
+                ServiceStatus::INACTIVE
+            ]), // 75% active, 25% inactive
         ];
     }
 }

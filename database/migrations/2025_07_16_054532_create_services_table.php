@@ -18,7 +18,7 @@ return new class extends Migration {
             $table->string('name');
             $table->text('description')->nullable();
             $table->decimal('price', total: 10, places: 2);
-            $table->enum('status', ['active', 'inactive']);
+            $table->string('status');
             $table->timestamps();
         });
     }

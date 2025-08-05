@@ -2,7 +2,10 @@
 
 namespace App\Models;
 
+use App\Enums\ServiceStatus;
 use Eloquent;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -26,6 +29,8 @@ use Illuminate\Support\Carbon;
  * @property-read int|null $orders_count
  * @property-read Organization $organization
  * @property-read Port $port
+ *
+ * @method static isActive()
  *
  * @method static \Database\Factories\ServiceFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Service newModelQuery()
@@ -92,5 +97,26 @@ class Service extends Model
         return $this->belongsToMany(Order::class, 'order_service')
             ->as('orderService')
             ->withTimestamps();
+    }
+
+    /**
+     * Scope a query to only include active services.
+     */
+    #[Scope]
+    protected function isActive(Builder $query): Builder
+    {
+        return $query->where('status');
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'status' => ServiceStatus::class,
+        ];
     }
 }
