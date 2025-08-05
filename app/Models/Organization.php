@@ -29,7 +29,6 @@ use Illuminate\Support\Carbon;
  *
  * @method static vesselOwners()
  * @method static shippingAgencies()
- *
  * @method static \Database\Factories\OrganizationFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Organization newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Organization newQuery()

@@ -68,7 +68,7 @@ class ServiceFactory extends Factory
                 ServiceStatus::ACTIVE,
                 ServiceStatus::ACTIVE,
                 ServiceStatus::ACTIVE,
-                ServiceStatus::INACTIVE
+                ServiceStatus::INACTIVE,
             ]), // 75% active, 25% inactive
         ];
     }

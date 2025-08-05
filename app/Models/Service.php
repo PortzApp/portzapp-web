@@ -31,7 +31,6 @@ use Illuminate\Support\Carbon;
  * @property-read Port $port
  *
  * @method static isActive()
- *
  * @method static \Database\Factories\ServiceFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Service newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Service newQuery()
