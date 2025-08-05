@@ -9,6 +9,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -68,6 +69,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'email',
         'phone_number',
         'password',
+        'current_organization_id'
     ];
 
     /**
@@ -79,6 +81,11 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'remember_token',
     ];
+
+    public function currentOrganization(): BelongsTo
+    {
+        return $this->belongsTo(Organization::class, 'current_organization_id');
+    }
 
     /**
      * Get the services for the current user.
@@ -117,6 +124,25 @@ class User extends Authenticatable implements MustVerifyEmail
      * Get the user's role in a specific organization.
      */
     public function getRoleInOrganization(string $organizationId): ?UserRoles
+    {
+        $organization = $this->organizations()
+            ->where('organizations.id', $organizationId)
+            ->first();
+
+        if (!$organization) {
+            return null;
+        }
+
+        /** @var object{role: UserRoles} $pivot */
+        $pivot = $organization->pivot;
+
+        return $pivot->role;
+    }
+
+    /**
+     * Get the user's role in a specific organization.
+     */
+    public function getRolesInOrganizations(array $organizations): ?array
     {
         $organization = $this->organizations()
             ->where('organizations.id', $organizationId)
