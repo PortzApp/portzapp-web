@@ -102,18 +102,18 @@ class HandleInertiaRequests extends Middleware
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
                 'user' => $userAuth,
-                'can' => fn() => $user ? [
+                'can' => fn () => $user ? [
                     'create_services' => $user->can('create', Service::class),
                     'create_vessels' => $user->can('create', Vessel::class),
                     'edit_vessels' => $user->can('update', Vessel::class),
                     'delete_vessels' => $user->can('delete', Vessel::class),
                 ] : null,
             ],
-            'ziggy' => fn(): array => [
+            'ziggy' => fn (): array => [
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url(),
             ],
-            'sidebarOpen' => !$request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
     }
 }
