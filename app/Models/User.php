@@ -128,7 +128,7 @@ class User extends Authenticatable implements MustVerifyEmail
         /** @var Organization $current_organization */
         $current_organization = $this->currentOrganization;
 
-        if (!$current_organization) {
+        if (! $current_organization) {
             return false;
         }
 
@@ -149,7 +149,7 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         $organization = $this->currentOrganization;
 
-        if (!$organization) {
+        if (! $organization) {
             return null;
         }
 
@@ -157,7 +157,7 @@ class User extends Authenticatable implements MustVerifyEmail
             ->where('organizations.id', $organization->id)
             ->first();
 
-        if (!$organization_with_pivot) {
+        if (! $organization_with_pivot) {
             return null;
         }
 
