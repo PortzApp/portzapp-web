@@ -14,15 +14,16 @@ import {
 } from '@/components/ui/dialog';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
-import type { BreadcrumbItem } from '@/types';
+import type { BreadcrumbItem, SharedData } from '@/types';
 import { Vessel } from '@/types/core';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { Edit, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
 export default function VesselShowPage({ vessel }: { vessel: Vessel }) {
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+    const { auth } = usePage<SharedData>().props;
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -56,34 +57,38 @@ export default function VesselShowPage({ vessel }: { vessel: Vessel }) {
                         <p className="text-base text-muted-foreground">Vessel details and information</p>
                     </div>
                     <div className="flex gap-2">
-                        <Link href={route('vessels.edit', vessel.id)} className={buttonVariants({ variant: 'outline', size: 'sm' })}>
-                            <Edit className="mr-2 h-4 w-4" />
-                            Edit
-                        </Link>
-                        <Dialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
-                            <DialogTrigger asChild>
-                                <Button variant="destructive" size="sm">
-                                    <Trash2 className="mr-2 h-4 w-4" />
-                                    Delete
-                                </Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                                <DialogHeader>
-                                    <DialogTitle>Delete Vessel</DialogTitle>
-                                    <DialogDescription>
-                                        Are you sure you want to delete "{vessel.name}"? This action cannot be undone.
-                                    </DialogDescription>
-                                </DialogHeader>
-                                <DialogFooter>
-                                    <DialogClose asChild>
-                                        <Button variant="outline">Cancel</Button>
-                                    </DialogClose>
-                                    <Button variant="destructive" onClick={handleDeleteVessel}>
-                                        Delete Vessel
+                        {auth.can.edit_vessels && (
+                            <Link href={route('vessels.edit', vessel.id)} className={buttonVariants({ variant: 'outline', size: 'sm' })}>
+                                <Edit className="mr-2 h-4 w-4" />
+                                Edit
+                            </Link>
+                        )}
+                        {auth.can.delete_vessels && (
+                            <Dialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
+                                <DialogTrigger asChild>
+                                    <Button variant="destructive" size="sm">
+                                        <Trash2 className="mr-2 h-4 w-4" />
+                                        Delete
                                     </Button>
-                                </DialogFooter>
-                            </DialogContent>
-                        </Dialog>
+                                </DialogTrigger>
+                                <DialogContent>
+                                    <DialogHeader>
+                                        <DialogTitle>Delete Vessel</DialogTitle>
+                                        <DialogDescription>
+                                            Are you sure you want to delete "{vessel.name}"? This action cannot be undone.
+                                        </DialogDescription>
+                                    </DialogHeader>
+                                    <DialogFooter>
+                                        <DialogClose asChild>
+                                            <Button variant="outline">Cancel</Button>
+                                        </DialogClose>
+                                        <Button variant="destructive" onClick={handleDeleteVessel}>
+                                            Delete Vessel
+                                        </Button>
+                                    </DialogFooter>
+                                </DialogContent>
+                            </Dialog>
+                        )}
                     </div>
                 </div>
 
