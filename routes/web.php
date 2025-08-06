@@ -3,6 +3,7 @@
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PortController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\SwitchOrganization;
 use App\Http\Controllers\VesselController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -15,6 +16,8 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
+
+    Route::put('/user/current-organization', SwitchOrganization::class)->name('user.current-organization.update');
 
     Route::get('services', [ServiceController::class, 'index'])->name('services.index');
     Route::get('services/create', [ServiceController::class, 'create'])->name('services.create');
@@ -49,5 +52,5 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::delete('ports/{port}', [PortController::class, 'destroy'])->name('ports.destroy');
 });
 
-require __DIR__.'/settings.php';
-require __DIR__.'/auth.php';
+require __DIR__ . '/settings.php';
+require __DIR__ . '/auth.php';
