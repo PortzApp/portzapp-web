@@ -34,9 +34,7 @@ class VesselPolicy
     {
         return ($user->isInOrganizationWithBusinessType(OrganizationBusinessType::VESSEL_OWNER)
                 || $user->isInOrganizationWithBusinessType(OrganizationBusinessType::PORTZAPP_TEAM))
-            && ($user->isInOrganizationWithUserRole(UserRoles::ADMIN)
-                || $user->isInOrganizationWithUserRole(UserRoles::MANAGER)
-                || $user->isInOrganizationWithUserRole(UserRoles::OPERATIONS));
+            && $user->isInOrganizationWithUserRole(UserRoles::ADMIN);
     }
 
     /**
@@ -46,9 +44,7 @@ class VesselPolicy
     {
         return ($user->isInOrganizationWithBusinessType(OrganizationBusinessType::VESSEL_OWNER)
                 || $user->isInOrganizationWithBusinessType(OrganizationBusinessType::PORTZAPP_TEAM))
-            && ($user->isInOrganizationWithUserRole(UserRoles::ADMIN)
-                || $user->isInOrganizationWithUserRole(UserRoles::MANAGER)
-                || $user->isInOrganizationWithUserRole(UserRoles::OPERATIONS));
+            && $user->isInOrganizationWithUserRole(UserRoles::ADMIN);
     }
 
     /**
@@ -58,9 +54,7 @@ class VesselPolicy
     {
         return ($user->isInOrganizationWithBusinessType(OrganizationBusinessType::VESSEL_OWNER)
                 || $user->isInOrganizationWithBusinessType(OrganizationBusinessType::PORTZAPP_TEAM))
-            && ($user->isInOrganizationWithUserRole(UserRoles::ADMIN)
-                || $user->isInOrganizationWithUserRole(UserRoles::MANAGER)
-                || $user->isInOrganizationWithUserRole(UserRoles::OPERATIONS));
+            && $user->isInOrganizationWithUserRole(UserRoles::ADMIN);
     }
 
     /**
