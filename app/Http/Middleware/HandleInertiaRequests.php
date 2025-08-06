@@ -53,7 +53,7 @@ class HandleInertiaRequests extends Middleware
             /** @var Organization $current_organization */
             $current_organization = $user->currentOrganization;
             $current_organization_role = $user->current_organization_id
-                ? $user->getRoleInOrganization($user->current_organization_id)
+                ? $user->getRoleInCurrentOrganization()
                 : null;
 
             $userAuth = [
