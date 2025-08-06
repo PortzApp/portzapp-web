@@ -140,25 +140,6 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
-     * Get the user's role in a specific organization.
-     */
-    public function getRolesInOrganizations(array $organizations): ?array
-    {
-        $organization = $this->organizations()
-            ->where('organizations.id', $organizationId)
-            ->first();
-
-        if (!$organization) {
-            return null;
-        }
-
-        /** @var object{role: UserRoles} $pivot */
-        $pivot = $organization->pivot;
-
-        return $pivot->role;
-    }
-
-    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
