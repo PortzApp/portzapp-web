@@ -2,7 +2,6 @@
 
 namespace App\Http\Middleware;
 
-use App\Enums\UserRoles;
 use App\Models\Organization;
 use App\Models\Service;
 use Illuminate\Foundation\Inspiring;
@@ -48,8 +47,10 @@ class HandleInertiaRequests extends Middleware
         $userRole = null;
 
         if ($user) {
+            /** @var iterable<Organization> $all_organizations */
             $all_organizations = $user->organizations()->withPivot('role')->get();
 
+            /** @var Organization $current_organization */
             $current_organization = $user->currentOrganization;
             $current_organization_role = $user->current_organization_id
                 ? $user->getRoleInOrganization($user->current_organization_id)
@@ -73,8 +74,9 @@ class HandleInertiaRequests extends Middleware
                     'created_at' => $current_organization->created_at,
                     'updated_at' => $current_organization->updated_at,
                 ],
+                /** @phpstan-ignore method.nonObject */
                 'organizations' => $all_organizations->map(function (Organization $org) {
-                    /** @var object{role: UserRoles} $role_in_org */
+                    /** @phpstan-ignore property.notFound */
                     $role_in_org = $org->pivot->role;
 
                     return [
@@ -96,15 +98,15 @@ class HandleInertiaRequests extends Middleware
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
                 'user' => $userAuth,
-                'can' => fn () => $user ? [
+                'can' => fn() => $user ? [
                     'create_services' => $user->can('create', Service::class),
                 ] : null,
             ],
-            'ziggy' => fn (): array => [
+            'ziggy' => fn(): array => [
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url(),
             ],
-            'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            'sidebarOpen' => !$request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
     }
 }
