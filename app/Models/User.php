@@ -69,7 +69,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'email',
         'phone_number',
         'password',
-        'current_organization_id'
+        'current_organization_id',
     ];
 
     /**
@@ -129,7 +129,7 @@ class User extends Authenticatable implements MustVerifyEmail
             ->where('organizations.id', $organizationId)
             ->first();
 
-        if (!$organization) {
+        if (! $organization) {
             return null;
         }
 
