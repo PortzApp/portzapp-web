@@ -2,8 +2,10 @@
 
 namespace App\Http\Middleware;
 
+use App\Enums\UserRoles;
 use App\Models\Organization;
 use App\Models\Service;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -47,7 +49,7 @@ class HandleInertiaRequests extends Middleware
         $userRole = null;
 
         if ($user) {
-            /** @var iterable<Organization> $all_organizations */
+            /** @var Collection<int, Organization> $all_organizations */
             $all_organizations = $user->organizations()->withPivot('role')->get();
 
             /** @var Organization $current_organization */
@@ -74,10 +76,11 @@ class HandleInertiaRequests extends Middleware
                     'created_at' => $current_organization->created_at,
                     'updated_at' => $current_organization->updated_at,
                 ],
-                /** @phpstan-ignore method.nonObject */
                 'organizations' => $all_organizations->map(function (Organization $org) {
-                    /** @phpstan-ignore property.notFound */
-                    $role_in_org = $org->pivot->role;
+                    /** @var object{role: UserRoles} $pivot */
+                    /** @phpstan-ignore-next-line property.notFound */
+                    $pivot = $org->pivot;
+                    $role_in_org = $pivot->role;
 
                     return [
                         'id' => $org->id,
@@ -98,15 +101,15 @@ class HandleInertiaRequests extends Middleware
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
                 'user' => $userAuth,
-                'can' => fn () => $user ? [
+                'can' => fn() => $user ? [
                     'create_services' => $user->can('create', Service::class),
                 ] : null,
             ],
-            'ziggy' => fn (): array => [
+            'ziggy' => fn(): array => [
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url(),
             ],
-            'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            'sidebarOpen' => !$request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
     }
 }
