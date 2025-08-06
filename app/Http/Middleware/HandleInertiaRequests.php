@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Enums\UserRoles;
 use App\Models\Organization;
 use App\Models\Service;
+use App\Models\Vessel;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
@@ -103,6 +104,9 @@ class HandleInertiaRequests extends Middleware
                 'user' => $userAuth,
                 'can' => fn() => $user ? [
                     'create_services' => $user->can('create', Service::class),
+                    'create_vessels' => $user->can('create', Vessel::class),
+                    'edit_vessels' => $user->can('update', Vessel::class),
+                    'delete_vessels' => $user->can('delete', Vessel::class),
                 ] : null,
             ],
             'ziggy' => fn(): array => [
