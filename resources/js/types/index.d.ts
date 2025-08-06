@@ -6,6 +6,9 @@ export interface Auth {
     user: User;
     can: {
         create_services: boolean;
+        create_vessels: boolean;
+        edit_vessels: boolean;
+        delete_vessels: boolean;
     };
 }
 

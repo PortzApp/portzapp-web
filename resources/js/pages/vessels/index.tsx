@@ -2,9 +2,9 @@ import { columns } from '@/components/data-table/page-vessels/columns';
 import { VesselsPageDataTable } from '@/components/data-table/page-vessels/data-table';
 import { buttonVariants } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem } from '@/types';
+import type { BreadcrumbItem, SharedData } from '@/types';
 import { Vessel } from '@/types/core';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -14,7 +14,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function VesselsIndexPage({ vessels }: { vessels: Array<Vessel> }) {
-    // const { role: currentRole } = usePage<SharedData>().props.auth.user;
+    const { auth } = usePage<SharedData>().props;
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -22,9 +22,11 @@ export default function VesselsIndexPage({ vessels }: { vessels: Array<Vessel> }
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <div className="flex items-center justify-between">
                     <h1 className="text-2xl font-bold">My Vessels</h1>
-                    <Link href={route('vessels.create')} className={buttonVariants({ variant: 'default' })}>
-                        Create vessel
-                    </Link>
+                    {auth.can.create_vessels && (
+                        <Link href={route('vessels.create')} className={buttonVariants({ variant: 'default' })}>
+                            Create vessel
+                        </Link>
+                    )}
                 </div>
 
                 <VesselsPageDataTable columns={columns} data={vessels} />

@@ -8,7 +8,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-import { Link, router } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 import { Edit, Eye, MoreHorizontal, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -22,12 +22,14 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
+import type { SharedData } from '@/types';
 import { Vessel } from '@/types/core';
 import { toast } from 'sonner';
 
 export function VesselsPageColumnActions({ vessel }: { vessel: Vessel }) {
     const [openDropdown, setOpenDropdown] = useState(false);
     const [openDeleteVesselDialog, setOpenDeleteVesselDialog] = useState(false);
+    const { auth } = usePage<SharedData>().props;
 
     function handleDeleteVessel() {
         router.delete(route('vessels.destroy', vessel.id), {
@@ -59,37 +61,41 @@ export function VesselsPageColumnActions({ vessel }: { vessel: Vessel }) {
                     </Link>
                 </DropdownMenuItem>
 
-                <DropdownMenuItem asChild>
-                    <Link href={route('vessels.edit', vessel.id)} className="flex">
-                        <Edit />
-                        Edit vessel
-                    </Link>
-                </DropdownMenuItem>
+                {auth.can.edit_vessels && (
+                    <DropdownMenuItem asChild>
+                        <Link href={route('vessels.edit', vessel.id)} className="flex">
+                            <Edit />
+                            Edit vessel
+                        </Link>
+                    </DropdownMenuItem>
+                )}
 
-                <Dialog open={openDeleteVesselDialog} onOpenChange={setOpenDeleteVesselDialog}>
-                    <DialogTrigger asChild>
-                        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                            <Trash2 />
-                            Delete vessel
-                        </DropdownMenuItem>
-                    </DialogTrigger>
-
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>Delete vessel</DialogTitle>
-                            <DialogDescription>Are you sure you want to delete this vessel?</DialogDescription>
-                        </DialogHeader>
-
-                        <DialogFooter>
-                            <DialogClose asChild>
-                                <Button variant="outline">Cancel</Button>
-                            </DialogClose>
-                            <Button type="submit" onClick={handleDeleteVessel}>
+                {auth.can.delete_vessels && (
+                    <Dialog open={openDeleteVesselDialog} onOpenChange={setOpenDeleteVesselDialog}>
+                        <DialogTrigger asChild>
+                            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                <Trash2 />
                                 Delete vessel
-                            </Button>
-                        </DialogFooter>
-                    </DialogContent>
-                </Dialog>
+                            </DropdownMenuItem>
+                        </DialogTrigger>
+
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>Delete vessel</DialogTitle>
+                                <DialogDescription>Are you sure you want to delete this vessel?</DialogDescription>
+                            </DialogHeader>
+
+                            <DialogFooter>
+                                <DialogClose asChild>
+                                    <Button variant="outline">Cancel</Button>
+                                </DialogClose>
+                                <Button type="submit" onClick={handleDeleteVessel}>
+                                    Delete vessel
+                                </Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
+                )}
             </DropdownMenuContent>
         </DropdownMenu>
     );
