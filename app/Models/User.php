@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\OrganizationBusinessType;
 use App\Enums\UserRoles;
 use Database\Factories\UserFactory;
 use Eloquent;
@@ -82,6 +83,19 @@ class User extends Authenticatable implements MustVerifyEmail
         'remember_token',
     ];
 
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
+    }
+
     public function currentOrganization(): BelongsTo
     {
         return $this->belongsTo(Organization::class, 'current_organization_id');
@@ -96,20 +110,6 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
-     * Check if the user has a specific role in any organization.
-     */
-    public function hasRoleInOrganization(string $role, ?int $organizationId = null): bool
-    {
-        $query = $this->organizations()->wherePivot('role', $role);
-
-        if ($organizationId) {
-            $query->where('organizations.id', $organizationId);
-        }
-
-        return $query->exists();
-    }
-
-    /**
      * Get the organizations for the current user.
      */
     public function organizations(): BelongsToMany
@@ -121,34 +121,49 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Generic method to check if user is in an organization with a specific business type.
+     */
+    public function isInOrganizationWithBusinessType(OrganizationBusinessType $businessType): bool
+    {
+        /** @var Organization $current_organization */
+        $current_organization = $this->currentOrganization;
+
+        if (!$current_organization) {
+            return false;
+        }
+
+        return $current_organization->business_type === $businessType;
+    }
+
+    public function isInOrganizationWithUserRole(UserRoles $userRole): bool
+    {
+        $userRoleInOrg = $this->getRoleInCurrentOrganization();
+
+        return $userRoleInOrg === $userRole;
+    }
+
+    /**
      * Get the user's role in a specific organization.
      */
-    public function getRoleInOrganization(string $organizationId): ?UserRoles
+    public function getRoleInCurrentOrganization(): ?UserRoles
     {
-        $organization = $this->organizations()
-            ->where('organizations.id', $organizationId)
+        $organization = $this->currentOrganization;
+
+        if (!$organization) {
+            return null;
+        }
+
+        $organization_with_pivot = $this->organizations()
+            ->where('organizations.id', $organization->id)
             ->first();
 
-        if (! $organization) {
+        if (!$organization_with_pivot) {
             return null;
         }
 
         /** @var object{role: UserRoles} $pivot */
-        $pivot = $organization->pivot;
+        $pivot = $organization_with_pivot->pivot;
 
         return $pivot->role;
-    }
-
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
     }
 }
