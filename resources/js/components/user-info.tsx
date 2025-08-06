@@ -1,6 +1,6 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { type User } from '@/types/index';
+import { type User } from '@/types';
 
 function getRoleLabel(role: string): string {
     switch (role) {
@@ -17,7 +17,7 @@ export function UserInfo({ user, showEmail = false }: { user: User; showEmail?: 
     return (
         <div className="flex flex-1 items-center gap-2">
             <Avatar className="h-8 w-8 overflow-hidden rounded-full">
-                <AvatarImage src={user.avatar} alt={user.first_name} />
+                {/*<AvatarImage src={user.avatar} alt={user.first_name} />*/}
                 <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
                     {user.first_name.charAt(0)}
                 </AvatarFallback>
@@ -26,9 +26,11 @@ export function UserInfo({ user, showEmail = false }: { user: User; showEmail?: 
                 <span className="truncate font-medium">{user.first_name}</span>
                 {showEmail && <span className="truncate text-xs text-muted-foreground">{user.email}</span>}
             </div>
-            <Badge variant="outline" className="truncate rounded-full text-xs">
-                {getRoleLabel(user.role)}
-            </Badge>
+            {user.current_organization?.role && (
+                <Badge variant="outline" className="truncate rounded-full text-xs capitalize">
+                    {getRoleLabel(user.current_organization?.role)}
+                </Badge>
+            )}
         </div>
     );
 }

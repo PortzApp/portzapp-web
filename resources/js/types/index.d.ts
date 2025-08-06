@@ -1,4 +1,4 @@
-import { UserRoles } from '@/types/user-roles';
+import { UserRoles } from '@/types/core';
 import { LucideIcon } from 'lucide-react';
 import type { Config } from 'ziggy-js';
 
@@ -32,6 +32,7 @@ export interface SharedData {
     auth: Auth;
     ziggy: Config & { location: string };
     sidebarOpen: boolean;
+
     [key: string]: unknown;
 }
 
@@ -40,6 +41,9 @@ export interface Organization {
     name: string;
     business_type: string;
     registration_code: string;
+    role: UserRoles;
+    created_at: string;
+    updated_at: string;
 }
 
 export interface User {
@@ -48,11 +52,11 @@ export interface User {
     last_name: string;
     email: string;
     phone_number: string;
-    avatar?: string;
     email_verified_at: string | null;
-    role: UserRoles;
-    organization: Organization | null;
     created_at: string;
     updated_at: string;
+    current_organization: Organization | null;
+    organizations: Organization[] | null;
+
     [key: string]: unknown; // This allows for additional properties...
 }

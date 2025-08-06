@@ -9,6 +9,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -68,6 +69,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'email',
         'phone_number',
         'password',
+        'current_organization_id',
     ];
 
     /**
@@ -79,6 +81,11 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'remember_token',
     ];
+
+    public function currentOrganization(): BelongsTo
+    {
+        return $this->belongsTo(Organization::class, 'current_organization_id');
+    }
 
     /**
      * Get the services for the current user.
@@ -122,7 +129,7 @@ class User extends Authenticatable implements MustVerifyEmail
             ->where('organizations.id', $organizationId)
             ->first();
 
-        if (!$organization) {
+        if (! $organization) {
             return null;
         }
 

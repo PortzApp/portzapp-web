@@ -43,18 +43,18 @@ class HandleInertiaRequests extends Middleware
 
         $user = $request->user();
         $userAuth = null;
-        $currentOrganization = null;
+        $all_organizations = null;
         $userRole = null;
 
         if ($user) {
-            // Get user's first organization (primary organization)
-            // In a more complex system, you might want to track a "current" organization preference
-            /** @var Organization $currentOrganization */
-            $currentOrganization = $user->organizations()->first();
+            /** @var iterable<Organization> $all_organizations */
+            $all_organizations = $user->organizations()->withPivot('role')->get();
 
-            if ($currentOrganization) {
-                $userRole = $user->getRoleInOrganization($currentOrganization->id);
-            }
+            /** @var Organization $current_organization */
+            $current_organization = $user->currentOrganization;
+            $current_organization_role = $user->current_organization_id
+                ? $user->getRoleInOrganization($user->current_organization_id)
+                : null;
 
             $userAuth = [
                 'id' => $user->id,
@@ -65,13 +65,30 @@ class HandleInertiaRequests extends Middleware
                 'email_verified_at' => $user->email_verified_at,
                 'created_at' => $user->created_at,
                 'updated_at' => $user->updated_at,
-                'role' => $userRole,
-                'organization' => $currentOrganization ? [
-                    'id' => $currentOrganization->id,
-                    'name' => $currentOrganization->name,
-                    'business_type' => $currentOrganization->business_type,
-                    'registration_code' => $currentOrganization->registration_code,
-                ] : null,
+                'current_organization' => [
+                    'id' => $current_organization->id,
+                    'name' => $current_organization->name,
+                    'business_type' => $current_organization->business_type,
+                    'registration_code' => $current_organization->registration_code,
+                    'role' => $current_organization_role,
+                    'created_at' => $current_organization->created_at,
+                    'updated_at' => $current_organization->updated_at,
+                ],
+                /** @phpstan-ignore method.nonObject */
+                'organizations' => $all_organizations->map(function (Organization $org) {
+                    /** @phpstan-ignore property.notFound */
+                    $role_in_org = $org->pivot->role;
+
+                    return [
+                        'id' => $org->id,
+                        'name' => $org->name,
+                        'business_type' => $org->business_type,
+                        'registration_code' => $org->registration_code,
+                        'role' => $role_in_org,
+                        'created_at' => $org->created_at,
+                        'updated_at' => $org->updated_at,
+                    ];
+                }),
             ];
         }
 
@@ -81,15 +98,15 @@ class HandleInertiaRequests extends Middleware
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
                 'user' => $userAuth,
-                'can' => fn () => $user ? [
+                'can' => fn() => $user ? [
                     'create_services' => $user->can('create', Service::class),
                 ] : null,
             ],
-            'ziggy' => fn (): array => [
+            'ziggy' => fn(): array => [
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url(),
             ],
-            'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            'sidebarOpen' => !$request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
     }
 }

@@ -20,9 +20,11 @@ import {
     SidebarMenuItem,
     useSidebar,
 } from '@/components/ui/sidebar';
+import { cn } from '@/lib/utils';
 import type { NavItem, SharedData } from '@/types';
-import { usePage } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import { ChevronsUpDown, ClipboardCheck, LayoutGrid, ListCheck, MapPin, Package, Plus, Ship } from 'lucide-react';
+import { toast } from 'sonner';
 
 const mainNavItemsAsAdmin: NavItem[] = [
     {
@@ -114,7 +116,7 @@ export function AppSidebar() {
 
     const { auth } = usePage<SharedData>().props;
     const user = auth.user;
-    const businessType = user?.organization?.business_type;
+    const businessType = user?.current_organization?.business_type;
 
     let navItems = mainNavItemsAsAdmin;
 
@@ -129,7 +131,7 @@ export function AppSidebar() {
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
-                {user?.organization && (
+                {user?.organizations && (
                     <SidebarMenu>
                         <SidebarMenuItem>
                             <DropdownMenu>
@@ -140,13 +142,13 @@ export function AppSidebar() {
                                     >
                                         <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                                             {/* <activeTeam.logo className="size-4" /> */}
-                                            <span className="truncate">{user.organization.name.charAt(0)}</span>
+                                            <span className="truncate">{user.current_organization?.name.charAt(0)}</span>
                                         </div>
                                         <div className="grid flex-1 text-left text-sm leading-tight">
                                             <span className="truncate text-xs text-sidebar-accent-foreground">
                                                 {getBusinessTypeLabel(businessType || '')}
                                             </span>
-                                            <span className="truncate font-medium">{user.organization.name}</span>
+                                            <span className="truncate font-medium">{user.current_organization?.name}</span>
                                         </div>
                                         <ChevronsUpDown className="ml-auto" />
                                     </SidebarMenuButton>
@@ -158,14 +160,36 @@ export function AppSidebar() {
                                     sideOffset={4}
                                 >
                                     <DropdownMenuLabel className="text-xs text-muted-foreground">Organizations</DropdownMenuLabel>
-                                    <DropdownMenuItem className="gap-2 p-2">
-                                        <div className="flex size-6 items-center justify-center rounded-md border">
-                                            {/* <team.logo className="size-3.5 shrink-0" /> */}
-                                            <span className="truncate">{user.organization.name.charAt(0)}</span>
-                                        </div>
-                                        <span className="truncate">{user.organization.name}</span>
-                                        <DropdownMenuShortcut>⌘1</DropdownMenuShortcut>
-                                    </DropdownMenuItem>
+                                    <div className="flex flex-col gap-1">
+                                        {user.organizations?.map((org, index) => (
+                                            <DropdownMenuItem
+                                                key={org.id}
+                                                className={cn('gap-2 p-2', org.id === user.current_organization?.id && 'border bg-muted')}
+                                                onClick={async () => {
+                                                    router.put(
+                                                        route('user.current-organization.update'),
+                                                        {
+                                                            organization_id: org.id,
+                                                        },
+                                                        {
+                                                            onSuccess: () => {
+                                                                toast('Switched organization', {
+                                                                    description: `Switched to ${org.name}`,
+                                                                });
+                                                            },
+                                                        },
+                                                    );
+                                                }}
+                                            >
+                                                <div className="flex size-6 items-center justify-center rounded-md border">
+                                                    {/* <team.logo className="size-3.5 shrink-0" /> */}
+                                                    <span className="truncate">{org.name.charAt(0)}</span>
+                                                </div>
+                                                <span className="truncate">{org.name}</span>
+                                                <DropdownMenuShortcut>⌘{index}</DropdownMenuShortcut>
+                                            </DropdownMenuItem>
+                                        ))}
+                                    </div>
 
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem className="gap-2 p-2">
