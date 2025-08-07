@@ -8,7 +8,7 @@ import {
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuShortcut,
-    DropdownMenuTrigger,
+    DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import {
     Sidebar,
@@ -18,7 +18,7 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
-    useSidebar,
+    useSidebar
 } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
 import type { NavItem, SharedData } from '@/types';
@@ -104,8 +104,8 @@ function getBusinessTypeLabel(businessType: string): string {
             return 'Shipping Agency';
         case 'vessel_owner':
             return 'Vessel Owner';
-        case 'platform_admin':
-            return 'Platform Admin';
+        case 'portzapp_team':
+            return 'PortzApp Team';
         default:
             return businessType;
     }
@@ -120,7 +120,7 @@ export function AppSidebar() {
 
     let navItems = mainNavItemsAsAdmin;
 
-    if (businessType === 'platform_admin') {
+    if (businessType === 'portzapp_team') {
         navItems = mainNavItemsAsAdmin;
     } else if (businessType === 'vessel_owner') {
         navItems = mainNavItemsAsVesselOwner;
