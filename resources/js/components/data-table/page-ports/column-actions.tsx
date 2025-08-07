@@ -8,7 +8,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-import { Link, router } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 import { Edit, Eye, MoreHorizontal, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -22,12 +22,14 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
+import type { SharedData } from '@/types';
 import { Port } from '@/types/core';
 import { toast } from 'sonner';
 
 export function PortsPageColumnActions({ port }: { port: Port }) {
     const [openDropdown, setOpenDropdown] = useState(false);
     const [openDeletePortDialog, setOpenDeletePortDialog] = useState(false);
+    const { auth } = usePage<SharedData>().props;
 
     function handleDeletePort() {
         router.delete(route('ports.destroy', port.id), {
@@ -59,37 +61,41 @@ export function PortsPageColumnActions({ port }: { port: Port }) {
                     </Link>
                 </DropdownMenuItem>
 
-                <DropdownMenuItem asChild>
-                    <Link href={route('ports.edit', port.id)} className="flex">
-                        <Edit />
-                        Edit port
-                    </Link>
-                </DropdownMenuItem>
+                {auth.can.ports.edit && (
+                    <DropdownMenuItem asChild>
+                        <Link href={route('ports.edit', port.id)} className="flex">
+                            <Edit />
+                            Edit port
+                        </Link>
+                    </DropdownMenuItem>
+                )}
 
-                <Dialog open={openDeletePortDialog} onOpenChange={setOpenDeletePortDialog}>
-                    <DialogTrigger asChild>
-                        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                            <Trash2 />
-                            Delete port
-                        </DropdownMenuItem>
-                    </DialogTrigger>
-
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>Delete port</DialogTitle>
-                            <DialogDescription>Are you sure you want to delete this port?</DialogDescription>
-                        </DialogHeader>
-
-                        <DialogFooter>
-                            <DialogClose asChild>
-                                <Button variant="outline">Cancel</Button>
-                            </DialogClose>
-                            <Button type="submit" onClick={handleDeletePort}>
+                {auth.can.ports.delete && (
+                    <Dialog open={openDeletePortDialog} onOpenChange={setOpenDeletePortDialog}>
+                        <DialogTrigger asChild>
+                            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                <Trash2 />
                                 Delete port
-                            </Button>
-                        </DialogFooter>
-                    </DialogContent>
-                </Dialog>
+                            </DropdownMenuItem>
+                        </DialogTrigger>
+
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>Delete port</DialogTitle>
+                                <DialogDescription>Are you sure you want to delete this port?</DialogDescription>
+                            </DialogHeader>
+
+                            <DialogFooter>
+                                <DialogClose asChild>
+                                    <Button variant="outline">Cancel</Button>
+                                </DialogClose>
+                                <Button type="submit" onClick={handleDeletePort}>
+                                    Delete port
+                                </Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
+                )}
             </DropdownMenuContent>
         </DropdownMenu>
     );

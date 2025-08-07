@@ -13,14 +13,16 @@ import {
 } from '@/components/ui/dialog';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
-import type { BreadcrumbItem } from '@/types';
+import type { BreadcrumbItem, SharedData } from '@/types';
 import { Port } from '@/types/core';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { Dot, Edit, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
 export default function PortShowPage({ port }: { port: Port }) {
+    const { auth } = usePage<SharedData>().props;
+
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -55,34 +57,39 @@ export default function PortShowPage({ port }: { port: Port }) {
                         <p className="text-base text-muted-foreground">Port details and information</p>
                     </div>
                     <div className="flex gap-2">
-                        <Link href={route('ports.edit', port.id)} className={buttonVariants({ variant: 'outline', size: 'sm' })}>
-                            <Edit className="mr-2 h-4 w-4" />
-                            Edit
-                        </Link>
-                        <Dialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
-                            <DialogTrigger asChild>
-                                <Button variant="destructive" size="sm">
-                                    <Trash2 className="mr-2 h-4 w-4" />
-                                    Delete
-                                </Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                                <DialogHeader>
-                                    <DialogTitle>Delete Port</DialogTitle>
-                                    <DialogDescription>
-                                        Are you sure you want to delete "{port.name}"? This action cannot be undone.
-                                    </DialogDescription>
-                                </DialogHeader>
-                                <DialogFooter>
-                                    <DialogClose asChild>
-                                        <Button variant="outline">Cancel</Button>
-                                    </DialogClose>
-                                    <Button variant="destructive" onClick={handleDeletePort}>
-                                        Delete Port
+                        {auth.can.ports.edit && (
+                            <Link href={route('ports.edit', port.id)} className={buttonVariants({ variant: 'outline', size: 'sm' })}>
+                                <Edit className="mr-2 h-4 w-4" />
+                                Edit
+                            </Link>
+                        )}
+
+                        {auth.can.vessels.delete && (
+                            <Dialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
+                                <DialogTrigger asChild>
+                                    <Button variant="destructive" size="sm">
+                                        <Trash2 className="mr-2 h-4 w-4" />
+                                        Delete
                                     </Button>
-                                </DialogFooter>
-                            </DialogContent>
-                        </Dialog>
+                                </DialogTrigger>
+                                <DialogContent>
+                                    <DialogHeader>
+                                        <DialogTitle>Delete Port</DialogTitle>
+                                        <DialogDescription>
+                                            Are you sure you want to delete "{port.name}"? This action cannot be undone.
+                                        </DialogDescription>
+                                    </DialogHeader>
+                                    <DialogFooter>
+                                        <DialogClose asChild>
+                                            <Button variant="outline">Cancel</Button>
+                                        </DialogClose>
+                                        <Button variant="destructive" onClick={handleDeletePort}>
+                                            Delete Port
+                                        </Button>
+                                    </DialogFooter>
+                                </DialogContent>
+                            </Dialog>
+                        )}
                     </div>
                 </div>
 
