@@ -22,7 +22,7 @@ class OrderController extends Controller
     {
         $query = Order::with([
             'services.organization:id,name,business_type',
-            'vessel:id,name,imo_number,organization_id',
+            'vessels',
             'requestingOrganization:id,name,business_type',
             'providingOrganization:id,name,business_type',
         ]);
@@ -73,7 +73,7 @@ class OrderController extends Controller
             ->where('business_type', OrganizationBusinessType::VESSEL_OWNER)
             ->first();
 
-        if (! $vesselOwnerOrg) {
+        if (!$vesselOwnerOrg) {
             abort(403, 'You must belong to a vessel owner organization to place orders.');
         }
 
@@ -133,7 +133,7 @@ class OrderController extends Controller
 
         $order->load([
             'services.organization:id,name,business_type',
-            'vessel:id,name,imo_number,organization_id',
+            'vessels',
             'requestingOrganization:id,name,business_type',
             'providingOrganization:id,name,business_type',
         ]);
