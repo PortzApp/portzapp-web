@@ -104,6 +104,6 @@ export type VesselWithOrganization = WithRelation<Vessel, 'organization', Organi
 export type ServiceWithFullOrganization = ServiceWithOrganization;
 export type VesselWithFullOrganization = VesselWithOrganization;
 export type OrderWithFullRelations = OrderWithService<ServiceWithFullOrganization> &
-    OrderWithVessel<VesselWithFullOrganization> &
+    OrderWithVessel<VesselWithFullOrganization>[] &
     OrderWithRequestingOrganization &
     OrderWithProvidingOrganization;
