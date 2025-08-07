@@ -1,8 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { VesselStatus } from '@/types/vessel';
 import { CheckCircle2, CircleOff, Wrench } from 'lucide-react';
-
-type VesselStatus = 'active' | 'inactive' | 'maintenance';
 
 const vesselStatusStyles: Record<VesselStatus, string> = {
     active: 'bg-blue-200 text-blue-950',
