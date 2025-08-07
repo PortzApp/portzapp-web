@@ -9,6 +9,7 @@ use App\Models\Organization;
 use App\Models\Service;
 use App\Models\Vessel;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Collection;
 
 class OrderSeeder extends Seeder
 {
@@ -48,16 +49,18 @@ class OrderSeeder extends Seeder
             for ($i = 0; $i < $MAX_ORDER_COUNT_PER_ORGANIZATION; $i++) {
                 $chosenService = $activeServices->random();
                 $providingOrg = $shippingAgencyOrganizations->random();
-                $chosenVessel = $orgVessels->random();
+                // Pick 1-3 random vessels for this order
+                $chosenVessels = $orgVessels->random(rand(1, min(3, $orgVessels->count())));
+                $chosenVesselsIds = $chosenVessels instanceof Collection ? $chosenVessels->pluck('id')->all() : [$chosenVessels->id];
 
                 $order = Order::factory()->create([
-                    'vessel_id' => $chosenVessel->id,
                     'requesting_organization_id' => $requestingOrg->id,
                     'providing_organization_id' => $providingOrg->id,
                     'price' => $chosenService->price,
                 ]);
 
                 $order->services()->attach($chosenService->id);
+                $order->vessels()->attach($chosenVesselsIds);
             }
         });
 

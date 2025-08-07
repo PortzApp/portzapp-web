@@ -20,7 +20,6 @@ class OrderFactory extends Factory
     public function definition(): array
     {
         return [
-            'vessel_id' => Vessel::factory(),
             'requesting_organization_id' => Organization::factory(),
             'providing_organization_id' => Organization::factory(),
             'price' => fake()->randomFloat(2, 1000, 100000), // Between $1,000 and $100,000 for maritime services
