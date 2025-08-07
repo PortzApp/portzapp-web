@@ -89,7 +89,14 @@
         "test:refactor": "rector --dry-run",
         "test:all": [
             "@test:unit",
-            "@test:lint:backend",
+            "@test:lint",
+            "@test:spellcheck",
+            "@test:types",
+            "@test:refactor"
+        ],
+        "test": "@test:all",
+        "test:ci": [
+            "@test:lint",
             "@test:spellcheck",
             "@test:types",
             "@test:refactor"
