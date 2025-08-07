@@ -1,8 +1,8 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Run app" type="ComposerRunConfigurationType" factoryName="Composer Script">
+  <configuration default="false" name="composer db:seed" type="ComposerRunConfigurationType" factoryName="Composer Script">
     <option name="commandLineParameters" value="" />
     <option name="pathToComposerJson" value="$PROJECT_DIR$/composer.json" />
-    <option name="script" value="dev" />
+    <option name="script" value="db:seed" />
     <method v="2" />
   </configuration>
 </component>
