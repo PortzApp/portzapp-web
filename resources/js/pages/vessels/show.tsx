@@ -22,8 +22,9 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 
 export default function VesselShowPage({ vessel }: { vessel: Vessel }) {
-    const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const { auth } = usePage<SharedData>().props;
+
+    const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -57,13 +58,14 @@ export default function VesselShowPage({ vessel }: { vessel: Vessel }) {
                         <p className="text-base text-muted-foreground">Vessel details and information</p>
                     </div>
                     <div className="flex gap-2">
-                        {auth.can.edit_vessels && (
+                        {auth.can.vessels.edit && (
                             <Link href={route('vessels.edit', vessel.id)} className={buttonVariants({ variant: 'outline', size: 'sm' })}>
                                 <Edit className="mr-2 h-4 w-4" />
                                 Edit
                             </Link>
                         )}
-                        {auth.can.delete_vessels && (
+
+                        {auth.can.vessels.delete && (
                             <Dialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
                                 <DialogTrigger asChild>
                                     <Button variant="destructive" size="sm">

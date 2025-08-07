@@ -153,7 +153,7 @@ export default function Services({ services: initialServices, ports, service_cat
                 <div className="flex items-center justify-between">
                     <h1 className="text-2xl font-bold">Services</h1>
 
-                    {auth.user.organization?.business_type === 'shipping_agency' && (
+                    {auth.user.current_organization?.business_type === 'shipping_agency' && (
                         <Link href={'/services/create'} className={buttonVariants({ variant: 'default' })}>
                             <Plus className="mr-2 h-4 w-4" />
                             Add Service

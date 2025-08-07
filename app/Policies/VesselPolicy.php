@@ -21,7 +21,7 @@ class VesselPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Vessel $vessel): bool
+    public function view(User $user): bool
     {
         return $user->isInOrganizationWithBusinessType(OrganizationBusinessType::VESSEL_OWNER)
             || $user->isInOrganizationWithBusinessType(OrganizationBusinessType::PORTZAPP_TEAM);
