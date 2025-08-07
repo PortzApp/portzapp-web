@@ -1,10 +1,10 @@
 import { columns } from '@/components/data-table/page-orders/columns';
+import { OrdersPageDataTable } from '@/components/data-table/page-orders/data-table';
 import { buttonVariants } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, SharedData } from '@/types';
 import { OrderWithFullRelations } from '@/types/core';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { OrdersPageDataTable } from '@/components/data-table/page-orders/data-table';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
