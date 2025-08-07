@@ -11,27 +11,6 @@ export const columns: ColumnDef<OrderWithFullRelations>[] = [
         header: ({ column }) => <DataTableColumnHeader column={column} title="ID" />,
     },
     {
-        accessorKey: 'service.name',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Service" />,
-        cell: ({ row }) => {
-            const order = row.original;
-            return <span className="font-medium">{order.service.name}</span>;
-        },
-    },
-    {
-        accessorKey: 'vessel.name',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Vessel" />,
-        cell: ({ row }) => {
-            const order = row.original;
-            return (
-                <div>
-                    <p className="font-medium">{order.vessel.name}</p>
-                    <p className="text-xs text-muted-foreground">IMO: {order.vessel.imo_number}</p>
-                </div>
-            );
-        },
-    },
-    {
         accessorKey: 'status',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
         cell: ({ row }) => {
