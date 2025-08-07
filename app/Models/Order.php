@@ -52,7 +52,6 @@ class Order extends Model
     use HasFactory, HasUlids;
 
     protected $fillable = [
-        'vessel_id',
         'requesting_organization_id',
         'providing_organization_id',
         'price',
@@ -77,8 +76,10 @@ class Order extends Model
         return $this->belongsTo(Organization::class, 'providing_organization_id');
     }
 
-    public function vessel(): BelongsTo
+    public function vessels(): BelongsToMany
     {
-        return $this->belongsTo(Vessel::class);
+        return $this->belongsToMany(Vessel::class)
+            ->as('order_vessel')
+            ->withTimestamps();
     }
 }
