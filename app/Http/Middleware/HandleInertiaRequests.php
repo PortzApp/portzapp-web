@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Enums\UserRoles;
+use App\Models\Order;
 use App\Models\Organization;
 use App\Models\Port;
 use App\Models\Service;
@@ -103,8 +104,15 @@ class HandleInertiaRequests extends Middleware
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
                 'user' => $userAuth,
-                'can' => fn () => $user ? [
+                'can' => fn() => $user ? [
                     'create_services' => $user->can('create', Service::class),
+                    'orders' => [
+                        'view_any' => $user->can('view-any', Order::class),
+                        'view' => $user->can('view', Order::class),
+                        'create' => $user->can('create', Order::class),
+                        'edit' => $user->can('update', Order::class),
+                        'delete' => $user->can('delete', Order::class),
+                    ],
                     'vessels' => [
                         'view_any' => $user->can('view-any', Vessel::class),
                         'view' => $user->can('view', Vessel::class),
@@ -121,11 +129,11 @@ class HandleInertiaRequests extends Middleware
                     ],
                 ] : null,
             ],
-            'ziggy' => fn (): array => [
+            'ziggy' => fn(): array => [
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url(),
             ],
-            'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            'sidebarOpen' => !$request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
     }
 }
