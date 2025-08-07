@@ -69,7 +69,7 @@ class HandleInertiaRequests extends Middleware
                 'email_verified_at' => $user->email_verified_at,
                 'created_at' => $user->created_at,
                 'updated_at' => $user->updated_at,
-                'current_organization' => [
+                'current_organization' => $current_organization ? [
                     'id' => $current_organization->id,
                     'name' => $current_organization->name,
                     'business_type' => $current_organization->business_type,
@@ -77,7 +77,7 @@ class HandleInertiaRequests extends Middleware
                     'role' => $current_organization_role,
                     'created_at' => $current_organization->created_at,
                     'updated_at' => $current_organization->updated_at,
-                ],
+                ] : null,
                 'organizations' => $all_organizations->map(function (Organization $org) {
                     /** @var object{role: UserRoles} $pivot */
                     /** @phpstan-ignore-next-line property.notFound */
@@ -103,7 +103,7 @@ class HandleInertiaRequests extends Middleware
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
                 'user' => $userAuth,
-                'can' => fn () => $user ? [
+                'can' => fn() => $user ? [
                     'create_services' => $user->can('create', Service::class),
                     'vessels' => [
                         'view_any' => $user->can('view-any', Vessel::class),
@@ -121,11 +121,11 @@ class HandleInertiaRequests extends Middleware
                     ],
                 ] : null,
             ],
-            'ziggy' => fn (): array => [
+            'ziggy' => fn(): array => [
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url(),
             ],
-            'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            'sidebarOpen' => !$request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
     }
 }
