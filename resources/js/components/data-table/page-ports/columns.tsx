@@ -3,7 +3,7 @@ import { DataTableColumnHeader } from '@/components/data-table/primitives/data-t
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
-import { Port } from '@/types/core';
+import { Port } from '@/types/models';
 import { ColumnDef } from '@tanstack/react-table';
 
 export const columns: ColumnDef<Port>[] = [

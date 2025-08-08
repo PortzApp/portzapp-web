@@ -3,11 +3,11 @@ import { OrdersPageColumnActions } from '@/components/data-table/page-orders/col
 import { DataTableColumnHeader } from '@/components/data-table/primitives/data-table-column-header';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import type { Order } from '@/types/order';
-import { VesselType } from '@/types/vessel';
+import { VesselType } from '@/types/enums';
+import { OrderWithRelations } from '@/types/models';
 import { ColumnDef } from '@tanstack/react-table';
 
-export const columns: ColumnDef<Order>[] = [
+export const columns: ColumnDef<OrderWithRelations>[] = [
     {
         accessorKey: 'order_number',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Order Number" />,

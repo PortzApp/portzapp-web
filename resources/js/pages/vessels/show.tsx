@@ -15,11 +15,11 @@ import {
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
 import type { BreadcrumbItem, SharedData } from '@/types';
-import { Vessel } from '@/types/core';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { Edit, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { Vessel } from '@/types/models';
 
 export default function VesselShowPage({ vessel }: { vessel: Vessel }) {
     const { auth } = usePage<SharedData>().props;

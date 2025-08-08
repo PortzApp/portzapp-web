@@ -14,7 +14,7 @@ import {
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
 import type { BreadcrumbItem, SharedData } from '@/types';
-import { Port } from '@/types/core';
+import { Port } from '@/types/models';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { Dot, Edit, Trash2 } from 'lucide-react';
 import { useState } from 'react';

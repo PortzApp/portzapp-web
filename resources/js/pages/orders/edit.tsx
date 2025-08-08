@@ -7,25 +7,24 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-import { Order, Service, Vessel } from '@/types/core';
+import { OrderBase, Service, Vessel } from '@/types/models';
 import { Head, router, useForm } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
-import { FormEventHandler } from 'react';
+import React, { FormEventHandler } from 'react';
 
-interface EditOrderForm {
+type EditOrderForm = {
     vessel_id: string;
     service_ids: string[];
     status: string;
     notes: string;
-    [key: string]: string | string[];
-}
+};
 
 export default function OrderEditPage({
     order,
     vessels,
     services,
 }: {
-    order: Order & { vessel: Vessel; services: Service[] };
+    order: OrderBase & { vessel: Vessel; services: Service[] };
     vessels: Array<Vessel>;
     services: Array<Service>;
 }) {

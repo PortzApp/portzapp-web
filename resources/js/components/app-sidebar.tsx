@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
 import type { NavItem, SharedData } from '@/types';
+import { OrganizationBusinessType } from '@/types/enums';
 import { router, usePage } from '@inertiajs/react';
 import { ChevronsUpDown, ClipboardCheck, LayoutGrid, ListCheck, MapPin, Package, Plus, Ship } from 'lucide-react';
 import { toast } from 'sonner';
@@ -116,7 +117,7 @@ export function AppSidebar() {
 
     const { auth } = usePage<SharedData>().props;
     const user = auth.user;
-    const businessType = user?.current_organization?.business_type;
+    const businessType: OrganizationBusinessType | undefined = user?.current_organization?.business_type;
 
     let navItems = mainNavItemsAsAdmin;
 

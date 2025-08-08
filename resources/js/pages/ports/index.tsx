@@ -3,7 +3,7 @@ import { PortsPageDataTable } from '@/components/data-table/page-ports/data-tabl
 import { buttonVariants } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, SharedData } from '@/types';
-import { Port } from '@/types/core';
+import { Port } from '@/types/models';
 import { Head, Link, usePage } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [
