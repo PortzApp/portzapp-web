@@ -9,8 +9,8 @@ import { ColumnDef } from '@tanstack/react-table';
 
 export const columns: ColumnDef<Order>[] = [
     {
-        accessorKey: 'id',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="ID" />,
+        accessorKey: 'order_number',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Order Number" />,
     },
     {
         accessorKey: 'status',
@@ -90,14 +90,23 @@ export const columns: ColumnDef<Order>[] = [
 
             return (
                 <p className="text-sm tabular-nums">
-                    {new Date(order.created_at).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        hour12: false,
-                    })}
+                    {(() => {
+                        const now = new Date();
+                        const created = new Date(order.created_at);
+                        const diff = Math.floor((now.getTime() - created.getTime()) / 1000);
+
+                        if (diff < 60) return `${diff} seconds ago`;
+                        if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;
+                        if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
+                        if (diff < 604800) return `${Math.floor(diff / 86400)} days ago`;
+
+                        // Fallback to date if more than a week ago
+                        return created.toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                        });
+                    })()}
                 </p>
             );
         },
