@@ -2,8 +2,12 @@
 
 namespace Database\Factories;
 
+use App\Enums\OrderStatus;
 use App\Models\Order;
 use App\Models\Organization;
+use App\Models\User;
+use App\Models\Vessel;
+use App\Models\Port;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -18,24 +22,30 @@ class OrderFactory extends Factory
      */
     public function definition(): array
     {
+        $createdAt = fake()->dateTimeBetween('-1 month', 'now');
+        
         return [
-            'requesting_organization_id' => Organization::factory(),
-            'providing_organization_id' => Organization::factory(),
-            'price' => fake()->randomFloat(2, 1000, 100000), // Between $1,000 and $100,000 for maritime services
+            // Generate unique order number using timestamp + random suffix (format: ORD-YYMMDDHHMMSS-XXX)
+            // This ensures uniqueness and allows for unlimited scaling
+            'order_number' => 'ORD-' . $createdAt->format('ymdHis') . '-' . fake()->unique()->numberBetween(100, 999),
+            'vessel_id' => Vessel::factory(),
+            'port_id' => Port::factory(),
+            'placed_by_user_id' => User::factory(),
+            'placed_by_organization_id' => Organization::factory(),
             'notes' => fake()->optional(0.7)->sentence(),
             'status' => fake()->randomElement([
-                'pending',      // 30%
-                'pending',
-                'pending',
-                'accepted',     // 20%
-                'accepted',
-                'in_progress',  // 20%
-                'in_progress',
-                'completed',    // 20%
-                'completed',
-                'cancelled',     // 10%
+                OrderStatus::PENDING,      // 30%
+                OrderStatus::PENDING,
+                OrderStatus::PENDING,
+                OrderStatus::ACCEPTED,     // 20%
+                OrderStatus::ACCEPTED,
+                OrderStatus::IN_PROGRESS,  // 20%
+                OrderStatus::IN_PROGRESS,
+                OrderStatus::COMPLETED,    // 20%
+                OrderStatus::COMPLETED,
+                OrderStatus::CANCELLED,     // 10%
             ]),
-            'created_at' => fake()->dateTimeBetween('-1 month', 'now'),
+            'created_at' => $createdAt,
         ];
     }
 }
