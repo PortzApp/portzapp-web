@@ -1,11 +1,11 @@
 <?php
 
+use App\Enums\OrderStatus;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -13,11 +13,13 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->ulid('id')->primary();
-            $table->foreignUlid('requesting_organization_id')->constrained('organizations')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignUlid('providing_organization_id')->constrained('organizations')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->decimal('price', 12, 2);
+            $table->string('order_number')->unique();
+            $table->foreignUlid('vessel_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignUlid('port_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignUlid('placed_by_user_id')->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignUlid('placed_by_organization_id')->constrained('organizations')->cascadeOnUpdate()->cascadeOnDelete();
             $table->text('notes')->nullable();
-            $table->enum('status', ['pending', 'accepted', 'in_progress', 'completed', 'cancelled'])->default('pending');
+            $table->string('status')->default(OrderStatus::PENDING->value)->index();
             $table->timestamps();
         });
     }
