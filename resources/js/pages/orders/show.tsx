@@ -48,7 +48,7 @@ export default function OrderShowPage({ order }: { order: Order }) {
         });
     }
 
-    const totalServicePrice = order.services.reduce((sum, service) => sum + parseFloat(service.price), 0);
+    // const totalServicePrice = order.services.reduce((sum, service) => sum + parseFloat(service.price), 0);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
