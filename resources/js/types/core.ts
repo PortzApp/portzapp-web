@@ -51,8 +51,6 @@ export interface Service extends BaseModel {
 }
 
 export interface Order extends BaseModel {
-    service_id: number;
-    vessel_id: number;
     requesting_organization_id: number;
     providing_organization_id: number;
     price: number;
@@ -94,8 +92,8 @@ export type ServiceWithOrganization = WithRelation<Service, 'organization', Orga
 export type ServiceWithPort = WithRelation<Service, 'port', Port>;
 export type ServiceWithCategory = WithRelation<Service, 'category', ServiceCategory>;
 export type ServiceWithRelations = ServiceWithOrganization & ServiceWithPort & ServiceWithCategory;
-export type OrderWithService<S = Service> = WithRelation<Order, 'service', S>;
-export type OrderWithVessel<V = Vessel> = WithRelation<Order, 'vessel', V>;
+export type OrderWithServices<S = Service> = WithRelation<Order, 'services', S[]>;
+export type OrderWithVessels<V = Vessel> = WithRelation<Order, 'vessels', V[]>;
 export type OrderWithRequestingOrganization = WithRelation<Order, 'requesting_organization', Organization>;
 export type OrderWithProvidingOrganization = WithRelation<Order, 'providing_organization', Organization>;
 export type VesselWithOrganization = WithRelation<Vessel, 'organization', Organization>;
@@ -103,7 +101,7 @@ export type VesselWithOrganization = WithRelation<Vessel, 'organization', Organi
 // Complex compositions
 export type ServiceWithFullOrganization = ServiceWithOrganization;
 export type VesselWithFullOrganization = VesselWithOrganization;
-export type OrderWithFullRelations = OrderWithService<ServiceWithFullOrganization> &
-    OrderWithVessel<VesselWithFullOrganization>[] &
+export type OrderWithFullRelations = OrderWithServices<ServiceWithFullOrganization> &
+    OrderWithVessels<VesselWithFullOrganization> &
     OrderWithRequestingOrganization &
     OrderWithProvidingOrganization;
