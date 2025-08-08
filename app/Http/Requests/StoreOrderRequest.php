@@ -23,7 +23,8 @@ class StoreOrderRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'service_id' => ['required', 'exists:services,id'],
+            'service_ids' => ['required', 'array', 'min:1'],
+            'service_ids.*' => ['exists:services,id'],
             'vessel_id' => ['required', 'exists:vessels,id'],
             'notes' => ['nullable', 'string', 'max:1000'],
         ];
