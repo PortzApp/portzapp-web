@@ -1,7 +1,7 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { Dot, Ship, MapPin, User, Package } from 'lucide-react';
+import { Dot, MapPin, Package, Ship, User } from 'lucide-react';
 
 type Order = {
     id: string;
@@ -92,7 +92,7 @@ export default function OrderOverviewTab({ order }: OrderOverviewTabProps) {
     const totalServicePrice = order.services.reduce((sum, service) => sum + parseFloat(service.price), 0);
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             {/* Order Information */}
             <Card>
                 <CardHeader>
@@ -102,7 +102,7 @@ export default function OrderOverviewTab({ order }: OrderOverviewTabProps) {
                 <CardContent className="space-y-4">
                     <div className="flex justify-between">
                         <span className="text-sm font-medium text-muted-foreground">Order Number:</span>
-                        <span className="text-sm font-medium font-mono">{order.order_number}</span>
+                        <span className="font-mono text-sm font-medium">{order.order_number}</span>
                     </div>
                     <div className="flex justify-between">
                         <span className="text-sm font-medium text-muted-foreground">Total Services Value:</span>
@@ -112,13 +112,10 @@ export default function OrderOverviewTab({ order }: OrderOverviewTabProps) {
                         <span className="text-sm font-medium text-muted-foreground">Status:</span>
                         <Badge
                             className={cn(
-                                order.status === 'pending' &&
-                                    'bg-yellow-200 text-yellow-950 uppercase dark:bg-yellow-900 dark:text-yellow-50',
+                                order.status === 'pending' && 'bg-yellow-200 text-yellow-950 uppercase dark:bg-yellow-900 dark:text-yellow-50',
                                 order.status === 'accepted' && 'bg-blue-200 text-blue-950 uppercase dark:bg-blue-900 dark:text-blue-50',
-                                order.status === 'in_progress' &&
-                                    'bg-purple-200 text-purple-950 uppercase dark:bg-purple-900 dark:text-purple-50',
-                                order.status === 'completed' &&
-                                    'bg-green-200 text-green-950 uppercase dark:bg-green-900 dark:text-green-50',
+                                order.status === 'in_progress' && 'bg-purple-200 text-purple-950 uppercase dark:bg-purple-900 dark:text-purple-50',
+                                order.status === 'completed' && 'bg-green-200 text-green-950 uppercase dark:bg-green-900 dark:text-green-50',
                                 order.status === 'cancelled' && 'bg-red-200 text-red-950 uppercase dark:bg-red-900 dark:text-red-50',
                             )}
                         >
@@ -146,8 +143,7 @@ export default function OrderOverviewTab({ order }: OrderOverviewTabProps) {
                     <div className="flex justify-between">
                         <span className="text-sm text-muted-foreground">Vessel:</span>
                         <Badge variant="outline" className="flex items-center gap-1">
-                            <Ship className="h-3 w-3" />
-                            1
+                            <Ship className="h-3 w-3" />1
                         </Badge>
                     </div>
                     <div className="flex justify-between">
@@ -177,7 +173,7 @@ export default function OrderOverviewTab({ order }: OrderOverviewTabProps) {
                         </div>
                         <div className="flex justify-between">
                             <span className="text-sm text-muted-foreground">IMO:</span>
-                            <span className="text-sm font-mono">{order.vessel.imo_number}</span>
+                            <span className="font-mono text-sm">{order.vessel.imo_number}</span>
                         </div>
                         <div className="flex justify-between">
                             <span className="text-sm text-muted-foreground">Type:</span>
@@ -206,11 +202,13 @@ export default function OrderOverviewTab({ order }: OrderOverviewTabProps) {
                         </div>
                         <div className="flex justify-between">
                             <span className="text-sm text-muted-foreground">Code:</span>
-                            <span className="text-sm font-mono">{order.port.code}</span>
+                            <span className="font-mono text-sm">{order.port.code}</span>
                         </div>
                         <div className="flex justify-between">
                             <span className="text-sm text-muted-foreground">Location:</span>
-                            <span className="text-sm">{order.port.city}, {order.port.country}</span>
+                            <span className="text-sm">
+                                {order.port.city}, {order.port.country}
+                            </span>
                         </div>
                     </div>
                 </CardContent>
@@ -226,7 +224,7 @@ export default function OrderOverviewTab({ order }: OrderOverviewTabProps) {
                     <CardDescription>User and organization summary</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <div>
                             <span className="text-sm font-medium text-muted-foreground">User:</span>
                             <div className="mt-1">

@@ -1,6 +1,6 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Package, Building2 } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Building2, Package } from 'lucide-react';
 
 type Service = {
     id: string;
@@ -37,17 +37,20 @@ export default function OrderServicesTab({ services }: OrderServicesTabProps) {
     const totalServicePrice = services.reduce((sum, service) => sum + parseFloat(service.price), 0);
 
     // Group services by organization
-    const servicesByOrganization = services.reduce((acc, service) => {
-        const orgId = service.organization.id;
-        if (!acc[orgId]) {
-            acc[orgId] = {
-                organization: service.organization,
-                services: []
-            };
-        }
-        acc[orgId].services.push(service);
-        return acc;
-    }, {} as Record<string, { organization: Service['organization']; services: Service[] }>);
+    const servicesByOrganization = services.reduce(
+        (acc, service) => {
+            const orgId = service.organization.id;
+            if (!acc[orgId]) {
+                acc[orgId] = {
+                    organization: service.organization,
+                    services: [],
+                };
+            }
+            acc[orgId].services.push(service);
+            return acc;
+        },
+        {} as Record<string, { organization: Service['organization']; services: Service[] }>,
+    );
 
     return (
         <div className="space-y-6">
@@ -61,7 +64,7 @@ export default function OrderServicesTab({ services }: OrderServicesTabProps) {
                     <CardDescription>Overview of all services in this order</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                         <div className="text-center">
                             <div className="text-2xl font-bold">{services.length}</div>
                             <div className="text-sm text-muted-foreground">Total Services</div>
@@ -82,7 +85,7 @@ export default function OrderServicesTab({ services }: OrderServicesTabProps) {
             <div className="space-y-6">
                 {Object.values(servicesByOrganization).map(({ organization, services: orgServices }) => {
                     const orgTotal = orgServices.reduce((sum, service) => sum + parseFloat(service.price), 0);
-                    
+
                     return (
                         <Card key={organization.id}>
                             <CardHeader>
@@ -109,30 +112,21 @@ export default function OrderServicesTab({ services }: OrderServicesTabProps) {
                                     {orgServices.map((service) => (
                                         <div key={service.id} className="flex items-start justify-between rounded-lg border p-4">
                                             <div className="flex-1">
-                                                <div className="flex items-center gap-2 mb-2">
+                                                <div className="mb-2 flex items-center gap-2">
                                                     <h4 className="font-medium">{service.name}</h4>
-                                                    <Badge 
-                                                        variant={service.status === 'active' ? 'default' : 'secondary'}
-                                                        className="text-xs"
-                                                    >
+                                                    <Badge variant={service.status === 'active' ? 'default' : 'secondary'} className="text-xs">
                                                         {service.status}
                                                     </Badge>
                                                 </div>
-                                                <p className="text-sm text-muted-foreground mb-3">
-                                                    {service.description}
-                                                </p>
+                                                <p className="mb-3 text-sm text-muted-foreground">{service.description}</p>
                                                 <div className="flex items-center gap-4 text-xs text-muted-foreground">
                                                     <span>Service ID: {service.id}</span>
                                                     <span>Added: {new Date(service.order_service.created_at).toLocaleDateString()}</span>
                                                 </div>
                                             </div>
-                                            <div className="text-right ml-4">
-                                                <div className="text-lg font-semibold">
-                                                    ${parseFloat(service.price).toLocaleString()}
-                                                </div>
-                                                <div className="text-xs text-muted-foreground mt-1">
-                                                    per service
-                                                </div>
+                                            <div className="ml-4 text-right">
+                                                <div className="text-lg font-semibold">${parseFloat(service.price).toLocaleString()}</div>
+                                                <div className="mt-1 text-xs text-muted-foreground">per service</div>
                                             </div>
                                         </div>
                                     ))}
@@ -152,16 +146,14 @@ export default function OrderServicesTab({ services }: OrderServicesTabProps) {
                 <CardContent>
                     <div className="space-y-3">
                         {services.map((service, index) => (
-                            <div key={service.id} className="flex items-center justify-between py-3 border-b last:border-b-0">
+                            <div key={service.id} className="flex items-center justify-between border-b py-3 last:border-b-0">
                                 <div className="flex items-center gap-3">
-                                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-muted text-xs font-medium">
+                                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-xs font-medium">
                                         {index + 1}
                                     </div>
                                     <div>
                                         <div className="font-medium">{service.name}</div>
-                                        <div className="text-xs text-muted-foreground">
-                                            by {service.organization.name}
-                                        </div>
+                                        <div className="text-xs text-muted-foreground">by {service.organization.name}</div>
                                     </div>
                                 </div>
                                 <div className="text-right">

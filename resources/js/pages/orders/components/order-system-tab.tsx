@@ -1,6 +1,6 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Database, User, Building2, MapPin, Ship } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Building2, Calendar, Database, MapPin, Ship, User } from 'lucide-react';
 
 type Order = {
     id: string;
@@ -100,34 +100,28 @@ export default function OrderSystemTab({ order }: OrderSystemTabProps) {
                     <CardDescription>Technical details and database identifiers</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <div className="text-center p-4 rounded-lg bg-muted/50">
-                            <div className="text-2xl mb-2">📋</div>
-                            <div className="font-medium text-sm">Order ID</div>
-                            <div className="text-xs text-muted-foreground font-mono break-all">
-                                {order.id}
-                            </div>
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                        <div className="rounded-lg bg-muted/50 p-4 text-center">
+                            <div className="mb-2 text-2xl">📋</div>
+                            <div className="text-sm font-medium">Order ID</div>
+                            <div className="font-mono text-xs break-all text-muted-foreground">{order.id}</div>
                         </div>
-                        <div className="text-center p-4 rounded-lg bg-muted/50">
-                            <div className="text-2xl mb-2">🔢</div>
-                            <div className="font-medium text-sm">Order Number</div>
-                            <div className="text-xs text-muted-foreground font-mono">
-                                {order.order_number}
-                            </div>
+                        <div className="rounded-lg bg-muted/50 p-4 text-center">
+                            <div className="mb-2 text-2xl">🔢</div>
+                            <div className="text-sm font-medium">Order Number</div>
+                            <div className="font-mono text-xs text-muted-foreground">{order.order_number}</div>
                         </div>
-                        <div className="text-center p-4 rounded-lg bg-muted/50">
-                            <Calendar className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-                            <div className="font-medium text-sm">Created</div>
-                            <div className="text-xs text-muted-foreground">
-                                {new Date(order.created_at).toLocaleString()}
-                            </div>
+                        <div className="rounded-lg bg-muted/50 p-4 text-center">
+                            <Calendar className="mx-auto mb-2 h-8 w-8 text-muted-foreground" />
+                            <div className="text-sm font-medium">Created</div>
+                            <div className="text-xs text-muted-foreground">{new Date(order.created_at).toLocaleString()}</div>
                         </div>
                     </div>
                 </CardContent>
             </Card>
 
             {/* Entity IDs and References */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <Card>
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
@@ -137,41 +131,33 @@ export default function OrderSystemTab({ order }: OrderSystemTabProps) {
                         <CardDescription>Database identifiers and foreign key references</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        <div className="flex justify-between items-start">
+                        <div className="flex items-start justify-between">
                             <div className="flex items-center gap-2">
                                 <Ship className="h-4 w-4 text-muted-foreground" />
                                 <span className="text-sm font-medium text-muted-foreground">Vessel ID:</span>
                             </div>
-                            <span className="text-xs font-mono text-right max-w-[200px] break-all">
-                                {order.vessel_id}
-                            </span>
+                            <span className="max-w-[200px] text-right font-mono text-xs break-all">{order.vessel_id}</span>
                         </div>
-                        <div className="flex justify-between items-start">
+                        <div className="flex items-start justify-between">
                             <div className="flex items-center gap-2">
                                 <MapPin className="h-4 w-4 text-muted-foreground" />
                                 <span className="text-sm font-medium text-muted-foreground">Port ID:</span>
                             </div>
-                            <span className="text-xs font-mono text-right max-w-[200px] break-all">
-                                {order.port_id}
-                            </span>
+                            <span className="max-w-[200px] text-right font-mono text-xs break-all">{order.port_id}</span>
                         </div>
-                        <div className="flex justify-between items-start">
+                        <div className="flex items-start justify-between">
                             <div className="flex items-center gap-2">
                                 <User className="h-4 w-4 text-muted-foreground" />
                                 <span className="text-sm font-medium text-muted-foreground">User ID:</span>
                             </div>
-                            <span className="text-xs font-mono text-right max-w-[200px] break-all">
-                                {order.placed_by_user_id}
-                            </span>
+                            <span className="max-w-[200px] text-right font-mono text-xs break-all">{order.placed_by_user_id}</span>
                         </div>
-                        <div className="flex justify-between items-start">
+                        <div className="flex items-start justify-between">
                             <div className="flex items-center gap-2">
                                 <Building2 className="h-4 w-4 text-muted-foreground" />
                                 <span className="text-sm font-medium text-muted-foreground">Organization ID:</span>
                             </div>
-                            <span className="text-xs font-mono text-right max-w-[200px] break-all">
-                                {order.placed_by_organization_id}
-                            </span>
+                            <span className="max-w-[200px] text-right font-mono text-xs break-all">{order.placed_by_organization_id}</span>
                         </div>
                     </CardContent>
                 </Card>
@@ -198,11 +184,9 @@ export default function OrderSystemTab({ order }: OrderSystemTabProps) {
                                     hour12: false,
                                 })}
                             </div>
-                            <div className="text-xs text-muted-foreground font-mono">
-                                {order.created_at}
-                            </div>
+                            <div className="font-mono text-xs text-muted-foreground">{order.created_at}</div>
                         </div>
-                        
+
                         <div className="space-y-2">
                             <span className="text-sm font-medium text-muted-foreground">Last Updated:</span>
                             <div className="text-sm">
@@ -216,9 +200,7 @@ export default function OrderSystemTab({ order }: OrderSystemTabProps) {
                                     hour12: false,
                                 })}
                             </div>
-                            <div className="text-xs text-muted-foreground font-mono">
-                                {order.updated_at}
-                            </div>
+                            <div className="font-mono text-xs text-muted-foreground">{order.updated_at}</div>
                         </div>
                     </CardContent>
                 </Card>
@@ -234,11 +216,11 @@ export default function OrderSystemTab({ order }: OrderSystemTabProps) {
                     <div className="space-y-6">
                         {/* User Details */}
                         <div>
-                            <h4 className="font-medium mb-3 flex items-center gap-2">
+                            <h4 className="mb-3 flex items-center gap-2 font-medium">
                                 <User className="h-4 w-4" />
                                 User Information
                             </h4>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div className="grid grid-cols-1 gap-4 text-sm md:grid-cols-2">
                                 <div>
                                     <span className="text-muted-foreground">Name:</span>
                                     <span className="ml-2 font-medium">
@@ -261,26 +243,22 @@ export default function OrderSystemTab({ order }: OrderSystemTabProps) {
                                 </div>
                                 <div>
                                     <span className="text-muted-foreground">User Created:</span>
-                                    <span className="ml-2 text-xs">
-                                        {new Date(order.placed_by_user.created_at).toLocaleDateString()}
-                                    </span>
+                                    <span className="ml-2 text-xs">{new Date(order.placed_by_user.created_at).toLocaleDateString()}</span>
                                 </div>
                                 <div>
                                     <span className="text-muted-foreground">User ID:</span>
-                                    <span className="ml-2 font-mono text-xs break-all">
-                                        {order.placed_by_user.id}
-                                    </span>
+                                    <span className="ml-2 font-mono text-xs break-all">{order.placed_by_user.id}</span>
                                 </div>
                             </div>
                         </div>
 
                         {/* Organization Details */}
                         <div>
-                            <h4 className="font-medium mb-3 flex items-center gap-2">
+                            <h4 className="mb-3 flex items-center gap-2 font-medium">
                                 <Building2 className="h-4 w-4" />
                                 Organization Information
                             </h4>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div className="grid grid-cols-1 gap-4 text-sm md:grid-cols-2">
                                 <div>
                                     <span className="text-muted-foreground">Name:</span>
                                     <span className="ml-2 font-medium">{order.placed_by_organization.name}</span>
@@ -297,26 +275,22 @@ export default function OrderSystemTab({ order }: OrderSystemTabProps) {
                                 </div>
                                 <div>
                                     <span className="text-muted-foreground">Organization Created:</span>
-                                    <span className="ml-2 text-xs">
-                                        {new Date(order.placed_by_organization.created_at).toLocaleDateString()}
-                                    </span>
+                                    <span className="ml-2 text-xs">{new Date(order.placed_by_organization.created_at).toLocaleDateString()}</span>
                                 </div>
                                 <div className="md:col-span-2">
                                     <span className="text-muted-foreground">Organization ID:</span>
-                                    <span className="ml-2 font-mono text-xs break-all">
-                                        {order.placed_by_organization.id}
-                                    </span>
+                                    <span className="ml-2 font-mono text-xs break-all">{order.placed_by_organization.id}</span>
                                 </div>
                             </div>
                         </div>
 
                         {/* Port Details */}
                         <div>
-                            <h4 className="font-medium mb-3 flex items-center gap-2">
+                            <h4 className="mb-3 flex items-center gap-2 font-medium">
                                 <MapPin className="h-4 w-4" />
                                 Port Information
                             </h4>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div className="grid grid-cols-1 gap-4 text-sm md:grid-cols-2">
                                 <div>
                                     <span className="text-muted-foreground">Name:</span>
                                     <span className="ml-2 font-medium">{order.port.name}</span>
@@ -327,7 +301,9 @@ export default function OrderSystemTab({ order }: OrderSystemTabProps) {
                                 </div>
                                 <div>
                                     <span className="text-muted-foreground">Location:</span>
-                                    <span className="ml-2">{order.port.city}, {order.port.country}</span>
+                                    <span className="ml-2">
+                                        {order.port.city}, {order.port.country}
+                                    </span>
                                 </div>
                                 <div>
                                     <span className="text-muted-foreground">Timezone:</span>
@@ -341,9 +317,7 @@ export default function OrderSystemTab({ order }: OrderSystemTabProps) {
                                 </div>
                                 <div>
                                     <span className="text-muted-foreground">Port ID:</span>
-                                    <span className="ml-2 font-mono text-xs break-all">
-                                        {order.port.id}
-                                    </span>
+                                    <span className="ml-2 font-mono text-xs break-all">{order.port.id}</span>
                                 </div>
                             </div>
                         </div>
@@ -360,30 +334,24 @@ export default function OrderSystemTab({ order }: OrderSystemTabProps) {
                 <CardContent>
                     <div className="space-y-4">
                         {order.services.map((service, index) => (
-                            <div key={service.id} className="border rounded-lg p-4">
-                                <div className="flex items-center justify-between mb-3">
+                            <div key={service.id} className="rounded-lg border p-4">
+                                <div className="mb-3 flex items-center justify-between">
                                     <div className="flex items-center gap-2">
-                                        <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-xs font-medium">
+                                        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-xs font-medium">
                                             {index + 1}
                                         </div>
                                         <span className="font-medium">{service.name}</span>
                                     </div>
-                                    <Badge variant="outline">
-                                        Service Attached
-                                    </Badge>
+                                    <Badge variant="outline">Service Attached</Badge>
                                 </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                <div className="grid grid-cols-1 gap-4 text-sm md:grid-cols-2">
                                     <div>
                                         <span className="text-muted-foreground">Service ID:</span>
-                                        <span className="ml-2 font-mono text-xs break-all">
-                                            {service.id}
-                                        </span>
+                                        <span className="ml-2 font-mono text-xs break-all">{service.id}</span>
                                     </div>
                                     <div>
                                         <span className="text-muted-foreground">Attachment Date:</span>
-                                        <span className="ml-2 text-xs">
-                                            {new Date(service.order_service.created_at).toLocaleDateString()}
-                                        </span>
+                                        <span className="ml-2 text-xs">{new Date(service.order_service.created_at).toLocaleDateString()}</span>
                                     </div>
                                     <div>
                                         <span className="text-muted-foreground">Provider:</span>
@@ -391,9 +359,7 @@ export default function OrderSystemTab({ order }: OrderSystemTabProps) {
                                     </div>
                                     <div>
                                         <span className="text-muted-foreground">Provider ID:</span>
-                                        <span className="ml-2 font-mono text-xs break-all">
-                                            {service.organization.id}
-                                        </span>
+                                        <span className="ml-2 font-mono text-xs break-all">{service.organization.id}</span>
                                     </div>
                                 </div>
                             </div>

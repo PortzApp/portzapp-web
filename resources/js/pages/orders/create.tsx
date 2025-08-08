@@ -83,11 +83,7 @@ export default function OrdersCreatePage({ vessels, services }: { vessels: Array
 
                     <div className="flex flex-col gap-2">
                         <Label htmlFor="vessel_id">Vessel</Label>
-                        <Select
-                            value={data.vessel_id}
-                            onValueChange={(value) => setData('vessel_id', value)}
-                            disabled={processing}
-                        >
+                        <Select value={data.vessel_id} onValueChange={(value) => setData('vessel_id', value)} disabled={processing}>
                             <SelectTrigger>
                                 <SelectValue placeholder="Select vessel" />
                             </SelectTrigger>

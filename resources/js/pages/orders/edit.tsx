@@ -20,14 +20,14 @@ interface EditOrderForm {
     [key: string]: string | string[];
 }
 
-export default function OrderEditPage({ 
-    order, 
-    vessels, 
-    services 
-}: { 
+export default function OrderEditPage({
+    order,
+    vessels,
+    services,
+}: {
     order: Order & { vessel: Vessel; services: Service[] };
-    vessels: Array<Vessel>; 
-    services: Array<Service>; 
+    vessels: Array<Vessel>;
+    services: Array<Service>;
 }) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -46,7 +46,7 @@ export default function OrderEditPage({
 
     const { data, setData, put, processing, errors } = useForm<EditOrderForm>({
         vessel_id: order.vessel ? order.vessel.id.toString() : '',
-        service_ids: order.services ? order.services.map(s => s.id.toString()) : [],
+        service_ids: order.services ? order.services.map((s) => s.id.toString()) : [],
         status: order.status,
         notes: order.notes || '',
     });
@@ -79,11 +79,7 @@ export default function OrderEditPage({
                         {/* Vessel Select */}
                         <div className="flex flex-col gap-2">
                             <Label htmlFor="vessel_id">Vessel</Label>
-                            <Select
-                                value={data.vessel_id}
-                                onValueChange={(value) => setData('vessel_id', value)}
-                                disabled={processing}
-                            >
+                            <Select value={data.vessel_id} onValueChange={(value) => setData('vessel_id', value)} disabled={processing}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select vessel" />
                                 </SelectTrigger>
@@ -117,16 +113,19 @@ export default function OrderEditPage({
                                                         if (checked) {
                                                             setData('service_ids', [...data.service_ids, service.id.toString()]);
                                                         } else {
-                                                            setData('service_ids', data.service_ids.filter(id => id !== service.id.toString()));
+                                                            setData(
+                                                                'service_ids',
+                                                                data.service_ids.filter((id) => id !== service.id.toString()),
+                                                            );
                                                         }
                                                     }}
                                                     disabled={processing}
                                                 />
-                                                <Label htmlFor={`service-${service.id}`} className="cursor-pointer flex-1">
+                                                <Label htmlFor={`service-${service.id}`} className="flex-1 cursor-pointer">
                                                     <div className="font-medium">{service.name}</div>
                                                     <div className="text-sm text-muted-foreground">Price: ${service.price}</div>
                                                     {service.description && (
-                                                        <div className="text-sm text-muted-foreground mt-1">{service.description}</div>
+                                                        <div className="mt-1 text-sm text-muted-foreground">{service.description}</div>
                                                     )}
                                                 </Label>
                                             </div>
@@ -144,7 +143,9 @@ export default function OrderEditPage({
                             <Label htmlFor="status">Status</Label>
                             <Select
                                 value={data.status}
-                                onValueChange={(value: 'pending' | 'accepted' | 'in_progress' | 'completed' | 'cancelled') => setData('status', value)}
+                                onValueChange={(value: 'pending' | 'accepted' | 'in_progress' | 'completed' | 'cancelled') =>
+                                    setData('status', value)
+                                }
                                 disabled={processing}
                             >
                                 <SelectTrigger>
