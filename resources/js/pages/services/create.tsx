@@ -8,7 +8,7 @@ import AppLayout from '@/layouts/app-layout';
 import { LoaderCircle } from 'lucide-react';
 
 import type { BreadcrumbItem } from '@/types';
-import { Port, Service } from '@/types/core';
+import { Port, Service } from '@/types/models';
 import { Head, router, useForm } from '@inertiajs/react';
 import { useEcho } from '@laravel/echo-react';
 import { FormEventHandler } from 'react';

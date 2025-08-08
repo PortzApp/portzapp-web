@@ -15,7 +15,7 @@ import {
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
 import type { BreadcrumbItem, SharedData } from '@/types';
-import { Vessel } from '@/types/core';
+import { Vessel } from '@/types/models';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { Edit, Trash2 } from 'lucide-react';
 import { useState } from 'react';

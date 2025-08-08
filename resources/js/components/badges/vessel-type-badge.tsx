@@ -4,7 +4,8 @@ import TankerShipIcon from '@/components/icons/vessel-type-tanker-ship-icon';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
-import { VesselType } from '@/types/vessel';
+import { VesselType } from '@/types/enums';
+import React from 'react';
 
 const vesselTypeStyles: Record<VesselType, string> = {
     cargo: 'bg-neutral-100 text-neutral-800',

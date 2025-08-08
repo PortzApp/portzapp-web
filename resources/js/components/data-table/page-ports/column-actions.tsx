@@ -23,7 +23,7 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import type { SharedData } from '@/types';
-import { Port } from '@/types/core';
+import { Port } from '@/types/models';
 import { toast } from 'sonner';
 
 export function PortsPageColumnActions({ port }: { port: Port }) {

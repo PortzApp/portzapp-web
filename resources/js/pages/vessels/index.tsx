@@ -3,7 +3,7 @@ import { VesselsPageDataTable } from '@/components/data-table/page-vessels/data-
 import { buttonVariants } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, SharedData } from '@/types';
-import { Vessel } from '@/types/core';
+import { Vessel } from '@/types/models';
 import { Head, Link, usePage } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [

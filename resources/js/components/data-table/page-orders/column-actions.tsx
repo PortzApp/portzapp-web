@@ -22,10 +22,10 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
-import type { Order } from '@/types/order';
+import { OrderWithRelations } from '@/types/models';
 import { toast } from 'sonner';
 
-export function OrdersPageColumnActions({ order }: { order: Order }) {
+export function OrdersPageColumnActions({ order }: { order: OrderWithRelations }) {
     const [openDropdown, setOpenDropdown] = useState(false);
     const [openDeleteOrderDialog, setOpenDeleteOrderDialog] = useState(false);
 

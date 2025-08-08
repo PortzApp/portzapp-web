@@ -3,7 +3,7 @@ import { OrdersPageDataTable } from '@/components/data-table/page-orders/data-ta
 import { buttonVariants } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, SharedData } from '@/types';
-import type { Order } from '@/types/order';
+import { OrderWithRelations } from '@/types/models';
 import { Head, Link, usePage } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -13,7 +13,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function OrdersIndexPage({ orders }: { orders: Array<Order> }) {
+export default function OrdersIndexPage({ orders }: { orders: Array<OrderWithRelations> }) {
     const { auth } = usePage<SharedData>().props;
 
     return (

@@ -6,7 +6,8 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, SharedData } from '@/types';
-import { Port, ServiceWithRelations } from '@/types/core';
+import { ServiceWithRelations } from '@/types/core';
+import { Port } from '@/types/models';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { useEcho } from '@laravel/echo-react';
 import { Box, MapPin, Plus, RotateCcw, Star } from 'lucide-react';
@@ -24,7 +25,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 interface ServiceEvent {
     message: string;
     user: {
-        id: number;
+        id: string;
         name: string;
         email: string;
     };
@@ -40,7 +41,7 @@ interface ServiceUpdatedEvent extends ServiceEvent {
 }
 
 interface ServiceDeletedEvent extends ServiceEvent {
-    serviceId: number;
+    serviceId: string;
     serviceName: string;
 }
 
@@ -48,7 +49,7 @@ interface ServicesPageProps {
     services: ServiceWithRelations[];
     ports: Port[];
     service_categories: {
-        id: number;
+        id: string;
         name: string;
         created_at: string;
         updated_at: string;

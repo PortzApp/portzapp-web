@@ -23,7 +23,7 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import type { SharedData } from '@/types';
-import { Vessel } from '@/types/core';
+import { Vessel } from '@/types/models';
 import { toast } from 'sonner';
 
 export function VesselsPageColumnActions({ vessel }: { vessel: Vessel }) {

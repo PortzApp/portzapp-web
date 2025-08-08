@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import AuthLayout from '@/layouts/auth-layout';
-import { OrganizationBusinessType, UserRoles } from '@/types/core';
+import { OrganizationBusinessType, UserRoles } from '@/types/enums';
 
 type RegisterForm = {
     first_name: string;
@@ -223,7 +223,7 @@ export default function Register() {
                                 <Label htmlFor="admin_role">Admin (Company Owner/Manager)</Label>
                             </div>
                             <div className="flex items-center space-x-2">
-                                <RadioGroupItem value={UserRoles.MEMBER} id="member_role" />
+                                <RadioGroupItem value={UserRoles.VIEWER} id="member_role" />
                                 <Label htmlFor="member_role">Member (Employee)</Label>
                             </div>
                         </RadioGroup>

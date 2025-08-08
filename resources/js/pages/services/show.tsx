@@ -14,7 +14,7 @@ import {
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
-import { Service } from '@/types/core';
+import { Service } from '@/types/models';
 import { Head, Link, router } from '@inertiajs/react';
 import { useEcho } from '@laravel/echo-react';
 import { Dot, Edit, Trash2 } from 'lucide-react';
@@ -24,7 +24,7 @@ import { toast } from 'sonner';
 interface ServiceEvent {
     message: string;
     user: {
-        id: number;
+        id: string;
         name: string;
         email: string;
     };
@@ -40,7 +40,7 @@ interface ServiceUpdatedEvent extends ServiceEvent {
 }
 
 interface ServiceDeletedEvent extends ServiceEvent {
-    serviceId: number;
+    serviceId: string;
     serviceName: string;
 }
 
