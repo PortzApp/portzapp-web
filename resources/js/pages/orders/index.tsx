@@ -31,8 +31,6 @@ export default function OrdersIndexPage({ orders }: { orders: Array<Order> }) {
 
                 <OrdersPageDataTable columns={columns} data={orders} />
 
-                <pre>{JSON.stringify(orders, null, 2)}</pre>
-
                 {orders.length === 0 && (
                     <div className="py-8 text-center">
                         <p className="text-muted-foreground">No orders found. Create your first order!</p>
