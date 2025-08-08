@@ -8,6 +8,7 @@ use App\Http\Requests\StoreOrderRequest;
 use App\Http\Requests\UpdateOrderRequest;
 use App\Models\Order;
 use App\Models\Organization;
+use App\Models\Port;
 use App\Models\Service;
 use App\Models\Vessel;
 use Illuminate\Support\Facades\Gate;
@@ -21,10 +22,10 @@ class OrderController extends Controller
     public function index()
     {
         $query = Order::with([
-            'services.organization:id,name,business_type',
-            'vessels',
-            'requestingOrganization:id,name,business_type',
-            'providingOrganization:id,name,business_type',
+            'vessel',
+            'port',
+            'placedByUser',
+            'placedByOrganization',
         ]);
 
         // Get user's organization IDs based on business type
@@ -40,12 +41,14 @@ class OrderController extends Controller
         $query->where(function ($q) use ($userVesselOwnerOrgs, $userShippingAgencyOrgs): void {
             // Show orders where user's vessel owner org is requesting
             if ($userVesselOwnerOrgs->isNotEmpty()) {
-                $q->whereIn('requesting_organization_id', $userVesselOwnerOrgs);
+                $q->whereIn('placed_by_organization_id', $userVesselOwnerOrgs);
             }
 
-            // Show orders where user's shipping agency org is providing
+            // Show orders where user's shipping agency org is providing services
             if ($userShippingAgencyOrgs->isNotEmpty()) {
-                $q->orWhereIn('providing_organization_id', $userShippingAgencyOrgs);
+                $q->orWhereHas('services', function ($serviceQuery) use ($userShippingAgencyOrgs) {
+                    $serviceQuery->whereIn('organization_id', $userShippingAgencyOrgs);
+                });
             }
         });
 
@@ -65,29 +68,28 @@ class OrderController extends Controller
 
         $validated = $request->validated();
 
-        $service = Service::findOrFail($validated['service_id']);
-
         // Get the user's first vessel owner organization (for simplicity)
         /** @var Organization|null $vesselOwnerOrg */
         $vesselOwnerOrg = auth()->user()->organizations()
             ->where('business_type', OrganizationBusinessType::VESSEL_OWNER)
             ->first();
 
-        if (! $vesselOwnerOrg) {
+        if (!$vesselOwnerOrg) {
             abort(403, 'You must belong to a vessel owner organization to place orders.');
         }
 
         $order = Order::create([
+            'order_number' => 'ORD-' . strtoupper(uniqid()),
             'vessel_id' => $validated['vessel_id'],
-            'requesting_organization_id' => $vesselOwnerOrg->id,
-            'providing_organization_id' => $service->organization_id,
-            'price' => $service->price,
+            'port_id' => Port::factory()->create()->id,
+            'placed_by_user_id' => auth()->id(),
+            'placed_by_organization_id' => $vesselOwnerOrg->id,
             'notes' => $validated['notes'] ?? null,
             'status' => 'pending',
         ]);
 
-        // Attach the service using pivot relationship
-        $order->services()->attach($validated['service_id']);
+        // Attach services via pivot table (many-to-many)
+        $order->services()->attach($validated['service_ids']);
 
         return to_route('orders')->with('message', 'Order created successfully!');
     }
@@ -132,10 +134,11 @@ class OrderController extends Controller
         Gate::authorize('view', $order);
 
         $order->load([
-            'services.organization:id,name,business_type',
-            'vessels',
-            'requestingOrganization:id,name,business_type',
-            'providingOrganization:id,name,business_type',
+            'vessel',
+            'port',
+            'placedByUser',
+            'placedByOrganization',
+            'services.organization',
         ]);
 
         return Inertia::render('orders/show', [
@@ -183,18 +186,15 @@ class OrderController extends Controller
 
         $validated = $request->validated();
 
-        // Handle service updates if service_id is provided
-        if (isset($validated['service_id'])) {
-            // Sync to maintain single service functionality
-            $order->services()->sync([$validated['service_id']]);
+        // Handle vessel updates
+        if (isset($validated['vessel_id'])) {
+            // No need to unset, vessel_id will be updated directly in $order->update()
+        }
 
-            // Update the order's providing organization based on the new service
-            $service = Service::findOrFail($validated['service_id']);
-            $validated['providing_organization_id'] = $service->organization_id;
-            $validated['price'] = $service->price;
-
-            // Remove service_id from validated data as it's not a direct column
-            unset($validated['service_id']);
+        // Handle service updates
+        if (isset($validated['service_ids'])) {
+            $order->services()->sync($validated['service_ids']);
+            unset($validated['service_ids']);
         }
 
         $order->update($validated);
