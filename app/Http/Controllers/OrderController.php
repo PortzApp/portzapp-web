@@ -75,12 +75,12 @@ class OrderController extends Controller
             ->where('business_type', OrganizationBusinessType::VESSEL_OWNER)
             ->first();
 
-        if (!$vesselOwnerOrg) {
+        if (! $vesselOwnerOrg) {
             abort(403, 'You must belong to a vessel owner organization to place orders.');
         }
 
         $order = Order::create([
-            'order_number' => 'ORD-' . strtoupper(uniqid()),
+            'order_number' => 'ORD-'.strtoupper(uniqid()),
             'vessel_id' => $validated['vessel_id'],
             'port_id' => $validated['port_id'],
             'placed_by_user_id' => auth()->id(),
@@ -91,10 +91,10 @@ class OrderController extends Controller
 
         // Attach services via pivot table (many-to-many)
         // Handle both single service ID and arrays of service IDs
-        $serviceIds = is_array($validated['service_ids']) 
-            ? $validated['service_ids'] 
+        $serviceIds = is_array($validated['service_ids'])
+            ? $validated['service_ids']
             : [$validated['service_ids']];
-        
+
         $order->services()->attach($serviceIds);
 
         return to_route('orders')->with('message', 'Order created successfully!');

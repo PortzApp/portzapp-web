@@ -91,7 +91,7 @@ class Order extends Model
      */
     public function getTotalPriceAttribute(): float
     {
-        return (float)$this->services()->sum('price');
+        return (float) $this->services()->sum('price');
     }
 
     /**

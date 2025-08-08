@@ -37,9 +37,9 @@ class StoreOrderRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         // Convert single service_id to array format for consistent handling
-        if ($this->has('service_ids') && !is_array($this->service_ids)) {
+        if ($this->has('service_ids') && ! is_array($this->service_ids)) {
             $this->merge([
-                'service_ids' => [$this->service_ids]
+                'service_ids' => [$this->service_ids],
             ]);
         }
     }
