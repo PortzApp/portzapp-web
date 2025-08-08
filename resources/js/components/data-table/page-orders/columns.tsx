@@ -1,8 +1,10 @@
+import { VesselTypeBadge } from '@/components/badges';
 import { OrdersPageColumnActions } from '@/components/data-table/page-orders/column-actions';
 import { DataTableColumnHeader } from '@/components/data-table/primitives/data-table-column-header';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { OrderWithFullRelations } from '@/types/core';
+import { VesselType } from '@/types/vessel';
 import { ColumnDef } from '@tanstack/react-table';
 
 export const columns: ColumnDef<OrderWithFullRelations>[] = [
@@ -31,33 +33,73 @@ export const columns: ColumnDef<OrderWithFullRelations>[] = [
             );
         },
     },
+    // {
+    //     accessorKey: 'price',
+    //     header: ({ column }) => <DataTableColumnHeader column={column} title="Price" />,
+    //     cell: ({ row }) => {
+    //         const order = row.original;
+
+    //         return <span className="font-mono">${order.price.toLocaleString()}</span>;
+    //     },
+    // },
     {
-        accessorKey: 'price',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Price" />,
+        accessorKey: 'vessel',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Vessel" />,
         cell: ({ row }) => {
             const order = row.original;
 
-            return <span className="font-mono">${order.price.toLocaleString()}</span>;
+            return (
+                <div className="flex flex-col">
+                    <div className="flex items-center gap-2">
+                        <VesselTypeBadge type={order.vessel.vessel_type as VesselType} iconOnly />
+                        <p>{order.vessel.name}</p>
+                    </div>
+                    <p className="text-xs text-muted-foreground">IMO Number: {order.vessel.imo_number}</p>
+                </div>
+            );
         },
     },
     {
-        accessorKey: 'requesting_organization.name',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Requesting Org" />,
+        accessorKey: 'port',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Port" />,
         cell: ({ row }) => {
             const order = row.original;
 
-            return <span className="text-sm">{order.requesting_organization.name}</span>;
+            return (
+                <div className="flex flex-col">
+                    <p>{order.port.name}</p>
+                    <p className="text-xs text-muted-foreground">
+                        {order.port.city}, {order.port.country}
+                    </p>
+                </div>
+            );
         },
     },
     {
-        accessorKey: 'providing_organization.name',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Providing Org" />,
+        accessorKey: 'placed_by_organization.name',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Placed by" />,
         cell: ({ row }) => {
             const order = row.original;
 
-            return <span className="text-sm">{order.providing_organization.name}</span>;
+            return (
+                <div className="">
+                    <p>
+                        {order.placed_by_user.first_name} {order.placed_by_user.last_name}
+                    </p>
+                    <p className="text-xs text-muted-foreground">{order.placed_by_organization.name}</p>
+                </div>
+            );
         },
     },
+    // {
+    //     accessorKey: 'providing_organization.name',
+    //     header: ({ column }) => <DataTableColumnHeader column={column} title="Providing Org" />,
+    //     cell: ({ row }) => {
+    //         const order = row.original;
+
+    //         return <span className="text-sm">{order.providing_organization.name}</span>;
+    //     },
+    // },
     {
         accessorKey: 'created_at',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Created on" />,
