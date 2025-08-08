@@ -32,7 +32,7 @@ export function VesselTypeBadge({ type, iconOnly = false, className }: VesselTyp
             <TooltipProvider>
                 <Tooltip>
                     <TooltipTrigger>
-                        <Icon className={cn('h-15 w-15 text-neutral-600', className)} />
+                        <Icon className={cn('size-8 text-neutral-600', className)} />
                     </TooltipTrigger>
                     <TooltipContent>
                         <p className="capitalize">{type} Vessel</p>
