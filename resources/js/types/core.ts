@@ -10,7 +10,7 @@ export enum OrganizationBusinessType {
 }
 
 export interface BaseModel {
-    id: number;
+    id: string;
     created_at: string;
     updated_at: string;
 }
