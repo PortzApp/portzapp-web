@@ -74,12 +74,12 @@ class OrderController extends Controller
             ->where('business_type', OrganizationBusinessType::VESSEL_OWNER)
             ->first();
 
-        if (!$vesselOwnerOrg) {
+        if (! $vesselOwnerOrg) {
             abort(403, 'You must belong to a vessel owner organization to place orders.');
         }
 
         $order = Order::create([
-            'order_number' => 'ORD-' . strtoupper(uniqid()),
+            'order_number' => 'ORD-'.strtoupper(uniqid()),
             'vessel_id' => $validated['vessel_id'],
             'port_id' => Port::factory()->create()->id,
             'placed_by_user_id' => auth()->id(),

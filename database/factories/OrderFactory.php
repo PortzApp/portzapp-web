@@ -5,9 +5,9 @@ namespace Database\Factories;
 use App\Enums\OrderStatus;
 use App\Models\Order;
 use App\Models\Organization;
+use App\Models\Port;
 use App\Models\User;
 use App\Models\Vessel;
-use App\Models\Port;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -23,11 +23,11 @@ class OrderFactory extends Factory
     public function definition(): array
     {
         $createdAt = fake()->dateTimeBetween('-1 month', 'now');
-        
+
         return [
             // Generate unique order number using timestamp + random suffix (format: ORD-YYMMDDHHMMSS-XXX)
             // This ensures uniqueness and allows for unlimited scaling
-            'order_number' => 'ORD-' . $createdAt->format('ymdHis') . '-' . fake()->unique()->numberBetween(100, 999),
+            'order_number' => 'ORD-'.$createdAt->format('ymdHis').'-'.fake()->unique()->numberBetween(100, 999),
             'vessel_id' => Vessel::factory(),
             'port_id' => Port::factory(),
             'placed_by_user_id' => User::factory(),

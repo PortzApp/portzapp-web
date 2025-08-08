@@ -73,12 +73,12 @@ class Order extends Model
     {
         return $this->belongsTo(User::class, 'placed_by_user_id');
     }
-    
+
     public function placedByOrganization(): BelongsTo
     {
         return $this->belongsTo(Organization::class, 'placed_by_organization_id');
     }
-    
+
     public function services(): BelongsToMany
     {
         return $this->belongsToMany(Service::class, 'order_service')
@@ -86,13 +86,12 @@ class Order extends Model
             ->withTimestamps();
     }
 
-
     /**
      * Calculate the total price for this order from all associated services.
      */
     public function getTotalPriceAttribute(): float
     {
-        return (float)$this->services()->sum('price');
+        return (float) $this->services()->sum('price');
     }
 
     /**
