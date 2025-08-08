@@ -22,15 +22,15 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 interface CreateOrderForm {
-    service_id: string;
+    service_ids: string[];
     vessel_id: string;
     notes: string;
-    [key: string]: string;
+    [key: string]: string | string[];
 }
 
 export default function OrdersCreatePage({ vessels, services }: { vessels: Array<Vessel>; services: Array<Service> }) {
     const { data, setData, post, processing, errors, reset } = useForm<CreateOrderForm>({
-        service_id: '',
+        service_ids: [],
         vessel_id: '',
         notes: '',
     });
@@ -61,8 +61,12 @@ export default function OrdersCreatePage({ vessels, services }: { vessels: Array
 
                 <div className="grid max-w-4xl gap-4 md:grid-cols-2">
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="service_id">Service</Label>
-                        <Select value={data.service_id} onValueChange={(value) => setData('service_id', value)} disabled={processing}>
+                        <Label htmlFor="service_ids">Service</Label>
+                        <Select
+                            value={data.service_ids.length > 0 ? data.service_ids[0] : ''}
+                            onValueChange={(value) => setData('service_ids', [value])}
+                            disabled={processing}
+                        >
                             <SelectTrigger>
                                 <SelectValue placeholder="Select service" />
                             </SelectTrigger>
@@ -74,12 +78,16 @@ export default function OrdersCreatePage({ vessels, services }: { vessels: Array
                                 ))}
                             </SelectContent>
                         </Select>
-                        <InputError message={errors.service_id} />
+                        <InputError message={errors.service_ids} />
                     </div>
 
                     <div className="flex flex-col gap-2">
                         <Label htmlFor="vessel_id">Vessel</Label>
-                        <Select value={data.vessel_id} onValueChange={(value) => setData('vessel_id', value)} disabled={processing}>
+                        <Select
+                            value={data.vessel_id}
+                            onValueChange={(value) => setData('vessel_id', value)}
+                            disabled={processing}
+                        >
                             <SelectTrigger>
                                 <SelectValue placeholder="Select vessel" />
                             </SelectTrigger>
