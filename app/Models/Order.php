@@ -91,13 +91,13 @@ class Order extends Model
      */
     public function getTotalPriceAttribute(): float
     {
-        return (float) $this->services()->sum('price');
+        return (float)$this->services()->sum('price');
     }
 
     /**
      * Get all unique organizations that provide services for this order.
      */
-    public function getProvidingOrganizationsAttribute(): Collection
+    public function getProvidingOrganizationsAttribute(): \Illuminate\Support\Collection
     {
         return $this->services()->with('organization')->get()
             ->pluck('organization')
