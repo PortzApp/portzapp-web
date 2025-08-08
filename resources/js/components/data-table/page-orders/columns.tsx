@@ -3,11 +3,11 @@ import { OrdersPageColumnActions } from '@/components/data-table/page-orders/col
 import { DataTableColumnHeader } from '@/components/data-table/primitives/data-table-column-header';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { OrderWithFullRelations } from '@/types/core';
+import type { Order } from '@/types/order';
 import { VesselType } from '@/types/vessel';
 import { ColumnDef } from '@tanstack/react-table';
 
-export const columns: ColumnDef<OrderWithFullRelations>[] = [
+export const columns: ColumnDef<Order>[] = [
     {
         accessorKey: 'id',
         header: ({ column }) => <DataTableColumnHeader column={column} title="ID" />,
@@ -33,15 +33,6 @@ export const columns: ColumnDef<OrderWithFullRelations>[] = [
             );
         },
     },
-    // {
-    //     accessorKey: 'price',
-    //     header: ({ column }) => <DataTableColumnHeader column={column} title="Price" />,
-    //     cell: ({ row }) => {
-    //         const order = row.original;
-
-    //         return <span className="font-mono">${order.price.toLocaleString()}</span>;
-    //     },
-    // },
     {
         accessorKey: 'vessel',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Vessel" />,
@@ -91,15 +82,6 @@ export const columns: ColumnDef<OrderWithFullRelations>[] = [
             );
         },
     },
-    // {
-    //     accessorKey: 'providing_organization.name',
-    //     header: ({ column }) => <DataTableColumnHeader column={column} title="Providing Org" />,
-    //     cell: ({ row }) => {
-    //         const order = row.original;
-
-    //         return <span className="text-sm">{order.providing_organization.name}</span>;
-    //     },
-    // },
     {
         accessorKey: 'created_at',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Created on" />,
