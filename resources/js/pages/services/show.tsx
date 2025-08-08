@@ -14,12 +14,12 @@ import {
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
+import { Service } from '@/types/models';
 import { Head, Link, router } from '@inertiajs/react';
 import { useEcho } from '@laravel/echo-react';
 import { Dot, Edit, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { Service } from '@/types/models';
 
 interface ServiceEvent {
     message: string;

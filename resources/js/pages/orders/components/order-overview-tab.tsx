@@ -1,8 +1,8 @@
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { Dot, MapPin, Package, Ship, User } from 'lucide-react';
 import { OrderWithRelations } from '@/types/models';
+import { Dot, MapPin, Package, Ship, User } from 'lucide-react';
 
 interface OrderOverviewTabProps {
     order: OrderWithRelations;

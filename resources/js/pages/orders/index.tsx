@@ -3,8 +3,8 @@ import { OrdersPageDataTable } from '@/components/data-table/page-orders/data-ta
 import { buttonVariants } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, SharedData } from '@/types';
-import { Head, Link, usePage } from '@inertiajs/react';
 import { OrderWithRelations } from '@/types/models';
+import { Head, Link, usePage } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {

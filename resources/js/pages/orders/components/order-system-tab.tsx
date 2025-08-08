@@ -1,7 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Building2, Calendar, Database, MapPin, Ship, User } from 'lucide-react';
 import { OrderWithRelations } from '@/types/models';
+import { Building2, Calendar, Database, MapPin, Ship, User } from 'lucide-react';
 
 interface OrderSystemTabProps {
     order: OrderWithRelations;
