@@ -1,4 +1,4 @@
-import { OrganizationBusinessType, ServiceStatus, VesselStatus, VesselType } from '@/types/enums';
+import { OrderStatus, OrganizationBusinessType, ServiceStatus, VesselStatus, VesselType } from '@/types/enums';
 
 export interface BaseModel {
     id: string;
@@ -62,7 +62,7 @@ export interface OrderBase extends BaseModel {
     placed_by_user_id: string;
     placed_by_organization_id: string;
     notes: string;
-    status: string;
+    status: OrderStatus;
 }
 
 export interface OrderWithRelations extends OrderBase {
