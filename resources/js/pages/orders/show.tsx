@@ -8,7 +8,7 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-    DialogTrigger,
+    DialogTrigger
 } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
@@ -54,7 +54,7 @@ export default function OrderShowPage({ order }: { order: Order }) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Order ${order.order_number}`} />
 
-            <div className="flex flex-col gap-8 bg-neutral-50 p-8">
+            <div className="flex min-h-screen flex-col gap-8 bg-neutral-50 p-8">
                 <div className="flex items-center justify-between">
                     <div className="flex flex-col gap-1">
                         <h1 className="text-2xl font-semibold">
