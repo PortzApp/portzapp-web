@@ -1,6 +1,5 @@
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
     Dialog,
     DialogClose,
@@ -11,16 +10,21 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
-import { cn } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
-import { OrderWithFullRelations } from '@/types/core';
+import type { Order } from '@/types/order';
 import { Head, Link, router } from '@inertiajs/react';
-import { Dot, Edit, Trash2 } from 'lucide-react';
+import { Database, Edit, LayoutGrid, MapPin, Package, Ship, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
-export default function OrderShowPage({ order }: { order: OrderWithFullRelations }) {
+import OrderOverviewTab from '@/pages/orders/components/order-overview-tab';
+import OrderServicesTab from '@/pages/orders/components/order-services-tab';
+import OrderSystemTab from '@/pages/orders/components/order-system-tab';
+import OrderVesselTab from '@/pages/orders/components/order-vessel-tab';
+
+export default function OrderShowPage({ order }: { order: Order }) {
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -29,7 +33,7 @@ export default function OrderShowPage({ order }: { order: OrderWithFullRelations
             href: route('orders'),
         },
         {
-            title: `Order #${order.id}`,
+            title: `Order ID: ${order.id}`,
             href: `/orders/${order.id}`,
         },
     ];
@@ -44,14 +48,18 @@ export default function OrderShowPage({ order }: { order: OrderWithFullRelations
         });
     }
 
+    // const totalServicePrice = order.services.reduce((sum, service) => sum + parseFloat(service.price), 0);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`Order #${order.id}`} />
+            <Head title={`Order ${order.order_number}`} />
 
-            <div className="flex flex-col gap-8 p-8">
+            <div className="flex min-h-screen flex-col gap-8 bg-neutral-50 p-8">
                 <div className="flex items-center justify-between">
                     <div className="flex flex-col gap-1">
-                        <h1 className="text-2xl font-semibold">Order #{order.id}</h1>
+                        <h1 className="text-2xl font-semibold">
+                            Order: <span className="font-mono text-xl text-muted-foreground">{order.order_number}</span>
+                        </h1>
                         <p className="text-base text-muted-foreground">Order details and information</p>
                     </div>
                     <div className="flex gap-2">
@@ -70,7 +78,7 @@ export default function OrderShowPage({ order }: { order: OrderWithFullRelations
                                 <DialogHeader>
                                     <DialogTitle>Delete Order</DialogTitle>
                                     <DialogDescription>
-                                        Are you sure you want to delete order #{order.id}? This action cannot be undone.
+                                        Are you sure you want to delete order {order.order_number}? This action cannot be undone.
                                     </DialogDescription>
                                 </DialogHeader>
                                 <DialogFooter>
@@ -86,126 +94,113 @@ export default function OrderShowPage({ order }: { order: OrderWithFullRelations
                     </div>
                 </div>
 
-                <div className="grid gap-6 md:grid-cols-2">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Order Information</CardTitle>
-                            <CardDescription>Core order details</CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="flex justify-between">
-                                <span className="text-sm font-medium text-muted-foreground">Order ID:</span>
-                                <span className="text-sm font-medium">#{order.id}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-sm font-medium text-muted-foreground">Service:</span>
-                                <span className="text-sm font-medium">{order.service.name}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-sm font-medium text-muted-foreground">Price:</span>
-                                <span className="font-mono text-sm font-medium">${order.price.toLocaleString()}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-sm font-medium text-muted-foreground">Status:</span>
-                                <Badge
-                                    className={cn(
-                                        order.status === 'pending' &&
-                                            'bg-yellow-200 text-yellow-950 uppercase dark:bg-yellow-900 dark:text-yellow-50',
-                                        order.status === 'accepted' && 'bg-blue-200 text-blue-950 uppercase dark:bg-blue-900 dark:text-blue-50',
-                                        order.status === 'in_progress' &&
-                                            'bg-purple-200 text-purple-950 uppercase dark:bg-purple-900 dark:text-purple-50',
-                                        order.status === 'completed' && 'bg-green-200 text-green-950 uppercase dark:bg-green-900 dark:text-green-50',
-                                        order.status === 'cancelled' && 'bg-red-200 text-red-950 uppercase dark:bg-red-900 dark:text-red-50',
-                                    )}
-                                >
-                                    <Dot />
-                                    {order.status.replace('_', ' ')}
-                                </Badge>
-                            </div>
-                        </CardContent>
-                    </Card>
+                <Tabs defaultValue="overview" className="w-full">
+                    <TabsList className="grid w-full grid-cols-4">
+                        <TabsTrigger value="overview" className="flex items-center gap-2">
+                            <LayoutGrid className="h-4 w-4" />
+                            Overview
+                        </TabsTrigger>
+                        <TabsTrigger value="services" className="flex items-center gap-2">
+                            <Package className="h-4 w-4" />
+                            Services
+                            <Badge variant="secondary" className="ml-1">
+                                {order.services.length}
+                            </Badge>
+                        </TabsTrigger>
+                        <TabsTrigger value="vessel" className="flex items-center gap-2">
+                            <Ship className="h-4 w-4" />
+                            Vessel & Port
+                            <Badge variant="secondary" className="ml-1">
+                                1
+                            </Badge>
+                        </TabsTrigger>
+                        <TabsTrigger value="system" className="flex items-center gap-2">
+                            <Database className="h-4 w-4" />
+                            System Info
+                        </TabsTrigger>
+                    </TabsList>
 
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Vessel Information</CardTitle>
-                            <CardDescription>Associated vessel details</CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="flex justify-between">
-                                <span className="text-sm font-medium text-muted-foreground">Vessel Name:</span>
-                                <span className="text-sm font-medium">{order.vessel.name}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-sm font-medium text-muted-foreground">IMO Number:</span>
-                                <span className="font-mono text-sm font-medium">{order.vessel.imo_number}</span>
-                            </div>
-                        </CardContent>
-                    </Card>
+                    <div className="mt-6">
+                        <TabsContent value="overview" className="space-y-4">
+                            <OrderOverviewTab order={order} />
+                        </TabsContent>
 
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Organizations</CardTitle>
-                            <CardDescription>Requesting and providing organizations</CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="flex justify-between">
-                                <span className="text-sm font-medium text-muted-foreground">Requesting:</span>
-                                <span className="text-sm font-medium">{order.requesting_organization.name}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-sm font-medium text-muted-foreground">Providing:</span>
-                                <span className="text-sm font-medium">{order.providing_organization.name}</span>
-                            </div>
-                        </CardContent>
-                    </Card>
+                        <TabsContent value="services" className="space-y-4">
+                            <OrderServicesTab services={order.services} />
+                        </TabsContent>
 
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>System Information</CardTitle>
-                            <CardDescription>Record metadata</CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="flex justify-between">
-                                <span className="text-sm font-medium text-muted-foreground">Created:</span>
-                                <span className="text-sm font-medium tabular-nums">
-                                    {new Date(order.created_at).toLocaleDateString('en-US', {
-                                        year: 'numeric',
-                                        month: 'long',
-                                        day: 'numeric',
-                                        hour: '2-digit',
-                                        minute: '2-digit',
-                                        hour12: false,
-                                    })}
-                                </span>
+                        <TabsContent value="vessel" className="space-y-4">
+                            <OrderVesselTab vessel={order.vessel} />
+                            <div className="mt-6">
+                                {/* Port Information Card */}
+                                <div className="space-y-6">
+                                    <div className="flex items-center gap-2 text-lg font-semibold">
+                                        <MapPin className="h-5 w-5" />
+                                        Port Information
+                                    </div>
+                                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                                        {/* Port Details Card */}
+                                        <div className="rounded-lg border p-6">
+                                            <div className="space-y-4">
+                                                <div className="flex justify-between">
+                                                    <span className="text-sm font-medium text-muted-foreground">Port Name:</span>
+                                                    <span className="text-sm font-semibold">{order.port.name}</span>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span className="text-sm font-medium text-muted-foreground">Port Code:</span>
+                                                    <span className="font-mono text-sm">{order.port.code}</span>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span className="text-sm font-medium text-muted-foreground">Location:</span>
+                                                    <span className="text-sm">
+                                                        {order.port.city}, {order.port.country}
+                                                    </span>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span className="text-sm font-medium text-muted-foreground">Status:</span>
+                                                    <Badge
+                                                        className={
+                                                            order.port.status === 'active'
+                                                                ? 'bg-green-200 text-green-950 dark:bg-green-900 dark:text-green-50'
+                                                                : 'bg-red-200 text-red-950 dark:bg-red-900 dark:text-red-50'
+                                                        }
+                                                    >
+                                                        {order.port.status}
+                                                    </Badge>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {/* Port Coordinates */}
+                                        <div className="rounded-lg border p-6">
+                                            <div className="space-y-4">
+                                                <div className="flex justify-between">
+                                                    <span className="text-sm font-medium text-muted-foreground">Latitude:</span>
+                                                    <span className="font-mono text-sm">{order.port.latitude}</span>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span className="text-sm font-medium text-muted-foreground">Longitude:</span>
+                                                    <span className="font-mono text-sm">{order.port.longitude}</span>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span className="text-sm font-medium text-muted-foreground">Timezone:</span>
+                                                    <span className="text-sm">{order.port.timezone}</span>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span className="text-sm font-medium text-muted-foreground">Port ID:</span>
+                                                    <span className="font-mono text-xs text-muted-foreground">{order.port.id}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div className="flex justify-between">
-                                <span className="text-sm font-medium text-muted-foreground">Last Updated:</span>
-                                <span className="text-sm font-medium tabular-nums">
-                                    {new Date(order.updated_at).toLocaleDateString('en-US', {
-                                        year: 'numeric',
-                                        month: 'long',
-                                        day: 'numeric',
-                                        hour: '2-digit',
-                                        minute: '2-digit',
-                                        hour12: false,
-                                    })}
-                                </span>
-                            </div>
-                        </CardContent>
-                    </Card>
+                        </TabsContent>
 
-                    {order.notes && (
-                        <Card className="md:col-span-2">
-                            <CardHeader>
-                                <CardTitle>Notes</CardTitle>
-                                <CardDescription>Additional order notes and requirements</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <p className="text-sm">{order.notes}</p>
-                            </CardContent>
-                        </Card>
-                    )}
-                </div>
+                        <TabsContent value="system" className="space-y-4">
+                            <OrderSystemTab order={order} />
+                        </TabsContent>
+                    </div>
+                </Tabs>
             </div>
         </AppLayout>
     );

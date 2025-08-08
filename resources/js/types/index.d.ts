@@ -6,6 +6,13 @@ export interface Auth {
     user: User;
     can: {
         create_services: boolean;
+        orders: {
+            view_any: boolean;
+            view: boolean;
+            create: boolean;
+            edit: boolean;
+            delete: boolean;
+        };
         vessels: {
             view_any: boolean;
             view: boolean;

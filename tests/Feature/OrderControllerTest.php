@@ -95,10 +95,7 @@ beforeEach(function (): void {
     // Create orders
     $this->order = Order::factory()->create([
         'vessel_id' => $this->vessel->id,
-        'requesting_organization_id' => $this->vesselOwnerOrg->id,
-        'providing_organization_id' => $this->shippingAgencyOrg->id,
-        'price' => 5000.00,
-        'status' => 'pending',
+        'placed_by_organization_id' => $this->vesselOwnerOrg->id,
         'notes' => 'Test order',
     ]);
     // Attach the service via pivot table
@@ -106,10 +103,7 @@ beforeEach(function (): void {
 
     $this->orderFromOtherOrgs = Order::factory()->create([
         'vessel_id' => $this->vessel2->id,
-        'requesting_organization_id' => $this->vesselOwnerOrg2->id,
-        'providing_organization_id' => $this->shippingAgencyOrg2->id,
-        'price' => 3000.00,
-        'status' => 'accepted',
+        'placed_by_organization_id' => $this->vesselOwnerOrg2->id,
         'notes' => 'Another test order',
     ]);
     // Attach the service via pivot table
@@ -189,7 +183,7 @@ test('orders are filtered by user organization involvement', function (): void {
 
 test('vessel owner admin can create order', function (): void {
     $orderData = [
-        'service_id' => $this->service->id,
+        'service_ids' => [$this->service->id],
         'vessel_id' => $this->vessel->id,
         'notes' => 'New test order',
     ];
@@ -201,8 +195,8 @@ test('vessel owner admin can create order', function (): void {
     $response->assertSessionHas('message', 'Order created successfully!');
 
     $this->assertDatabaseHas('orders', [
-        'requesting_organization_id' => $this->vesselOwnerOrg->id,
-        'providing_organization_id' => $this->shippingAgencyOrg->id,
+        'placed_by_organization_id' => $this->vesselOwnerOrg->id,
+        'vessel_id' => $this->vessel->id,
         'notes' => 'New test order',
     ]);
 
@@ -214,7 +208,7 @@ test('vessel owner admin can create order', function (): void {
 
 test('vessel owner member can create order', function (): void {
     $orderData = [
-        'service_id' => $this->service->id,
+        'service_ids' => [$this->service->id],
         'vessel_id' => $this->vessel->id,
         'notes' => 'Member created order',
     ];
@@ -226,8 +220,8 @@ test('vessel owner member can create order', function (): void {
     $response->assertSessionHas('message', 'Order created successfully!');
 
     $this->assertDatabaseHas('orders', [
-        'requesting_organization_id' => $this->vesselOwnerOrg->id,
-        'providing_organization_id' => $this->shippingAgencyOrg->id,
+        'placed_by_organization_id' => $this->vesselOwnerOrg->id,
+        'vessel_id' => $this->vessel->id,
         'notes' => 'Member created order',
     ]);
 
@@ -239,7 +233,7 @@ test('vessel owner member can create order', function (): void {
 
 test('shipping agency user cannot create order', function (): void {
     $orderData = [
-        'service_id' => $this->service->id,
+        'service_ids' => [$this->service->id],
         'vessel_id' => $this->vessel->id,
         'notes' => 'Unauthorized order',
     ];
@@ -257,7 +251,7 @@ test('user without vessel owner org cannot create order', function (): void {
     $userWithoutOrg = User::factory()->create();
 
     $orderData = [
-        'service_id' => $this->service->id,
+        'service_ids' => [$this->service->id],
         'vessel_id' => $this->vessel->id,
         'notes' => 'Unauthorized order',
     ];

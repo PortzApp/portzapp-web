@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-import { Service, Vessel } from '@/types/core';
+import { Port, Service, Vessel } from '@/types/core';
 import { Head, router, useForm } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 import { FormEventHandler } from 'react';
@@ -21,17 +21,18 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-interface CreateOrderForm {
+type CreateOrderForm = {
     service_id: string;
     vessel_id: string;
+    port_id: string;
     notes: string;
-    [key: string]: string;
-}
+};
 
-export default function OrdersCreatePage({ vessels, services }: { vessels: Array<Vessel>; services: Array<Service> }) {
+export default function OrdersCreatePage({ vessels, services, ports }: { vessels: Array<Vessel>; services: Array<Service>; ports: Array<Port> }) {
     const { data, setData, post, processing, errors, reset } = useForm<CreateOrderForm>({
         service_id: '',
         vessel_id: '',
+        port_id: '',
         notes: '',
     });
 
@@ -59,17 +60,20 @@ export default function OrdersCreatePage({ vessels, services }: { vessels: Array
                     </p>
                 </div>
 
-                <div className="grid max-w-4xl gap-4 md:grid-cols-2">
+                <div className="flex max-w-md flex-col gap-4">
                     <div className="flex flex-col gap-2">
                         <Label htmlFor="service_id">Service</Label>
                         <Select value={data.service_id} onValueChange={(value) => setData('service_id', value)} disabled={processing}>
-                            <SelectTrigger>
+                            <SelectTrigger className="h-auto text-left [&>span]:flex [&>span]:items-center [&>span]:gap-2" id="service_id">
                                 <SelectValue placeholder="Select service" />
                             </SelectTrigger>
                             <SelectContent>
                                 {services.map((service) => (
                                     <SelectItem key={service.id} value={service.id.toString()}>
-                                        {service.name} - ${service.price}
+                                        <div className="flex flex-col">
+                                            <span className="font-medium">{service.name}</span>
+                                            <span className="text-sm text-muted-foreground">${service.price}</span>
+                                        </div>
                                     </SelectItem>
                                 ))}
                             </SelectContent>
@@ -80,18 +84,45 @@ export default function OrdersCreatePage({ vessels, services }: { vessels: Array
                     <div className="flex flex-col gap-2">
                         <Label htmlFor="vessel_id">Vessel</Label>
                         <Select value={data.vessel_id} onValueChange={(value) => setData('vessel_id', value)} disabled={processing}>
-                            <SelectTrigger>
+                            <SelectTrigger className="h-auto text-left [&>span]:flex [&>span]:items-center [&>span]:gap-2" id="vessel_id">
                                 <SelectValue placeholder="Select vessel" />
                             </SelectTrigger>
                             <SelectContent>
                                 {vessels.map((vessel) => (
-                                    <SelectItem key={vessel.id} value={vessel.id.toString()}>
-                                        {vessel.name} (IMO: {vessel.imo_number})
+                                    <SelectItem key={vessel.id} value={vessel.id}>
+                                        <div className="flex flex-col">
+                                            <span className="font-medium">{vessel.name}</span>
+                                            <span className="text-sm text-muted-foreground">IMO: {vessel.imo_number}</span>
+                                        </div>
                                     </SelectItem>
                                 ))}
                             </SelectContent>
                         </Select>
                         <InputError message={errors.vessel_id} />
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                        <Label htmlFor="port_id">Port</Label>
+                        <Select value={data.port_id} onValueChange={(value) => setData('port_id', value)} disabled={processing}>
+                            <SelectTrigger className="h-auto text-left [&>span]:flex [&>span]:items-center [&>span]:gap-2" id="port_id">
+                                <SelectValue placeholder="Select port" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {ports.map((port) => (
+                                    <SelectItem key={port.id} value={port.id.toString()}>
+                                        <div className="flex flex-col">
+                                            <span className="font-medium">
+                                                {port.name} <span className="text-xs text-muted-foreground">({port.code})</span>
+                                            </span>
+                                            <span className="text-sm text-muted-foreground">
+                                                {port.city}, {port.country}
+                                            </span>
+                                        </div>
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        <InputError message={errors.port_id} />
                     </div>
 
                     <div className="flex flex-col gap-2 md:col-span-2">

@@ -1,35 +1,16 @@
+import { VesselTypeBadge } from '@/components/badges';
 import { OrdersPageColumnActions } from '@/components/data-table/page-orders/column-actions';
 import { DataTableColumnHeader } from '@/components/data-table/primitives/data-table-column-header';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { OrderWithFullRelations } from '@/types/core';
+import type { Order } from '@/types/order';
+import { VesselType } from '@/types/vessel';
 import { ColumnDef } from '@tanstack/react-table';
 
-export const columns: ColumnDef<OrderWithFullRelations>[] = [
+export const columns: ColumnDef<Order>[] = [
     {
-        accessorKey: 'id',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="ID" />,
-    },
-    {
-        accessorKey: 'service.name',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Service" />,
-        cell: ({ row }) => {
-            const order = row.original;
-            return <span className="font-medium">{order.service.name}</span>;
-        },
-    },
-    {
-        accessorKey: 'vessel.name',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Vessel" />,
-        cell: ({ row }) => {
-            const order = row.original;
-            return (
-                <div>
-                    <p className="font-medium">{order.vessel.name}</p>
-                    <p className="text-xs text-muted-foreground">IMO: {order.vessel.imo_number}</p>
-                </div>
-            );
-        },
+        accessorKey: 'order_number',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Order Number" />,
     },
     {
         accessorKey: 'status',
@@ -53,30 +34,52 @@ export const columns: ColumnDef<OrderWithFullRelations>[] = [
         },
     },
     {
-        accessorKey: 'price',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Price" />,
+        accessorKey: 'vessel',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Vessel" />,
         cell: ({ row }) => {
             const order = row.original;
 
-            return <span className="font-mono">${order.price.toLocaleString()}</span>;
+            return (
+                <div className="flex flex-col">
+                    <div className="flex items-center gap-2">
+                        <VesselTypeBadge type={order.vessel.vessel_type as VesselType} iconOnly />
+                        <p>{order.vessel.name}</p>
+                    </div>
+                    <p className="text-xs text-muted-foreground">IMO Number: {order.vessel.imo_number}</p>
+                </div>
+            );
         },
     },
     {
-        accessorKey: 'requesting_organization.name',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Requesting Org" />,
+        accessorKey: 'port',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Port" />,
         cell: ({ row }) => {
             const order = row.original;
 
-            return <span className="text-sm">{order.requesting_organization.name}</span>;
+            return (
+                <div className="flex flex-col">
+                    <p>{order.port.name}</p>
+                    <p className="text-xs text-muted-foreground">
+                        {order.port.city}, {order.port.country}
+                    </p>
+                </div>
+            );
         },
     },
     {
-        accessorKey: 'providing_organization.name',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Providing Org" />,
+        accessorKey: 'placed_by_organization.name',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Placed by" />,
         cell: ({ row }) => {
             const order = row.original;
 
-            return <span className="text-sm">{order.providing_organization.name}</span>;
+            return (
+                <div className="">
+                    <p>
+                        {order.placed_by_user.first_name} {order.placed_by_user.last_name}
+                    </p>
+                    <p className="text-xs text-muted-foreground">{order.placed_by_organization.name}</p>
+                </div>
+            );
         },
     },
     {
@@ -87,14 +90,23 @@ export const columns: ColumnDef<OrderWithFullRelations>[] = [
 
             return (
                 <p className="text-sm tabular-nums">
-                    {new Date(order.created_at).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        hour12: false,
-                    })}
+                    {(() => {
+                        const now = new Date();
+                        const created = new Date(order.created_at);
+                        const diff = Math.floor((now.getTime() - created.getTime()) / 1000);
+
+                        if (diff < 60) return `${diff} seconds ago`;
+                        if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;
+                        if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
+                        if (diff < 604800) return `${Math.floor(diff / 86400)} days ago`;
+
+                        // Fallback to date if more than a week ago
+                        return created.toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                        });
+                    })()}
                 </p>
             );
         },

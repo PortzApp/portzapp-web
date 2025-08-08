@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Enums\UserRoles;
+use App\Models\Order;
 use App\Models\Organization;
 use App\Models\Port;
 use App\Models\Service;
@@ -105,6 +106,13 @@ class HandleInertiaRequests extends Middleware
                 'user' => $userAuth,
                 'can' => fn () => $user ? [
                     'create_services' => $user->can('create', Service::class),
+                    'orders' => [
+                        'view_any' => $user->can('view-any', Order::class),
+                        'view' => $user->can('view', Order::class),
+                        'create' => $user->can('create', Order::class),
+                        'edit' => $user->can('update', Order::class),
+                        'delete' => $user->can('delete', Order::class),
+                    ],
                     'vessels' => [
                         'view_any' => $user->can('view-any', Vessel::class),
                         'view' => $user->can('view', Vessel::class),
