@@ -47,7 +47,7 @@ class OrderController extends Controller
 
             // Show orders where user's shipping agency org is providing services
             if ($userShippingAgencyOrgs->isNotEmpty()) {
-                $q->orWhereHas('services', function ($serviceQuery) use ($userShippingAgencyOrgs) {
+                $q->orWhereHas('services', function ($serviceQuery) use ($userShippingAgencyOrgs): void {
                     $serviceQuery->whereIn('organization_id', $userShippingAgencyOrgs);
                 });
             }
