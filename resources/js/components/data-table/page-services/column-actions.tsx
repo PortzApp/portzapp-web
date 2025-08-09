@@ -1,3 +1,10 @@
+import { useState } from 'react';
+
+import { Link, router } from '@inertiajs/react';
+import { Edit, Eye, MoreHorizontal, Trash2 } from 'lucide-react';
+
+import { Service } from '@/types/models';
+
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -17,11 +24,6 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-
-import { Service } from '@/types/models';
-import { Link, router } from '@inertiajs/react';
-import { Edit, Eye, MoreHorizontal, Trash2 } from 'lucide-react';
-import { useState } from 'react';
 
 export function ServicesPageColumnActions({ service }: { service: Service }) {
     const [openDropdown, setOpenDropdown] = useState(false);

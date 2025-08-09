@@ -1,6 +1,6 @@
 import { LucideIcon } from 'lucide-react';
-import type { Config } from 'ziggy-js';
 
+import type { Config } from 'ziggy-js';
 import { OrganizationBusinessType, UserRoles } from '@/types/enums';
 
 export interface SharedData {

@@ -1,9 +1,12 @@
+import { ColumnDef } from '@tanstack/react-table';
+
+import { Vessel } from '@/types/models';
+
+import { Checkbox } from '@/components/ui/checkbox';
+
 import { VesselStatusBadge, VesselTypeBadge } from '@/components/badges';
 import { VesselsPageColumnActions } from '@/components/data-table/page-vessels/column-actions';
 import { DataTableColumnHeader } from '@/components/data-table/primitives/data-table-column-header';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Vessel } from '@/types/models';
-import { ColumnDef } from '@tanstack/react-table';
 
 export const columns: ColumnDef<Vessel>[] = [
     {

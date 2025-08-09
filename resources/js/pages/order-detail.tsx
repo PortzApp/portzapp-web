@@ -1,10 +1,13 @@
+import { BreadcrumbItem } from '@/types';
+import { Head } from '@inertiajs/react';
+
+import { OrderWithFullRelations } from '@/types/core';
+
+import AppLayout from '@/layouts/app-layout';
+
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import AppLayout from '@/layouts/app-layout';
-import { BreadcrumbItem } from '@/types';
-import { OrderWithFullRelations } from '@/types/core';
-import { Head } from '@inertiajs/react';
 
 export default function OrderDetail({ order }: { order: OrderWithFullRelations }) {
     console.log(order);

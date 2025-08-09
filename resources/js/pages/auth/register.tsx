@@ -1,15 +1,19 @@
-import { Head, useForm } from '@inertiajs/react';
-import { LoaderCircle } from 'lucide-react';
 import { FormEventHandler } from 'react';
 
-import InputError from '@/components/input-error';
-import TextLink from '@/components/text-link';
+import { Head, useForm } from '@inertiajs/react';
+import { LoaderCircle } from 'lucide-react';
+
+import { OrganizationBusinessType, UserRoles } from '@/types/enums';
+
+import AuthLayout from '@/layouts/auth-layout';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import AuthLayout from '@/layouts/auth-layout';
-import { OrganizationBusinessType, UserRoles } from '@/types/enums';
+
+import InputError from '@/components/input-error';
+import TextLink from '@/components/text-link';
 
 type RegisterForm = {
     first_name: string;

@@ -1,3 +1,17 @@
+import { useState } from 'react';
+
+import { Head, Link, router } from '@inertiajs/react';
+import { useEcho } from '@laravel/echo-react';
+import { Dot, Edit, Trash2 } from 'lucide-react';
+import { toast } from 'sonner';
+
+import type { BreadcrumbItem } from '@/types';
+import { Service } from '@/types/models';
+
+import { cn } from '@/lib/utils';
+
+import AppLayout from '@/layouts/app-layout';
+
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,15 +25,6 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
-import AppLayout from '@/layouts/app-layout';
-import { cn } from '@/lib/utils';
-import type { BreadcrumbItem } from '@/types';
-import { Service } from '@/types/models';
-import { Head, Link, router } from '@inertiajs/react';
-import { useEcho } from '@laravel/echo-react';
-import { Dot, Edit, Trash2 } from 'lucide-react';
-import { useState } from 'react';
-import { toast } from 'sonner';
 
 interface ServiceEvent {
     message: string;

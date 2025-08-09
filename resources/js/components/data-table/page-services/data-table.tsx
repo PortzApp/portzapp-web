@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+
 import {
     ColumnDef,
     ColumnFiltersState,
@@ -16,7 +18,7 @@ import {
 
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { useState } from 'react';
+
 import { DataTablePaginationControls } from '../primitives/data-table-pagination-controls';
 import { DataTableViewOptions } from '../primitives/data-table-view-options';
 

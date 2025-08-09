@@ -1,7 +1,10 @@
+import { ColumnDef } from '@tanstack/react-table';
+
+import { Service } from '@/types/models';
+
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Service } from '@/types/models';
-import { ColumnDef } from '@tanstack/react-table';
+
 import { DataTableColumnHeader } from '../primitives/data-table-column-header';
 import { ServicesPageColumnActions } from './column-actions';
 

@@ -1,7 +1,10 @@
-import { SidebarProvider } from '@/components/ui/sidebar';
-import type { SharedData } from '@/types';
-import { usePage } from '@inertiajs/react';
 import React from 'react';
+
+import { usePage } from '@inertiajs/react';
+
+import type { SharedData } from '@/types';
+
+import { SidebarProvider } from '@/components/ui/sidebar';
 
 interface AppShellProps {
     children: React.ReactNode;

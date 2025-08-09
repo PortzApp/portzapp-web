@@ -51,8 +51,6 @@ export default {
     importOrderParserPlugins: ['typescript', 'jsx', 'decorators-legacy'],
     importOrderTypeScriptVersion: '5.0.0',
     importOrderCaseSensitive: false,
-    importOrderMergeDuplicateImports: true,
-    importOrderCombineTypeAndValueImports: true,
 
     // Options for `prettier-plugin-tailwindcss`
     // Usage: https://github.com/tailwindlabs/prettier-plugin-tailwindcss

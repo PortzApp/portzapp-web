@@ -1,6 +1,12 @@
-import { NavFooter } from '@/components/nav-footer';
-import { NavMain } from '@/components/nav-main';
-import { NavUser } from '@/components/nav-user';
+import { router, usePage } from '@inertiajs/react';
+import { ChevronsUpDown, ClipboardCheck, LayoutGrid, ListCheck, MapPin, Package, Plus, Ship } from 'lucide-react';
+import { toast } from 'sonner';
+
+import type { NavItem, SharedData } from '@/types';
+import { OrganizationBusinessType } from '@/types/enums';
+
+import { cn } from '@/lib/utils';
+
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -20,12 +26,10 @@ import {
     SidebarMenuItem,
     useSidebar,
 } from '@/components/ui/sidebar';
-import { cn } from '@/lib/utils';
-import type { NavItem, SharedData } from '@/types';
-import { OrganizationBusinessType } from '@/types/enums';
-import { router, usePage } from '@inertiajs/react';
-import { ChevronsUpDown, ClipboardCheck, LayoutGrid, ListCheck, MapPin, Package, Plus, Ship } from 'lucide-react';
-import { toast } from 'sonner';
+
+import { NavFooter } from '@/components/nav-footer';
+import { NavMain } from '@/components/nav-main';
+import { NavUser } from '@/components/nav-user';
 
 const mainNavItemsAsAdmin: NavItem[] = [
     {

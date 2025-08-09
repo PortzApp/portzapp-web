@@ -1,3 +1,16 @@
+import { useState } from 'react';
+
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Dot, Edit, Trash2 } from 'lucide-react';
+import { toast } from 'sonner';
+
+import type { BreadcrumbItem, SharedData } from '@/types';
+import { Port } from '@/types/models';
+
+import { cn } from '@/lib/utils';
+
+import AppLayout from '@/layouts/app-layout';
+
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,14 +24,6 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
-import AppLayout from '@/layouts/app-layout';
-import { cn } from '@/lib/utils';
-import type { BreadcrumbItem, SharedData } from '@/types';
-import { Port } from '@/types/models';
-import { Head, Link, router, usePage } from '@inertiajs/react';
-import { Dot, Edit, Trash2 } from 'lucide-react';
-import { useState } from 'react';
-import { toast } from 'sonner';
 
 export default function PortShowPage({ port }: { port: Port }) {
     const { auth } = usePage<SharedData>().props;

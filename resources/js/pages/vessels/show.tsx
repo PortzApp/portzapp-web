@@ -1,4 +1,16 @@
-import { VesselStatusBadge } from '@/components/badges';
+import { useState } from 'react';
+
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Edit, Trash2 } from 'lucide-react';
+import { toast } from 'sonner';
+
+import type { BreadcrumbItem, SharedData } from '@/types';
+import { Vessel } from '@/types/models';
+
+import { cn } from '@/lib/utils';
+
+import AppLayout from '@/layouts/app-layout';
+
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,14 +24,8 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
-import AppLayout from '@/layouts/app-layout';
-import { cn } from '@/lib/utils';
-import type { BreadcrumbItem, SharedData } from '@/types';
-import { Vessel } from '@/types/models';
-import { Head, Link, router, usePage } from '@inertiajs/react';
-import { Edit, Trash2 } from 'lucide-react';
-import { useState } from 'react';
-import { toast } from 'sonner';
+
+import { VesselStatusBadge } from '@/components/badges';
 
 export default function VesselShowPage({ vessel }: { vessel: Vessel }) {
     const { auth } = usePage<SharedData>().props;
