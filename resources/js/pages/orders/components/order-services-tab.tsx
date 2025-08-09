@@ -1,6 +1,7 @@
+import { Building2, Package } from 'lucide-react';
+
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Building2, Package } from 'lucide-react';
 
 type Service = {
     id: string;

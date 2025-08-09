@@ -1,17 +1,13 @@
-import { Button } from '@/components/ui/button';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { useState } from 'react';
 
 import { Link, router, usePage } from '@inertiajs/react';
 import { Edit, Eye, MoreHorizontal, Trash2 } from 'lucide-react';
-import { useState } from 'react';
+import { toast } from 'sonner';
 
+import type { SharedData } from '@/types';
+import { Vessel } from '@/types/models';
+
+import { Button } from '@/components/ui/button';
 import {
     Dialog,
     DialogClose,
@@ -22,9 +18,14 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
-import type { SharedData } from '@/types';
-import { Vessel } from '@/types/models';
-import { toast } from 'sonner';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 export function VesselsPageColumnActions({ vessel }: { vessel: Vessel }) {
     const [openDropdown, setOpenDropdown] = useState(false);

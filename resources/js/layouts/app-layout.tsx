@@ -1,7 +1,10 @@
-import { Toaster } from '@/components/ui/sonner';
-import AppLayoutTemplate from '@/layouts/app/app-sidebar-layout';
-import type { BreadcrumbItem } from '@/types';
 import { type ReactNode } from 'react';
+
+import type { BreadcrumbItem } from '@/types';
+
+import AppLayoutTemplate from '@/layouts/app/app-sidebar-layout';
+
+import { Toaster } from '@/components/ui/sonner';
 
 interface AppLayoutProps {
     children: ReactNode;

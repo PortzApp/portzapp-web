@@ -1,3 +1,18 @@
+import { useState } from 'react';
+
+import OrderOverviewTab from '@/pages/orders/components/order-overview-tab';
+import OrderServicesTab from '@/pages/orders/components/order-services-tab';
+import OrderSystemTab from '@/pages/orders/components/order-system-tab';
+import OrderVesselTab from '@/pages/orders/components/order-vessel-tab';
+import { Head, Link, router } from '@inertiajs/react';
+import { Database, Edit, LayoutGrid, MapPin, Package, Ship, Trash2 } from 'lucide-react';
+import { toast } from 'sonner';
+
+import type { BreadcrumbItem } from '@/types';
+import { OrderWithRelations } from '@/types/models';
+
+import AppLayout from '@/layouts/app-layout';
+
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
 import {
@@ -11,18 +26,6 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem } from '@/types';
-import { Head, Link, router } from '@inertiajs/react';
-import { Database, Edit, LayoutGrid, MapPin, Package, Ship, Trash2 } from 'lucide-react';
-import { useState } from 'react';
-import { toast } from 'sonner';
-
-import OrderOverviewTab from '@/pages/orders/components/order-overview-tab';
-import OrderServicesTab from '@/pages/orders/components/order-services-tab';
-import OrderSystemTab from '@/pages/orders/components/order-system-tab';
-import OrderVesselTab from '@/pages/orders/components/order-vessel-tab';
-import { OrderWithRelations } from '@/types/models';
 
 export default function OrderShowPage({ order }: { order: OrderWithRelations }) {
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);

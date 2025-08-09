@@ -1,11 +1,15 @@
+import React from 'react';
+
+import { VesselType } from '@/types/enums';
+
+import { cn } from '@/lib/utils';
+
+import { Badge } from '@/components/ui/badge';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+
 import BulkCarrierIcon from '@/components/icons/vessel-type-bulk-carrier-icon';
 import ContainerShipIcon from '@/components/icons/vessel-type-container-ship-icon';
 import TankerShipIcon from '@/components/icons/vessel-type-tanker-ship-icon';
-import { Badge } from '@/components/ui/badge';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { cn } from '@/lib/utils';
-import { VesselType } from '@/types/enums';
-import React from 'react';
 
 const vesselTypeStyles: Record<VesselType, string> = {
     cargo: 'bg-neutral-100 text-neutral-800',

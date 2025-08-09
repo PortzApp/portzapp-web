@@ -1,6 +1,8 @@
-import { cn } from '@/lib/utils';
-import { type LucideProps } from 'lucide-react';
 import { type ComponentType } from 'react';
+
+import { type LucideProps } from 'lucide-react';
+
+import { cn } from '@/lib/utils';
 
 interface IconProps extends Omit<LucideProps, 'ref'> {
     iconNode: ComponentType<LucideProps>;

@@ -1,10 +1,14 @@
-import { columns } from '@/components/data-table/page-ports/columns';
-import { PortsPageDataTable } from '@/components/data-table/page-ports/data-table';
-import { buttonVariants } from '@/components/ui/button';
-import AppLayout from '@/layouts/app-layout';
+import { Head, Link, usePage } from '@inertiajs/react';
+
 import type { BreadcrumbItem, SharedData } from '@/types';
 import { Port } from '@/types/models';
-import { Head, Link, usePage } from '@inertiajs/react';
+
+import AppLayout from '@/layouts/app-layout';
+
+import { buttonVariants } from '@/components/ui/button';
+
+import { columns } from '@/components/data-table/page-ports/columns';
+import { PortsPageDataTable } from '@/components/data-table/page-ports/data-table';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {

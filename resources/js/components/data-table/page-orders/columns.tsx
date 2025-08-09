@@ -1,11 +1,15 @@
+import { ColumnDef } from '@tanstack/react-table';
+
+import { VesselType } from '@/types/enums';
+import { OrderWithRelations } from '@/types/models';
+
+import { cn } from '@/lib/utils';
+
+import { Badge } from '@/components/ui/badge';
+
 import { VesselTypeBadge } from '@/components/badges';
 import { OrdersPageColumnActions } from '@/components/data-table/page-orders/column-actions';
 import { DataTableColumnHeader } from '@/components/data-table/primitives/data-table-column-header';
-import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
-import { VesselType } from '@/types/enums';
-import { OrderWithRelations } from '@/types/models';
-import { ColumnDef } from '@tanstack/react-table';
 
 export const columns: ColumnDef<OrderWithRelations>[] = [
     {

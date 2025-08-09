@@ -1,6 +1,7 @@
+import { type User } from '@/types';
+
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { type User } from '@/types';
 
 function getRoleLabel(role: string): string {
     switch (role) {
