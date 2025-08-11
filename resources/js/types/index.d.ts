@@ -15,11 +15,11 @@ export interface SharedData {
 
 interface Auth {
     user: User;
-    can: {
-        create_services: boolean;
-        orders: PolicyRules;
-        vessels: PolicyRules;
-        ports: PolicyRules;
+    permissions: {
+        service: PolicyAbilities;
+        order: PolicyAbilities;
+        vessel: PolicyAbilities;
+        port: PolicyAbilities;
     };
 }
 
@@ -49,7 +49,7 @@ interface Organization {
     updated_at: string;
 }
 
-interface PolicyRules {
+interface PolicyAbilities {
     view_any: boolean;
     view: boolean;
     create: boolean;
