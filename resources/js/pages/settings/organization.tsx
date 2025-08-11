@@ -30,8 +30,8 @@ export default function OrganizationSettingsPage({ users }: { users: UserWithPiv
                 <div className="space-y-6">
                     <HeadingSmall title="Organization settings" description="Manage your organization's members" />
 
-                    <div className="rounded-lg bg-white shadow-sm ring-1 ring-gray-900/5">
-                        <div className="overflow-x-auto">
+                    <div className="bg-white">
+                        <div className="overflow-x-auto rounded-md border">
                             <table className="min-w-full divide-y divide-gray-300">
                                 <thead className="bg-gray-50">
                                     <tr>
