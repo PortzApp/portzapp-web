@@ -1,8 +1,8 @@
 import { OrganizationsPageColumnActions } from '@/pages/organizations/components/data-table/column-actions';
 import { ColumnDef } from '@tanstack/react-table';
 
-import { Organization } from '@/types/models';
 import { OrganizationBusinessType } from '@/types/enums';
+import { Organization } from '@/types/models';
 
 import { cn } from '@/lib/utils';
 

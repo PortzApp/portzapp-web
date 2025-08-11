@@ -4,8 +4,8 @@ import { Head, router, useForm } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 
 import type { BreadcrumbItem } from '@/types';
-import { Organization } from '@/types/models';
 import { OrganizationBusinessType } from '@/types/enums';
+import { Organization } from '@/types/models';
 
 import AppLayout from '@/layouts/app-layout';
 
@@ -100,10 +100,7 @@ export default function EditOrganizationPage({ organization }: { organization: O
 
                     <div className="flex flex-col gap-2">
                         <Label htmlFor="business_type">Business Type</Label>
-                        <Select 
-                            value={data.business_type} 
-                            onValueChange={(value: OrganizationBusinessType) => setData('business_type', value)}
-                        >
+                        <Select value={data.business_type} onValueChange={(value: OrganizationBusinessType) => setData('business_type', value)}>
                             <SelectTrigger>
                                 <SelectValue placeholder="Select business type" />
                             </SelectTrigger>

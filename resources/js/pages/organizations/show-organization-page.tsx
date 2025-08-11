@@ -5,8 +5,8 @@ import { Edit, Trash2, Users } from 'lucide-react';
 import { toast } from 'sonner';
 
 import type { BreadcrumbItem, SharedData } from '@/types';
-import { Organization } from '@/types/models';
 import { OrganizationBusinessType, UserRoles } from '@/types/enums';
+import { Organization } from '@/types/models';
 
 import AppLayout from '@/layouts/app-layout';
 
@@ -23,14 +23,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 interface OrganizationUser {
     id: string;
@@ -56,7 +49,7 @@ interface OrganizationWithMembers extends Organization {
 
 const businessTypeLabels = {
     [OrganizationBusinessType.VESSEL_OWNER]: 'Vessel Owner',
-    [OrganizationBusinessType.SHIPPING_AGENCY]: 'Shipping Agency', 
+    [OrganizationBusinessType.SHIPPING_AGENCY]: 'Shipping Agency',
     [OrganizationBusinessType.PORTZAPP_TEAM]: 'Portzapp Team',
 };
 
@@ -159,9 +152,7 @@ export default function ShowOrganizationPage({ organization }: { organization: O
                             </div>
                             <div className="flex justify-between">
                                 <span className="text-sm font-medium text-muted-foreground">Business Type:</span>
-                                <Badge variant="secondary">
-                                    {businessTypeLabels[organization.business_type]}
-                                </Badge>
+                                <Badge variant="secondary">{businessTypeLabels[organization.business_type]}</Badge>
                             </div>
                         </CardContent>
                     </Card>
@@ -215,7 +206,9 @@ export default function ShowOrganizationPage({ organization }: { organization: O
                                 <CardDescription>
                                     Users who are part of this organization
                                     {organization.users && organization.users.length > 0 && (
-                                        <span className="ml-2">({organization.users.length} member{organization.users.length !== 1 ? 's' : ''})</span>
+                                        <span className="ml-2">
+                                            ({organization.users.length} member{organization.users.length !== 1 ? 's' : ''})
+                                        </span>
                                     )}
                                 </CardDescription>
                             </CardHeader>
@@ -240,9 +233,7 @@ export default function ShowOrganizationPage({ organization }: { organization: O
                                                     <TableCell>{user.email}</TableCell>
                                                     <TableCell>{user.phone_number}</TableCell>
                                                     <TableCell>
-                                                        <Badge variant="outline">
-                                                            {roleLabels[user.pivot.role]}
-                                                        </Badge>
+                                                        <Badge variant="outline">{roleLabels[user.pivot.role]}</Badge>
                                                     </TableCell>
                                                     <TableCell className="text-sm text-muted-foreground">
                                                         {new Date(user.pivot.created_at).toLocaleDateString('en-US', {
