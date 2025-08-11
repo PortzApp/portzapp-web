@@ -26,7 +26,7 @@ export default function PortsIndexPage({ ports }: { ports: Array<Port> }) {
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <div className="flex items-center justify-between">
                     <h1 className="text-2xl font-bold">Ports</h1>
-                    {auth.can.ports.create && (
+                    {auth.permissions.port.create && (
                         <Link href={route('ports.create')} className={buttonVariants({ variant: 'default' })}>
                             Create port
                         </Link>

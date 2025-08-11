@@ -26,7 +26,7 @@ export default function VesselsIndexPage({ vessels }: { vessels: Array<Vessel> }
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <div className="flex items-center justify-between">
                     <h1 className="text-2xl font-bold">My Vessels</h1>
-                    {auth.can.vessels.create && (
+                    {auth.permissions.vessel.create && (
                         <Link href={route('vessels.create')} className={buttonVariants({ variant: 'default' })}>
                             Create vessel
                         </Link>

@@ -62,14 +62,14 @@ export default function ShowPortPage({ port }: { port: Port }) {
                         <p className="text-base text-muted-foreground">Port details and information</p>
                     </div>
                     <div className="flex gap-2">
-                        {auth.can.ports.edit && (
+                        {auth.permissions.port.edit && (
                             <Link href={route('ports.edit', port.id)} className={buttonVariants({ variant: 'outline', size: 'sm' })}>
                                 <Edit className="mr-2 h-4 w-4" />
                                 Edit
                             </Link>
                         )}
 
-                        {auth.can.vessels.delete && (
+                        {auth.permissions.vessel.delete && (
                             <Dialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
                                 <DialogTrigger asChild>
                                     <Button variant="destructive" size="sm">

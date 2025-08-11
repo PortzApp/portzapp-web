@@ -64,14 +64,14 @@ export default function ShowVesselPage({ vessel }: { vessel: Vessel }) {
                         <p className="text-base text-muted-foreground">Vessel details and information</p>
                     </div>
                     <div className="flex gap-2">
-                        {auth.can.vessels.edit && (
+                        {auth.permissions.vessel.edit && (
                             <Link href={route('vessels.edit', vessel.id)} className={buttonVariants({ variant: 'outline', size: 'sm' })}>
                                 <Edit className="mr-2 h-4 w-4" />
                                 Edit
                             </Link>
                         )}
 
-                        {auth.can.vessels.delete && (
+                        {auth.permissions.vessel.delete && (
                             <Dialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
                                 <DialogTrigger asChild>
                                     <Button variant="destructive" size="sm">
