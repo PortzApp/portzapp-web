@@ -1,11 +1,11 @@
 import { FormEventHandler, useState } from 'react';
 
 import { Head, router, useForm } from '@inertiajs/react';
-import { LoaderCircle, Plus, Trash2, Edit3, X } from 'lucide-react';
+import { Edit3, LoaderCircle, Plus, Trash2 } from 'lucide-react';
 
 import type { BreadcrumbItem } from '@/types';
 import { OrganizationBusinessType, UserRoles } from '@/types/enums';
-import { OrganizationWithMembers, User, UserWithRole } from '@/types/models';
+import { Organization, OrganizationWithMembers, User, UserWithRole } from '@/types/models';
 
 import AppLayout from '@/layouts/app-layout';
 
@@ -41,7 +41,7 @@ interface Props {
     userRoles: { value: string; label: string }[];
 }
 
-export default function EditOrganizationPage({ organization, availableUsers, businessTypes, userRoles }: Props) {
+export default function EditOrganizationPage({ organization, availableUsers }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Organizations',
@@ -69,15 +69,28 @@ export default function EditOrganizationPage({ organization, availableUsers, bus
     const [isAddMemberOpen, setIsAddMemberOpen] = useState(false);
     const [isEditRoleOpen, setIsEditRoleOpen] = useState(false);
     const [selectedMember, setSelectedMember] = useState<UserWithRole | null>(null);
-    
+
     // Add member form
-    const { data: addMemberData, setData: setAddMemberData, post: postAddMember, processing: addMemberProcessing, errors: addMemberErrors, reset: resetAddMember } = useForm({
+    const {
+        data: addMemberData,
+        setData: setAddMemberData,
+        post: postAddMember,
+        processing: addMemberProcessing,
+        errors: addMemberErrors,
+        reset: resetAddMember,
+    } = useForm({
         user_id: '',
         role: 'viewer' as UserRoles,
     });
-    
+
     // Edit role form
-    const { data: editRoleData, setData: setEditRoleData, put: putEditRole, processing: editRoleProcessing, errors: editRoleErrors } = useForm({
+    const {
+        data: editRoleData,
+        setData: setEditRoleData,
+        put: putEditRole,
+        processing: editRoleProcessing,
+        errors: editRoleErrors,
+    } = useForm({
         role: 'viewer' as UserRoles,
     });
 
@@ -91,7 +104,7 @@ export default function EditOrganizationPage({ organization, availableUsers, bus
             },
         });
     };
-    
+
     const handleAddMember = () => {
         postAddMember(route('organizations.members.add', organization.id), {
             onSuccess: () => {
@@ -101,7 +114,7 @@ export default function EditOrganizationPage({ organization, availableUsers, bus
             },
         });
     };
-    
+
     const handleRemoveMember = (user: UserWithRole) => {
         if (confirm(`Are you sure you want to remove ${user.first_name} ${user.last_name} from this organization?`)) {
             router.delete(route('organizations.members.remove', [organization.id, user.id]), {
@@ -111,16 +124,16 @@ export default function EditOrganizationPage({ organization, availableUsers, bus
             });
         }
     };
-    
+
     const handleEditRole = (user: UserWithRole) => {
         setSelectedMember(user);
         setEditRoleData('role', user.pivot.role);
         setIsEditRoleOpen(true);
     };
-    
+
     const handleUpdateRole = () => {
         if (!selectedMember) return;
-        
+
         putEditRole(route('organizations.members.role.update', [organization.id, selectedMember.id]), {
             onSuccess: () => {
                 setIsEditRoleOpen(false);
@@ -129,9 +142,9 @@ export default function EditOrganizationPage({ organization, availableUsers, bus
             },
         });
     };
-    
+
     const getRoleLabel = (role: UserRoles) => {
-        return userRoleOptions.find(r => r.value === role)?.label || role;
+        return userRoleOptions.find((r) => r.value === role)?.label || role;
     };
 
     return (
@@ -209,9 +222,9 @@ export default function EditOrganizationPage({ organization, availableUsers, bus
                     </Button>
                 </div>
             </form>
-            
+
             <Separator className="my-8" />
-            
+
             {/* Member Management Section */}
             <div className="p-8 pt-0">
                 <Card>
@@ -220,7 +233,8 @@ export default function EditOrganizationPage({ organization, availableUsers, bus
                             <div>
                                 <CardTitle>Organization Members</CardTitle>
                                 <CardDescription>
-                                    Manage users who have access to this organization. You can add new members, remove existing ones, and update their roles.
+                                    Manage users who have access to this organization. You can add new members, remove existing ones, and update their
+                                    roles.
                                 </CardDescription>
                             </div>
                             <Dialog open={isAddMemberOpen} onOpenChange={setIsAddMemberOpen}>
@@ -233,9 +247,7 @@ export default function EditOrganizationPage({ organization, availableUsers, bus
                                 <DialogContent>
                                     <DialogHeader>
                                         <DialogTitle>Add New Member</DialogTitle>
-                                        <DialogDescription>
-                                            Select a user and assign them a role in this organization.
-                                        </DialogDescription>
+                                        <DialogDescription>Select a user and assign them a role in this organization.</DialogDescription>
                                     </DialogHeader>
                                     <div className="space-y-4">
                                         <div className="space-y-2">
@@ -288,12 +300,13 @@ export default function EditOrganizationPage({ organization, availableUsers, bus
                         {organization.users && organization.users.length > 0 ? (
                             <div className="space-y-4">
                                 {organization.users.map((user) => (
-                                    <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg">
+                                    <div key={user.id} className="flex items-center justify-between rounded-lg border p-4">
                                         <div className="flex items-center space-x-4">
                                             <div className="flex-shrink-0">
-                                                <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
+                                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-200">
                                                     <span className="text-sm font-medium text-gray-700">
-                                                        {user.first_name.charAt(0)}{user.last_name.charAt(0)}
+                                                        {user.first_name.charAt(0)}
+                                                        {user.last_name.charAt(0)}
                                                     </span>
                                                 </div>
                                             </div>
@@ -305,21 +318,13 @@ export default function EditOrganizationPage({ organization, availableUsers, bus
                                             </div>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                            <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
                                                 {getRoleLabel(user.pivot.role)}
                                             </span>
-                                            <Button
-                                                size="sm"
-                                                variant="outline"
-                                                onClick={() => handleEditRole(user)}
-                                            >
+                                            <Button size="sm" variant="outline" onClick={() => handleEditRole(user)}>
                                                 <Edit3 className="h-4 w-4" />
                                             </Button>
-                                            <Button
-                                                size="sm"
-                                                variant="outline"
-                                                onClick={() => handleRemoveMember(user)}
-                                            >
+                                            <Button size="sm" variant="outline" onClick={() => handleRemoveMember(user)}>
                                                 <Trash2 className="h-4 w-4" />
                                             </Button>
                                         </div>
@@ -327,14 +332,14 @@ export default function EditOrganizationPage({ organization, availableUsers, bus
                                 ))}
                             </div>
                         ) : (
-                            <div className="text-center py-8">
+                            <div className="py-8 text-center">
                                 <p className="text-gray-500">No members found in this organization.</p>
                             </div>
                         )}
                     </CardContent>
                 </Card>
             </div>
-            
+
             {/* Edit Role Dialog */}
             <Dialog open={isEditRoleOpen} onOpenChange={setIsEditRoleOpen}>
                 <DialogContent>
