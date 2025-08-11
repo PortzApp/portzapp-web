@@ -27,7 +27,7 @@ import {
 
 import { VesselStatusBadge } from '@/components/badges';
 
-export default function VesselShowPage({ vessel }: { vessel: Vessel }) {
+export default function ShowVesselPage({ vessel }: { vessel: Vessel }) {
     const { auth } = usePage<SharedData>().props;
 
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);

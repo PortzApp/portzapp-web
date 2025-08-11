@@ -17,7 +17,7 @@ class VesselController extends Controller
     {
         Gate::authorize('view-any', Vessel::class);
 
-        return Inertia::render('vessels/index', [
+        return Inertia::render('vessels/vessels-index-page', [
             'vessels' => Vessel::query()->latest()->get(),
         ]);
     }
@@ -49,7 +49,7 @@ class VesselController extends Controller
     {
         Gate::authorize('create', Vessel::class);
 
-        return Inertia::render('vessels/create');
+        return Inertia::render('vessels/create-vessel-page');
     }
 
     /**
@@ -59,7 +59,7 @@ class VesselController extends Controller
     {
         Gate::authorize('view', $vessel);
 
-        return Inertia::render('vessels/show', [
+        return Inertia::render('vessels/show-vessel-page', [
             'vessel' => $vessel,
         ]);
     }
@@ -71,7 +71,7 @@ class VesselController extends Controller
     {
         Gate::authorize('update', $vessel);
 
-        return Inertia::render('vessels/edit', [
+        return Inertia::render('vessels/edit-vessel-page', [
             'vessel' => $vessel,
         ]);
     }
