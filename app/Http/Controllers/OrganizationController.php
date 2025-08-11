@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\OrganizationBusinessType;
+use App\Enums\UserRoles;
 use App\Models\Organization;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -113,11 +114,24 @@ class OrganizationController extends Controller
 
         Gate::authorize('update', $organization);
 
+        // Load organization members with their roles
+        $organization->load('users');
+
+        // Get all users that are not already in this organization for the add member functionality
+        $availableUsers = User::whereDoesntHave('organizations', function ($query) use ($organization): void {
+            $query->where('organization_id', $organization->id);
+        })->get(['id', 'first_name', 'last_name', 'email']);
+
         return Inertia::render('organizations/edit-organization-page', [
             'organization' => $organization,
+            'availableUsers' => $availableUsers,
             'businessTypes' => collect(OrganizationBusinessType::cases())->map(fn ($type) => [
                 'value' => $type->value,
                 'label' => $type->label(),
+            ]),
+            'userRoles' => collect(UserRoles::cases())->map(fn ($role) => [
+                'value' => $role->value,
+                'label' => $role->label(),
             ]),
         ]);
     }
@@ -174,5 +188,88 @@ class OrganizationController extends Controller
 
         return redirect()->route('organizations.index')
             ->with('message', 'Organization deleted successfully!');
+    }
+
+    /**
+     * Add a user to the organization.
+     */
+    public function addMember(Request $request, Organization $organization)
+    {
+        Gate::authorize('update', $organization);
+
+        $validated = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'role' => 'required|in:'.implode(',', array_map(fn ($case) => $case->value, UserRoles::cases())),
+        ]);
+
+        $user = User::find($validated['user_id']);
+
+        // Check if user is already a member
+        if ($organization->users()->where('user_id', $user->id)->exists()) {
+            return redirect()->back()->withErrors([
+                'user_id' => 'User is already a member of this organization.',
+            ]);
+        }
+
+        // Add the user to the organization with the specified role
+        $organization->users()->attach($user->id, [
+            'role' => UserRoles::from($validated['role']),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return redirect()->back()->with('message', 'Member added successfully!');
+    }
+
+    /**
+     * Remove a user from the organization.
+     */
+    public function removeMember(Organization $organization, User $user)
+    {
+        Gate::authorize('update', $organization);
+
+        // Check if user is a member
+        if (! $organization->users()->where('user_id', $user->id)->exists()) {
+            return redirect()->back()->withErrors([
+                'error' => 'User is not a member of this organization.',
+            ]);
+        }
+
+        // If this is the user's current organization, clear their current_organization_id
+        if ($user->current_organization_id === $organization->id) {
+            $user->update(['current_organization_id' => null]);
+        }
+
+        // Remove the user from the organization
+        $organization->users()->detach($user->id);
+
+        return redirect()->back()->with('message', 'Member removed successfully!');
+    }
+
+    /**
+     * Update a user's role in the organization.
+     */
+    public function updateMemberRole(Request $request, Organization $organization, User $user)
+    {
+        Gate::authorize('update', $organization);
+
+        $validated = $request->validate([
+            'role' => 'required|in:'.implode(',', array_map(fn ($case) => $case->value, UserRoles::cases())),
+        ]);
+
+        // Check if user is a member
+        if (! $organization->users()->where('user_id', $user->id)->exists()) {
+            return redirect()->back()->withErrors([
+                'error' => 'User is not a member of this organization.',
+            ]);
+        }
+
+        // Update the user's role
+        $organization->users()->updateExistingPivot($user->id, [
+            'role' => UserRoles::from($validated['role']),
+            'updated_at' => now(),
+        ]);
+
+        return redirect()->back()->with('message', 'Member role updated successfully!');
     }
 }

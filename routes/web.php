@@ -52,6 +52,11 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     // Organization management routes (restricted to portzapp_team business type)
     Route::middleware('portzapp.team')->group(function (): void {
         Route::resource('organizations', OrganizationController::class);
+
+        // Member management routes
+        Route::post('organizations/{organization}/members', [OrganizationController::class, 'addMember'])->name('organizations.members.add');
+        Route::delete('organizations/{organization}/members/{user}', [OrganizationController::class, 'removeMember'])->name('organizations.members.remove');
+        Route::put('organizations/{organization}/members/{user}/role', [OrganizationController::class, 'updateMemberRole'])->name('organizations.members.role.update');
     });
 });
 

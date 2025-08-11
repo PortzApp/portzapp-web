@@ -1,4 +1,4 @@
-import { OrderStatus, OrganizationBusinessType, ServiceStatus, VesselStatus, VesselType } from '@/types/enums';
+import { OrderStatus, OrganizationBusinessType, ServiceStatus, UserRoles, VesselStatus, VesselType } from '@/types/enums';
 
 export interface BaseModel {
     id: string;
@@ -26,6 +26,20 @@ export interface Organization extends BaseModel {
 // Organization type that includes member count
 export interface OrganizationWithMemberCount extends Organization {
     member_count: number;
+}
+
+// User with organization role information
+export interface UserWithRole extends User {
+    pivot: {
+        role: UserRoles;
+        created_at: string;
+        updated_at: string;
+    };
+}
+
+// Organization with members loaded
+export interface OrganizationWithMembers extends Organization {
+    users: UserWithRole[];
 }
 
 export interface Vessel extends BaseModel {
