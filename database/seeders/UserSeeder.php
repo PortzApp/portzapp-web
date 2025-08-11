@@ -14,6 +14,11 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
+        // Create PORTZAPP_TEAM organization
+        $portzappOrg = Organization::factory()->portzappTeam()->create([
+            'name' => 'PortzApp Team',
+        ]);
+
         // Create shipping agency organizations
         $shippingOrg1 = Organization::factory()->shippingAgency()->create();
         $shippingOrg2 = Organization::factory()->shippingAgency()->create();
@@ -66,6 +71,21 @@ class UserSeeder extends Seeder
         ]);
         $vesselAdmin2->organizations()->attach($vesselOrg2, ['role' => UserRoles::ADMIN->value]);
 
-        $this->command->info('Created 6 users across 4 organizations (2 shipping agencies, 2 vessel owners)');
+        // Create admin users for PORTZAPP_TEAM
+        $portzappAdmin1 = User::factory()->create([
+            'first_name' => 'Admin',
+            'last_name' => 'One',
+            'email' => 'admin1@portzapp.com',
+        ]);
+        $portzappAdmin1->organizations()->attach($portzappOrg, ['role' => UserRoles::ADMIN->value]);
+
+        $portzappAdmin2 = User::factory()->create([
+            'first_name' => 'Admin',
+            'last_name' => 'Two',
+            'email' => 'admin2@portzapp.com',
+        ]);
+        $portzappAdmin2->organizations()->attach($portzappOrg, ['role' => UserRoles::ADMIN->value]);
+
+        $this->command->info('Created 8 users across 5 organizations (2 shipping agencies, 2 vessel owners, 1 PORTZAPP_TEAM)');
     }
 }
