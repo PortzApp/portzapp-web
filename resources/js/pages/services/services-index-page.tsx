@@ -61,7 +61,7 @@ interface ServicesPageProps {
     }[];
 }
 
-export default function Services({ services: initialServices, ports, service_categories }: ServicesPageProps) {
+export default function ServicesIndexPage({ services: initialServices, ports, service_categories }: ServicesPageProps) {
     const { auth } = usePage<SharedData>().props;
 
     const [services, setServices] = useState(initialServices);
