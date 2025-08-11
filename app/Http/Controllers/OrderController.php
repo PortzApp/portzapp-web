@@ -55,7 +55,7 @@ class OrderController extends Controller
 
         $orders = $query->latest()->get();
 
-        return Inertia::render('orders/index', [
+        return Inertia::render('orders/orders-index-page', [
             'orders' => $orders,
         ]);
     }
@@ -75,12 +75,12 @@ class OrderController extends Controller
             ->where('business_type', OrganizationBusinessType::VESSEL_OWNER)
             ->first();
 
-        if (! $vesselOwnerOrg) {
+        if (!$vesselOwnerOrg) {
             abort(403, 'You must belong to a vessel owner organization to place orders.');
         }
 
         $order = Order::create([
-            'order_number' => 'ORD-'.strtoupper(uniqid()),
+            'order_number' => 'ORD-' . strtoupper(uniqid()),
             'vessel_id' => $validated['vessel_id'],
             'port_id' => $validated['port_id'],
             'placed_by_user_id' => auth()->id(),
@@ -129,7 +129,7 @@ class OrderController extends Controller
         // Get all ports ordered by name
         $ports = Port::orderBy('name')->get();
 
-        return Inertia::render('orders/create', [
+        return Inertia::render('orders/create-order-page', [
             'vessels' => $vessels,
             'services' => $services,
             'ports' => $ports,
@@ -151,7 +151,7 @@ class OrderController extends Controller
             'services.organization',
         ]);
 
-        return Inertia::render('orders/show', [
+        return Inertia::render('orders/show-order-page', [
             'order' => $order,
         ]);
     }
@@ -180,7 +180,7 @@ class OrderController extends Controller
 
         $order->load(['services', 'vessel']);
 
-        return Inertia::render('orders/edit', [
+        return Inertia::render('orders/edit-order-page', [
             'order' => $order,
             'vessels' => $vessels,
             'services' => $services,

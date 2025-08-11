@@ -32,7 +32,7 @@ type CreateOrderForm = {
     notes: string;
 };
 
-export default function OrdersCreatePage({ vessels, services, ports }: { vessels: Array<Vessel>; services: Array<Service>; ports: Array<Port> }) {
+export default function CreateOrderPage({ vessels, services, ports }: { vessels: Array<Vessel>; services: Array<Service>; ports: Array<Port> }) {
     const { data, setData, post, processing, errors, reset } = useForm<CreateOrderForm>({
         service_id: '',
         vessel_id: '',
