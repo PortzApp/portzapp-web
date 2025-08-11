@@ -62,7 +62,7 @@ export function VesselsPageColumnActions({ vessel }: { vessel: Vessel }) {
                     </Link>
                 </DropdownMenuItem>
 
-                {auth.can.vessels.edit && (
+                {auth.permissions.vessel.edit && (
                     <DropdownMenuItem asChild>
                         <Link href={route('vessels.edit', vessel.id)} className="flex">
                             <Edit />
@@ -71,7 +71,7 @@ export function VesselsPageColumnActions({ vessel }: { vessel: Vessel }) {
                     </DropdownMenuItem>
                 )}
 
-                {auth.can.vessels.delete && (
+                {auth.permissions.vessel.delete && (
                     <Dialog open={openDeleteVesselDialog} onOpenChange={setOpenDeleteVesselDialog}>
                         <DialogTrigger asChild>
                             <DropdownMenuItem onSelect={(e) => e.preventDefault()}>

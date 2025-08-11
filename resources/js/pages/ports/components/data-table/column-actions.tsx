@@ -62,7 +62,7 @@ export function PortsPageColumnActions({ port }: { port: Port }) {
                     </Link>
                 </DropdownMenuItem>
 
-                {auth.can.ports.edit && (
+                {auth.permissions.port.edit && (
                     <DropdownMenuItem asChild>
                         <Link href={route('ports.edit', port.id)} className="flex">
                             <Edit />
@@ -71,7 +71,7 @@ export function PortsPageColumnActions({ port }: { port: Port }) {
                     </DropdownMenuItem>
                 )}
 
-                {auth.can.ports.delete && (
+                {auth.permissions.port.delete && (
                     <Dialog open={openDeletePortDialog} onOpenChange={setOpenDeletePortDialog}>
                         <DialogTrigger asChild>
                             <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
