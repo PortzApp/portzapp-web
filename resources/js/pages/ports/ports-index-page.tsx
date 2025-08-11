@@ -7,8 +7,8 @@ import AppLayout from '@/layouts/app-layout';
 
 import { buttonVariants } from '@/components/ui/button';
 
-import { columns } from '@/components/data-table/page-ports/columns';
-import { PortsPageDataTable } from '@/components/data-table/page-ports/data-table';
+import { columns } from './components/data-table/columns';
+import { PortsPageDataTable } from './components/data-table/data-table';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
