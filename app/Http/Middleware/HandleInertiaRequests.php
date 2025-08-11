@@ -104,23 +104,29 @@ class HandleInertiaRequests extends Middleware
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
                 'user' => $userAuth,
-                'can' => fn () => $user ? [
-                    'create_services' => $user->can('create', Service::class),
-                    'orders' => [
+                'permissions' => fn () => $user ? [
+                    'service' => [
+                        'view_any' => $user->can('view-any', Service::class),
+                        'view' => $user->can('view', Service::class),
+                        'create' => $user->can('create', Service::class),
+                        'edit' => $user->can('update', Service::class),
+                        'delete' => $user->can('delete', Service::class),
+                    ],
+                    'order' => [
                         'view_any' => $user->can('view-any', Order::class),
                         'view' => $user->can('view', Order::class),
                         'create' => $user->can('create', Order::class),
                         'edit' => $user->can('update', Order::class),
                         'delete' => $user->can('delete', Order::class),
                     ],
-                    'vessels' => [
+                    'vessel' => [
                         'view_any' => $user->can('view-any', Vessel::class),
                         'view' => $user->can('view', Vessel::class),
                         'create' => $user->can('create', Vessel::class),
                         'edit' => $user->can('update', Vessel::class),
                         'delete' => $user->can('delete', Vessel::class),
                     ],
-                    'ports' => [
+                    'port' => [
                         'view_any' => $user->can('view-any', Port::class),
                         'view' => $user->can('view', Port::class),
                         'create' => $user->can('create', Port::class),
