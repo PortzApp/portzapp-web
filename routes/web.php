@@ -45,12 +45,12 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::delete('vessels/{vessel}', [VesselController::class, 'destroy'])->name('vessels.destroy');
 
     // Ports management routes (restricted to portzapp_team business type)
-    Route::middleware('portzapp.team')->group(function () {
+    Route::middleware('portzapp.team')->group(function (): void {
         Route::resource('ports', PortController::class);
     });
 
     // Organization management routes (restricted to portzapp_team business type)
-    Route::middleware('portzapp.team')->group(function () {
+    Route::middleware('portzapp.team')->group(function (): void {
         Route::resource('organizations', OrganizationController::class);
     });
 });
