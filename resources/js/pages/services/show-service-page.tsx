@@ -49,7 +49,7 @@ interface ServiceDeletedEvent extends ServiceEvent {
     serviceName: string;
 }
 
-export default function ServiceShowPage({ service: initialService }: { service: Service }) {
+export default function ShowServicePage({ service: initialService }: { service: Service }) {
     const [service, setService] = useState(initialService);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 

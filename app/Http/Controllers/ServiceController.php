@@ -48,7 +48,7 @@ class ServiceController extends Controller
 
         $services = $query->latest()->get();
 
-        return Inertia::render('services/index', [
+        return Inertia::render('services/services-index-page', [
             'services' => Inertia::always($services),
             'ports' => Port::query()->orderBy('name')->get(),
             'service_categories' => ServiceCategory::query()->orderBy('service_categories.name')->get(),
@@ -88,7 +88,7 @@ class ServiceController extends Controller
     {
         Gate::authorize('create', Service::class);
 
-        return Inertia::render('services/create', [
+        return Inertia::render('services/create-service-page', [
             'ports' => Port::query()->get(),
         ]);
     }
@@ -102,7 +102,7 @@ class ServiceController extends Controller
 
         $service->load(['organization:id,name', 'port:id,name', 'category:id,name', 'orders']);
 
-        return Inertia::render('services/show', [
+        return Inertia::render('services/show-service-page', [
             'service' => $service,
         ]);
     }
@@ -116,7 +116,7 @@ class ServiceController extends Controller
 
         $service->load(['organization:id,name', 'port:id,name', 'orders']);
 
-        return Inertia::render('services/edit', [
+        return Inertia::render('services/edit-service-page', [
             'service' => $service,
             'ports' => Port::query()->get(),
         ]);

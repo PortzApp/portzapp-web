@@ -19,7 +19,7 @@ class PortController extends Controller
 
         $ports = Port::query()->latest()->get();
 
-        return Inertia::render('ports/index', [
+        return Inertia::render('ports/ports-index-page', [
             'ports' => $ports,
         ]);
     }
@@ -43,7 +43,7 @@ class PortController extends Controller
     {
         Gate::authorize('create', Port::class);
 
-        return Inertia::render('ports/create');
+        return Inertia::render('ports/create-port-page');
     }
 
     /**
@@ -53,7 +53,7 @@ class PortController extends Controller
     {
         Gate::authorize('view', $port);
 
-        return Inertia::render('ports/show', [
+        return Inertia::render('ports/show-port-page', [
             'port' => $port,
         ]);
     }
@@ -65,7 +65,7 @@ class PortController extends Controller
     {
         Gate::authorize('update', $port);
 
-        return Inertia::render('ports/edit', [
+        return Inertia::render('ports/edit-port-page', [
             'port' => $port,
         ]);
     }

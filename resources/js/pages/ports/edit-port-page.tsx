@@ -15,7 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 import InputError from '@/components/input-error';
 
-export default function PortEditPage({ port }: { port: Port }) {
+export default function EditPortPage({ port }: { port: Port }) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Ports',

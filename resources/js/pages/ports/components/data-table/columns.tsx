@@ -1,3 +1,4 @@
+import { PortsPageColumnActions } from '@/pages/ports/components/data-table/column-actions';
 import { ColumnDef } from '@tanstack/react-table';
 
 import { Port } from '@/types/models';
@@ -6,9 +7,7 @@ import { cn } from '@/lib/utils';
 
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
-
-import { PortsPageColumnActions } from '@/components/data-table/page-ports/column-actions';
-import { DataTableColumnHeader } from '@/components/data-table/primitives/data-table-column-header';
+import { DataTableColumnHeader } from '@/components/ui/data-table/data-table-column-header';
 
 export const columns: ColumnDef<Port>[] = [
     {

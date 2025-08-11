@@ -23,7 +23,7 @@ type EditOrderForm = {
     notes: string;
 };
 
-export default function OrderEditPage({
+export default function EditOrderPage({
     order,
     vessels,
     services,

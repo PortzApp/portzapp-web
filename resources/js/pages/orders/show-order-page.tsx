@@ -27,7 +27,7 @@ import {
 } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-export default function OrderShowPage({ order }: { order: OrderWithRelations }) {
+export default function ShowOrderPage({ order }: { order: OrderWithRelations }) {
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
     const breadcrumbs: BreadcrumbItem[] = [

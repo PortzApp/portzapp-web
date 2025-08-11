@@ -4,8 +4,8 @@ import { Service } from '@/types/models';
 
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
+import { DataTableColumnHeader } from '@/components/ui/data-table/data-table-column-header';
 
-import { DataTableColumnHeader } from '../primitives/data-table-column-header';
 import { ServicesPageColumnActions } from './column-actions';
 
 export const servicesPageColumns: ColumnDef<Service>[] = [

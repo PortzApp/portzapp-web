@@ -55,7 +55,7 @@ class OrderController extends Controller
 
         $orders = $query->latest()->get();
 
-        return Inertia::render('orders/index', [
+        return Inertia::render('orders/orders-index-page', [
             'orders' => $orders,
         ]);
     }
@@ -129,7 +129,7 @@ class OrderController extends Controller
         // Get all ports ordered by name
         $ports = Port::orderBy('name')->get();
 
-        return Inertia::render('orders/create', [
+        return Inertia::render('orders/create-order-page', [
             'vessels' => $vessels,
             'services' => $services,
             'ports' => $ports,
@@ -151,7 +151,7 @@ class OrderController extends Controller
             'services.organization',
         ]);
 
-        return Inertia::render('orders/show', [
+        return Inertia::render('orders/show-order-page', [
             'order' => $order,
         ]);
     }
@@ -180,7 +180,7 @@ class OrderController extends Controller
 
         $order->load(['services', 'vessel']);
 
-        return Inertia::render('orders/edit', [
+        return Inertia::render('orders/edit-order-page', [
             'order' => $order,
             'vessels' => $vessels,
             'services' => $services,

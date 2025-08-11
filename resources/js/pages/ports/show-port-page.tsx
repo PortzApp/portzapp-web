@@ -1,11 +1,11 @@
 import { useState } from 'react';
 
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { Edit, Trash2 } from 'lucide-react';
+import { Dot, Edit, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import type { BreadcrumbItem, SharedData } from '@/types';
-import { Vessel } from '@/types/models';
+import { Port } from '@/types/models';
 
 import { cn } from '@/lib/utils';
 
@@ -25,47 +25,45 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 
-import { VesselStatusBadge } from '@/components/badges';
-
-export default function VesselShowPage({ vessel }: { vessel: Vessel }) {
+export default function ShowPortPage({ port }: { port: Port }) {
     const { auth } = usePage<SharedData>().props;
 
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: 'Vessels',
-            href: '/vessels',
+            title: 'Ports',
+            href: '/ports',
         },
         {
-            title: vessel.name,
-            href: `/vessels/${vessel.id}`,
+            title: port.name,
+            href: `/ports/${port.id}`,
         },
     ];
 
-    function handleDeleteVessel() {
+    function handleDeletePort() {
         setOpenDeleteDialog(false);
 
-        router.delete(route('vessels.destroy', vessel.id), {
+        router.delete(route('ports.destroy', port.id), {
             onSuccess: () => {
-                toast(`Vessel "${vessel.name}" deleted successfully!`);
+                toast(`Port "${port.name}" deleted successfully!`);
             },
         });
     }
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={vessel.name} />
+            <Head title={port.name} />
 
             <div className="flex flex-col gap-8 p-8">
                 <div className="flex items-center justify-between">
                     <div className="flex flex-col gap-1">
-                        <h1 className="text-2xl font-semibold">{vessel.name}</h1>
-                        <p className="text-base text-muted-foreground">Vessel details and information</p>
+                        <h1 className="text-2xl font-semibold">{port.name}</h1>
+                        <p className="text-base text-muted-foreground">Port details and information</p>
                     </div>
                     <div className="flex gap-2">
-                        {auth.can.vessels.edit && (
-                            <Link href={route('vessels.edit', vessel.id)} className={buttonVariants({ variant: 'outline', size: 'sm' })}>
+                        {auth.can.ports.edit && (
+                            <Link href={route('ports.edit', port.id)} className={buttonVariants({ variant: 'outline', size: 'sm' })}>
                                 <Edit className="mr-2 h-4 w-4" />
                                 Edit
                             </Link>
@@ -81,17 +79,17 @@ export default function VesselShowPage({ vessel }: { vessel: Vessel }) {
                                 </DialogTrigger>
                                 <DialogContent>
                                     <DialogHeader>
-                                        <DialogTitle>Delete Vessel</DialogTitle>
+                                        <DialogTitle>Delete Port</DialogTitle>
                                         <DialogDescription>
-                                            Are you sure you want to delete "{vessel.name}"? This action cannot be undone.
+                                            Are you sure you want to delete "{port.name}"? This action cannot be undone.
                                         </DialogDescription>
                                     </DialogHeader>
                                     <DialogFooter>
                                         <DialogClose asChild>
                                             <Button variant="outline">Cancel</Button>
                                         </DialogClose>
-                                        <Button variant="destructive" onClick={handleDeleteVessel}>
-                                            Delete Vessel
+                                        <Button variant="destructive" onClick={handleDeletePort}>
+                                            Delete Port
                                         </Button>
                                     </DialogFooter>
                                 </DialogContent>
@@ -104,32 +102,59 @@ export default function VesselShowPage({ vessel }: { vessel: Vessel }) {
                     <Card>
                         <CardHeader>
                             <CardTitle>Basic Information</CardTitle>
-                            <CardDescription>Core vessel details</CardDescription>
+                            <CardDescription>Core port details</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="flex justify-between">
                                 <span className="text-sm font-medium text-muted-foreground">Name:</span>
-                                <span className="text-sm font-medium">{vessel.name}</span>
+                                <span className="text-sm font-medium">{port.name}</span>
                             </div>
                             <div className="flex justify-between">
-                                <span className="text-sm font-medium text-muted-foreground">IMO Number:</span>
-                                <span className="text-sm font-medium tabular-nums">{vessel.imo_number}</span>
+                                <span className="text-sm font-medium text-muted-foreground">Code:</span>
+                                <span className="font-mono text-sm font-medium">{port.code}</span>
                             </div>
                             <div className="flex justify-between">
-                                <span className="text-sm font-medium text-muted-foreground">Type:</span>
-                                <Badge
-                                    className={cn(
-                                        vessel.vessel_type === 'cargo' && 'bg-neutral-100 text-neutral-800 uppercase',
-                                        vessel.vessel_type === 'tanker' && 'bg-neutral-100 text-neutral-800 uppercase',
-                                        vessel.vessel_type === 'container' && 'bg-neutral-100 text-neutral-800 uppercase',
-                                    )}
-                                >
-                                    {vessel.vessel_type}
-                                </Badge>
+                                <span className="text-sm font-medium text-muted-foreground">Country:</span>
+                                <span className="text-sm font-medium">{port.country}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-sm font-medium text-muted-foreground">City:</span>
+                                <span className="text-sm font-medium">{port.city}</span>
                             </div>
                             <div className="flex justify-between">
                                 <span className="text-sm font-medium text-muted-foreground">Status:</span>
-                                <VesselStatusBadge status={vessel.status} className="capitalize" />
+                                <Badge
+                                    className={cn(
+                                        port.status === 'active' && 'bg-blue-200 text-blue-950 uppercase dark:bg-blue-900 dark:text-blue-50',
+                                        port.status === 'inactive' && 'bg-red-200 text-red-950 uppercase dark:bg-red-900 dark:text-red-50',
+                                        port.status === 'maintenance' &&
+                                            'bg-yellow-200 text-yellow-950 uppercase dark:bg-yellow-900 dark:text-yellow-50',
+                                    )}
+                                >
+                                    <Dot />
+                                    {port.status}
+                                </Badge>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Location Information</CardTitle>
+                            <CardDescription>Geographic details</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="flex justify-between">
+                                <span className="text-sm font-medium text-muted-foreground">Latitude:</span>
+                                <span className="text-sm font-medium tabular-nums">{port.latitude}°</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-sm font-medium text-muted-foreground">Longitude:</span>
+                                <span className="text-sm font-medium tabular-nums">{port.longitude}°</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-sm font-medium text-muted-foreground">Timezone:</span>
+                                <span className="text-sm font-medium">{port.timezone}</span>
                             </div>
                         </CardContent>
                     </Card>
@@ -141,13 +166,13 @@ export default function VesselShowPage({ vessel }: { vessel: Vessel }) {
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="flex justify-between">
-                                <span className="text-sm font-medium text-muted-foreground">Vessel ID:</span>
-                                <span className="text-sm font-medium tabular-nums">#{vessel.id}</span>
+                                <span className="text-sm font-medium text-muted-foreground">Port ID:</span>
+                                <span className="text-sm font-medium tabular-nums">#{port.id}</span>
                             </div>
                             <div className="flex justify-between">
                                 <span className="text-sm font-medium text-muted-foreground">Created:</span>
                                 <span className="text-sm font-medium tabular-nums">
-                                    {new Date(vessel.created_at).toLocaleDateString('en-US', {
+                                    {new Date(port.created_at).toLocaleDateString('en-US', {
                                         year: 'numeric',
                                         month: 'long',
                                         day: 'numeric',
@@ -160,7 +185,7 @@ export default function VesselShowPage({ vessel }: { vessel: Vessel }) {
                             <div className="flex justify-between">
                                 <span className="text-sm font-medium text-muted-foreground">Last Updated:</span>
                                 <span className="text-sm font-medium tabular-nums">
-                                    {new Date(vessel.updated_at).toLocaleDateString('en-US', {
+                                    {new Date(port.updated_at).toLocaleDateString('en-US', {
                                         year: 'numeric',
                                         month: 'long',
                                         day: 'numeric',

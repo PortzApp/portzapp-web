@@ -15,34 +15,38 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 import InputError from '@/components/input-error';
 
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Vessels',
-        href: '/vessels',
-    },
-    {
-        title: 'Create Vessel',
-        href: '/vessels/create',
-    },
-];
+export default function EditVesselPage({ vessel }: { vessel: Vessel }) {
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Vessels',
+            href: '/vessels',
+        },
+        {
+            title: vessel.name,
+            href: `/vessels/${vessel.id}`,
+        },
+        {
+            title: 'Edit',
+            href: `/vessels/${vessel.id}/edit`,
+        },
+    ];
 
-export default function VesselsCreatePage() {
     type VesselForm = Omit<Vessel, 'id' | 'owner_id' | 'created_at' | 'updated_at' | 'organization_id'>;
 
-    const { data, setData, post, processing, errors, reset } = useForm<VesselForm>({
-        name: '',
-        imo_number: '',
-        vessel_type: 'tanker',
-        status: 'active',
+    const { data, setData, put, processing, errors } = useForm<VesselForm>({
+        name: vessel.name,
+        imo_number: vessel.imo_number,
+        vessel_type: vessel.vessel_type,
+        status: vessel.status,
     });
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-        post(route('vessels.store'), {
+        put(route('vessels.update', vessel.id), {
             onSuccess: () => {
-                reset();
                 router.visit(route('vessels.index'), {
                     only: ['vessels'],
+                    preserveScroll: true,
                 });
             },
         });
@@ -50,13 +54,13 @@ export default function VesselsCreatePage() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Vessels Page" />
+            <Head title={`Edit ${vessel.name}`} />
 
             <form onSubmit={submit} className="flex flex-col gap-8 p-8">
                 <div className="flex flex-col gap-1">
-                    <h1 className="text-xl font-semibold">Create Vessel</h1>
+                    <h1 className="text-xl font-semibold">Edit Vessel</h1>
                     <p className="text-base text-muted-foreground">
-                        Fill out the form below to create a new vessel. You can specify the vessel name, IMO number, vessel type, and status.
+                        Update the vessel information below. You can modify the vessel name, IMO number, vessel type, and status.
                     </p>
                 </div>
 
@@ -119,10 +123,21 @@ export default function VesselsCreatePage() {
                     </div>
                 </div>
 
-                <Button type="submit" disabled={processing} className="w-fit">
-                    {processing && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
-                    Create Vessel
-                </Button>
+                <div className="flex gap-4">
+                    <Button type="submit" disabled={processing} className="w-fit">
+                        {processing && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
+                        Update Vessel
+                    </Button>
+                    <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => router.visit(route('vessels.index'))}
+                        disabled={processing}
+                        className="w-fit"
+                    >
+                        Cancel
+                    </Button>
+                </div>
             </form>
         </AppLayout>
     );

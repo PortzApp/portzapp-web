@@ -16,18 +16,17 @@ import {
     VisibilityState,
 } from '@tanstack/react-table';
 
+import { DataTablePaginationControls } from '@/components/ui/data-table/data-table-pagination-controls';
+import { DataTableViewOptions } from '@/components/ui/data-table/data-table-view-options';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-
-import { DataTablePaginationControls } from '../primitives/data-table-pagination-controls';
-import { DataTableViewOptions } from '../primitives/data-table-view-options';
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
     data: TData[];
 }
 
-export function VesselsPageDataTable<TData, TValue>({ columns, data }: DataTableProps<TData, TValue>) {
+export function PortsPageDataTable<TData, TValue>({ columns, data }: DataTableProps<TData, TValue>) {
     const [sorting, setSorting] = useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
