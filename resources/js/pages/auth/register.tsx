@@ -5,6 +5,8 @@ import { LoaderCircle } from 'lucide-react';
 
 import { OrganizationBusinessType, UserRoles } from '@/types/enums';
 
+import { getRoleLabel } from '@/utils/role-labels';
+
 import AuthLayout from '@/layouts/auth-layout';
 
 import { Button } from '@/components/ui/button';
@@ -224,11 +226,27 @@ export default function Register() {
                         <RadioGroup value={data.user_role} onValueChange={handleUserRoleChange} className="flex flex-col gap-2">
                             <div className="flex items-center space-x-2">
                                 <RadioGroupItem value={UserRoles.ADMIN} id="admin_role" />
-                                <Label htmlFor="admin_role">Admin (Company Owner/Manager)</Label>
+                                <Label htmlFor="admin_role">{getRoleLabel(UserRoles.ADMIN)}</Label>
                             </div>
                             <div className="flex items-center space-x-2">
-                                <RadioGroupItem value={UserRoles.VIEWER} id="member_role" />
-                                <Label htmlFor="member_role">Member (Employee)</Label>
+                                <RadioGroupItem value={UserRoles.CEO} id="ceo_role" />
+                                <Label htmlFor="ceo_role">{getRoleLabel(UserRoles.CEO)}</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value={UserRoles.MANAGER} id="manager_role" />
+                                <Label htmlFor="manager_role">{getRoleLabel(UserRoles.MANAGER)}</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value={UserRoles.OPERATIONS} id="operations_role" />
+                                <Label htmlFor="operations_role">{getRoleLabel(UserRoles.OPERATIONS)}</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value={UserRoles.FINANCE} id="finance_role" />
+                                <Label htmlFor="finance_role">{getRoleLabel(UserRoles.FINANCE)}</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value={UserRoles.VIEWER} id="viewer_role" />
+                                <Label htmlFor="viewer_role">{getRoleLabel(UserRoles.VIEWER)}</Label>
                             </div>
                         </RadioGroup>
                         <InputError message={errors.user_role} />

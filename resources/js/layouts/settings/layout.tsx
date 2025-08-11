@@ -13,6 +13,11 @@ import Heading from '@/components/heading';
 
 const sidebarNavItems: NavItem[] = [
     {
+        title: 'Organization',
+        href: '/settings/organization',
+        icon: null,
+    },
+    {
         title: 'Profile',
         href: '/settings/profile',
         icon: null,
