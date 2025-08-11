@@ -20,6 +20,7 @@ interface Auth {
         order: PolicyAbilities;
         vessel: PolicyAbilities;
         port: PolicyAbilities;
+        organization: PolicyAbilities;
     };
 }
 

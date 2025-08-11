@@ -1,5 +1,5 @@
 import { UserRoles } from '@/types/enums';
-import { OrderBase, Organization, Port, Service, ServiceCategory, User, Vessel } from '@/types/models';
+import { OrderBase, Organization, OrganizationWithMemberCount, Port, Service, ServiceCategory, User, Vessel } from '@/types/models';
 
 // Generic type for adding relationships
 export type WithRelation<T, K extends string, R> = T & Record<K, R>;
@@ -8,6 +8,7 @@ export type WithRelation<T, K extends string, R> = T & Record<K, R>;
 export type UserWithOrganizations = WithRelation<User, 'organizations', Organization[]>;
 export type UserWithPivot = User & { pivot: { role: UserRoles } };
 export type OrganizationWithUsers = WithRelation<Organization, 'users', UserWithPivot[]>;
+export type OrganizationWithUsersAndCount = WithRelation<OrganizationWithMemberCount, 'users', UserWithPivot[]>;
 export type ServiceWithOrganization = WithRelation<Service, 'organization', Organization>;
 export type ServiceWithPort = WithRelation<Service, 'port', Port>;
 export type ServiceWithCategory = WithRelation<Service, 'category', ServiceCategory>;

@@ -1,5 +1,5 @@
 import { router, usePage } from '@inertiajs/react';
-import { ChevronsUpDown, ClipboardCheck, LayoutGrid, ListCheck, MapPin, Package, Plus, Ship } from 'lucide-react';
+import { Building2, ChevronsUpDown, ClipboardCheck, LayoutGrid, ListCheck, MapPin, Package, Plus, Ship } from 'lucide-react';
 import { toast } from 'sonner';
 
 import type { NavItem, SharedData } from '@/types';
@@ -46,6 +46,11 @@ const mainNavItemsAsAdmin: NavItem[] = [
         title: 'Ports',
         href: '/ports',
         icon: MapPin,
+    },
+    {
+        title: 'Organizations',
+        href: '/organizations',
+        icon: Building2,
     },
 ];
 

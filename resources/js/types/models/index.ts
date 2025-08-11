@@ -20,6 +20,12 @@ export interface Organization extends BaseModel {
     name: string;
     registration_code: string;
     business_type: OrganizationBusinessType;
+    users_count?: number;
+}
+
+// Organization type that includes member count
+export interface OrganizationWithMemberCount extends Organization {
+    member_count: number;
 }
 
 export interface Vessel extends BaseModel {
