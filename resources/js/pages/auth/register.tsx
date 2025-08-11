@@ -4,6 +4,7 @@ import { Head, useForm } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 
 import { OrganizationBusinessType, UserRoles } from '@/types/enums';
+
 import { getRoleLabel } from '@/utils/role-labels';
 
 import AuthLayout from '@/layouts/auth-layout';
