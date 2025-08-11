@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Organization;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -45,6 +46,7 @@ class OrganizationController extends Controller
      */
     public function edit()
     {
+        /** @var User $user */
         $user = auth()->user();
 
         // Check if the user has a current organization
@@ -53,6 +55,7 @@ class OrganizationController extends Controller
         }
 
         // Get the user's current organization
+        /** @var Organization|null $currentOrganization */
         $currentOrganization = $user->currentOrganization;
 
         if (! $currentOrganization) {
