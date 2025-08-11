@@ -13,7 +13,7 @@ import {
     RowSelectionState,
     SortingState,
     useReactTable,
-    VisibilityState
+    VisibilityState,
 } from '@tanstack/react-table';
 
 import { DataTablePaginationControls } from '@/components/ui/data-table/data-table-pagination-controls';
