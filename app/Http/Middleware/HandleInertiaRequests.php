@@ -105,6 +105,13 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $userAuth,
                 'permissions' => fn () => $user ? [
+                    'organization' => [
+                        'view_any' => $user->can('view-any', Organization::class),
+                        'view' => $user->can('view', Organization::class),
+                        'create' => $user->can('create', Organization::class),
+                        'edit' => $user->can('update', Organization::class),
+                        'delete' => $user->can('delete', Organization::class),
+                    ],
                     'service' => [
                         'view_any' => $user->can('view-any', Service::class),
                         'view' => $user->can('view', Service::class),
