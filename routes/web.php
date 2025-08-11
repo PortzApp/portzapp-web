@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\OrganizationController;
 use App\Http\Controllers\PortController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\SwitchOrganization;
@@ -43,13 +44,15 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::put('vessels/{vessel}', [VesselController::class, 'update'])->name('vessels.update');
     Route::delete('vessels/{vessel}', [VesselController::class, 'destroy'])->name('vessels.destroy');
 
-    Route::get('ports', [PortController::class, 'index'])->name('ports.index');
-    Route::get('ports/create', [PortController::class, 'create'])->name('ports.create');
-    Route::get('ports/{port}', [PortController::class, 'show'])->name('ports.show');
-    Route::post('ports', [PortController::class, 'store'])->name('ports.store');
-    Route::get('ports/{port}/edit', [PortController::class, 'edit'])->name('ports.edit');
-    Route::put('ports/{port}', [PortController::class, 'update'])->name('ports.update');
-    Route::delete('ports/{port}', [PortController::class, 'destroy'])->name('ports.destroy');
+    // Ports management routes (restricted to portzapp_team business type)
+    Route::middleware('portzapp.team')->group(function () {
+        Route::resource('ports', PortController::class);
+    });
+
+    // Organization management routes (restricted to portzapp_team business type)
+    Route::middleware('portzapp.team')->group(function () {
+        Route::resource('organizations', OrganizationController::class);
+    });
 });
 
 require __DIR__.'/settings.php';
