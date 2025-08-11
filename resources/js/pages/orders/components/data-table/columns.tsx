@@ -7,9 +7,9 @@ import { OrderWithRelations } from '@/types/models';
 import { cn } from '@/lib/utils';
 
 import { Badge } from '@/components/ui/badge';
+import { DataTableColumnHeader } from '@/components/ui/data-table/data-table-column-header';
 
 import { VesselTypeBadge } from '@/components/badges';
-import { DataTableColumnHeader } from '@/components/data-table/primitives/data-table-column-header';
 
 export const columns: ColumnDef<OrderWithRelations>[] = [
     {

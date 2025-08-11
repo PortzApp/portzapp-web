@@ -16,11 +16,10 @@ import {
     VisibilityState
 } from '@tanstack/react-table';
 
+import { DataTablePaginationControls } from '@/components/ui/data-table/data-table-pagination-controls';
+import { DataTableViewOptions } from '@/components/ui/data-table/data-table-view-options';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-
-import { DataTablePaginationControls } from '@/components/data-table/primitives/data-table-pagination-controls';
-import { DataTableViewOptions } from '@/components/data-table/primitives/data-table-view-options';
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];

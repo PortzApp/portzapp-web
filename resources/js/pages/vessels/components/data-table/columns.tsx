@@ -4,9 +4,9 @@ import { ColumnDef } from '@tanstack/react-table';
 import { Vessel } from '@/types/models';
 
 import { Checkbox } from '@/components/ui/checkbox';
+import { DataTableColumnHeader } from '@/components/ui/data-table/data-table-column-header';
 
 import { VesselStatusBadge, VesselTypeBadge } from '@/components/badges';
-import { DataTableColumnHeader } from '@/components/data-table/primitives/data-table-column-header';
 
 export const columns: ColumnDef<Vessel>[] = [
     {
