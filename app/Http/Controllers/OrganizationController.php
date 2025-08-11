@@ -118,7 +118,7 @@ class OrganizationController extends Controller
         $organization->load('users');
 
         // Get all users that are not already in this organization for the add member functionality
-        $availableUsers = User::whereDoesntHave('organizations', function ($query) use ($organization) {
+        $availableUsers = User::whereDoesntHave('organizations', function ($query) use ($organization): void {
             $query->where('organization_id', $organization->id);
         })->get(['id', 'first_name', 'last_name', 'email']);
 
