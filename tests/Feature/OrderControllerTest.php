@@ -112,7 +112,7 @@ beforeEach(function (): void {
 
 test('vessel owner admin can view orders index', function (): void {
     $response = $this->actingAs($this->vesselOwnerAdmin)
-        ->get(route('orders'));
+        ->get(route('orders.index'));
 
     $response->assertStatus(200);
     $response->assertInertia(fn ($page) => $page->component('orders/index')
@@ -123,7 +123,7 @@ test('vessel owner admin can view orders index', function (): void {
 
 test('vessel owner member can view orders index', function (): void {
     $response = $this->actingAs($this->vesselOwnerMember)
-        ->get(route('orders'));
+        ->get(route('orders.index'));
 
     $response->assertStatus(200);
     $response->assertInertia(fn ($page) => $page->component('orders/index')
@@ -133,7 +133,7 @@ test('vessel owner member can view orders index', function (): void {
 
 test('shipping agency admin can view orders index', function (): void {
     $response = $this->actingAs($this->shippingAgencyAdmin)
-        ->get(route('orders'));
+        ->get(route('orders.index'));
 
     $response->assertStatus(200);
     $response->assertInertia(fn ($page) => $page->component('orders/index')
@@ -144,7 +144,7 @@ test('shipping agency admin can view orders index', function (): void {
 
 test('shipping agency member can view orders index', function (): void {
     $response = $this->actingAs($this->shippingAgencyMember)
-        ->get(route('orders'));
+        ->get(route('orders.index'));
 
     $response->assertStatus(200);
     $response->assertInertia(fn ($page) => $page->component('orders/index')
@@ -154,7 +154,7 @@ test('shipping agency member can view orders index', function (): void {
 
 test('platform admin can view all orders', function (): void {
     $response = $this->actingAs($this->platformAdmin)
-        ->get(route('orders'));
+        ->get(route('orders.index'));
 
     $response->assertStatus(200);
     $response->assertInertia(fn ($page) => $page->component('orders/index')
@@ -170,7 +170,7 @@ test('orders are filtered by user organization involvement', function (): void {
     ]);
 
     $response = $this->actingAs($userInSecondOrg)
-        ->get(route('orders'));
+        ->get(route('orders.index'));
 
     $response->assertStatus(200);
 
@@ -434,7 +434,7 @@ test('user in multiple organizations sees orders from all their orgs', function 
     ]);
 
     $response = $this->actingAs($this->vesselOwnerAdmin)
-        ->get(route('orders'));
+        ->get(route('orders.index'));
 
     $response->assertStatus(200);
 
