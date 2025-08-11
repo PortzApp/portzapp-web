@@ -18,7 +18,7 @@ import { Button, buttonVariants } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
-import { ServicesPageColumnActions } from '@/components/data-table/page-services/column-actions';
+import { ServicesPageColumnActions } from './components/data-table/column-actions';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
