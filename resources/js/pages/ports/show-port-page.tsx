@@ -25,7 +25,7 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 
-export default function PortShowPage({ port }: { port: Port }) {
+export default function ShowPortPage({ port }: { port: Port }) {
     const { auth } = usePage<SharedData>().props;
 
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);

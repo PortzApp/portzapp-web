@@ -26,7 +26,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function PortsCreatePage() {
+export default function CreatePortPage() {
     type PortForm = Omit<Port, 'id' | 'created_at' | 'updated_at'>;
 
     const { data, setData, post, processing, errors, reset } = useForm<PortForm>({
