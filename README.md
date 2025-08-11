@@ -25,6 +25,44 @@ This is the web app for the PortzApp project, built with Laravel + React.
 - [via Docker] Mailpit Web UI: [`8025`](http://localhost:8025) (accessible, for testing emails locally)
 - [via Docker] Mailpit SMTP: `1025` (only for sending emails for local dev in `.env`)
 
+### Seeded Users
+
+Shipping Agency Users:
+
+```
+admin@shipping1.com
+password
+
+viewer@shipping1.com
+password
+
+admin@shipping2.com
+password
+```
+
+Vessel Owner Users:
+
+```
+admin@vessels1.com
+password
+
+viewer@vessels1.com
+password
+
+admin@vessels2.com
+password
+```
+
+PortzApp Team User:
+
+```
+admin@portzapp.com
+password
+
+viewer@portzapp.com
+password
+```
+
 ## Getting Started
 
 ### Prerequisites
