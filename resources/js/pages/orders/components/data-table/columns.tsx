@@ -1,3 +1,4 @@
+import { OrdersPageColumnActions } from '@/pages/orders/components/data-table/column-actions';
 import { ColumnDef } from '@tanstack/react-table';
 
 import { VesselType } from '@/types/enums';
@@ -8,7 +9,6 @@ import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 
 import { VesselTypeBadge } from '@/components/badges';
-import { OrdersPageColumnActions } from '@/components/data-table/page-orders/column-actions';
 import { DataTableColumnHeader } from '@/components/data-table/primitives/data-table-column-header';
 
 export const columns: ColumnDef<OrderWithRelations>[] = [
