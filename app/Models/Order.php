@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
 /**
@@ -80,6 +81,11 @@ class Order extends Model
         return $this->belongsTo(Organization::class, 'placed_by_organization_id');
     }
 
+    public function orderGroups(): HasMany
+    {
+        return $this->hasMany(OrderGroup::class);
+    }
+
     public function services(): BelongsToMany
     {
         return $this->belongsToMany(Service::class, 'order_service')
@@ -88,11 +94,19 @@ class Order extends Model
     }
 
     /**
+     * Calculate the total amount for this order from all order group subtotals.
+     */
+    public function calculateTotalAmount(): float
+    {
+        return (float) $this->orderGroups()->sum('subtotal_amount');
+    }
+
+    /**
      * Calculate the total price for this order from all associated services.
      */
     public function getTotalPriceAttribute(): float
     {
-        return (float) $this->services()->sum('price');
+        return $this->total_amount ?? $this->calculateTotalAmount();
     }
 
     /**
@@ -100,8 +114,8 @@ class Order extends Model
      */
     public function getProvidingOrganizationsAttribute(): \Illuminate\Support\Collection
     {
-        return $this->services()->with('organization')->get()
-            ->pluck('organization')
+        return $this->orderGroups()->with('shippingAgencyOrganization')->get()
+            ->pluck('shippingAgencyOrganization')
             ->unique('id')
             ->values();
     }
