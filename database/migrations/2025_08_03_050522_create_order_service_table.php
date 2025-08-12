@@ -12,12 +12,16 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('order_service', function (Blueprint $table) {
-            $table->foreignUlid('order_id')->constrained()->cascadeOnDelete();
-            $table->foreignUlid('service_id')->constrained()->cascadeOnDelete();
+            $table->foreignUlid('order_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignUlid('order_group_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignUlid('service_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->integer('quantity');
+            $table->decimal('unit_price', 10, 2);
+            $table->decimal('total_price', 10, 2);
             $table->timestamps();
 
             // Unique composite index to prevent duplicate entries
-            $table->unique(['order_id', 'service_id']);
+            $table->unique(['order_id', 'order_group_id', 'service_id']);
         });
     }
 

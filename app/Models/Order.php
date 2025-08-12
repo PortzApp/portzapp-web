@@ -83,7 +83,7 @@ class Order extends Model
     public function services(): BelongsToMany
     {
         return $this->belongsToMany(Service::class, 'order_service')
-            ->as('orderService')
+            ->withPivot('order_group_id', 'quantity', 'unit_price', 'total_price')
             ->withTimestamps();
     }
 
