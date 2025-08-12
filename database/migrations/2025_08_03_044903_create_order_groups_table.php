@@ -18,6 +18,8 @@ return new class extends Migration
             $table->dateTime('accepted_at')->nullable();
             $table->dateTime('rejected_at')->nullable();
             $table->foreignUlid('accepted_by_user_id')->nullable()->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->text('response_notes')->nullable();
+            $table->text('rejection_reason')->nullable();
             $table->timestamps();
         });
     }

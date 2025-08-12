@@ -22,6 +22,8 @@ class OrderGroup extends Model
         'accepted_at',
         'rejected_at',
         'accepted_by_user_id',
+        'response_notes',
+        'rejection_reason',
     ];
 
     public function order(): BelongsTo
