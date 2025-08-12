@@ -57,6 +57,7 @@ class Order extends Model
         'placed_by_organization_id',
         'notes',
         'status',
+        'total_amount',
     ];
 
     public function vessel(): BelongsTo
