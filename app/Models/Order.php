@@ -120,6 +120,35 @@ class Order extends Model
             ->values();
     }
 
+    /**
+     * Check if all order groups are confirmed/accepted
+     */
+    public function isFullyConfirmed(): bool
+    {
+        if ($this->orderGroups()->count() === 0) {
+            return false;
+        }
+
+        return $this->orderGroups()->where('status', \App\Enums\OrderGroupStatus::ACCEPTED)->count()
+               === $this->orderGroups()->count();
+    }
+
+    /**
+     * Check if at least one order group is confirmed/accepted
+     */
+    public function isPartiallyConfirmed(): bool
+    {
+        return $this->orderGroups()->where('status', \App\Enums\OrderGroupStatus::ACCEPTED)->exists();
+    }
+
+    /**
+     * Get pending order groups
+     */
+    public function getPendingGroups()
+    {
+        return $this->orderGroups()->where('status', \App\Enums\OrderGroupStatus::PENDING)->get();
+    }
+
     protected function casts(): array
     {
         return [
