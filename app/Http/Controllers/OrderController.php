@@ -148,6 +148,9 @@ class OrderController extends Controller
             'port',
             'placedByUser',
             'placedByOrganization',
+            'orderGroups.shippingAgencyOrganization',
+            'orderGroups.services.category',
+            'orderGroups.acceptedByUser',
             'services.organization',
         ]);
 
@@ -222,5 +225,46 @@ class OrderController extends Controller
         $order->delete();
 
         return to_route('orders.index')->with('message', 'Order deleted successfully!');
+    }
+
+    /**
+     * Track order with real-time status updates
+     */
+    public function track(Order $order)
+    {
+        Gate::authorize('view', $order);
+
+        $order->load([
+            'vessel.organization',
+            'port',
+            'placedByUser',
+            'placedByOrganization',
+            'orderGroups' => function ($query) {
+                $query->with([
+                    'shippingAgencyOrganization',
+                    'services.category',
+                    'acceptedByUser',
+                ])->orderBy('group_number');
+            },
+        ]);
+
+        // Calculate progress statistics
+        $totalGroups = $order->orderGroups->count();
+        $acceptedGroups = $order->orderGroups->where('status', \App\Enums\OrderGroupStatus::ACCEPTED)->count();
+        $rejectedGroups = $order->orderGroups->where('status', \App\Enums\OrderGroupStatus::REJECTED)->count();
+        $pendingGroups = $order->orderGroups->where('status', \App\Enums\OrderGroupStatus::PENDING)->count();
+
+        $progress = [
+            'total' => $totalGroups,
+            'accepted' => $acceptedGroups,
+            'rejected' => $rejectedGroups,
+            'pending' => $pendingGroups,
+            'completion_percentage' => $totalGroups > 0 ? round(($acceptedGroups / $totalGroups) * 100, 1) : 0,
+        ];
+
+        return Inertia::render('orders/track-order-page', [
+            'order' => $order,
+            'progress' => $progress,
+        ]);
     }
 }
