@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\AgencyOrderController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\OrderWizardController;
 use App\Http\Controllers\OrganizationController;
 use App\Http\Controllers\PortController;
 use App\Http\Controllers\ServiceController;
@@ -25,6 +27,30 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
         'services' => ServiceController::class,
         'orders' => OrderController::class,
     ]);
+
+    // Order Wizard Routes
+    Route::prefix('orders/wizard')->name('orders.wizard.')->group(function (): void {
+        Route::get('/', [OrderWizardController::class, 'start'])->name('start');
+        Route::post('/', [OrderWizardController::class, 'storeStart'])->name('store-start');
+        Route::get('/categories', [OrderWizardController::class, 'categories'])->name('categories');
+        Route::post('/categories', [OrderWizardController::class, 'storeCategories'])->name('store-categories');
+        Route::get('/services/{category}', [OrderWizardController::class, 'services'])->name('services');
+        Route::post('/services/{category}', [OrderWizardController::class, 'storeService'])->name('store-service');
+        Route::get('/summary', [OrderWizardController::class, 'summary'])->name('summary');
+        Route::post('/confirm', [OrderWizardController::class, 'confirm'])->name('confirm');
+        Route::get('/cancel', [OrderWizardController::class, 'cancel'])->name('cancel');
+    });
+
+    // Order tracking route
+    Route::get('/orders/{order}/track', [OrderController::class, 'track'])->name('orders.track');
+
+    // Agency Order Management Routes
+    Route::prefix('agency/orders')->name('agency.orders.')->group(function (): void {
+        Route::get('/', [AgencyOrderController::class, 'index'])->name('index');
+        Route::get('/{orderGroup}', [AgencyOrderController::class, 'show'])->name('show');
+        Route::post('/{orderGroup}/accept', [AgencyOrderController::class, 'accept'])->name('accept');
+        Route::post('/{orderGroup}/reject', [AgencyOrderController::class, 'reject'])->name('reject');
+    });
 
     // Ports management routes (restricted to portzapp_team business type)
     Route::middleware('portzapp.team')->group(function (): void {
