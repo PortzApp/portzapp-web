@@ -17,11 +17,11 @@ import InputError from '@/components/input-error';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Orders',
-        href: route('orders'),
+        href: route('orders.index'),
     },
     {
         title: 'Create Order',
-        href: '/orders/create',
+        href: route('orders.create'),
     },
 ];
 

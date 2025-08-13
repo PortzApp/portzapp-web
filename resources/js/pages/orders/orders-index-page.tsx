@@ -13,7 +13,7 @@ import { OrdersPageDataTable } from './components/data-table/data-table';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Orders',
-        href: route('orders'),
+        href: route('orders.index'),
     },
 ];
 
@@ -44,7 +44,3 @@ export default function OrdersIndexPage({ orders }: { orders: Array<OrderWithRel
         </AppLayout>
     );
 }
-
-// export default function Page() {
-//     return <p>Hello world</p>;
-// }

@@ -55,9 +55,9 @@ export function OrdersPageDataTable<TData, TValue>({ columns, data }: DataTableP
         <div>
             <div className="flex items-center py-4">
                 <Input
-                    placeholder="Search by order ID..."
-                    value={(table.getColumn('id')?.getFilterValue() as string) ?? ''}
-                    onChange={(event) => table.getColumn('id')?.setFilterValue(event.target.value)}
+                    placeholder="Search by order number..."
+                    value={(table.getColumn('order_number')?.getFilterValue() as string) ?? ''}
+                    onChange={(event) => table.getColumn('order_number')?.setFilterValue(event.target.value)}
                     className="max-w-sm"
                 />
 
