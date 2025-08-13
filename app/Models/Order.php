@@ -96,6 +96,16 @@ class Order extends Model
     }
 
     /**
+     * Get all services through order groups using a proper relationship.
+     */
+    public function allServices()
+    {
+        return Service::whereHas('orderGroups', function ($query) {
+            $query->where('order_id', $this->id);
+        })->with('organization');
+    }
+
+    /**
      * Calculate the total price for this order from all order groups.
      */
     public function getTotalPriceAttribute(): float

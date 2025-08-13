@@ -160,11 +160,16 @@ class OrderController extends Controller
             'placedByUser',
             'placedByOrganization',
             'orderGroups.fulfillingOrganization',
-            'orderGroups.services',
+            'orderGroups.services.organization',
         ]);
 
+        // Get all services through order groups
+        $allServices = $order->allServices()->get();
+
         return Inertia::render('orders/show-order-page', [
-            'order' => $order,
+            'order' => array_merge($order->toArray(), [
+                'all_services' => $allServices,
+            ]),
         ]);
     }
 

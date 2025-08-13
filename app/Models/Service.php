@@ -100,6 +100,15 @@ class Service extends Model
     }
 
     /**
+     * Get the order groups for the current service.
+     */
+    public function orderGroups(): BelongsToMany
+    {
+        return $this->belongsToMany(OrderGroup::class, 'order_group_service')
+            ->withTimestamps();
+    }
+
+    /**
      * Scope a query to only include active services.
      */
     #[Scope]
