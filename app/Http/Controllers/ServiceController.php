@@ -71,6 +71,7 @@ class ServiceController extends Controller
             'price' => $validated['price'],
             'status' => $validated['status'],
             'port_id' => $validated['port_id'],
+            'service_category_id' => $validated['service_category_id'],
         ]);
 
         // Load relationships for the created service
@@ -154,7 +155,7 @@ class ServiceController extends Controller
     {
         Gate::authorize('delete', $service);
 
-        $serviceId = $service->id;
+        $serviceId = (string) $service->id;
         $serviceName = $service->name;
 
         $service->delete();

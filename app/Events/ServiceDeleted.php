@@ -18,7 +18,7 @@ class ServiceDeleted implements ShouldBroadcastNow
      */
     public function __construct(
         public User $user,
-        public int $serviceId,
+        public string $serviceId,
         public string $serviceName,
     ) {}
 
