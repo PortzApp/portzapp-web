@@ -35,7 +35,7 @@ export default function ShowVesselPage({ vessel }: { vessel: Vessel }) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Vessels',
-            href: '/vessels',
+            href: route('vessels.index'),
         },
         {
             title: vessel.name,

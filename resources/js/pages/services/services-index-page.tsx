@@ -23,7 +23,7 @@ import { ServicesPageColumnActions } from './components/data-table/column-action
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Services',
-        href: '/services',
+        href: route('services.index'),
     },
 ];
 
@@ -160,7 +160,7 @@ export default function ServicesIndexPage({ services: initialServices, ports, se
                     <h1 className="text-2xl font-bold">Services</h1>
 
                     {auth.user.current_organization?.business_type === 'shipping_agency' && (
-                        <Link href={'/services/create'} className={buttonVariants({ variant: 'default' })}>
+                        <Link href={route('services.create')} className={buttonVariants({ variant: 'default' })}>
                             <Plus className="mr-2 h-4 w-4" />
                             Add Service
                         </Link>

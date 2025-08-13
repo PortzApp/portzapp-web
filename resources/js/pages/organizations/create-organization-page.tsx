@@ -19,11 +19,11 @@ import InputError from '@/components/input-error';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Organizations',
-        href: '/organizations',
+        href: route('organizations.index'),
     },
     {
         title: 'Create Organization',
-        href: '/organizations/create',
+        href: route('organizations.create'),
     },
 ];
 

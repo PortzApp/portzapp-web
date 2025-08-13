@@ -70,7 +70,7 @@ export default function ShowOrganizationPage({ organization }: { organization: O
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Organizations',
-            href: '/organizations',
+            href: route('organizations.index'),
         },
         {
             title: organization.name,

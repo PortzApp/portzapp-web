@@ -13,7 +13,7 @@ import { PortsPageDataTable } from './components/data-table/data-table';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Ports',
-        href: '/ports',
+        href: route('ports.index'),
     },
 ];
 

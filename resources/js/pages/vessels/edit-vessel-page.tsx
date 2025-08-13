@@ -19,7 +19,7 @@ export default function EditVesselPage({ vessel }: { vessel: Vessel }) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Vessels',
-            href: '/vessels',
+            href: route('vessels.index'),
         },
         {
             title: vessel.name,
