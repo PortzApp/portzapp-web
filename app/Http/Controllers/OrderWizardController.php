@@ -14,6 +14,7 @@ use App\Models\Vessel;
 use App\Models\WizardSession;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class OrderWizardController extends Controller
@@ -287,7 +288,9 @@ class OrderWizardController extends Controller
             'notes' => ['nullable', 'string', 'max:1000'],
         ]);
 
-        DB::transaction(function () use ($session, $validated) {
+        $orderId = null;
+
+        DB::transaction(function () use ($session, $validated, &$orderId) {
             // Get vessel owner organization
             $vessel = Vessel::find($session->data['vessel_id']);
 
@@ -359,10 +362,37 @@ class OrderWizardController extends Controller
 
             // Delete the wizard session
             $session->delete();
+
+            // Store the order ID for the confirmation page
+            $orderId = $order->id;
         });
 
-        return redirect()->route('orders.index')
-            ->with('message', 'Order created successfully and sent to agencies for approval!');
+        return redirect()->route('orders.wizard.confirmation', $orderId);
+    }
+
+    /**
+     * Show order confirmation page
+     */
+    public function confirmation(Order $order)
+    {
+        // Ensure user can view this order
+        Gate::authorize('view');
+
+        // Load all relationships for the confirmation page
+        $order->load([
+            'vessel.organization',
+            'port',
+            'placedByUser',
+            'placedByOrganization',
+            'orderGroups' => function ($query) {
+                $query->with(['shippingAgencyOrganization', 'services']);
+            },
+            'services',
+        ]);
+
+        return Inertia::render('orders/wizard/confirmation', [
+            'order' => $order,
+        ]);
     }
 
     /**
@@ -370,7 +400,7 @@ class OrderWizardController extends Controller
      */
     public function cancel()
     {
-        WizardSession::where('user_id', auth()->id())->delete();
+        WizardSession::where('user_id', auth()->user()->id)->delete();
 
         return redirect()->route('orders.index')
             ->with('message', 'Order wizard cancelled.');
