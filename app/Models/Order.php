@@ -131,7 +131,7 @@ class Order extends Model
         $groupStatuses = $this->orderGroups->pluck('status');
 
         if ($groupStatuses->isEmpty()) {
-            return $this->status;
+            return OrderStatus::from($this->status);
         }
 
         $allAccepted = $groupStatuses->every(fn ($status) => $status === OrderGroupStatus::ACCEPTED);

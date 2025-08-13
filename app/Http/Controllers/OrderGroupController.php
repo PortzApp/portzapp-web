@@ -62,8 +62,16 @@ class OrderGroupController extends Controller
             'services',
         ]);
 
+        // Load sibling order groups for context (excluding current one)
+        $siblingOrderGroups = OrderGroup::where('order_id', $orderGroup->order_id)
+            ->where('id', '!=', $orderGroup->id)
+            ->with(['fulfillingOrganization', 'services'])
+            ->get();
+
         return Inertia::render('order-groups/show-order-group-page', [
             'orderGroup' => $orderGroup,
+            'parentOrder' => $orderGroup->order,
+            'siblingOrderGroups' => $siblingOrderGroups,
         ]);
     }
 

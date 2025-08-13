@@ -1,8 +1,10 @@
 <?php
 
+use App\Enums\OrderGroupStatus;
 use App\Enums\OrganizationBusinessType;
 use App\Enums\UserRoles;
 use App\Models\Order;
+use App\Models\OrderGroup;
 use App\Models\Organization;
 use App\Models\Port;
 use App\Models\Service;
@@ -73,7 +75,13 @@ beforeEach(function (): void {
         'placed_by_user_id' => $this->vesselOwnerAdmin->id,
         'placed_by_organization_id' => $this->vesselOwnerOrg->id,
     ]);
-    $this->orderFromVesselOwner->services()->attach($this->service);
+    // Create order groups for shipping agencies to have access
+    $this->orderGroup1 = OrderGroup::factory()->create([
+        'order_id' => $this->orderFromVesselOwner->id,
+        'fulfilling_organization_id' => $this->shippingAgencyOrg->id,
+        'status' => OrderGroupStatus::PENDING,
+    ]);
+    $this->orderGroup1->services()->attach($this->service);
 
     $this->orderFromVesselOwner2 = Order::factory()->create([
         'vessel_id' => $this->vessel2->id,
@@ -81,7 +89,13 @@ beforeEach(function (): void {
         'placed_by_user_id' => $this->vesselOwnerAdmin2->id,
         'placed_by_organization_id' => $this->vesselOwnerOrg2->id,
     ]);
-    $this->orderFromVesselOwner2->services()->attach($this->service2);
+
+    $this->orderGroup2 = OrderGroup::factory()->create([
+        'order_id' => $this->orderFromVesselOwner2->id,
+        'fulfilling_organization_id' => $this->shippingAgencyOrg2->id,
+        'status' => OrderGroupStatus::PENDING,
+    ]);
+    $this->orderGroup2->services()->attach($this->service2);
 });
 
 describe('OrderPolicy viewAny', function (): void {

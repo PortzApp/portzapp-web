@@ -1,9 +1,11 @@
 <?php
 
+use App\Enums\OrderGroupStatus;
 use App\Enums\OrganizationBusinessType;
 use App\Enums\ServiceStatus;
 use App\Enums\UserRoles;
 use App\Models\Order;
+use App\Models\OrderGroup;
 use App\Models\Organization;
 use App\Models\Port;
 use App\Models\Service;
@@ -105,8 +107,13 @@ beforeEach(function (): void {
         'placed_by_organization_id' => $this->vesselOwnerOrg->id,
         'notes' => 'Test order',
     ]);
-    // Attach the service via pivot table
-    $this->order->services()->attach($this->service->id);
+    // Create order group for shipping agency to have access
+    $this->orderGroup = OrderGroup::factory()->create([
+        'order_id' => $this->order->id,
+        'fulfilling_organization_id' => $this->shippingAgencyOrg->id,
+        'status' => OrderGroupStatus::PENDING,
+    ]);
+    $this->orderGroup->services()->attach($this->service->id);
 
     $this->orderFromOtherOrgs = Order::factory()->create([
         'vessel_id' => $this->vessel2->id,
@@ -139,25 +146,18 @@ test('vessel owner member can view orders index', function (): void {
     );
 });
 
-test('shipping agency admin can view orders index', function (): void {
+test('shipping agency admin is redirected to order groups', function (): void {
     $response = $this->actingAs($this->shippingAgencyAdmin)
         ->get(route('orders.index'));
 
-    $response->assertStatus(200);
-    $response->assertInertia(fn ($page) => $page->component('orders/orders-index-page')
-        ->has('orders', 1)
-        ->where('orders.0.id', $this->order->id)
-    );
+    $response->assertRedirect(route('order-groups.index'));
 });
 
-test('shipping agency member can view orders index', function (): void {
+test('shipping agency member is redirected to order groups', function (): void {
     $response = $this->actingAs($this->shippingAgencyMember)
         ->get(route('orders.index'));
 
-    $response->assertStatus(200);
-    $response->assertInertia(fn ($page) => $page->component('orders/orders-index-page')
-        ->has('orders', 1)
-    );
+    $response->assertRedirect(route('order-groups.index'));
 });
 
 test('platform admin can view all orders', function (): void {
@@ -209,10 +209,13 @@ test('vessel owner admin can create order', function (): void {
         'notes' => 'New test order',
     ]);
 
-    // Check that the service is attached via pivot table
+    // Check that OrderGroups were created and services attached to groups
     $newOrder = Order::where('notes', 'New test order')->first();
-    expect($newOrder->services)->toHaveCount(1);
-    expect($newOrder->services->first()->id)->toBe($this->service->id);
+    expect($newOrder->orderGroups)->toHaveCount(1);
+
+    $orderGroup = $newOrder->orderGroups->first();
+    expect($orderGroup->services)->toHaveCount(1);
+    expect($orderGroup->services->first()->id)->toBe($this->service->id);
 });
 
 test('vessel owner member cannot create order', function (): void {
@@ -296,7 +299,7 @@ test('shipping agency admin can view order details for their services', function
 test('vessel owner admin can update own order', function (): void {
     $updateData = [
         'notes' => 'Updated order notes',
-        'status' => 'accepted',
+        'status' => 'confirmed',
     ];
 
     $response = $this->actingAs($this->vesselOwnerAdmin)
@@ -314,7 +317,7 @@ test('vessel owner admin can update own order', function (): void {
 test('vessel owner member cannot update own order', function (): void {
     $updateData = [
         'notes' => 'Member updated notes',
-        'status' => 'pending',
+        'status' => 'draft',
     ];
 
     $response = $this->actingAs($this->vesselOwnerMember)
@@ -325,7 +328,7 @@ test('vessel owner member cannot update own order', function (): void {
 
 test('shipping agency admin cannot update order', function (): void {
     $updateData = [
-        'status' => 'completed',
+        'status' => 'confirmed',
         'notes' => 'Service completed',
     ];
 

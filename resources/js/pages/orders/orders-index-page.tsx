@@ -13,7 +13,7 @@ import { OrdersPageDataTable } from './components/data-table/data-table';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Orders',
-        href: route('orders'),
+        href: route('orders.index'),
     },
 ];
 

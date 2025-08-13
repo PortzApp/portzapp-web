@@ -1,11 +1,20 @@
 export const OrderStatus = {
-    PENDING: 'pending',
-    ACCEPTED: 'accepted',
-    IN_PROGRESS: 'in_progress',
-    COMPLETED: 'completed',
+    DRAFT: 'draft',
+    PENDING_AGENCY_CONFIRMATION: 'pending_agency_confirmation',
+    PARTIALLY_CONFIRMED: 'partially_confirmed',
+    CONFIRMED: 'confirmed',
     CANCELLED: 'cancelled',
 } as const;
 export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus];
+
+export const OrderGroupStatus = {
+    PENDING: 'pending',
+    ACCEPTED: 'accepted',
+    REJECTED: 'rejected',
+    IN_PROGRESS: 'in_progress',
+    COMPLETED: 'completed',
+} as const;
+export type OrderGroupStatus = (typeof OrderGroupStatus)[keyof typeof OrderGroupStatus];
 
 export const OrganizationBusinessType = {
     VESSEL_OWNER: 'vessel_owner',

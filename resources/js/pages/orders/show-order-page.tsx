@@ -1,11 +1,12 @@
 import { useState } from 'react';
 
+import OrderGroupsTab from '@/pages/orders/components/order-groups-tab';
 import OrderOverviewTab from '@/pages/orders/components/order-overview-tab';
 import OrderServicesTab from '@/pages/orders/components/order-services-tab';
 import OrderSystemTab from '@/pages/orders/components/order-system-tab';
 import OrderVesselTab from '@/pages/orders/components/order-vessel-tab';
 import { Head, Link, router } from '@inertiajs/react';
-import { Database, Edit, LayoutGrid, MapPin, Package, Ship, Trash2 } from 'lucide-react';
+import { Database, Edit, LayoutGrid, MapPin, Package, Ship, Trash2, Users } from 'lucide-react';
 import { toast } from 'sonner';
 
 import type { BreadcrumbItem } from '@/types';
@@ -98,10 +99,17 @@ export default function ShowOrderPage({ order }: { order: OrderWithRelations }) 
                 </div>
 
                 <Tabs defaultValue="overview" className="w-full">
-                    <TabsList className="grid w-full grid-cols-4">
+                    <TabsList className="grid w-full grid-cols-5">
                         <TabsTrigger value="overview" className="flex items-center gap-2">
                             <LayoutGrid className="h-4 w-4" />
                             Overview
+                        </TabsTrigger>
+                        <TabsTrigger value="groups" className="flex items-center gap-2">
+                            <Users className="h-4 w-4" />
+                            Order Groups
+                            <Badge variant="secondary" className="ml-1">
+                                {order.order_groups?.length || 0}
+                            </Badge>
                         </TabsTrigger>
                         <TabsTrigger value="services" className="flex items-center gap-2">
                             <Package className="h-4 w-4" />
@@ -126,6 +134,10 @@ export default function ShowOrderPage({ order }: { order: OrderWithRelations }) 
                     <div className="mt-6">
                         <TabsContent value="overview" className="space-y-4">
                             <OrderOverviewTab order={order} />
+                        </TabsContent>
+
+                        <TabsContent value="groups" className="space-y-4">
+                            <OrderGroupsTab orderGroups={order.order_groups || []} />
                         </TabsContent>
 
                         <TabsContent value="services" className="space-y-4">
