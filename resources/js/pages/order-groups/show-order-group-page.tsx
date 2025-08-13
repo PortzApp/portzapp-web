@@ -35,6 +35,9 @@ export default function ShowOrderGroupPage({
     siblingOrderGroups: OrderGroup[];
 }) {
     const breadcrumbs = getBreadcrumbs(orderGroup);
+    
+    // Calculate total price from services
+    const totalPrice = orderGroup.services?.reduce((sum, service) => sum + parseFloat(service.price), 0) || 0;
 
     const canAccept = orderGroup.status === 'pending';
     const canReject = orderGroup.status === 'pending';
@@ -200,7 +203,7 @@ export default function ShowOrderGroupPage({
 
                                 <div className="flex items-center justify-between text-lg font-bold">
                                     <span>Total Price:</span>
-                                    <span className="tabular-nums">${parseFloat(orderGroup.total_price?.toString() || '0').toFixed(2)}</span>
+                                    <span className="tabular-nums">${totalPrice.toFixed(2)}</span>
                                 </div>
                             </div>
                         </CardContent>
