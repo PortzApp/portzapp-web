@@ -1,5 +1,5 @@
 import { router, usePage } from '@inertiajs/react';
-import { Building2, ChevronsUpDown, ClipboardCheck, LayoutGrid, ListCheck, MapPin, Package, Plus, Ship } from 'lucide-react';
+import { Building2, ChevronsUpDown, ClipboardCheck, LayoutGrid, ListCheck, MapPin, Package, Plus, Ship, Wand2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import type { NavItem, SharedData } from '@/types';
@@ -67,8 +67,13 @@ const mainNavItemsAsVesselOwner: NavItem[] = [
     },
     {
         title: 'Orders',
-        href: '/orders',
+        href: route('orders.index'),
         icon: ClipboardCheck,
+    },
+    {
+        title: 'Create Order',
+        href: route('orders.wizard.start'),
+        icon: Wand2,
     },
     {
         title: 'Vessels',
@@ -90,7 +95,7 @@ const mainNavItemsAsShippingAgency: NavItem[] = [
     },
     {
         title: 'Order Requests',
-        href: '/orders',
+        href: '/agency/orders',
         icon: ListCheck,
     },
 ];
