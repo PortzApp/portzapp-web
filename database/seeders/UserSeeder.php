@@ -32,6 +32,7 @@ class UserSeeder extends Seeder
             'first_name' => 'Admin',
             'last_name' => 'Shipping1',
             'email' => 'admin@shipping1.com',
+            'current_organization_id' => $shippingOrg1->id,
         ]);
         $shippingAdmin1->organizations()->attach($shippingOrg1, ['role' => UserRoles::ADMIN]);
 
@@ -39,6 +40,7 @@ class UserSeeder extends Seeder
             'first_name' => 'Viewer',
             'last_name' => 'Shipping1',
             'email' => 'viewer@shipping1.com',
+            'current_organization_id' => $shippingOrg1->id,
         ]);
         $shippingMember1->organizations()->attach($shippingOrg1, ['role' => UserRoles::VIEWER]);
 
@@ -46,6 +48,7 @@ class UserSeeder extends Seeder
             'first_name' => 'Admin',
             'last_name' => 'Shipping2',
             'email' => 'admin@shipping2.com',
+            'current_organization_id' => $shippingOrg2->id,
         ]);
         $shippingAdmin2->organizations()->attach($shippingOrg2, ['role' => UserRoles::ADMIN]);
 
@@ -54,6 +57,7 @@ class UserSeeder extends Seeder
             'first_name' => 'Admin',
             'last_name' => 'Vessel1',
             'email' => 'admin@vessels1.com',
+            'current_organization_id' => $vesselOrg1->id,
         ]);
         $vesselAdmin1->organizations()->attach($vesselOrg1, ['role' => UserRoles::ADMIN]);
 
@@ -61,6 +65,7 @@ class UserSeeder extends Seeder
             'first_name' => 'Viewer',
             'last_name' => 'Vessel1',
             'email' => 'viewer@vessels1.com',
+            'current_organization_id' => $vesselOrg1->id,
         ]);
         $vesselMember1->organizations()->attach($vesselOrg1, ['role' => UserRoles::VIEWER]);
 
@@ -68,6 +73,7 @@ class UserSeeder extends Seeder
             'first_name' => 'Admin',
             'last_name' => 'Vessel2',
             'email' => 'admin@vessels2.com',
+            'current_organization_id' => $vesselOrg2->id,
         ]);
         $vesselAdmin2->organizations()->attach($vesselOrg2, ['role' => UserRoles::ADMIN]);
 
@@ -76,6 +82,7 @@ class UserSeeder extends Seeder
             'first_name' => 'Admin',
             'last_name' => 'PortzApp',
             'email' => 'admin@portzapp.com',
+            'current_organization_id' => $portzappOrg->id,
         ]);
         $portzappAdmin1->organizations()->attach($portzappOrg, ['role' => UserRoles::ADMIN]);
 
@@ -83,6 +90,7 @@ class UserSeeder extends Seeder
             'first_name' => 'Viewer',
             'last_name' => 'PortzApp',
             'email' => 'viewer@portzapp.com',
+            'current_organization_id' => $portzappOrg->id,
         ]);
         $portzappAdmin2->organizations()->attach($portzappOrg, ['role' => UserRoles::VIEWER]);
 
