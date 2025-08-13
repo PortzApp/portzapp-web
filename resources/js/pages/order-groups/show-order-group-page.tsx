@@ -35,7 +35,7 @@ export default function ShowOrderGroupPage({
     siblingOrderGroups: OrderGroup[];
 }) {
     const breadcrumbs = getBreadcrumbs(orderGroup);
-    
+
     // Calculate total price from services
     const totalPrice = orderGroup.services?.reduce((sum, service) => sum + parseFloat(service.price), 0) || 0;
 
