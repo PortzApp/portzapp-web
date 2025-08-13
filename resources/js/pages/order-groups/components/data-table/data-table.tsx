@@ -3,7 +3,6 @@
 import { useState } from 'react';
 
 import {
-    ColumnDef,
     ColumnFiltersState,
     flexRender,
     getCoreRowModel,
@@ -16,14 +15,13 @@ import {
     VisibilityState,
 } from '@tanstack/react-table';
 
+import type { ColumnDef } from '@tanstack/react-table';
 import { OrderGroup } from '@/types/models';
 
 import { DataTablePaginationControls } from '@/components/ui/data-table/data-table-pagination-controls';
 import { DataTableViewOptions } from '@/components/ui/data-table/data-table-view-options';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-
-import type { ColumnDef } from '@tanstack/react-table';
 
 interface OrderGroupsPageDataTableProps {
     columns: ColumnDef<OrderGroup>[];
