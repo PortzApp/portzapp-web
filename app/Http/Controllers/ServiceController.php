@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\OrganizationBusinessType;
 use App\Events\ServiceCreated;
 use App\Events\ServiceDeleted;
 use App\Events\ServiceUpdated;
@@ -24,7 +25,15 @@ class ServiceController extends Controller
     {
         Gate::authorize('view-any', Service::class);
 
+        $user = request()->user();
         $query = Service::query()->with(['organization', 'port', 'category', 'orders']);
+
+        // Apply organization-based filtering
+        if ($user->isInOrganizationWithBusinessType(OrganizationBusinessType::SHIPPING_AGENCY)) {
+            // SHIPPING_AGENCY users can only see services from their own organization
+            $query->where('organization_id', $user->current_organization_id);
+        }
+        // VESSEL_OWNER and PORTZAPP_TEAM users can see all services (no additional filter)
 
         // Filter by port if provided
         if (request()->has('port') && request()->get('port') !== '') {
@@ -65,7 +74,7 @@ class ServiceController extends Controller
         $validated = $request->validated();
 
         $service = Service::create([
-            'organization_id' => $request->user()->organizations->first()?->id,
+            'organization_id' => $request->user()->current_organization_id,
             'name' => $validated['name'],
             'description' => $validated['description'],
             'price' => $validated['price'],
