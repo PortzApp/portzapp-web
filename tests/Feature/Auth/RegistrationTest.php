@@ -52,7 +52,7 @@ test('users can register as organization member', function (): void {
         'company_registration_code' => 'REG-VESSEL001',
         'password' => 'password',
         'password_confirmation' => 'password',
-        'user_role' => 'member',
+        'user_role' => 'viewer',
         'organization_business_type' => 'vessel_owner',
     ]);
 
