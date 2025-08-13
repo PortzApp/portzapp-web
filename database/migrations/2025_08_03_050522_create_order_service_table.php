@@ -12,7 +12,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('order_service', function (Blueprint $table) {
-            $table->ulid('id')->primary();
             $table->foreignUlid('order_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignUlid('order_group_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignUlid('service_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
