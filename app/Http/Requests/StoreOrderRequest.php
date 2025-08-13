@@ -26,7 +26,7 @@ class StoreOrderRequest extends FormRequest
             'service_ids' => ['required'],
             'service_ids.*' => ['exists:services,id'],
             'vessel_id' => ['required', 'exists:vessels,id'],
-            'port_id' => 'required|exists:ports,id',
+            'port_id' => ['required', 'exists:ports,id'],
             'notes' => ['nullable', 'string', 'max:1000'],
         ];
     }
