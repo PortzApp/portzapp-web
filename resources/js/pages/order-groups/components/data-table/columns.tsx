@@ -104,8 +104,10 @@ export const columns: ColumnDef<OrderGroup>[] = [
         header: ({ column }) => <DataTableColumnHeader column={column} title="Total Price" />,
         cell: ({ row }) => {
             const orderGroup = row.original;
+            // Calculate total price from services
+            const totalPrice = orderGroup.services?.reduce((sum, service) => sum + parseFloat(service.price), 0) || 0;
 
-            return <p className="font-medium tabular-nums">${parseFloat(orderGroup.total_price?.toString() || '0').toFixed(2)}</p>;
+            return <p className="font-medium tabular-nums">${totalPrice.toFixed(2)}</p>;
         },
     },
     {
