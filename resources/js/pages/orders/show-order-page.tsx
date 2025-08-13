@@ -10,7 +10,7 @@ import { Database, Edit, LayoutGrid, MapPin, Package, Ship, Trash2, Users } from
 import { toast } from 'sonner';
 
 import type { BreadcrumbItem } from '@/types';
-import { OrderWithRelations } from '@/types/models';
+import { OrderWithRelations, Service } from '@/types/models';
 
 import AppLayout from '@/layouts/app-layout';
 
@@ -34,7 +34,7 @@ export default function ShowOrderPage({ order }: { order: OrderWithRelations }) 
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Orders',
-            href: route('orders'),
+            href: route('orders.index'),
         },
         {
             title: `Order ID: ${order.id}`,
@@ -51,14 +51,13 @@ export default function ShowOrderPage({ order }: { order: OrderWithRelations }) 
             },
         });
     }
-
     // const totalServicePrice = order.services.reduce((sum, service) => sum + parseFloat(service.price), 0);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Order ${order.order_number}`} />
 
-            <div className="flex min-h-screen flex-col gap-8 bg-neutral-50 p-8">
+            <div className="flex min-h-screen flex-col gap-8 bg-neutral-50 p-8 dark:bg-neutral-950">
                 <div className="flex items-center justify-between">
                     <div className="flex flex-col gap-1">
                         <h1 className="text-2xl font-semibold">
@@ -115,7 +114,7 @@ export default function ShowOrderPage({ order }: { order: OrderWithRelations }) 
                             <Package className="h-4 w-4" />
                             Services
                             <Badge variant="secondary" className="ml-1">
-                                {order.services.length}
+                                {(order.all_services || order.services || []).length}
                             </Badge>
                         </TabsTrigger>
                         <TabsTrigger value="vessel" className="flex items-center gap-2">
@@ -141,7 +140,7 @@ export default function ShowOrderPage({ order }: { order: OrderWithRelations }) 
                         </TabsContent>
 
                         <TabsContent value="services" className="space-y-4">
-                            <OrderServicesTab services={order.services} />
+                            <OrderServicesTab services={(order.all_services || order.services || []) as Service[]} />
                         </TabsContent>
 
                         <TabsContent value="vessel" className="space-y-4">
@@ -155,7 +154,7 @@ export default function ShowOrderPage({ order }: { order: OrderWithRelations }) 
                                     </div>
                                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                                         {/* Port Details Card */}
-                                        <div className="rounded-lg border p-6">
+                                        <div className="rounded-lg border p-6 dark:border-neutral-800">
                                             <div className="space-y-4">
                                                 <div className="flex justify-between">
                                                     <span className="text-sm font-medium text-muted-foreground">Port Name:</span>
@@ -186,7 +185,7 @@ export default function ShowOrderPage({ order }: { order: OrderWithRelations }) 
                                             </div>
                                         </div>
                                         {/* Port Coordinates */}
-                                        <div className="rounded-lg border p-6">
+                                        <div className="rounded-lg border p-6 dark:border-neutral-800">
                                             <div className="space-y-4">
                                                 <div className="flex justify-between">
                                                     <span className="text-sm font-medium text-muted-foreground">Latitude:</span>
