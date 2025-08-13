@@ -2,6 +2,8 @@
 
 namespace App\Policies;
 
+use App\Enums\OrganizationBusinessType;
+use App\Enums\UserRoles;
 use App\Models\Order;
 use App\Models\User;
 
@@ -18,9 +20,26 @@ class OrderPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user): bool
+    public function view(User $user, Order $order): bool
     {
-        return true;
+        // PORTZAPP_TEAM can view all orders
+        if ($user->isInOrganizationWithBusinessType(OrganizationBusinessType::PORTZAPP_TEAM)) {
+            return true;
+        }
+
+        // VESSEL_OWNER can view orders placed by their organization
+        if ($user->isInOrganizationWithBusinessType(OrganizationBusinessType::VESSEL_OWNER)) {
+            return $order->placed_by_organization_id === $user->current_organization_id;
+        }
+
+        // SHIPPING_AGENCY can view orders where they are providing services
+        if ($user->isInOrganizationWithBusinessType(OrganizationBusinessType::SHIPPING_AGENCY)) {
+            return $order->services()->whereHas('organization', function ($query) use ($user): void {
+                $query->where('id', $user->current_organization_id);
+            })->exists();
+        }
+
+        return false;
     }
 
     /**
@@ -28,23 +47,47 @@ class OrderPolicy
      */
     public function create(User $user): bool
     {
-        return true;
+        // Only VESSEL_OWNER users with ADMIN role can create orders
+        return $user->isInOrganizationWithBusinessType(OrganizationBusinessType::VESSEL_OWNER) &&
+               $user->isInOrganizationWithUserRole(UserRoles::ADMIN);
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user): bool
+    public function update(User $user, Order $order): bool
     {
-        return true;
+        // PORTZAPP_TEAM can update all orders
+        if ($user->isInOrganizationWithBusinessType(OrganizationBusinessType::PORTZAPP_TEAM)) {
+            return true;
+        }
+
+        // VESSEL_OWNER users with ADMIN role can update orders placed by their organization
+        if ($user->isInOrganizationWithBusinessType(OrganizationBusinessType::VESSEL_OWNER) &&
+            $user->isInOrganizationWithUserRole(UserRoles::ADMIN)) {
+            return $order->placed_by_organization_id === $user->current_organization_id;
+        }
+
+        return false;
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user): bool
+    public function delete(User $user, Order $order): bool
     {
-        return true;
+        // PORTZAPP_TEAM can delete all orders
+        if ($user->isInOrganizationWithBusinessType(OrganizationBusinessType::PORTZAPP_TEAM)) {
+            return true;
+        }
+
+        // VESSEL_OWNER users with ADMIN role can delete orders placed by their organization
+        if ($user->isInOrganizationWithBusinessType(OrganizationBusinessType::VESSEL_OWNER) &&
+            $user->isInOrganizationWithUserRole(UserRoles::ADMIN)) {
+            return $order->placed_by_organization_id === $user->current_organization_id;
+        }
+
+        return false;
     }
 
     /**

@@ -22,6 +22,7 @@ class OrderController extends Controller
      */
     public function index()
     {
+        $user = auth()->user();
         $query = Order::with([
             'vessel',
             'port',
@@ -29,29 +30,27 @@ class OrderController extends Controller
             'placedByOrganization',
         ]);
 
-        // Get user's organization IDs based on business type
-        $userVesselOwnerOrgs = auth()->user()->organizations()
-            ->where('business_type', OrganizationBusinessType::VESSEL_OWNER)
-            ->pluck('organizations.id');
+        // PORTZAPP_TEAM can see all orders
+        if ($user->isInOrganizationWithBusinessType(OrganizationBusinessType::PORTZAPP_TEAM)) {
+            // No filtering needed - show all orders
+        } else {
+            // Filter orders based on user's organization involvement
+            $query->where(function ($q) use ($user): void {
+                // VESSEL_OWNER: Show orders placed by their organization
+                if ($user->isInOrganizationWithBusinessType(OrganizationBusinessType::VESSEL_OWNER)) {
+                    $q->where('placed_by_organization_id', $user->current_organization_id);
+                }
 
-        $userShippingAgencyOrgs = auth()->user()->organizations()
-            ->where('business_type', OrganizationBusinessType::SHIPPING_AGENCY)
-            ->pluck('organizations.id');
-
-        // Filter orders based on user's organization involvement
-        $query->where(function ($q) use ($userVesselOwnerOrgs, $userShippingAgencyOrgs): void {
-            // Show orders where user's vessel owner org is requesting
-            if ($userVesselOwnerOrgs->isNotEmpty()) {
-                $q->whereIn('placed_by_organization_id', $userVesselOwnerOrgs);
-            }
-
-            // Show orders where user's shipping agency org is providing services
-            if ($userShippingAgencyOrgs->isNotEmpty()) {
-                $q->orWhereHas('services', function ($serviceQuery) use ($userShippingAgencyOrgs): void {
-                    $serviceQuery->whereIn('organization_id', $userShippingAgencyOrgs);
-                });
-            }
-        });
+                // SHIPPING_AGENCY: Show orders where they are providing services
+                if ($user->isInOrganizationWithBusinessType(OrganizationBusinessType::SHIPPING_AGENCY)) {
+                    $q->orWhereHas('services', function ($serviceQuery) use ($user): void {
+                        $serviceQuery->whereHas('organization', function ($orgQuery) use ($user): void {
+                            $orgQuery->where('id', $user->current_organization_id);
+                        });
+                    });
+                }
+            });
+        }
 
         $orders = $query->latest()->get();
 
