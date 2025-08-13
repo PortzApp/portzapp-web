@@ -200,7 +200,7 @@ export default function ShowOrderGroupPage({
 
                                 <div className="flex items-center justify-between text-lg font-bold">
                                     <span>Total Price:</span>
-                                    <span className="tabular-nums">${parseFloat(orderGroup.total_price.toString()).toFixed(2)}</span>
+                                    <span className="tabular-nums">${parseFloat(orderGroup.total_price?.toString() || '0').toFixed(2)}</span>
                                 </div>
                             </div>
                         </CardContent>
