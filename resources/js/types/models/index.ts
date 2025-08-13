@@ -69,6 +69,13 @@ export interface Service extends BaseModel {
     organization_id: number;
     port_id: number;
     service_category_id: number;
+    organization?: Organization;
+    order_service?: {
+        order_id: string;
+        service_id: string;
+        created_at: string;
+        updated_at: string;
+    };
 }
 
 export interface ServiceCategory extends BaseModel {
@@ -94,7 +101,7 @@ export interface OrderGroupBase extends BaseModel {
 }
 
 export interface OrderGroup extends OrderGroupBase {
-    order: OrderBase;
+    order: OrderWithRelations;
     fulfilling_organization: Organization;
     services: Service[];
     total_price: number;

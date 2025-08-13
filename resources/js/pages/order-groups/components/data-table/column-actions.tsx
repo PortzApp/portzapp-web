@@ -1,5 +1,5 @@
 import { Link, router } from '@inertiajs/react';
-import { DotsHorizontalIcon } from '@radix-ui/react-icons';
+import { MoreHorizontal } from 'lucide-react';
 
 import { OrderGroup } from '@/types/models';
 
@@ -44,7 +44,7 @@ export function OrderGroupsPageColumnActions({ orderGroup }: OrderGroupsPageColu
             <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="h-8 w-8 p-0">
                     <span className="sr-only">Open menu</span>
-                    <DotsHorizontalIcon className="h-4 w-4" />
+                    <MoreHorizontal className="h-4 w-4" />
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
