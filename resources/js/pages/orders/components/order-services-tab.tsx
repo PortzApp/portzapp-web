@@ -1,45 +1,22 @@
 import { Building2, Package } from 'lucide-react';
 
+import { Service } from '@/types/models';
+
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-
-type Service = {
-    id: string;
-    organization_id: string;
-    port_id: string;
-    service_category_id: string;
-    name: string;
-    description: string;
-    price: string;
-    status: string;
-    created_at: string;
-    updated_at: string;
-    order_service: {
-        order_id: string;
-        service_id: string;
-        created_at: string;
-        updated_at: string;
-    };
-    organization: {
-        id: string;
-        name: string;
-        registration_code: string;
-        business_type: string;
-        created_at: string;
-        updated_at: string;
-    };
-};
 
 interface OrderServicesTabProps {
     services: Service[];
 }
 
 export default function OrderServicesTab({ services }: OrderServicesTabProps) {
-    const totalServicePrice = services.reduce((sum, service) => sum + parseFloat(service.price), 0);
+    const safeServices = services || [];
+    const totalServicePrice = safeServices.reduce((sum, service) => sum + parseFloat(service.price), 0);
 
     // Group services by organization
-    const servicesByOrganization = services.reduce(
+    const servicesByOrganization = safeServices.reduce(
         (acc, service) => {
+            if (!service.organization) return acc;
             const orgId = service.organization.id;
             if (!acc[orgId]) {
                 acc[orgId] = {
@@ -50,7 +27,7 @@ export default function OrderServicesTab({ services }: OrderServicesTabProps) {
             acc[orgId].services.push(service);
             return acc;
         },
-        {} as Record<string, { organization: Service['organization']; services: Service[] }>,
+        {} as Record<string, { organization: NonNullable<Service['organization']>; services: Service[] }>,
     );
 
     return (
@@ -67,7 +44,7 @@ export default function OrderServicesTab({ services }: OrderServicesTabProps) {
                 <CardContent>
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                         <div className="text-center">
-                            <div className="text-2xl font-bold">{services.length}</div>
+                            <div className="text-2xl font-bold">{safeServices.length}</div>
                             <div className="text-sm text-muted-foreground">Total Services</div>
                         </div>
                         <div className="text-center">
@@ -122,7 +99,10 @@ export default function OrderServicesTab({ services }: OrderServicesTabProps) {
                                                 <p className="mb-3 text-sm text-muted-foreground">{service.description}</p>
                                                 <div className="flex items-center gap-4 text-xs text-muted-foreground">
                                                     <span>Service ID: {service.id}</span>
-                                                    <span>Added: {new Date(service.order_service.created_at).toLocaleDateString()}</span>
+                                                    <span>
+                                                        Added:{' '}
+                                                        {new Date(service.order_service?.created_at || service.created_at).toLocaleDateString()}
+                                                    </span>
                                                 </div>
                                             </div>
                                             <div className="ml-4 text-right">
@@ -146,7 +126,7 @@ export default function OrderServicesTab({ services }: OrderServicesTabProps) {
                 </CardHeader>
                 <CardContent>
                     <div className="space-y-3">
-                        {services.map((service, index) => (
+                        {safeServices.map((service, index) => (
                             <div key={service.id} className="flex items-center justify-between border-b py-3 last:border-b-0">
                                 <div className="flex items-center gap-3">
                                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-xs font-medium">
@@ -154,7 +134,7 @@ export default function OrderServicesTab({ services }: OrderServicesTabProps) {
                                     </div>
                                     <div>
                                         <div className="font-medium">{service.name}</div>
-                                        <div className="text-xs text-muted-foreground">by {service.organization.name}</div>
+                                        <div className="text-xs text-muted-foreground">by {service.organization?.name || 'Unknown'}</div>
                                     </div>
                                 </div>
                                 <div className="text-right">

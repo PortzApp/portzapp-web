@@ -75,7 +75,7 @@ export default function OrderGroupsTab({ orderGroups }: OrderGroupsTabProps) {
                                 </div>
                                 <div>
                                     <span className="font-medium text-muted-foreground">Total Price:</span>
-                                    <p className="font-semibold tabular-nums">${parseFloat(group.total_price.toString()).toFixed(2)}</p>
+                                    <p className="font-semibold tabular-nums">${parseFloat(group.total_price?.toString() || '0').toFixed(2)}</p>
                                 </div>
                                 <div>
                                     <span className="font-medium text-muted-foreground">Created:</span>
