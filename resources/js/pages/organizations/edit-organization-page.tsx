@@ -45,7 +45,7 @@ export default function EditOrganizationPage({ organization, availableUsers }: P
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Organizations',
-            href: '/organizations',
+            href: route('organizations.index'),
         },
         {
             title: organization.name,

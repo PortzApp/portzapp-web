@@ -19,7 +19,7 @@ export default function EditPortPage({ port }: { port: Port }) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Ports',
-            href: '/ports',
+            href: route('ports.index'),
         },
         {
             title: port.name,

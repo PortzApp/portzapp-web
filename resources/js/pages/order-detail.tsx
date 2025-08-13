@@ -15,7 +15,7 @@ export default function OrderDetail({ order }: { order: OrderWithFullRelations }
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Orders',
-            href: '/orders',
+            href: route('orders.index'),
         },
         {
             title: `Order ${order.id}`,
