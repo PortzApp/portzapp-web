@@ -51,4 +51,4 @@ jobs:
           sudo apt-get update && sudo apt-get install -y aspell aspell-en
 
       - name: Test all (unit, lint, spellcheck, types, refactor)
-        run: composer test:ci
+        run: composer test
