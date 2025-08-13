@@ -105,7 +105,7 @@ export const columns: ColumnDef<OrderGroup>[] = [
         cell: ({ row }) => {
             const orderGroup = row.original;
 
-            return <p className="font-medium tabular-nums">${parseFloat(orderGroup.total_price.toString()).toFixed(2)}</p>;
+            return <p className="font-medium tabular-nums">${parseFloat(orderGroup.total_price?.toString() || '0').toFixed(2)}</p>;
         },
     },
     {
