@@ -38,27 +38,27 @@ beforeEach(function (): void {
     ]);
 
     // Create users
-    $this->vesselOwnerAdmin = User::factory()->create();
+    $this->vesselOwnerAdmin = User::factory()->create(['current_organization_id' => $this->vesselOwnerOrg->id]);
     $this->vesselOwnerAdmin->organizations()->attach($this->vesselOwnerOrg, [
         'role' => UserRoles::ADMIN->value,
     ]);
 
-    $this->vesselOwnerMember = User::factory()->create();
+    $this->vesselOwnerMember = User::factory()->create(['current_organization_id' => $this->vesselOwnerOrg->id]);
     $this->vesselOwnerMember->organizations()->attach($this->vesselOwnerOrg, [
         'role' => UserRoles::VIEWER->value,
     ]);
 
-    $this->shippingAgencyAdmin = User::factory()->create();
+    $this->shippingAgencyAdmin = User::factory()->create(['current_organization_id' => $this->shippingAgencyOrg->id]);
     $this->shippingAgencyAdmin->organizations()->attach($this->shippingAgencyOrg, [
         'role' => UserRoles::ADMIN->value,
     ]);
 
-    $this->shippingAgencyMember = User::factory()->create();
+    $this->shippingAgencyMember = User::factory()->create(['current_organization_id' => $this->shippingAgencyOrg->id]);
     $this->shippingAgencyMember->organizations()->attach($this->shippingAgencyOrg, [
         'role' => UserRoles::VIEWER->value,
     ]);
 
-    $this->platformAdmin = User::factory()->create();
+    $this->platformAdmin = User::factory()->create(['current_organization_id' => $this->platformAdminOrg->id]);
     $this->platformAdmin->organizations()->attach($this->platformAdminOrg, [
         'role' => UserRoles::ADMIN->value,
     ]);
@@ -172,7 +172,7 @@ test('platform admin can view all orders', function (): void {
 
 test('orders are filtered by user organization involvement', function (): void {
     // Create a user in the second vessel owner org
-    $userInSecondOrg = User::factory()->create();
+    $userInSecondOrg = User::factory()->create(['current_organization_id' => $this->vesselOwnerOrg2->id]);
     $userInSecondOrg->organizations()->attach($this->vesselOwnerOrg2, [
         'role' => UserRoles::ADMIN->value,
     ]);
@@ -215,7 +215,7 @@ test('vessel owner admin can create order', function (): void {
     expect($newOrder->services->first()->id)->toBe($this->service->id);
 });
 
-test('vessel owner member can create order', function (): void {
+test('vessel owner member cannot create order', function (): void {
     $orderData = [
         'service_ids' => [$this->service->id],
         'vessel_id' => $this->vessel->id,
@@ -226,19 +226,10 @@ test('vessel owner member can create order', function (): void {
     $response = $this->actingAs($this->vesselOwnerMember)
         ->post(route('orders.store'), $orderData);
 
-    $response->assertRedirect();
-    $response->assertSessionHas('message', 'Order created successfully!');
-
-    $this->assertDatabaseHas('orders', [
-        'placed_by_organization_id' => $this->vesselOwnerOrg->id,
-        'vessel_id' => $this->vessel->id,
+    $response->assertStatus(403);
+    $this->assertDatabaseMissing('orders', [
         'notes' => 'Member created order',
     ]);
-
-    // Check that the service is attached via pivot table
-    $newOrder = Order::where('notes', 'Member created order')->first();
-    expect($newOrder->services)->toHaveCount(1);
-    expect($newOrder->services->first()->id)->toBe($this->service->id);
 });
 
 test('shipping agency user cannot create order', function (): void {
@@ -320,25 +311,19 @@ test('vessel owner admin can update own order', function (): void {
     ]);
 });
 
-test('vessel owner member can update own order', function (): void {
+test('vessel owner member cannot update own order', function (): void {
     $updateData = [
         'notes' => 'Member updated notes',
-        'status' => 'pending', // Keep the same status but include it for validation
+        'status' => 'pending',
     ];
 
     $response = $this->actingAs($this->vesselOwnerMember)
         ->put(route('orders.update', $this->order), $updateData);
 
-    $response->assertRedirect();
-    $response->assertSessionHas('message', 'Order updated successfully!');
-
-    $this->assertDatabaseHas('orders', [
-        'id' => $this->order->id,
-        'notes' => 'Member updated notes',
-    ]);
+    $response->assertStatus(403);
 });
 
-test('shipping agency admin can update order status', function (): void {
+test('shipping agency admin cannot update order', function (): void {
     $updateData = [
         'status' => 'completed',
         'notes' => 'Service completed',
@@ -347,13 +332,7 @@ test('shipping agency admin can update order status', function (): void {
     $response = $this->actingAs($this->shippingAgencyAdmin)
         ->put(route('orders.update', $this->order), $updateData);
 
-    $response->assertRedirect();
-    $response->assertSessionHas('message', 'Order updated successfully!');
-
-    $this->assertDatabaseHas('orders', [
-        'id' => $this->order->id,
-        'status' => 'completed',
-    ]);
+    $response->assertStatus(403);
 });
 
 // TODO: Fix authorization test - currently returns 302 instead of 403
@@ -456,8 +435,10 @@ test('user in multiple organizations sees orders from all their orgs', function 
 
     $response->assertStatus(200);
 
-    // Should see orders from both organizations
+    // Should see orders from vessel owner org (placed by them) and shipping agency org (servicing)
+    // Since the existing order was placed by vesselOwnerOrg and serviced by shippingAgencyOrg,
+    // the user should see it regardless of which organization they're filtering by
     $response->assertInertia(fn ($page) => $page->component('orders/orders-index-page')
-        ->has('orders', 1) // Still only one order involves their organizations
+        ->has('orders', 1) // Only one order matches the criteria
     );
 });
