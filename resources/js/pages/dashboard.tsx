@@ -9,7 +9,7 @@ import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Dashboard',
-        href: '/dashboard',
+        href: route('dashboard'),
     },
 ];
 

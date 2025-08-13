@@ -13,7 +13,7 @@ import { VesselsPageDataTable } from './components/data-table/data-table';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Vessels',
-        href: '/vessels',
+        href: route('vessels.index'),
     },
 ];
 

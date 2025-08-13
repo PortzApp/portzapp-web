@@ -34,22 +34,22 @@ import { NavUser } from '@/components/nav-user';
 const mainNavItemsAsAdmin: NavItem[] = [
     {
         title: 'Dashboard',
-        href: '/dashboard',
+        href: route('dashboard'),
         icon: LayoutGrid,
     },
     {
         title: 'Services',
-        href: '/services',
+        href: route('services.index'),
         icon: Package,
     },
     {
         title: 'Ports',
-        href: '/ports',
+        href: route('ports.index'),
         icon: MapPin,
     },
     {
         title: 'Organizations',
-        href: '/organizations',
+        href: route('organizations.index'),
         icon: Building2,
     },
 ];
@@ -57,22 +57,22 @@ const mainNavItemsAsAdmin: NavItem[] = [
 const mainNavItemsAsVesselOwner: NavItem[] = [
     {
         title: 'Dashboard',
-        href: '/dashboard',
+        href: route('dashboard'),
         icon: LayoutGrid,
     },
     {
         title: 'Services',
-        href: '/services',
+        href: route('services.index'),
         icon: Package,
     },
     {
         title: 'Orders',
-        href: '/orders',
+        href: route('orders.index'),
         icon: ClipboardCheck,
     },
     {
         title: 'Vessels',
-        href: '/vessels',
+        href: route('vessels.index'),
         icon: Ship,
     },
 ];
@@ -80,17 +80,17 @@ const mainNavItemsAsVesselOwner: NavItem[] = [
 const mainNavItemsAsShippingAgency: NavItem[] = [
     {
         title: 'Dashboard',
-        href: '/dashboard',
+        href: route('dashboard'),
         icon: LayoutGrid,
     },
     {
         title: 'My Services',
-        href: '/services',
+        href: route('services.index'),
         icon: Package,
     },
     {
         title: 'Order Requests',
-        href: '/orders',
+        href: route('orders.index'),
         icon: ListCheck,
     },
 ];

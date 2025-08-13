@@ -13,7 +13,7 @@ import { OrganizationsPageDataTable } from './components/data-table/data-table';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Organizations',
-        href: '/organizations',
+        href: route('organizations.index'),
     },
 ];
 

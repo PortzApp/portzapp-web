@@ -33,7 +33,7 @@ export default function ShowPortPage({ port }: { port: Port }) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Ports',
-            href: '/ports',
+            href: route('ports.index'),
         },
         {
             title: port.name,

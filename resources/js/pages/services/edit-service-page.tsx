@@ -46,7 +46,7 @@ export default function EditServicePage({ service: initialService, ports }: { se
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Services',
-            href: '/services',
+            href: route('services.index'),
         },
         {
             title: service.name,

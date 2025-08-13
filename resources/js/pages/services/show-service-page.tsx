@@ -100,7 +100,7 @@ export default function ShowServicePage({ service: initialService }: { service: 
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Services',
-            href: '/services',
+            href: route('services.index'),
         },
         {
             title: service.name,
