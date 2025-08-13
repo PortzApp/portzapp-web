@@ -29,9 +29,9 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     ]);
 
     // Order Wizard Routes
-    Route::prefix('orders/wizard')->name('orders.wizard.')->group(function (): void {
+    Route::prefix('orders/create')->name('orders.wizard.')->group(function (): void {
         Route::get('/', [OrderWizardController::class, 'start'])->name('start');
-        Route::post('/', [OrderWizardController::class, 'storeStart'])->name('store-start');
+        Route::post('/start', [OrderWizardController::class, 'storeStart'])->name('store-start');
         Route::get('/categories', [OrderWizardController::class, 'categories'])->name('categories');
         Route::post('/categories', [OrderWizardController::class, 'storeCategories'])->name('store-categories');
         Route::get('/services/{category}', [OrderWizardController::class, 'services'])->name('services');
