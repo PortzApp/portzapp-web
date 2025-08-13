@@ -40,6 +40,7 @@ class OrderGroup extends Model
     {
         return $this->belongsToMany(Service::class, 'order_service')
             ->withPivot('quantity', 'unit_price', 'total_price')
+            ->wherePivot('order_group_id', $this->id)
             ->withTimestamps();
     }
 
