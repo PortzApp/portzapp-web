@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\OrderGroupController;
 use App\Http\Controllers\OrganizationController;
 use App\Http\Controllers\PortController;
 use App\Http\Controllers\ServiceController;
@@ -24,7 +25,14 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
         'vessels' => VesselController::class,
         'services' => ServiceController::class,
         'orders' => OrderController::class,
+        'order-groups' => OrderGroupController::class,
     ]);
+
+    // Order group action routes
+    Route::post('order-groups/{orderGroup}/accept', [OrderGroupController::class, 'accept'])->name('order-groups.accept');
+    Route::post('order-groups/{orderGroup}/reject', [OrderGroupController::class, 'reject'])->name('order-groups.reject');
+    Route::post('order-groups/{orderGroup}/start', [OrderGroupController::class, 'start'])->name('order-groups.start');
+    Route::post('order-groups/{orderGroup}/complete', [OrderGroupController::class, 'complete'])->name('order-groups.complete');
 
     // Ports management routes (restricted to portzapp_team business type)
     Route::middleware('portzapp.team')->group(function (): void {

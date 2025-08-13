@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\OrderGroupStatus;
 use App\Enums\OrderStatus;
 use Database\Factories\OrderFactory;
 use Eloquent;
@@ -11,6 +12,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
 /**
@@ -26,6 +28,8 @@ use Illuminate\Support\Carbon;
  * @property-read Vessel $vessel
  * @property-read Organization $placedByOrganization
  * @property-read User $placedByUser
+ * @property-read Collection<int, OrderGroup> $orderGroups
+ * @property-read int|null $order_groups_count
  * @property-read Collection<int, Service> $services
  * @property-read int|null $services_count
  * @property-read float $total_price
@@ -79,6 +83,11 @@ class Order extends Model
         return $this->belongsTo(Organization::class, 'placed_by_organization_id');
     }
 
+    public function orderGroups(): HasMany
+    {
+        return $this->hasMany(OrderGroup::class);
+    }
+
     public function services(): BelongsToMany
     {
         return $this->belongsToMany(Service::class, 'order_service')
@@ -87,22 +96,66 @@ class Order extends Model
     }
 
     /**
-     * Calculate the total price for this order from all associated services.
+     * Calculate the total price for this order from all order groups.
      */
     public function getTotalPriceAttribute(): float
     {
-        return (float) $this->services()->sum('price');
+        return (float) $this->orderGroups->sum('total_price');
     }
 
     /**
-     * Get all unique organizations that provide services for this order.
+     * Get all services across all order groups for this order.
+     */
+    public function getAllServicesAttribute(): \Illuminate\Support\Collection
+    {
+        return $this->orderGroups->flatMap(function ($orderGroup) {
+            return $orderGroup->services;
+        });
+    }
+
+    /**
+     * Get all unique organizations that are fulfilling order groups for this order.
      */
     public function getProvidingOrganizationsAttribute(): \Illuminate\Support\Collection
     {
-        return $this->services()->with('organization')->get()
-            ->pluck('organization')
+        return $this->orderGroups->pluck('fulfillingOrganization')
             ->unique('id')
             ->values();
+    }
+
+    /**
+     * Calculate aggregate status based on order group statuses.
+     */
+    public function getAggregatedStatusAttribute(): OrderStatus
+    {
+        $groupStatuses = $this->orderGroups->pluck('status');
+
+        if ($groupStatuses->isEmpty()) {
+            return $this->status;
+        }
+
+        $allAccepted = $groupStatuses->every(fn ($status) => $status === OrderGroupStatus::ACCEPTED);
+        $allCompleted = $groupStatuses->every(fn ($status) => $status === OrderGroupStatus::COMPLETED);
+        $anyRejected = $groupStatuses->contains(OrderGroupStatus::REJECTED);
+        $anyAccepted = $groupStatuses->contains(OrderGroupStatus::ACCEPTED);
+
+        if ($allCompleted) {
+            return OrderStatus::CONFIRMED;
+        }
+
+        if ($allAccepted) {
+            return OrderStatus::CONFIRMED;
+        }
+
+        if ($anyRejected) {
+            return OrderStatus::CANCELLED;
+        }
+
+        if ($anyAccepted) {
+            return OrderStatus::PARTIALLY_CONFIRMED;
+        }
+
+        return OrderStatus::PENDING_AGENCY_CONFIRMATION;
     }
 
     protected function casts(): array
