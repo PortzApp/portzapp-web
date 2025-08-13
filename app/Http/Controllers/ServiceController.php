@@ -23,7 +23,7 @@ class ServiceController extends Controller
      */
     public function index(): Response
     {
-        Gate::authorize('view-any', Service::class);
+        Gate::authorize('viewAny', Service::class);
 
         $user = request()->user();
         $query = Service::query()->with(['organization', 'port', 'category', 'orders']);

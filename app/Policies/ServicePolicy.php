@@ -20,8 +20,13 @@ class ServicePolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Service $service): bool
+    public function view(User $user, ?Service $service = null): bool
     {
+        // If no specific service is provided, check general view permission
+        if ($service === null) {
+            return true; // Allow viewing the service list page
+        }
+
         // PORTZAPP_TEAM can view all services
         if ($user->isInOrganizationWithBusinessType(OrganizationBusinessType::PORTZAPP_TEAM)) {
             return true;
@@ -53,8 +58,14 @@ class ServicePolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Service $service): bool
+    public function update(User $user, ?Service $service = null): bool
     {
+        // If no specific service is provided, check general update permission
+        if ($service === null) {
+            return $user->isInOrganizationWithBusinessType(OrganizationBusinessType::SHIPPING_AGENCY) &&
+                   $user->isInOrganizationWithUserRole(UserRoles::ADMIN);
+        }
+
         // Only SHIPPING_AGENCY users with ADMIN role can update services
         // And they can only update services from their own organization
         return $user->isInOrganizationWithBusinessType(OrganizationBusinessType::SHIPPING_AGENCY) &&
@@ -65,8 +76,14 @@ class ServicePolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Service $service): bool
+    public function delete(User $user, ?Service $service = null): bool
     {
+        // If no specific service is provided, check general delete permission
+        if ($service === null) {
+            return $user->isInOrganizationWithBusinessType(OrganizationBusinessType::SHIPPING_AGENCY) &&
+                   $user->isInOrganizationWithUserRole(UserRoles::ADMIN);
+        }
+
         // Only SHIPPING_AGENCY users with ADMIN role can delete services
         // And they can only delete services from their own organization
         return $user->isInOrganizationWithBusinessType(OrganizationBusinessType::SHIPPING_AGENCY) &&
@@ -77,7 +94,7 @@ class ServicePolicy
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, Service $service): bool
+    public function restore(User $user, ?Service $service = null): bool
     {
         return false;
     }
@@ -85,7 +102,7 @@ class ServicePolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, Service $service): bool
+    public function forceDelete(User $user, ?Service $service = null): bool
     {
         return false;
     }
