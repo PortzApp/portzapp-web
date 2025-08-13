@@ -5,6 +5,7 @@ use App\Enums\ServiceStatus;
 use App\Enums\UserRoles;
 use App\Models\Order;
 use App\Models\Organization;
+use App\Models\Port;
 use App\Models\Service;
 use App\Models\User;
 use App\Models\Vessel;
@@ -92,9 +93,15 @@ beforeEach(function (): void {
         'status' => ServiceStatus::ACTIVE,
     ]);
 
+    // Create ports
+    $this->port = Port::factory()->create([
+        'name' => 'Test Port',
+    ]);
+
     // Create orders
     $this->order = Order::factory()->create([
         'vessel_id' => $this->vessel->id,
+        'port_id' => $this->port->id,
         'placed_by_organization_id' => $this->vesselOwnerOrg->id,
         'notes' => 'Test order',
     ]);
@@ -103,6 +110,7 @@ beforeEach(function (): void {
 
     $this->orderFromOtherOrgs = Order::factory()->create([
         'vessel_id' => $this->vessel2->id,
+        'port_id' => $this->port->id,
         'placed_by_organization_id' => $this->vesselOwnerOrg2->id,
         'notes' => 'Another test order',
     ]);
@@ -115,7 +123,7 @@ test('vessel owner admin can view orders index', function (): void {
         ->get(route('orders.index'));
 
     $response->assertStatus(200);
-    $response->assertInertia(fn ($page) => $page->component('orders/index')
+    $response->assertInertia(fn ($page) => $page->component('orders/orders-index-page')
         ->has('orders', 1)
         ->where('orders.0.id', $this->order->id)
     );
@@ -126,7 +134,7 @@ test('vessel owner member can view orders index', function (): void {
         ->get(route('orders.index'));
 
     $response->assertStatus(200);
-    $response->assertInertia(fn ($page) => $page->component('orders/index')
+    $response->assertInertia(fn ($page) => $page->component('orders/orders-index-page')
         ->has('orders', 1)
     );
 });
@@ -136,7 +144,7 @@ test('shipping agency admin can view orders index', function (): void {
         ->get(route('orders.index'));
 
     $response->assertStatus(200);
-    $response->assertInertia(fn ($page) => $page->component('orders/index')
+    $response->assertInertia(fn ($page) => $page->component('orders/orders-index-page')
         ->has('orders', 1)
         ->where('orders.0.id', $this->order->id)
     );
@@ -147,7 +155,7 @@ test('shipping agency member can view orders index', function (): void {
         ->get(route('orders.index'));
 
     $response->assertStatus(200);
-    $response->assertInertia(fn ($page) => $page->component('orders/index')
+    $response->assertInertia(fn ($page) => $page->component('orders/orders-index-page')
         ->has('orders', 1)
     );
 });
@@ -157,7 +165,7 @@ test('platform admin can view all orders', function (): void {
         ->get(route('orders.index'));
 
     $response->assertStatus(200);
-    $response->assertInertia(fn ($page) => $page->component('orders/index')
+    $response->assertInertia(fn ($page) => $page->component('orders/orders-index-page')
         ->has('orders', 2) // Should see both orders
     );
 });
@@ -175,7 +183,7 @@ test('orders are filtered by user organization involvement', function (): void {
     $response->assertStatus(200);
 
     // Should only see orders from their organization
-    $response->assertInertia(fn ($page) => $page->component('orders/index')
+    $response->assertInertia(fn ($page) => $page->component('orders/orders-index-page')
         ->has('orders', 1)
         ->where('orders.0.id', $this->orderFromOtherOrgs->id)
     );
@@ -185,6 +193,7 @@ test('vessel owner admin can create order', function (): void {
     $orderData = [
         'service_ids' => [$this->service->id],
         'vessel_id' => $this->vessel->id,
+        'port_id' => $this->port->id,
         'notes' => 'New test order',
     ];
 
@@ -210,6 +219,7 @@ test('vessel owner member can create order', function (): void {
     $orderData = [
         'service_ids' => [$this->service->id],
         'vessel_id' => $this->vessel->id,
+        'port_id' => $this->port->id,
         'notes' => 'Member created order',
     ];
 
@@ -235,6 +245,7 @@ test('shipping agency user cannot create order', function (): void {
     $orderData = [
         'service_ids' => [$this->service->id],
         'vessel_id' => $this->vessel->id,
+        'port_id' => $this->port->id,
         'notes' => 'Unauthorized order',
     ];
 
@@ -253,6 +264,7 @@ test('user without vessel owner org cannot create order', function (): void {
     $orderData = [
         'service_ids' => [$this->service->id],
         'vessel_id' => $this->vessel->id,
+        'port_id' => $this->port->id,
         'notes' => 'Unauthorized order',
     ];
 
@@ -267,7 +279,7 @@ test('vessel owner admin can view own order details', function (): void {
         ->get(route('orders.show', $this->order));
 
     $response->assertStatus(200);
-    $response->assertInertia(fn ($page) => $page->component('orders/show')
+    $response->assertInertia(fn ($page) => $page->component('orders/show-order-page')
         ->where('order.id', $this->order->id)
     );
 });
@@ -277,7 +289,7 @@ test('shipping agency admin can view order details for their services', function
         ->get(route('orders.show', $this->order));
 
     $response->assertStatus(200);
-    $response->assertInertia(fn ($page) => $page->component('orders/show')
+    $response->assertInertia(fn ($page) => $page->component('orders/show-order-page')
         ->where('order.id', $this->order->id)
     );
 });
@@ -439,7 +451,7 @@ test('user in multiple organizations sees orders from all their orgs', function 
     $response->assertStatus(200);
 
     // Should see orders from both organizations
-    $response->assertInertia(fn ($page) => $page->component('orders/index')
+    $response->assertInertia(fn ($page) => $page->component('orders/orders-index-page')
         ->has('orders', 1) // Still only one order involves their organizations
     );
 });

@@ -71,6 +71,7 @@ class ServiceController extends Controller
             'price' => $validated['price'],
             'status' => $validated['status'],
             'port_id' => $validated['port_id'],
+            'service_category_id' => $validated['service_category_id'],
         ]);
 
         // Load relationships for the created service

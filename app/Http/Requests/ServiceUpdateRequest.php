@@ -26,8 +26,8 @@ class ServiceUpdateRequest extends FormRequest
             'description' => ['nullable', 'string', 'max:1000'],
             'price' => ['required', 'numeric', 'min:0', 'max:99999999.99'],
             'status' => ['required', 'in:active,inactive'],
-            'port_id' => ['required', 'numeric', 'exists:ports,id'],
-            'service_category_id' => ['required', 'numeric', 'exists:service_categories,id'],
+            'port_id' => ['required', 'string', 'exists:ports,id'],
+            'service_category_id' => ['required', 'string', 'exists:service_categories,id'],
         ];
     }
 }
