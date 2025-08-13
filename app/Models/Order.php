@@ -100,7 +100,7 @@ class Order extends Model
      */
     public function allServices()
     {
-        return Service::whereHas('orderGroups', function ($query) {
+        return Service::whereHas('orderGroups', function ($query): void {
             $query->where('order_id', $this->id);
         })->with('organization');
     }
