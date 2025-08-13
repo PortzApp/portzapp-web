@@ -1,15 +1,16 @@
 import { useState } from 'react';
 
+import OrderGroupsTab from '@/pages/orders/components/order-groups-tab';
 import OrderOverviewTab from '@/pages/orders/components/order-overview-tab';
 import OrderServicesTab from '@/pages/orders/components/order-services-tab';
 import OrderSystemTab from '@/pages/orders/components/order-system-tab';
 import OrderVesselTab from '@/pages/orders/components/order-vessel-tab';
 import { Head, Link, router } from '@inertiajs/react';
-import { Database, Edit, LayoutGrid, MapPin, Package, Ship, Trash2 } from 'lucide-react';
+import { Database, Edit, LayoutGrid, MapPin, Package, Ship, Trash2, Users } from 'lucide-react';
 import { toast } from 'sonner';
 
 import type { BreadcrumbItem } from '@/types';
-import { OrderWithRelations } from '@/types/models';
+import { OrderWithRelations, Service } from '@/types/models';
 
 import AppLayout from '@/layouts/app-layout';
 
@@ -33,7 +34,7 @@ export default function ShowOrderPage({ order }: { order: OrderWithRelations }) 
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Orders',
-            href: route('orders'),
+            href: route('orders.index'),
         },
         {
             title: `Order ID: ${order.id}`,
@@ -50,14 +51,13 @@ export default function ShowOrderPage({ order }: { order: OrderWithRelations }) 
             },
         });
     }
-
     // const totalServicePrice = order.services.reduce((sum, service) => sum + parseFloat(service.price), 0);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Order ${order.order_number}`} />
 
-            <div className="flex min-h-screen flex-col gap-8 bg-neutral-50 p-8">
+            <div className="flex min-h-screen flex-col gap-8 bg-neutral-50 p-8 dark:bg-neutral-950">
                 <div className="flex items-center justify-between">
                     <div className="flex flex-col gap-1">
                         <h1 className="text-2xl font-semibold">
@@ -98,16 +98,23 @@ export default function ShowOrderPage({ order }: { order: OrderWithRelations }) 
                 </div>
 
                 <Tabs defaultValue="overview" className="w-full">
-                    <TabsList className="grid w-full grid-cols-4">
+                    <TabsList className="grid w-full grid-cols-5">
                         <TabsTrigger value="overview" className="flex items-center gap-2">
                             <LayoutGrid className="h-4 w-4" />
                             Overview
+                        </TabsTrigger>
+                        <TabsTrigger value="groups" className="flex items-center gap-2">
+                            <Users className="h-4 w-4" />
+                            Order Groups
+                            <Badge variant="secondary" className="ml-1">
+                                {order.order_groups?.length || 0}
+                            </Badge>
                         </TabsTrigger>
                         <TabsTrigger value="services" className="flex items-center gap-2">
                             <Package className="h-4 w-4" />
                             Services
                             <Badge variant="secondary" className="ml-1">
-                                {order.services.length}
+                                {(order.all_services || order.services || []).length}
                             </Badge>
                         </TabsTrigger>
                         <TabsTrigger value="vessel" className="flex items-center gap-2">
@@ -128,8 +135,12 @@ export default function ShowOrderPage({ order }: { order: OrderWithRelations }) 
                             <OrderOverviewTab order={order} />
                         </TabsContent>
 
+                        <TabsContent value="groups" className="space-y-4">
+                            <OrderGroupsTab orderGroups={order.order_groups || []} />
+                        </TabsContent>
+
                         <TabsContent value="services" className="space-y-4">
-                            <OrderServicesTab services={order.services} />
+                            <OrderServicesTab services={(order.all_services || order.services || []) as Service[]} />
                         </TabsContent>
 
                         <TabsContent value="vessel" className="space-y-4">
@@ -143,7 +154,7 @@ export default function ShowOrderPage({ order }: { order: OrderWithRelations }) 
                                     </div>
                                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                                         {/* Port Details Card */}
-                                        <div className="rounded-lg border p-6">
+                                        <div className="rounded-lg border p-6 dark:border-neutral-800">
                                             <div className="space-y-4">
                                                 <div className="flex justify-between">
                                                     <span className="text-sm font-medium text-muted-foreground">Port Name:</span>
@@ -174,7 +185,7 @@ export default function ShowOrderPage({ order }: { order: OrderWithRelations }) 
                                             </div>
                                         </div>
                                         {/* Port Coordinates */}
-                                        <div className="rounded-lg border p-6">
+                                        <div className="rounded-lg border p-6 dark:border-neutral-800">
                                             <div className="space-y-4">
                                                 <div className="flex justify-between">
                                                     <span className="text-sm font-medium text-muted-foreground">Latitude:</span>

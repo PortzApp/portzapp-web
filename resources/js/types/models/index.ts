@@ -1,4 +1,4 @@
-import { OrderStatus, OrganizationBusinessType, ServiceStatus, UserRoles, VesselStatus, VesselType } from '@/types/enums';
+import { OrderGroupStatus, OrderStatus, OrganizationBusinessType, ServiceStatus, UserRoles, VesselStatus, VesselType } from '@/types/enums';
 
 export interface BaseModel {
     id: string;
@@ -69,6 +69,13 @@ export interface Service extends BaseModel {
     organization_id: number;
     port_id: number;
     service_category_id: number;
+    organization?: Organization;
+    order_service?: {
+        order_id: string;
+        service_id: string;
+        created_at: string;
+        updated_at: string;
+    };
 }
 
 export interface ServiceCategory extends BaseModel {
@@ -83,6 +90,21 @@ export interface OrderBase extends BaseModel {
     placed_by_organization_id: string;
     notes: string;
     status: OrderStatus;
+}
+
+export interface OrderGroupBase extends BaseModel {
+    group_number: string;
+    order_id: string;
+    fulfilling_organization_id: string;
+    status: OrderGroupStatus;
+    notes: string | null;
+}
+
+export interface OrderGroup extends OrderGroupBase {
+    order: OrderWithRelations;
+    fulfilling_organization: Organization;
+    services: Service[];
+    total_price: number;
 }
 
 export interface OrderWithRelations extends OrderBase {
@@ -100,6 +122,10 @@ export interface OrderWithRelations extends OrderBase {
         current_organization_id: string | null;
     };
     placed_by_organization: Organization;
+    order_groups?: OrderGroup[];
+    all_services?: Service[];
+    total_price?: number;
+    aggregated_status?: OrderStatus;
     services: {
         id: string;
         organization_id: string;

@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\OrderGroupStatus;
 use App\Enums\OrderStatus;
 use App\Enums\OrganizationBusinessType;
 use App\Enums\ServiceStatus;
 use App\Http\Requests\StoreOrderRequest;
 use App\Http\Requests\UpdateOrderRequest;
 use App\Models\Order;
+use App\Models\OrderGroup;
 use App\Models\Organization;
 use App\Models\Port;
 use App\Models\Service;
@@ -23,33 +25,29 @@ class OrderController extends Controller
     public function index()
     {
         $user = auth()->user();
+
+        // SHIPPING_AGENCY users should see order groups, not full orders
+        if ($user->isInOrganizationWithBusinessType(OrganizationBusinessType::SHIPPING_AGENCY)) {
+            return redirect()->route('order-groups.index');
+        }
+
         $query = Order::with([
             'vessel',
             'port',
             'placedByUser',
             'placedByOrganization',
+            'orderGroups.fulfillingOrganization',
+            'orderGroups.services',
         ]);
 
         // PORTZAPP_TEAM can see all orders
         if ($user->isInOrganizationWithBusinessType(OrganizationBusinessType::PORTZAPP_TEAM)) {
             // No filtering needed - show all orders
         } else {
-            // Filter orders based on user's organization involvement
-            $query->where(function ($q) use ($user): void {
-                // VESSEL_OWNER: Show orders placed by their organization
-                if ($user->isInOrganizationWithBusinessType(OrganizationBusinessType::VESSEL_OWNER)) {
-                    $q->where('placed_by_organization_id', $user->current_organization_id);
-                }
-
-                // SHIPPING_AGENCY: Show orders where they are providing services
-                if ($user->isInOrganizationWithBusinessType(OrganizationBusinessType::SHIPPING_AGENCY)) {
-                    $q->orWhereHas('services', function ($serviceQuery) use ($user): void {
-                        $serviceQuery->whereHas('organization', function ($orgQuery) use ($user): void {
-                            $orgQuery->where('id', $user->current_organization_id);
-                        });
-                    });
-                }
-            });
+            // VESSEL_OWNER: Show orders placed by their organization
+            if ($user->isInOrganizationWithBusinessType(OrganizationBusinessType::VESSEL_OWNER)) {
+                $query->where('placed_by_organization_id', $user->current_organization_id);
+            }
         }
 
         $orders = $query->latest()->get();
@@ -85,16 +83,30 @@ class OrderController extends Controller
             'placed_by_user_id' => auth()->id(),
             'placed_by_organization_id' => $vesselOwnerOrg->id,
             'notes' => $validated['notes'] ?? null,
-            'status' => OrderStatus::PENDING,
+            'status' => OrderStatus::PENDING_AGENCY_CONFIRMATION,
         ]);
 
-        // Attach services via pivot table (many-to-many)
         // Handle both single service ID and arrays of service IDs
         $serviceIds = is_array($validated['service_ids'])
             ? $validated['service_ids']
             : [$validated['service_ids']];
 
-        $order->services()->attach($serviceIds);
+        // Get services with their organizations to group by agency
+        $services = Service::whereIn('id', $serviceIds)->with('organization')->get();
+        $servicesByOrg = $services->groupBy('organization_id');
+
+        // Create order groups for each organization
+        foreach ($servicesByOrg as $orgId => $orgServices) {
+            $orderGroup = OrderGroup::create([
+                'group_number' => 'GRP-'.strtoupper(uniqid()),
+                'order_id' => $order->id,
+                'fulfilling_organization_id' => $orgId,
+                'status' => OrderGroupStatus::PENDING,
+            ]);
+
+            // Attach services to this order group
+            $orderGroup->services()->attach($orgServices->pluck('id')->toArray());
+        }
 
         return to_route('orders.index')->with('message', 'Order created successfully!');
     }
@@ -147,11 +159,17 @@ class OrderController extends Controller
             'port',
             'placedByUser',
             'placedByOrganization',
-            'services.organization',
+            'orderGroups.fulfillingOrganization',
+            'orderGroups.services.organization',
         ]);
 
+        // Get all services through order groups
+        $allServices = $order->allServices()->get();
+
         return Inertia::render('orders/show-order-page', [
-            'order' => $order,
+            'order' => array_merge($order->toArray(), [
+                'all_services' => $allServices,
+            ]),
         ]);
     }
 

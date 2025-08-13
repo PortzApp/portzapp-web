@@ -18,6 +18,7 @@ interface Auth {
     permissions: {
         service: PolicyAbilities;
         order: PolicyAbilities;
+        order_group: PolicyAbilities;
         vessel: PolicyAbilities;
         port: PolicyAbilities;
         organization: PolicyAbilities;

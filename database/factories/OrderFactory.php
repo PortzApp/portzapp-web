@@ -34,18 +34,78 @@ class OrderFactory extends Factory
             'placed_by_organization_id' => Organization::factory(),
             'notes' => fake()->optional(0.7)->sentence(),
             'status' => fake()->randomElement([
-                OrderStatus::PENDING,      // 30%
-                OrderStatus::PENDING,
-                OrderStatus::PENDING,
-                OrderStatus::ACCEPTED,     // 20%
-                OrderStatus::ACCEPTED,
-                OrderStatus::IN_PROGRESS,  // 20%
-                OrderStatus::IN_PROGRESS,
-                OrderStatus::COMPLETED,    // 20%
-                OrderStatus::COMPLETED,
-                OrderStatus::CANCELLED,     // 10%
+                OrderStatus::DRAFT,                        // 10%
+                OrderStatus::PENDING_AGENCY_CONFIRMATION,  // 30%
+                OrderStatus::PENDING_AGENCY_CONFIRMATION,
+                OrderStatus::PENDING_AGENCY_CONFIRMATION,
+                OrderStatus::PARTIALLY_CONFIRMED,          // 20%
+                OrderStatus::PARTIALLY_CONFIRMED,
+                OrderStatus::CONFIRMED,                     // 30%
+                OrderStatus::CONFIRMED,
+                OrderStatus::CONFIRMED,
+                OrderStatus::CANCELLED,                     // 10%
             ]),
             'created_at' => $createdAt,
         ];
+    }
+
+    /**
+     * Indicate that the order is a draft.
+     */
+    public function draft(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => OrderStatus::DRAFT,
+        ]);
+    }
+
+    /**
+     * Indicate that the order is pending agency confirmation.
+     */
+    public function pendingAgencyConfirmation(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => OrderStatus::PENDING_AGENCY_CONFIRMATION,
+        ]);
+    }
+
+    /**
+     * Indicate that the order is partially confirmed.
+     */
+    public function partiallyConfirmed(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => OrderStatus::PARTIALLY_CONFIRMED,
+        ]);
+    }
+
+    /**
+     * Indicate that the order is confirmed.
+     */
+    public function confirmed(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => OrderStatus::CONFIRMED,
+        ]);
+    }
+
+    /**
+     * Indicate that the order is cancelled.
+     */
+    public function cancelled(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => OrderStatus::CANCELLED,
+        ]);
+    }
+
+    /**
+     * Configure the factory for a specific vessel owner organization.
+     */
+    public function forVesselOwner(Organization $organization): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'placed_by_organization_id' => $organization->id,
+        ]);
     }
 }

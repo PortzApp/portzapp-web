@@ -32,11 +32,10 @@ class OrderPolicy
             return $order->placed_by_organization_id === $user->current_organization_id;
         }
 
-        // SHIPPING_AGENCY can view orders where they are providing services
+        // SHIPPING_AGENCY users should view order groups instead of full orders
+        // But allow them to view orders if they have order groups for this order
         if ($user->isInOrganizationWithBusinessType(OrganizationBusinessType::SHIPPING_AGENCY)) {
-            return $order->services()->whereHas('organization', function ($query) use ($user): void {
-                $query->where('id', $user->current_organization_id);
-            })->exists();
+            return $order->orderGroups()->where('fulfilling_organization_id', $user->current_organization_id)->exists();
         }
 
         return false;

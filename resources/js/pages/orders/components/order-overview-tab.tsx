@@ -12,7 +12,7 @@ interface OrderOverviewTabProps {
 }
 
 export default function OrderOverviewTab({ order }: OrderOverviewTabProps) {
-    const totalServicePrice = order.services.reduce((sum, service) => sum + parseFloat(service.price), 0);
+    const totalServicePrice = order.services?.reduce((sum, service) => sum + parseFloat(service.price), 0) || 0;
 
     return (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -35,10 +35,11 @@ export default function OrderOverviewTab({ order }: OrderOverviewTabProps) {
                         <span className="text-sm font-medium text-muted-foreground">Status:</span>
                         <Badge
                             className={cn(
-                                order.status === 'pending' && 'bg-yellow-200 text-yellow-950 uppercase dark:bg-yellow-900 dark:text-yellow-50',
-                                order.status === 'accepted' && 'bg-blue-200 text-blue-950 uppercase dark:bg-blue-900 dark:text-blue-50',
-                                order.status === 'in_progress' && 'bg-purple-200 text-purple-950 uppercase dark:bg-purple-900 dark:text-purple-50',
-                                order.status === 'completed' && 'bg-green-200 text-green-950 uppercase dark:bg-green-900 dark:text-green-50',
+                                order.status === 'draft' && 'bg-yellow-200 text-yellow-950 uppercase dark:bg-yellow-900 dark:text-yellow-50',
+                                order.status === 'pending_agency_confirmation' &&
+                                    'bg-orange-200 text-orange-950 uppercase dark:bg-orange-900 dark:text-orange-50',
+                                order.status === 'partially_confirmed' && 'bg-blue-200 text-blue-950 uppercase dark:bg-blue-900 dark:text-blue-50',
+                                order.status === 'confirmed' && 'bg-green-200 text-green-950 uppercase dark:bg-green-900 dark:text-green-50',
                                 order.status === 'cancelled' && 'bg-red-200 text-red-950 uppercase dark:bg-red-900 dark:text-red-50',
                             )}
                         >
@@ -60,7 +61,7 @@ export default function OrderOverviewTab({ order }: OrderOverviewTabProps) {
                         <span className="text-sm text-muted-foreground">Total Services:</span>
                         <Badge variant="outline" className="flex items-center gap-1">
                             <Package className="h-3 w-3" />
-                            {order.services.length}
+                            {order.services?.length || 0}
                         </Badge>
                     </div>
                     <div className="flex justify-between">
