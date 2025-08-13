@@ -24,3 +24,5 @@ yarn-error.log
 /.zed
 .docker-container-volumes
 **/.DS_Store
+CLAUDE.md
+.claude
