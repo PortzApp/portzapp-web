@@ -30,7 +30,7 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
 
     // Order Wizard Routes
     Route::prefix('orders/create')->name('orders.wizard.')->group(function (): void {
-        Route::get('/', [OrderWizardController::class, 'start'])->name('start');
+        Route::get('/new', [OrderWizardController::class, 'start'])->name('start');
         Route::post('/start', [OrderWizardController::class, 'storeStart'])->name('store-start');
         Route::get('/categories', [OrderWizardController::class, 'categories'])->name('categories');
         Route::post('/categories', [OrderWizardController::class, 'storeCategories'])->name('store-categories');
@@ -38,6 +38,7 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
         Route::post('/services/{category}', [OrderWizardController::class, 'storeService'])->name('store-service');
         Route::get('/summary', [OrderWizardController::class, 'summary'])->name('summary');
         Route::post('/confirm', [OrderWizardController::class, 'confirm'])->name('confirm');
+        Route::get('/confirmation/{order}', [OrderWizardController::class, 'confirmation'])->name('confirmation');
         Route::get('/cancel', [OrderWizardController::class, 'cancel'])->name('cancel');
     });
 
