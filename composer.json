@@ -75,6 +75,9 @@
             "@php artisan config:clear --ansi",
             "@php artisan test"
         ],
+        "test:coverage": "XDEBUG_MODE=coverage ./vendor/bin/pest --coverage",
+        "test:coverage:html": "XDEBUG_MODE=coverage ./vendor/bin/pest --coverage-html=coverage-report",
+        "test:coverage:min": "XDEBUG_MODE=coverage ./vendor/bin/pest --coverage --min=60",
         "test:lint": [
             "@test:lint:frontend",
             "@test:lint:backend"
