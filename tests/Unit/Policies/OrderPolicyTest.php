@@ -8,9 +8,6 @@ use App\Models\Port;
 use App\Models\Service;
 use App\Models\User;
 use App\Models\Vessel;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 beforeEach(function (): void {
     // Create organizations
