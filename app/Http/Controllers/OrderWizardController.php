@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\OrderStatus;
 use App\Enums\OrganizationBusinessType;
 use App\Enums\ServiceStatus;
 use App\Models\Order;
@@ -70,8 +71,9 @@ class OrderWizardController extends Controller
         // Create new wizard session
         $session = WizardSession::create([
             'user_id' => auth()->id(),
+            'session_token' => 'WIZ-' . strtoupper(uniqid()) . '-' . now()->format('Ymd'),
+            'current_step' => 1,
             'data' => [
-                'current_step' => 1,
                 'vessel_id' => $validated['vessel_id'],
                 'port_id' => $validated['port_id'],
                 'selected_categories' => [],
@@ -297,7 +299,7 @@ class OrderWizardController extends Controller
                 'placed_by_user_id' => auth()->id(),
                 'placed_by_organization_id' => $vessel->organization_id,
                 'notes' => $validated['notes'] ?? null,
-                'status' => \App\Enums\OrderStatus::PENDING,
+                'status' => OrderStatus::DRAFT,
                 'total_amount' => 0, // Will be calculated after creating groups
             ]);
 
