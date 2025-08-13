@@ -9,6 +9,7 @@ export interface BaseModel {
 export interface User extends BaseModel {
     first_name: string;
     last_name: string;
+    name?: string; // Computed full name
     email: string;
     phone_number: string;
     avatar?: string;
@@ -48,6 +49,7 @@ export interface Vessel extends BaseModel {
     imo_number: string;
     vessel_type: VesselType;
     status: VesselStatus;
+    organization?: Organization;
 }
 
 export interface Port extends BaseModel {
@@ -64,15 +66,19 @@ export interface Port extends BaseModel {
 export interface Service extends BaseModel {
     name: string;
     description: string | null;
-    price: string;
+    price: number;
     status: ServiceStatus;
-    organization_id: number;
-    port_id: number;
-    service_category_id: number;
+    organization_id: string;
+    port_id: string;
+    service_category_id: string;
+    organization?: Organization;
+    category?: ServiceCategory;
+    port?: Port;
 }
 
 export interface ServiceCategory extends BaseModel {
     name: string;
+    services?: Service[];
 }
 
 export interface OrderBase extends BaseModel {
@@ -85,38 +91,47 @@ export interface OrderBase extends BaseModel {
     status: OrderStatus;
 }
 
-export interface OrderWithRelations extends OrderBase {
-    vessel: Vessel;
-    port: Port;
-    placed_by_user: {
-        id: string;
-        first_name: string;
-        last_name: string;
-        email: string;
-        phone_number: string;
-        email_verified_at: string;
-        created_at: string;
-        updated_at: string;
-        current_organization_id: string | null;
-    };
-    placed_by_organization: Organization;
-    services: {
-        id: string;
-        organization_id: string;
-        port_id: string;
-        service_category_id: string;
-        name: string;
-        description: string;
-        price: string;
-        status: string;
-        created_at: string;
-        updated_at: string;
-        order_service: {
-            order_id: string;
-            service_id: string;
-            created_at: string;
-            updated_at: string;
-        };
-        organization: Organization;
-    }[];
+export interface OrderGroup extends BaseModel {
+    group_number: number;
+    order_id: string;
+    agency_organization_id: string;
+    status: string;
+    subtotal_amount: number;
+    accepted_at: string | null;
+    rejected_at: string | null;
+    accepted_by_user_id: string | null;
+    response_notes: string | null;
+    rejection_reason: string | null;
+    order?: Order;
+    shippingAgencyOrganization?: Organization;
+    services?: Service[];
+    acceptedByUser?: User;
 }
+
+export interface WizardSession extends BaseModel {
+    user_id: string;
+    session_token?: string;
+    current_step?: number;
+    data: {
+        current_step: number;
+        vessel_id?: string;
+        port_id?: string;
+        selected_categories?: string[];
+        selected_services?: Record<string, { service_id: string; quantity: number; }[]>;
+    };
+    expires_at: string;
+    user?: User;
+}
+
+export interface Order extends OrderBase {
+    total_amount?: number;
+    vessel?: Vessel;
+    port?: Port;
+    placedByUser?: User;
+    placedByOrganization?: Organization;
+    orderGroups?: OrderGroup[];
+    services?: Service[];
+}
+
+// Legacy interface for backward compatibility
+export interface OrderWithRelations extends Order {}
