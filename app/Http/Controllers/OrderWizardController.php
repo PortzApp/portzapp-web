@@ -71,7 +71,7 @@ class OrderWizardController extends Controller
         // Create new wizard session
         $session = WizardSession::create([
             'user_id' => auth()->id(),
-            'session_token' => 'WIZ-' . strtoupper(uniqid()) . '-' . now()->format('Ymd'),
+            'session_token' => 'WIZ-'.strtoupper(uniqid()).'-'.now()->format('Ymd'),
             'current_step' => 1,
             'data' => [
                 'vessel_id' => $validated['vessel_id'],
