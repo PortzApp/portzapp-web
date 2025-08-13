@@ -155,7 +155,7 @@ class ServiceController extends Controller
     {
         Gate::authorize('delete', $service);
 
-        $serviceId = $service->id;
+        $serviceId = (string) $service->id;
         $serviceName = $service->name;
 
         $service->delete();
