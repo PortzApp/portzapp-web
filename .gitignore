@@ -26,3 +26,7 @@ yarn-error.log
 **/.DS_Store
 CLAUDE.md
 .claude
+.cursor
+.junie
+.github/copilot-instructions.md
+.mcp.json
