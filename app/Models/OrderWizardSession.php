@@ -57,7 +57,9 @@ class OrderWizardSession extends Model
 
     public function isExpired(): bool
     {
-        return $this->expires_at && $this->expires_at->isPast();
+        $expiresAt = $this->expires_at;
+
+        return $expiresAt !== null && $expiresAt instanceof \Carbon\Carbon && $expiresAt->isPast();
     }
 
     public function isCompleted(): bool
@@ -84,7 +86,7 @@ class OrderWizardSession extends Model
     public function scopeActive($query)
     {
         return $query->where('status', 'draft')
-            ->where(function ($q) {
+            ->where(function ($q): void {
                 $q->whereNull('expires_at')
                     ->orWhere('expires_at', '>', now());
             });
