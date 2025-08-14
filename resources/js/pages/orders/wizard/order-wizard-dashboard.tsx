@@ -3,13 +3,14 @@ import { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import { Calendar, Clock, MapPin, Plus, Ship, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { route } from 'ziggy-js';
 
-import type { BreadcrumbItem, SharedData } from '@/types';
+import type { BreadcrumbItem } from '@/types';
 import type { OrderWizardSession } from '@/types/wizard';
 
 import AppLayout from '@/layouts/app-layout';
 
-import { Button, buttonVariants } from '@/components/ui/button';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 import { useOrderWizardStore } from './stores/order-wizard-store';
@@ -38,7 +39,7 @@ export default function OrderWizardDashboard({ sessions }: OrderWizardDashboardP
             reset(); // Clear any existing state
             await createNewSession();
             router.visit(route('order-wizard.flow'));
-        } catch (error) {
+        } catch {
             toast.error('Failed to start new order. Please try again.');
         }
     };
@@ -49,29 +50,24 @@ export default function OrderWizardDashboard({ sessions }: OrderWizardDashboardP
         router.visit(route('order-wizard.flow', { session: session.id }));
     };
 
-    const handleDeleteSession = async (sessionId: string) => {
+    const handleDeleteSession = (sessionId: string) => {
         setIsDeleting(sessionId);
-        
-        try {
-            const response = await fetch(`/order-wizard-sessions/${sessionId}`, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-                },
-            });
 
-            if (!response.ok) {
-                throw new Error('Failed to delete session');
-            }
-
-            toast.success('Draft order deleted successfully');
-            router.reload({ only: ['sessions'] });
-        } catch (error) {
-            console.error('Error deleting session:', error);
-            toast.error('Failed to delete draft order. Please try again.');
-        } finally {
-            setIsDeleting(null);
-        }
+        router.delete(route('order-wizard-sessions.destroy', sessionId), {
+            onSuccess: () => {
+                toast.success('Draft order deleted successfully');
+                setIsDeleting(null);
+            },
+            onError: (errors) => {
+                console.error('Error deleting session:', errors);
+                toast.error('Failed to delete draft order. Please try again.');
+                setIsDeleting(null);
+            },
+            onFinish: () => {
+                setIsDeleting(null);
+            },
+            only: ['sessions'],
+        });
     };
 
     const getProgressPercentage = (step: string): number => {
@@ -116,94 +112,86 @@ export default function OrderWizardDashboard({ sessions }: OrderWizardDashboardP
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title=\"Order Wizard\" />
-            
-            <div className=\"mx-auto flex h-full w-full max-w-6xl flex-1 flex-col gap-8 rounded-xl p-8\">
+            <Head title="Order Wizard" />
+
+            <div className="mx-auto flex h-full w-full max-w-6xl flex-1 flex-col gap-8 rounded-xl p-8">
                 {/* Header */}
-                <div className=\"flex items-center justify-between\">
+                <div className="flex items-center justify-between">
                     <div>
-                        <h1 className=\"text-2xl font-bold\">Order Wizard</h1>
-                        <p className=\"text-muted-foreground\">
-                            Create orders step-by-step with our guided wizard, or resume your draft orders.
-                        </p>
+                        <h1 className="text-2xl font-bold">Order Wizard</h1>
+                        <p className="text-muted-foreground">Create orders step-by-step with our guided wizard, or resume your draft orders.</p>
                     </div>
-                    <Button onClick={handleStartNewOrder} size=\"lg\">
-                        <Plus className=\"mr-2 h-5 w-5\" />
+                    <Button onClick={handleStartNewOrder} size="lg">
+                        <Plus className="mr-2 h-5 w-5" />
                         Start New Order
                     </Button>
                 </div>
 
                 {/* Draft Orders */}
                 {sessions.length > 0 ? (
-                    <div className=\"grid gap-4 md:grid-cols-2 lg:grid-cols-3\">
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                         {sessions.map((session) => (
-                            <Card key={session.id} className=\"hover:shadow-md transition-shadow\">
-                                <CardHeader className=\"pb-4\">
-                                    <div className=\"flex items-start justify-between\">
-                                        <div className=\"flex-1\">
-                                            <CardTitle className=\"text-lg\">{session.session_name}</CardTitle>
-                                            <CardDescription className=\"flex items-center gap-1 mt-1\">
-                                                <Calendar className=\"h-3 w-3\" />
+                            <Card key={session.id} className="transition-shadow hover:shadow-md">
+                                <CardHeader className="pb-4">
+                                    <div className="flex items-start justify-between">
+                                        <div className="flex-1">
+                                            <CardTitle className="text-lg">{session.session_name}</CardTitle>
+                                            <CardDescription className="mt-1 flex items-center gap-1">
+                                                <Calendar className="h-3 w-3" />
                                                 {formatDate(session.updated_at)}
                                             </CardDescription>
                                         </div>
                                         <Button
-                                            variant=\"ghost\"
-                                            size=\"sm\"
+                                            variant="ghost"
+                                            size="sm"
                                             onClick={() => handleDeleteSession(session.id)}
                                             disabled={isDeleting === session.id}
-                                            className=\"text-muted-foreground hover:text-destructive\"
+                                            className="text-muted-foreground hover:text-destructive"
                                         >
-                                            <Trash2 className=\"h-4 w-4\" />
+                                            <Trash2 className="h-4 w-4" />
                                         </Button>
                                     </div>
                                 </CardHeader>
-                                
-                                <CardContent className=\"space-y-4\">
+
+                                <CardContent className="space-y-4">
                                     {/* Progress */}
                                     <div>
-                                        <div className=\"flex items-center justify-between text-sm mb-2\">
-                                            <span className=\"font-medium\">{getStepLabel(session.current_step)}</span>
-                                            <span className=\"text-muted-foreground\">
-                                                {getProgressPercentage(session.current_step)}%
-                                            </span>
+                                        <div className="mb-2 flex items-center justify-between text-sm">
+                                            <span className="font-medium">{getStepLabel(session.current_step)}</span>
+                                            <span className="text-muted-foreground">{getProgressPercentage(session.current_step)}%</span>
                                         </div>
-                                        <div className=\"w-full bg-secondary rounded-full h-2\">
+                                        <div className="h-2 w-full rounded-full bg-secondary">
                                             <div
-                                                className=\"bg-primary rounded-full h-2 transition-all duration-300\"
+                                                className="h-2 rounded-full bg-primary transition-all duration-300"
                                                 style={{ width: `${getProgressPercentage(session.current_step)}%` }}
                                             />
                                         </div>
                                     </div>
 
                                     {/* Details */}
-                                    <div className=\"space-y-2 text-sm\">
+                                    <div className="space-y-2 text-sm">
                                         {session.vessel && (
-                                            <div className=\"flex items-center gap-2 text-muted-foreground\">
-                                                <Ship className=\"h-4 w-4\" />
+                                            <div className="flex items-center gap-2 text-muted-foreground">
+                                                <Ship className="h-4 w-4" />
                                                 <span>{session.vessel.name}</span>
                                             </div>
                                         )}
                                         {session.port && (
-                                            <div className=\"flex items-center gap-2 text-muted-foreground\">
-                                                <MapPin className=\"h-4 w-4\" />
+                                            <div className="flex items-center gap-2 text-muted-foreground">
+                                                <MapPin className="h-4 w-4" />
                                                 <span>{session.port.name}</span>
                                             </div>
                                         )}
                                         {session.expires_at && (
-                                            <div className=\"flex items-center gap-2 text-muted-foreground\">
-                                                <Clock className=\"h-4 w-4\" />
+                                            <div className="flex items-center gap-2 text-muted-foreground">
+                                                <Clock className="h-4 w-4" />
                                                 <span>Expires {formatDate(session.expires_at)}</span>
                                             </div>
                                         )}
                                     </div>
 
                                     {/* Actions */}
-                                    <Button 
-                                        onClick={() => handleResumeSession(session)}
-                                        className=\"w-full\"
-                                        variant=\"outline\"
-                                    >
+                                    <Button onClick={() => handleResumeSession(session)} className="w-full" variant="outline">
                                         Resume Order
                                     </Button>
                                 </CardContent>
@@ -212,19 +200,17 @@ export default function OrderWizardDashboard({ sessions }: OrderWizardDashboardP
                     </div>
                 ) : (
                     /* Empty State */
-                    <Card className=\"flex flex-col items-center justify-center py-16 text-center\">
-                        <div className=\"mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-muted\">
-                            <Plus className=\"h-10 w-10 text-muted-foreground\" />
+                    <Card className="flex flex-col items-center justify-center py-16 text-center">
+                        <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-muted">
+                            <Plus className="h-10 w-10 text-muted-foreground" />
                         </div>
                         <CardHeader>
                             <CardTitle>No Draft Orders</CardTitle>
-                            <CardDescription>
-                                Get started by creating your first order with our step-by-step wizard.
-                            </CardDescription>
+                            <CardDescription>Get started by creating your first order with our step-by-step wizard.</CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <Button onClick={handleStartNewOrder} size=\"lg\">
-                                <Plus className=\"mr-2 h-5 w-5\" />
+                            <Button onClick={handleStartNewOrder} size="lg">
+                                <Plus className="mr-2 h-5 w-5" />
                                 Start Your First Order
                             </Button>
                         </CardContent>
@@ -232,14 +218,14 @@ export default function OrderWizardDashboard({ sessions }: OrderWizardDashboardP
                 )}
 
                 {/* Quick Links */}
-                <div className=\"flex items-center gap-4 pt-4 border-t\">
-                    <p className=\"text-sm text-muted-foreground\">
+                <div className="flex items-center gap-4 border-t pt-4">
+                    <p className="text-sm text-muted-foreground">
                         Need help? Check out our{' '}
-                        <Link href=\"#\" className=\"text-primary hover:underline\">
+                        <Link href="#" className="text-primary hover:underline">
                             order guide
                         </Link>{' '}
                         or{' '}
-                        <Link href={route('orders.index')} className=\"text-primary hover:underline\">
+                        <Link href={route('orders.index')} className="text-primary hover:underline">
                             view all orders
                         </Link>
                         .

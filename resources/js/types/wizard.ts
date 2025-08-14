@@ -37,4 +37,5 @@ export interface WizardPageData {
     vessels: Vessel[];
     ports: Port[];
     serviceCategories: ServiceCategory[];
+    services: Service[];
 }
