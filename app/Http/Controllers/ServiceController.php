@@ -57,10 +57,32 @@ class ServiceController extends Controller
 
         $services = $query->latest()->get();
 
+        // Build base query for counts (same organization filtering as main query)
+        $countQuery = Service::query();
+        if ($user->isInOrganizationWithBusinessType(OrganizationBusinessType::SHIPPING_AGENCY)) {
+            $countQuery->where('organization_id', $user->current_organization_id);
+        }
+
+        // Get ports with service counts
+        $portsWithCounts = Port::query()
+            ->withCount(['services' => function ($query) use ($countQuery) {
+                $query->whereIn('id', $countQuery->pluck('id'));
+            }])
+            ->orderBy('name')
+            ->get();
+
+        // Get service categories with service counts
+        $categoriesWithCounts = ServiceCategory::query()
+            ->withCount(['services' => function ($query) use ($countQuery) {
+                $query->whereIn('id', $countQuery->pluck('id'));
+            }])
+            ->orderBy('service_categories.name')
+            ->get();
+
         return Inertia::render('services/services-index-page', [
             'services' => Inertia::always($services),
-            'ports' => Port::query()->orderBy('name')->get(),
-            'service_categories' => ServiceCategory::query()->orderBy('service_categories.name')->get(),
+            'ports' => $portsWithCounts,
+            'service_categories' => $categoriesWithCounts,
         ]);
     }
 

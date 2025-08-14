@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 
 import type { BreadcrumbItem, SharedData } from '@/types';
 import { ServiceWithRelations } from '@/types/core';
-import { Port } from '@/types/models';
+import { Port, ServiceCategory } from '@/types/models';
 
 import AppLayout from '@/layouts/app-layout';
 
@@ -53,12 +53,7 @@ interface ServiceDeletedEvent extends ServiceEvent {
 interface ServicesPageProps {
     services: ServiceWithRelations[];
     ports: Port[];
-    service_categories: {
-        id: string;
-        name: string;
-        created_at: string;
-        updated_at: string;
-    }[];
+    service_categories: ServiceCategory[];
 }
 
 export default function ServicesIndexPage({ services: initialServices, ports, service_categories }: ServicesPageProps) {
@@ -195,7 +190,12 @@ export default function ServicesIndexPage({ services: initialServices, ports, se
                                         {ports.map((port) => (
                                             <div className="flex items-center gap-2" key={port.id}>
                                                 <RadioGroupItem value={port.name} id={port.id.toString()} />
-                                                <Label htmlFor={port.id.toString()}>{port.name}</Label>
+                                                <Label htmlFor={port.id.toString()}>
+                                                    {port.name}
+                                                    {typeof port.services_count === 'number' && (
+                                                        <span className="ml-1 text-muted-foreground">({port.services_count})</span>
+                                                    )}
+                                                </Label>
                                             </div>
                                         ))}
                                     </RadioGroup>
@@ -217,7 +217,12 @@ export default function ServicesIndexPage({ services: initialServices, ports, se
                                         {service_categories.map((category) => (
                                             <div className="flex items-center gap-2" key={category.id}>
                                                 <RadioGroupItem value={category.name} id={category.id.toString()} />
-                                                <Label htmlFor={category.id.toString()}>{category.name}</Label>
+                                                <Label htmlFor={category.id.toString()}>
+                                                    {category.name}
+                                                    {typeof category.services_count === 'number' && (
+                                                        <span className="ml-1 text-muted-foreground">({category.services_count})</span>
+                                                    )}
+                                                </Label>
                                             </div>
                                         ))}
                                     </RadioGroup>

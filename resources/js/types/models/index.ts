@@ -59,6 +59,7 @@ export interface Port extends BaseModel {
     latitude: number;
     longitude: number;
     timezone: string;
+    services_count?: number;
 }
 
 export interface Service extends BaseModel {
@@ -80,6 +81,7 @@ export interface Service extends BaseModel {
 
 export interface ServiceCategory extends BaseModel {
     name: string;
+    services_count?: number;
 }
 
 export interface OrderBase extends BaseModel {
