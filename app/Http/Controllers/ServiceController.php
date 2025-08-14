@@ -100,6 +100,7 @@ class ServiceController extends Controller
 
         return Inertia::render('services/create-service-page', [
             'ports' => Port::query()->get(),
+            'serviceCategories' => ServiceCategory::query()->get(),
         ]);
     }
 
@@ -129,6 +130,7 @@ class ServiceController extends Controller
         return Inertia::render('services/edit-service-page', [
             'service' => $service,
             'ports' => Port::query()->get(),
+            'serviceCategories' => ServiceCategory::query()->get(),
         ]);
     }
 

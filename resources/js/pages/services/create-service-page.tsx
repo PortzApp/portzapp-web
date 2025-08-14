@@ -6,7 +6,7 @@ import { LoaderCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 import type { BreadcrumbItem } from '@/types';
-import { Port, Service } from '@/types/models';
+import { Port, Service, ServiceCategory } from '@/types/models';
 
 import AppLayout from '@/layouts/app-layout';
 
@@ -33,7 +33,8 @@ export type ServiceForm = {
     description: string;
     price: string;
     status: 'active' | 'inactive';
-    port_id: number;
+    port_id: string;
+    service_category_id: string;
 };
 
 interface ServiceEvent {
@@ -59,13 +60,14 @@ interface ServiceDeletedEvent extends ServiceEvent {
     serviceName: string;
 }
 
-export default function CreateServicePage({ ports }: { ports: Port[] }) {
+export default function CreateServicePage({ ports, serviceCategories }: { ports: Port[]; serviceCategories: ServiceCategory[] }) {
     const { data, setData, post, processing, errors, reset } = useForm<ServiceForm>({
         name: '',
         description: '',
         price: '',
         status: 'active',
-        port_id: 0,
+        port_id: '',
+        service_category_id: '',
     });
 
     // Listen for service events to show real-time updates
@@ -186,13 +188,7 @@ export default function CreateServicePage({ ports }: { ports: Port[] }) {
 
                     <div className="flex flex-col gap-2">
                         <Label htmlFor="port">Port</Label>
-                        <Select
-                            value={data.port_id.toString()}
-                            onValueChange={(value) => {
-                                const currentValue = parseInt(value);
-                                setData('port_id', currentValue);
-                            }}
-                        >
+                        <Select value={data.port_id} onValueChange={(value) => setData('port_id', value)}>
                             <SelectTrigger>
                                 <SelectValue placeholder="Select port" />
                             </SelectTrigger>
@@ -205,6 +201,23 @@ export default function CreateServicePage({ ports }: { ports: Port[] }) {
                             </SelectContent>
                         </Select>
                         <InputError message={errors.port_id} />
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                        <Label htmlFor="service_category">Service Category</Label>
+                        <Select value={data.service_category_id} onValueChange={(value) => setData('service_category_id', value)}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select service category" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {serviceCategories.map((category) => (
+                                    <SelectItem key={category.id} value={category.id.toString()}>
+                                        {category.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        <InputError message={errors.service_category_id} />
                     </div>
                 </div>
 
