@@ -188,10 +188,7 @@ export default function CreateServicePage({ ports, serviceCategories }: { ports:
 
                     <div className="flex flex-col gap-2">
                         <Label htmlFor="port">Port</Label>
-                        <Select
-                            value={data.port_id}
-                            onValueChange={(value) => setData('port_id', value)}
-                        >
+                        <Select value={data.port_id} onValueChange={(value) => setData('port_id', value)}>
                             <SelectTrigger>
                                 <SelectValue placeholder="Select port" />
                             </SelectTrigger>
@@ -208,10 +205,7 @@ export default function CreateServicePage({ ports, serviceCategories }: { ports:
 
                     <div className="flex flex-col gap-2">
                         <Label htmlFor="service_category">Service Category</Label>
-                        <Select
-                            value={data.service_category_id}
-                            onValueChange={(value) => setData('service_category_id', value)}
-                        >
+                        <Select value={data.service_category_id} onValueChange={(value) => setData('service_category_id', value)}>
                             <SelectTrigger>
                                 <SelectValue placeholder="Select service category" />
                             </SelectTrigger>

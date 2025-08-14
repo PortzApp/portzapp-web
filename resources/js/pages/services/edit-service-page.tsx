@@ -41,7 +41,15 @@ interface ServiceDeletedEvent extends ServiceEvent {
     serviceName: string;
 }
 
-export default function EditServicePage({ service: initialService, ports, serviceCategories }: { service: Service; ports: Port[]; serviceCategories: ServiceCategory[] }) {
+export default function EditServicePage({
+    service: initialService,
+    ports,
+    serviceCategories,
+}: {
+    service: Service;
+    ports: Port[];
+    serviceCategories: ServiceCategory[];
+}) {
     const [service, setService] = useState(initialService);
     const breadcrumbs: BreadcrumbItem[] = [
         {
