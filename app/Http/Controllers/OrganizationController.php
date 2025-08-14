@@ -51,9 +51,9 @@ class OrganizationController extends Controller
         Gate::authorize('create', Organization::class);
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'registration_code' => 'required|string|max:255|unique:organizations',
-            'business_type' => 'required|in:'.implode(',', array_map(fn ($case) => $case->value, OrganizationBusinessType::cases())),
+            'name' => ['required', 'string', 'max:255'],
+            'registration_code' => ['required', 'string', 'max:255', 'unique:organizations'],
+            'business_type' => ['required', 'in:'.implode(',', array_map(fn ($case) => $case->value, OrganizationBusinessType::cases()))],
         ]);
 
         $organization = Organization::create([
@@ -144,9 +144,9 @@ class OrganizationController extends Controller
         Gate::authorize('update', $organization);
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'registration_code' => 'required|string|max:255|unique:organizations,registration_code,'.$organization->id,
-            'business_type' => 'required|in:'.implode(',', array_map(fn ($case) => $case->value, OrganizationBusinessType::cases())),
+            'name' => ['required', 'string', 'max:255'],
+            'registration_code' => ['required', 'string', 'max:255', 'unique:organizations,registration_code,'.$organization->id],
+            'business_type' => ['required', 'in:'.implode(',', array_map(fn ($case) => $case->value, OrganizationBusinessType::cases()))],
         ]);
 
         $organization->update([
@@ -198,8 +198,8 @@ class OrganizationController extends Controller
         Gate::authorize('update', $organization);
 
         $validated = $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'role' => 'required|in:'.implode(',', array_map(fn ($case) => $case->value, UserRoles::cases())),
+            'user_id' => ['required', 'exists:users,id'],
+            'role' => ['required', 'in:'.implode(',', array_map(fn ($case) => $case->value, UserRoles::cases()))],
         ]);
 
         $user = User::find($validated['user_id']);
@@ -254,7 +254,7 @@ class OrganizationController extends Controller
         Gate::authorize('update', $organization);
 
         $validated = $request->validate([
-            'role' => 'required|in:'.implode(',', array_map(fn ($case) => $case->value, UserRoles::cases())),
+            'role' => ['required', 'in:'.implode(',', array_map(fn ($case) => $case->value, UserRoles::cases()))],
         ]);
 
         // Check if user is a member

@@ -37,12 +37,12 @@ class RegisteredUserController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
-            'phone_number' => 'required|string|max:25',
-            'company_name' => 'required|string|max:255',
-            'company_registration_code' => 'required|string|max:255',
+            'first_name' => ['required', 'string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'phone_number' => ['required', 'string', 'max:25'],
+            'company_name' => ['required', 'string', 'max:255'],
+            'company_registration_code' => ['required', 'string', 'max:255'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'user_role' => [Rule::enum(UserRoles::class)],
             'organization_business_type' => [Rule::enum(OrganizationBusinessType::class)],

@@ -28,8 +28,8 @@ class UpdateOrderRequest extends FormRequest
             'service_ids' => ['sometimes', 'array', 'min:1'],
             'service_ids.*' => ['exists:services,id'],
             'vessel_id' => ['sometimes', 'exists:vessels,id'],
-            'status' => 'sometimes|in:draft,pending_agency_confirmation,partially_confirmed,confirmed,cancelled',
-            'notes' => 'sometimes|string|nullable',
+            'status' => ['sometimes', 'in:draft,pending_agency_confirmation,partially_confirmed,confirmed,cancelled'],
+            'notes' => ['sometimes', 'string', 'nullable'],
         ];
     }
 }

@@ -22,14 +22,14 @@ class StorePortRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
-            'code' => 'required|string|max:255|unique:ports,code',
-            'status' => 'required|in:active,inactive,maintenance',
-            'country' => 'required|string|max:255',
-            'city' => 'required|string|max:255',
-            'latitude' => 'required|numeric',
-            'longitude' => 'required|numeric',
-            'timezone' => 'required|string|max:255',
+            'name' => ['required', 'string', 'max:255'],
+            'code' => ['required', 'string', 'max:255', 'unique:ports,code'],
+            'status' => ['required', 'in:active,inactive,maintenance'],
+            'country' => ['required', 'string', 'max:255'],
+            'city' => ['required', 'string', 'max:255'],
+            'latitude' => ['required', 'numeric'],
+            'longitude' => ['required', 'numeric'],
+            'timezone' => ['required', 'string', 'max:255'],
         ];
     }
 }
