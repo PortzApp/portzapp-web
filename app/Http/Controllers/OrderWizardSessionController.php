@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Enums\OrderGroupStatus;
 use App\Enums\OrderStatus;
-use App\Enums\OrganizationBusinessType;
 use App\Models\Order;
 use App\Models\OrderGroup;
 use App\Models\OrderWizardSession;
@@ -55,7 +54,7 @@ class OrderWizardSessionController extends Controller
         ]);
 
         $user = auth()->user();
-        $sessionName = $validated['session_name'] ?? 'Order Draft - ' . now()->format('M j, Y g:i A');
+        $sessionName = $validated['session_name'] ?? 'Order Draft - '.now()->format('M j, Y g:i A');
 
         $session = OrderWizardSession::create([
             'user_id' => $user->id,
@@ -148,7 +147,7 @@ class OrderWizardSessionController extends Controller
         ]);
 
         // Validate that the session has all required data
-        if (!$session->vessel_id || !$session->port_id || empty($session->selected_services)) {
+        if (! $session->vessel_id || ! $session->port_id || empty($session->selected_services)) {
             return response()->json([
                 'error' => 'Session is incomplete. Please ensure vessel, port, and services are selected.',
             ], 422);
@@ -159,7 +158,7 @@ class OrderWizardSessionController extends Controller
 
             // Create the order
             $order = Order::create([
-                'order_number' => 'ORD-' . strtoupper(uniqid()),
+                'order_number' => 'ORD-'.strtoupper(uniqid()),
                 'vessel_id' => $session->vessel_id,
                 'port_id' => $session->port_id,
                 'placed_by_user_id' => $session->user_id,
@@ -175,7 +174,7 @@ class OrderWizardSessionController extends Controller
 
             foreach ($servicesByOrg as $orgId => $orgServices) {
                 $orderGroup = OrderGroup::create([
-                    'group_number' => 'GRP-' . strtoupper(uniqid()),
+                    'group_number' => 'GRP-'.strtoupper(uniqid()),
                     'order_id' => $order->id,
                     'fulfilling_organization_id' => $orgId,
                     'status' => OrderGroupStatus::PENDING,
@@ -230,7 +229,7 @@ class OrderWizardSessionController extends Controller
     /**
      * Get wizard flow data.
      */
-    public function flow(OrderWizardSession $session = null): Response
+    public function flow(?OrderWizardSession $session = null): Response
     {
         if ($session) {
             Gate::authorize('view', $session);

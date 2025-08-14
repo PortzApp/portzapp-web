@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\OrderGroupController;
+use App\Http\Controllers\OrderWizardSessionController;
 use App\Http\Controllers\OrganizationController;
 use App\Http\Controllers\PortController;
 use App\Http\Controllers\ServiceController;
@@ -33,6 +34,22 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::post('order-groups/{orderGroup}/reject', [OrderGroupController::class, 'reject'])->name('order-groups.reject');
     Route::post('order-groups/{orderGroup}/start', [OrderGroupController::class, 'start'])->name('order-groups.start');
     Route::post('order-groups/{orderGroup}/complete', [OrderGroupController::class, 'complete'])->name('order-groups.complete');
+
+    // Order wizard routes
+    Route::prefix('order-wizard')->group(function (): void {
+        Route::get('dashboard', [OrderWizardSessionController::class, 'dashboard'])->name('order-wizard.dashboard');
+        Route::get('flow/{session?}', [OrderWizardSessionController::class, 'flow'])->name('order-wizard.flow');
+        Route::post('sessions/{session}/complete', [OrderWizardSessionController::class, 'complete'])->name('order-wizard.complete');
+    });
+
+    // Order wizard session API routes
+    Route::apiResource('order-wizard-sessions', OrderWizardSessionController::class)->names([
+        'index' => 'order-wizard-sessions.index',
+        'store' => 'order-wizard-sessions.store',
+        'show' => 'order-wizard-sessions.show',
+        'update' => 'order-wizard-sessions.update',
+        'destroy' => 'order-wizard-sessions.destroy',
+    ]);
 
     // Ports management routes (restricted to portzapp_team business type)
     Route::middleware('portzapp.team')->group(function (): void {
