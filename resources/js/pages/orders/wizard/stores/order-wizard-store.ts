@@ -1,9 +1,18 @@
 import { router } from '@inertiajs/react';
+import { route } from 'ziggy-js';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 
 import type { Port, Service, ServiceCategory, Vessel } from '@/types/models';
 import type { OrderWizardSession, ServiceSelection, WizardStep } from '@/types/wizard';
+
+interface InertiaResponse {
+    props: {
+        session?: OrderWizardSession;
+        order?: { id: string };
+        [key: string]: unknown;
+    };
+}
 
 interface OrderWizardStore {
     // Session data
@@ -27,14 +36,15 @@ interface OrderWizardStore {
     createNewSession: (sessionName?: string) => Promise<void>;
     setVesselAndPort: (vessel: Vessel, port: Port) => Promise<void>;
     selectCategories: (categories: ServiceCategory[]) => Promise<void>;
+    selectServices: (services: Service[]) => Promise<void>;
     addService: (service: Service, organization: { id: string; name: string }) => Promise<void>;
     removeService: (serviceId: string) => Promise<void>;
     setNotes: (notes: string) => void;
     setCurrentStep: (step: WizardStep) => void;
     saveProgress: () => Promise<void>;
-    completeOrder: () => Promise<{ success: boolean; order?: any; error?: string }>;
+    completeOrder: () => Promise<{ success: boolean; order?: { id: string }; error?: string }>;
     reset: () => void;
-    
+
     // Navigation helpers
     goToNextStep: () => Promise<void>;
     goToPreviousStep: () => Promise<void>;
@@ -78,199 +88,251 @@ export const useOrderWizardStore = create<OrderWizardStore>()(
                 },
 
                 createNewSession: async (sessionName) => {
-                    set({ isLoading: true });
-                    
-                    try {
-                        const response = await fetch('/order-wizard-sessions', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                    return new Promise<void>((resolve, reject) => {
+                        set({ isLoading: true });
+
+                        router.post(
+                            route('order-wizard-sessions.store'),
+                            { session_name: sessionName },
+                            {
+                                onSuccess: (page: InertiaResponse) => {
+                                    const data = page.props;
+                                    set({
+                                        sessionId: data.session!.id,
+                                        sessionName: data.session!.session_name,
+                                        currentStep: 'vessel_port',
+                                        isLoading: false,
+                                    });
+                                    resolve();
+                                },
+                                onError: (errors) => {
+                                    console.error('Error creating session:', errors);
+                                    set({ isLoading: false });
+                                    reject(new Error('Failed to create session'));
+                                },
+                                onFinish: () => {
+                                    set({ isLoading: false });
+                                },
                             },
-                            body: JSON.stringify({
-                                session_name: sessionName,
-                            }),
-                        });
-
-                        if (!response.ok) {
-                            throw new Error('Failed to create session');
-                        }
-
-                        const data = await response.json();
-                        set({
-                            sessionId: data.session.id,
-                            sessionName: data.session.session_name,
-                            currentStep: 'vessel_port',
-                            isLoading: false,
-                        });
-                    } catch (error) {
-                        console.error('Error creating session:', error);
-                        set({ isLoading: false });
-                        throw error;
-                    }
+                        );
+                    });
                 },
 
                 setVesselAndPort: async (vessel, port) => {
-                    set({ isSaving: true });
-                    
-                    try {
+                    return new Promise<void>((resolve, reject) => {
                         const { sessionId } = get();
                         if (!sessionId) {
-                            throw new Error('No session ID');
+                            reject(new Error('No session ID'));
+                            return;
                         }
 
-                        const response = await fetch(`/order-wizard-sessions/${sessionId}`, {
-                            method: 'PATCH',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-                            },
-                            body: JSON.stringify({
+                        set({ isSaving: true });
+
+                        router.patch(
+                            route('order-wizard-sessions.update', sessionId),
+                            {
                                 vessel_id: vessel.id,
                                 port_id: port.id,
                                 current_step: 'categories',
-                            }),
-                        });
-
-                        if (!response.ok) {
-                            throw new Error('Failed to save vessel and port');
-                        }
-
-                        set({
-                            vessel,
-                            port,
-                            currentStep: 'categories',
-                            isSaving: false,
-                        });
-                    } catch (error) {
-                        console.error('Error saving vessel and port:', error);
-                        set({ isSaving: false });
-                        throw error;
-                    }
+                            },
+                            {
+                                onSuccess: () => {
+                                    set({
+                                        vessel,
+                                        port,
+                                        currentStep: 'categories',
+                                        isSaving: false,
+                                    });
+                                    resolve();
+                                },
+                                onError: (errors) => {
+                                    console.error('Error saving vessel and port:', errors);
+                                    set({ isSaving: false });
+                                    reject(new Error('Failed to save vessel and port'));
+                                },
+                                onFinish: () => {
+                                    set({ isSaving: false });
+                                },
+                            },
+                        );
+                    });
                 },
 
                 selectCategories: async (categories) => {
-                    set({ isSaving: true });
-                    
-                    try {
+                    return new Promise<void>((resolve, reject) => {
                         const { sessionId } = get();
                         if (!sessionId) {
-                            throw new Error('No session ID');
+                            reject(new Error('No session ID'));
+                            return;
                         }
 
-                        const categoryIds = categories.map(cat => cat.id);
-                        const response = await fetch(`/order-wizard-sessions/${sessionId}`, {
-                            method: 'PATCH',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-                            },
-                            body: JSON.stringify({
+                        set({ isSaving: true });
+
+                        const categoryIds = categories.map((cat) => cat.id);
+                        router.patch(
+                            route('order-wizard-sessions.update', sessionId),
+                            {
                                 selected_categories: categoryIds,
                                 current_step: 'services',
-                            }),
-                        });
+                            },
+                            {
+                                onSuccess: () => {
+                                    set({
+                                        selectedCategories: categories,
+                                        currentStep: 'services',
+                                        isSaving: false,
+                                    });
+                                    resolve();
+                                },
+                                onError: (errors) => {
+                                    console.error('Error saving categories:', errors);
+                                    set({ isSaving: false });
+                                    reject(new Error('Failed to save categories'));
+                                },
+                                onFinish: () => {
+                                    set({ isSaving: false });
+                                },
+                            },
+                        );
+                    });
+                },
 
-                        if (!response.ok) {
-                            throw new Error('Failed to save categories');
+                selectServices: async (services) => {
+                    return new Promise<void>((resolve, reject) => {
+                        const { sessionId, selectedCategories } = get();
+                        if (!sessionId) {
+                            reject(new Error('No session ID'));
+                            return;
                         }
 
-                        set({
-                            selectedCategories: categories,
-                            currentStep: 'services',
-                            isSaving: false,
+                        set({ isSaving: true });
+
+                        // Convert services to ServiceSelection format
+                        const serviceSelections: ServiceSelection[] = services.map((service) => {
+                            const category = selectedCategories.find((cat) => cat.id === service.service_category_id.toString());
+                            return {
+                                id: service.id,
+                                name: service.name,
+                                price: service.price,
+                                description: service.description,
+                                organization_id: service.organization?.id || '',
+                                organization_name: service.organization?.name || '',
+                                category_id: service.service_category_id.toString(),
+                                category_name: category?.name || '',
+                            };
                         });
-                    } catch (error) {
-                        console.error('Error saving categories:', error);
-                        set({ isSaving: false });
-                        throw error;
-                    }
+
+                        router.patch(
+                            route('order-wizard-sessions.update', sessionId),
+                            {
+                                selected_services: JSON.parse(JSON.stringify(serviceSelections)),
+                                current_step: 'review',
+                            },
+                            {
+                                onSuccess: () => {
+                                    set({
+                                        selectedServices: serviceSelections,
+                                        currentStep: 'review',
+                                        isSaving: false,
+                                    });
+                                    resolve();
+                                },
+                                onError: (errors) => {
+                                    console.error('Error saving services:', errors);
+                                    set({ isSaving: false });
+                                    reject(new Error('Failed to save services'));
+                                },
+                                onFinish: () => {
+                                    set({ isSaving: false });
+                                },
+                            },
+                        );
+                    });
                 },
 
                 addService: async (service, organization) => {
-                    const { selectedServices, sessionId } = get();
-                    
-                    const serviceSelection: ServiceSelection = {
-                        id: service.id,
-                        name: service.name,
-                        price: service.price,
-                        description: service.description,
-                        organization_id: organization.id,
-                        organization_name: organization.name,
-                        category_id: service.service_category_id,
-                        category_name: '', // Will be populated from context
-                    };
+                    return new Promise<void>((resolve, reject) => {
+                        const { selectedServices, sessionId } = get();
 
-                    const newSelectedServices = [...selectedServices, serviceSelection];
-                    
-                    set({ isSaving: true });
-                    
-                    try {
                         if (!sessionId) {
-                            throw new Error('No session ID');
+                            reject(new Error('No session ID'));
+                            return;
                         }
 
-                        const response = await fetch(`/order-wizard-sessions/${sessionId}`, {
-                            method: 'PATCH',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                        const serviceSelection: ServiceSelection = {
+                            id: service.id,
+                            name: service.name,
+                            price: service.price,
+                            description: service.description,
+                            organization_id: organization.id,
+                            organization_name: organization.name,
+                            category_id: service.service_category_id.toString(),
+                            category_name: '', // Will be populated from context
+                        };
+
+                        const newSelectedServices = [...selectedServices, serviceSelection];
+
+                        set({ isSaving: true });
+
+                        router.patch(
+                            route('order-wizard-sessions.update', sessionId),
+                            { selected_services: JSON.parse(JSON.stringify(newSelectedServices)) },
+                            {
+                                onSuccess: () => {
+                                    set({
+                                        selectedServices: newSelectedServices,
+                                        isSaving: false,
+                                    });
+                                    resolve();
+                                },
+                                onError: (errors) => {
+                                    console.error('Error adding service:', errors);
+                                    set({ isSaving: false });
+                                    reject(new Error('Failed to add service'));
+                                },
+                                onFinish: () => {
+                                    set({ isSaving: false });
+                                },
                             },
-                            body: JSON.stringify({
-                                selected_services: newSelectedServices,
-                            }),
-                        });
-
-                        if (!response.ok) {
-                            throw new Error('Failed to add service');
-                        }
-
-                        set({
-                            selectedServices: newSelectedServices,
-                            isSaving: false,
-                        });
-                    } catch (error) {
-                        console.error('Error adding service:', error);
-                        set({ isSaving: false });
-                        throw error;
-                    }
+                        );
+                    });
                 },
 
                 removeService: async (serviceId) => {
-                    const { selectedServices, sessionId } = get();
-                    const newSelectedServices = selectedServices.filter(s => s.id !== serviceId);
-                    
-                    set({ isSaving: true });
-                    
-                    try {
+                    return new Promise<void>((resolve, reject) => {
+                        const { selectedServices, sessionId } = get();
+
                         if (!sessionId) {
-                            throw new Error('No session ID');
+                            reject(new Error('No session ID'));
+                            return;
                         }
 
-                        const response = await fetch(`/order-wizard-sessions/${sessionId}`, {
-                            method: 'PATCH',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                        const newSelectedServices = selectedServices.filter((s) => s.id !== serviceId);
+
+                        set({ isSaving: true });
+
+                        router.patch(
+                            route('order-wizard-sessions.update', sessionId),
+                            { selected_services: JSON.parse(JSON.stringify(newSelectedServices)) },
+                            {
+                                onSuccess: () => {
+                                    set({
+                                        selectedServices: newSelectedServices,
+                                        isSaving: false,
+                                    });
+                                    resolve();
+                                },
+                                onError: (errors) => {
+                                    console.error('Error removing service:', errors);
+                                    set({ isSaving: false });
+                                    reject(new Error('Failed to remove service'));
+                                },
+                                onFinish: () => {
+                                    set({ isSaving: false });
+                                },
                             },
-                            body: JSON.stringify({
-                                selected_services: newSelectedServices,
-                            }),
-                        });
-
-                        if (!response.ok) {
-                            throw new Error('Failed to remove service');
-                        }
-
-                        set({
-                            selectedServices: newSelectedServices,
-                            isSaving: false,
-                        });
-                    } catch (error) {
-                        console.error('Error removing service:', error);
-                        set({ isSaving: false });
-                        throw error;
-                    }
+                        );
+                    });
                 },
 
                 setNotes: (notes) => {
@@ -286,66 +348,56 @@ export const useOrderWizardStore = create<OrderWizardStore>()(
                     if (!sessionId) return;
 
                     set({ isSaving: true });
-                    
-                    try {
-                        const response = await fetch(`/order-wizard-sessions/${sessionId}`, {
-                            method: 'PATCH',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+
+                    router.patch(
+                        route('order-wizard-sessions.update', sessionId),
+                        { current_step: currentStep },
+                        {
+                            onError: (errors) => {
+                                console.error('Error saving progress:', errors);
                             },
-                            body: JSON.stringify({
-                                current_step: currentStep,
-                            }),
-                        });
-
-                        if (!response.ok) {
-                            throw new Error('Failed to save progress');
-                        }
-
-                        set({ isSaving: false });
-                    } catch (error) {
-                        console.error('Error saving progress:', error);
-                        set({ isSaving: false });
-                        throw error;
-                    }
+                            onFinish: () => {
+                                set({ isSaving: false });
+                            },
+                        },
+                    );
                 },
 
                 completeOrder: async () => {
-                    const { sessionId, notes } = get();
-                    if (!sessionId) {
-                        return { success: false, error: 'No session ID' };
-                    }
-
-                    set({ isSaving: true });
-                    
-                    try {
-                        const response = await fetch(`/order-wizard/sessions/${sessionId}/complete`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-                            },
-                            body: JSON.stringify({
-                                notes,
-                            }),
-                        });
-
-                        const data = await response.json();
-
-                        if (!response.ok) {
-                            return { success: false, error: data.error || 'Failed to complete order' };
+                    return new Promise<{ success: boolean; order?: { id: string }; error?: string }>((resolve) => {
+                        const { sessionId, notes } = get();
+                        if (!sessionId) {
+                            resolve({ success: false, error: 'No session ID' });
+                            return;
                         }
 
-                        set({ isSaving: false });
-                        get().reset();
-                        
-                        return { success: true, order: data.order };
-                    } catch (error) {
-                        console.error('Error completing order:', error);
-                        set({ isSaving: false });
-                        return { success: false, error: 'Network error' };
-                    }
+                        set({ isSaving: true });
+
+                        router.post(
+                            route('order-wizard.complete', sessionId),
+                            { notes },
+                            {
+                                onSuccess: (page: InertiaResponse) => {
+                                    const data = page.props;
+                                    set({ isSaving: false });
+                                    get().reset();
+                                    resolve({ success: true, order: data.order });
+                                },
+                                onError: (errors) => {
+                                    console.error('Error completing order:', errors);
+                                    set({ isSaving: false });
+                                    const errorMessage =
+                                        typeof errors === 'object' && errors !== null && 'message' in errors
+                                            ? (errors as { message: string }).message
+                                            : 'Failed to complete order';
+                                    resolve({ success: false, error: errorMessage });
+                                },
+                                onFinish: () => {
+                                    set({ isSaving: false });
+                                },
+                            },
+                        );
+                    });
                 },
 
                 reset: () => {
@@ -356,7 +408,7 @@ export const useOrderWizardStore = create<OrderWizardStore>()(
                     const { currentStep } = get();
                     const steps: WizardStep[] = ['vessel_port', 'categories', 'services', 'review'];
                     const currentIndex = steps.indexOf(currentStep);
-                    
+
                     if (currentIndex < steps.length - 1) {
                         const nextStep = steps[currentIndex + 1];
                         set({ currentStep: nextStep });
@@ -368,7 +420,7 @@ export const useOrderWizardStore = create<OrderWizardStore>()(
                     const { currentStep } = get();
                     const steps: WizardStep[] = ['vessel_port', 'categories', 'services', 'review'];
                     const currentIndex = steps.indexOf(currentStep);
-                    
+
                     if (currentIndex > 0) {
                         const previousStep = steps[currentIndex - 1];
                         set({ currentStep: previousStep });
@@ -378,17 +430,18 @@ export const useOrderWizardStore = create<OrderWizardStore>()(
 
                 canGoToNextStep: () => {
                     const { currentStep, vessel, port, selectedCategories, selectedServices } = get();
-                    
+
                     switch (currentStep) {
                         case 'vessel_port':
                             return vessel !== null && port !== null;
                         case 'categories':
                             return selectedCategories.length > 0;
-                        case 'services':
+                        case 'services': {
                             // Check that we have selected at least one service for each category
-                            const selectedCategoryIds = selectedCategories.map(c => c.id);
-                            const servicesCategoryIds = selectedServices.map(s => s.category_id);
-                            return selectedCategoryIds.every(catId => servicesCategoryIds.includes(catId));
+                            const selectedCategoryIds = selectedCategories.map((c) => c.id);
+                            const servicesCategoryIds = selectedServices.map((s) => s.category_id);
+                            return selectedCategoryIds.every((catId) => servicesCategoryIds.includes(catId));
+                        }
                         case 'review':
                             return selectedServices.length > 0;
                         default:
@@ -403,10 +456,10 @@ export const useOrderWizardStore = create<OrderWizardStore>()(
                     currentStep: state.currentStep,
                     sessionName: state.sessionName,
                 }),
-            }
+            },
         ),
         {
             name: 'order-wizard-store',
-        }
-    )
+        },
+    ),
 );
