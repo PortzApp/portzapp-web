@@ -6,7 +6,7 @@ import { LoaderCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 import type { BreadcrumbItem } from '@/types';
-import { Port, Service } from '@/types/models';
+import { Port, Service, ServiceCategory } from '@/types/models';
 
 import AppLayout from '@/layouts/app-layout';
 
@@ -41,7 +41,7 @@ interface ServiceDeletedEvent extends ServiceEvent {
     serviceName: string;
 }
 
-export default function EditServicePage({ service: initialService, ports }: { service: Service; ports: Port[] }) {
+export default function EditServicePage({ service: initialService, ports, serviceCategories }: { service: Service; ports: Port[]; serviceCategories: ServiceCategory[] }) {
     const [service, setService] = useState(initialService);
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -63,7 +63,8 @@ export default function EditServicePage({ service: initialService, ports }: { se
         description: string;
         price: number;
         status: 'active' | 'inactive';
-        port_id: number;
+        port_id: string;
+        service_category_id: string;
     };
 
     const { data, setData, put, processing, errors } = useForm<ServiceForm>({
@@ -71,7 +72,8 @@ export default function EditServicePage({ service: initialService, ports }: { se
         description: service.description || '',
         price: typeof service.price === 'string' ? parseFloat(service.price) : service.price,
         status: service.status,
-        port_id: service.port_id,
+        port_id: service.port_id.toString(),
+        service_category_id: service.service_category_id?.toString() || '',
     });
 
     // Listen for service events
@@ -96,7 +98,8 @@ export default function EditServicePage({ service: initialService, ports }: { se
                 description: updatedService.description || '',
                 price: typeof updatedService.price === 'string' ? parseFloat(updatedService.price) : updatedService.price,
                 status: updatedService.status,
-                port_id: updatedService.port_id,
+                port_id: updatedService.port_id.toString(),
+                service_category_id: updatedService.service_category_id?.toString() || '',
             });
         }
 
@@ -192,7 +195,7 @@ export default function EditServicePage({ service: initialService, ports }: { se
 
                     <div className="flex flex-col gap-2">
                         <Label htmlFor="port_id">Port</Label>
-                        <Select value={data.port_id?.toString()} onValueChange={(value) => setData('port_id', parseInt(value))}>
+                        <Select value={data.port_id} onValueChange={(value) => setData('port_id', value)}>
                             <SelectTrigger>
                                 <SelectValue placeholder="Select a port" />
                             </SelectTrigger>
@@ -205,6 +208,23 @@ export default function EditServicePage({ service: initialService, ports }: { se
                             </SelectContent>
                         </Select>
                         <InputError message={errors.port_id} />
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                        <Label htmlFor="service_category">Service Category</Label>
+                        <Select value={data.service_category_id} onValueChange={(value) => setData('service_category_id', value)}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select service category" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {serviceCategories.map((category) => (
+                                    <SelectItem key={category.id} value={category.id.toString()}>
+                                        {category.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        <InputError message={errors.service_category_id} />
                     </div>
 
                     <div className="flex flex-col gap-2">
