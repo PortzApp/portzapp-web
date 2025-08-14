@@ -11,6 +11,7 @@ import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
+import { StepVesselPort } from './components/step-vessel-port';
 import { WizardProgressBar } from './components/wizard-progress-bar';
 import { useOrderWizardStore } from './stores/order-wizard-store';
 
@@ -61,34 +62,7 @@ export default function OrderWizardFlow({ session, vessels, ports, serviceCatego
     const renderStepContent = () => {
         switch (currentStep) {
             case 'vessel_port':
-                return (
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Select Vessel & Port</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className=\"space-y-4\">
-                                <div>
-                                    <h3 className=\"text-sm font-medium mb-2\">Available Vessels</h3>
-                                    <p className=\"text-sm text-muted-foreground\">
-                                        {vessels.length} vessel(s) available
-                                    </p>
-                                </div>
-                                <div>
-                                    <h3 className=\"text-sm font-medium mb-2\">Available Ports</h3>
-                                    <p className=\"text-sm text-muted-foreground\">
-                                        {ports.length} port(s) available
-                                    </p>
-                                </div>
-                                <div className=\"p-4 bg-muted rounded-md\">
-                                    <p className=\"text-sm text-center text-muted-foreground\">
-                                        Step 1 component will be implemented next
-                                    </p>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-                );
+                return <StepVesselPort vessels={vessels} ports={ports} />;
 
             case 'categories':
                 return (

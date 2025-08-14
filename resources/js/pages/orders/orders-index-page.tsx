@@ -27,7 +27,7 @@ export default function OrdersIndexPage({ orders }: { orders: Array<OrderWithRel
                 <div className="flex items-center justify-between">
                     <h1 className="text-2xl font-bold">Orders</h1>
                     {auth.user.current_organization?.business_type === 'vessel_owner' && (
-                        <Link href={route('orders.create')} className={buttonVariants({ variant: 'default' })}>
+                        <Link href={route('order-wizard.dashboard')} className={buttonVariants({ variant: 'default' })}>
                             Create order
                         </Link>
                     )}
