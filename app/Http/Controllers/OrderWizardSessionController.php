@@ -12,6 +12,7 @@ use App\Models\Port;
 use App\Models\Service;
 use App\Models\ServiceCategory;
 use App\Models\Vessel;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -375,7 +376,7 @@ class OrderWizardSessionController extends Controller
     /**
      * Show categories selection step.
      */
-    public function showCategoriesStep(OrderWizardSession $session): Response
+    public function showCategoriesStep(OrderWizardSession $session): Response|RedirectResponse
     {
         Gate::authorize('view', $session);
 
@@ -404,7 +405,7 @@ class OrderWizardSessionController extends Controller
     /**
      * Show services selection step.
      */
-    public function showServicesStep(OrderWizardSession $session): Response
+    public function showServicesStep(OrderWizardSession $session): Response|RedirectResponse
     {
         Gate::authorize('view', $session);
 
@@ -462,7 +463,7 @@ class OrderWizardSessionController extends Controller
     /**
      * Show review step.
      */
-    public function showReviewStep(OrderWizardSession $session): Response
+    public function showReviewStep(OrderWizardSession $session): Response|RedirectResponse
     {
         Gate::authorize('view', $session);
 
