@@ -13,8 +13,6 @@ import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
-import { useOrderWizardStore } from './stores/order-wizard-store';
-
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Orders',
@@ -32,26 +30,27 @@ interface OrderWizardDashboardProps {
 
 export default function OrderWizardDashboard({ sessions }: OrderWizardDashboardProps) {
     const [isDeleting, setIsDeleting] = useState<string | null>(null);
-    const { createNewSession, reset } = useOrderWizardStore();
 
-    const handleStartNewOrder = async () => {
-        try {
-            reset(); // Clear any existing state
-            await createNewSession();
-            router.visit(route('order-wizard.flow'));
-        } catch {
-            toast.error('Failed to start new order. Please try again.');
-        }
+    const handleStartNewOrder = () => {
+        router.post(
+            route('order-wizard-sessions.store'),
+            {},
+            {
+                onError: () => {
+                    toast.error('Failed to start new order. Please try again.');
+                },
+            },
+        );
     };
 
     const handleResumeSession = (session: OrderWizardSession) => {
-        const store = useOrderWizardStore.getState();
-        store.initSession(session);
         router.visit(route('order-wizard.flow', { session: session.id }));
     };
 
     const handleDeleteSession = (sessionId: string) => {
         setIsDeleting(sessionId);
+
+        console.log('🚨 sessionId: ', sessionId);
 
         router.delete(route('order-wizard-sessions.destroy', sessionId), {
             onSuccess: () => {

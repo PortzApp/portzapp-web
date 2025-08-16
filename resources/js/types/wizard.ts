@@ -2,6 +2,25 @@ import { Port, Service, ServiceCategory, Vessel } from '@/types/models';
 
 export type WizardStep = 'vessel_port' | 'categories' | 'services' | 'review';
 
+export interface OrderWizardCategorySelection {
+    id: string;
+    session_id: string;
+    service_category_id: string;
+    order_index: number;
+    service_category?: ServiceCategory;
+}
+
+export interface OrderWizardServiceSelection {
+    id: string;
+    session_id: string;
+    service_category_id: string;
+    service_id: string;
+    organization_id: string;
+    price_snapshot: string;
+    notes: string | null;
+    service?: Service;
+}
+
 export interface OrderWizardSession {
     id: string;
     user_id: string;
@@ -9,8 +28,6 @@ export interface OrderWizardSession {
     session_name: string;
     vessel_id: string | null;
     port_id: string | null;
-    selected_categories: string[] | null;
-    selected_services: ServiceSelection[] | null;
     current_step: WizardStep;
     status: 'draft' | 'completed' | 'abandoned';
     completed_at: string | null;
@@ -19,6 +36,8 @@ export interface OrderWizardSession {
     updated_at: string;
     vessel?: Vessel;
     port?: Port;
+    category_selections?: OrderWizardCategorySelection[];
+    service_selections?: OrderWizardServiceSelection[];
 }
 
 export interface ServiceSelection {

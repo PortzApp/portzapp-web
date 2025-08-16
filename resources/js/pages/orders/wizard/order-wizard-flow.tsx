@@ -1,10 +1,10 @@
-import { useEffect } from 'react';
+import { useState } from 'react';
 
 import { Head, router } from '@inertiajs/react';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 
 import type { BreadcrumbItem } from '@/types';
-import type { WizardPageData } from '@/types/wizard';
+import type { WizardPageData, WizardStep } from '@/types/wizard';
 
 import AppLayout from '@/layouts/app-layout';
 
@@ -15,7 +15,6 @@ import { StepReview } from './components/step-review';
 import { StepServices } from './components/step-services';
 import { StepVesselPort } from './components/step-vessel-port';
 import { WizardProgressBar } from './components/wizard-progress-bar';
-import { useOrderWizardStore } from './stores/order-wizard-store';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -33,42 +32,51 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function OrderWizardFlow({ session, vessels, ports, serviceCategories, services }: WizardPageData) {
-    const { currentStep, initSession, canGoToNextStep, goToNextStep, goToPreviousStep, isSaving } = useOrderWizardStore();
+    const [isSaving, setIsSaving] = useState(false);
 
-    console.log('🚨 currentStep: ', currentStep);
-
-    // Initialize the session when the component mounts
-    useEffect(() => {
-        initSession(session || undefined);
-    }, [session, initSession]);
-
-    const handleNext = async () => {
-        if (canGoToNextStep()) {
-            await goToNextStep();
-        }
-    };
-
-    const handleBack = async () => {
-        await goToPreviousStep();
-    };
+    // Get current step from session or default to first step
+    const currentStep: WizardStep = session?.current_step || 'vessel_port';
 
     const handleBackToDashboard = () => {
         router.visit(route('order-wizard.dashboard'));
     };
 
+    const goToPreviousStep = () => {
+        if (!session) return;
+
+        const steps: WizardStep[] = ['vessel_port', 'categories', 'services', 'review'];
+        const currentIndex = steps.indexOf(currentStep);
+
+        if (currentIndex > 0) {
+            const previousStep = steps[currentIndex - 1];
+            setIsSaving(true);
+
+            router.patch(
+                route('order-wizard-sessions.update', session.id),
+                {
+                    current_step: previousStep,
+                },
+                {
+                    onFinish: () => setIsSaving(false),
+                    only: ['session'],
+                },
+            );
+        }
+    };
+
     const renderStepContent = () => {
         switch (currentStep) {
             case 'vessel_port':
-                return <StepVesselPort vessels={vessels} ports={ports} />;
+                return <StepVesselPort vessels={vessels} ports={ports} session={session} />;
 
             case 'categories':
-                return <StepCategories serviceCategories={serviceCategories} />;
+                return <StepCategories serviceCategories={serviceCategories} session={session} />;
 
             case 'services':
-                return <StepServices services={services} />;
+                return <StepServices services={services} session={session} />;
 
             case 'review':
-                return <StepReview />;
+                return <StepReview session={session} />;
 
             default:
                 return null;
@@ -79,7 +87,7 @@ export default function OrderWizardFlow({ session, vessels, ports, serviceCatego
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Create Order - Order Wizard" />
 
-            <div className="mx-auto flex h-full w-full max-w-4xl flex-1 flex-col gap-8 rounded-xl p-8">
+            <div className="mx-auto flex h-full w-full max-w-6xl flex-1 flex-col gap-8 rounded-xl p-8">
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div>
@@ -91,7 +99,7 @@ export default function OrderWizardFlow({ session, vessels, ports, serviceCatego
                     </Button>
                 </div>
 
-                {/* Progress Bar */}
+                {/* Progress Stepper */}
                 <WizardProgressBar currentStep={currentStep} />
 
                 {/* Step Content */}
@@ -99,17 +107,15 @@ export default function OrderWizardFlow({ session, vessels, ports, serviceCatego
 
                 {/* Navigation */}
                 <div className="flex items-center justify-between border-t pt-6">
-                    <Button variant="outline" onClick={handleBack} disabled={currentStep === 'vessel_port' || isSaving}>
+                    <Button variant="outline" onClick={goToPreviousStep} disabled={currentStep === 'vessel_port' || isSaving}>
                         <ArrowLeft className="mr-2 h-4 w-4" />
                         Back
                     </Button>
 
                     <div className="text-sm text-muted-foreground">{isSaving && 'Saving...'}</div>
 
-                    <Button onClick={handleNext} disabled={!canGoToNextStep() || isSaving}>
-                        {currentStep === 'review' ? 'Place Order' : 'Next'}
-                        {currentStep !== 'review' && <ArrowRight className="ml-2 h-4 w-4" />}
-                    </Button>
+                    {/* Next button is now handled by individual step components */}
+                    <div className="text-sm text-muted-foreground">Complete this step to continue</div>
                 </div>
             </div>
         </AppLayout>

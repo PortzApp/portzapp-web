@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use App\Enums\WizardStep;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class OrderWizardSession extends Model
 {
@@ -17,23 +19,19 @@ class OrderWizardSession extends Model
         'session_name',
         'vessel_id',
         'port_id',
-        'selected_categories',
-        'selected_services',
         'current_step',
+        'current_category_index',
         'status',
         'completed_at',
         'expires_at',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'selected_categories' => 'array',
-            'selected_services' => 'array',
-            'completed_at' => 'datetime',
-            'expires_at' => 'datetime',
-        ];
-    }
+    protected $casts = [
+        'current_step' => WizardStep::class,
+        'current_category_index' => 'integer',
+        'completed_at' => 'datetime',
+        'expires_at' => 'datetime',
+    ];
 
     public function user(): BelongsTo
     {
@@ -55,6 +53,16 @@ class OrderWizardSession extends Model
         return $this->belongsTo(Port::class);
     }
 
+    public function categorySelections(): HasMany
+    {
+        return $this->hasMany(OrderWizardCategorySelection::class, 'session_id')->orderBy('order_index');
+    }
+
+    public function serviceSelections(): HasMany
+    {
+        return $this->hasMany(OrderWizardServiceSelection::class, 'session_id');
+    }
+
     public function isExpired(): bool
     {
         $expiresAt = $this->expires_at;
@@ -72,15 +80,14 @@ class OrderWizardSession extends Model
         return $this->status === 'draft';
     }
 
+    public function getCurrentStepEnum(): ?WizardStep
+    {
+        return WizardStep::tryFrom($this->getAttributes()['current_step'] ?? '');
+    }
+
     public function getProgressPercentage(): int
     {
-        return match ($this->current_step) {
-            'vessel_port' => 25,
-            'categories' => 50,
-            'services' => 75,
-            'review' => 100,
-            default => 0,
-        };
+        return $this->getCurrentStepEnum()?->getProgressPercentage() ?? 0;
     }
 
     public function scopeActive($query)

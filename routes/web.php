@@ -39,6 +39,18 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::prefix('order-wizard')->group(function (): void {
         Route::get('dashboard', [OrderWizardSessionController::class, 'dashboard'])->name('order-wizard.dashboard');
         Route::get('flow/{session?}', [OrderWizardSessionController::class, 'flow'])->name('order-wizard.flow');
+
+        // Individual step routes
+        Route::get('session/{session}/step/vessel_port', [OrderWizardSessionController::class, 'showVesselPortStep'])->name('order-wizard.step.vessel-port');
+        Route::get('session/{session}/step/categories', [OrderWizardSessionController::class, 'showCategoriesStep'])->name('order-wizard.step.categories');
+        Route::get('session/{session}/step/services', [OrderWizardSessionController::class, 'showServicesStep'])->name('order-wizard.step.services');
+        Route::get('session/{session}/step/review', [OrderWizardSessionController::class, 'showReviewStep'])->name('order-wizard.step.review');
+
+        // Legacy route for backward compatibility
+        Route::get('session/{session}/step/{step}', function ($session, $step) {
+            return redirect()->route('order-wizard.step.'.str_replace('_', '-', $step), ['session' => $session]);
+        })->name('order-wizard.step');
+
         Route::post('sessions/{session}/complete', [OrderWizardSessionController::class, 'complete'])->name('order-wizard.complete');
     });
 
@@ -50,6 +62,16 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
         'update' => 'order-wizard-sessions.update',
         'destroy' => 'order-wizard-sessions.destroy',
     ]);
+
+    // Additional Order wizard session routes
+    Route::patch('order-wizard-sessions/{session}/vessel-port', [OrderWizardSessionController::class, 'setVesselAndPort'])
+        ->name('order-wizard-sessions.set-vessel-port');
+    Route::patch('order-wizard-sessions/{session}/categories', [OrderWizardSessionController::class, 'setCategories'])
+        ->name('order-wizard-sessions.set-categories');
+    Route::patch('order-wizard-sessions/{session}/services', [OrderWizardSessionController::class, 'setServices'])
+        ->name('order-wizard-sessions.set-services');
+    Route::post('order-wizard-sessions/{session}/complete', [OrderWizardSessionController::class, 'complete'])
+        ->name('order-wizard-sessions.complete');
 
     // Ports management routes (restricted to portzapp_team business type)
     Route::middleware('portzapp.team')->group(function (): void {
