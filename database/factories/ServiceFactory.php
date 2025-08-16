@@ -21,9 +21,8 @@ class ServiceFactory extends Factory
      */
     public function definition(): array
     {
-        $serviceTypes = [
+        $serviceNames = [
             'Port Agency Services',
-            'Ship Chandling',
             'Crew Management',
             'Cargo Handling',
             'Vessel Documentation',
@@ -34,7 +33,6 @@ class ServiceFactory extends Factory
             'Maritime Logistics',
             'Freight Forwarding',
             'Container Services',
-            'Stevedoring',
             'Pilotage Services',
             'Tugboat Services',
             'Ship Repair & Maintenance',
@@ -61,7 +59,7 @@ class ServiceFactory extends Factory
             'organization_id' => Organization::factory(),
             'port_id' => Port::factory(),
             'service_category_id' => ServiceCategory::factory(),
-            'name' => fake()->randomElement($serviceTypes),
+            'name' => fake()->randomElement($serviceNames),
             'description' => fake()->randomElement($descriptions),
             'price' => fake()->randomFloat(2, 500, 50000), // Between $500 and $50,000 for maritime services
             'status' => fake()->randomElement([

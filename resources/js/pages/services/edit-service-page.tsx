@@ -80,8 +80,8 @@ export default function EditServicePage({
         description: service.description || '',
         price: typeof service.price === 'string' ? parseFloat(service.price) : service.price,
         status: service.status,
-        port_id: service.port_id.toString(),
-        service_category_id: service.service_category_id?.toString() || '',
+        port_id: service.port_id,
+        service_category_id: service.service_category_id || '',
     });
 
     // Listen for service events
@@ -106,8 +106,8 @@ export default function EditServicePage({
                 description: updatedService.description || '',
                 price: typeof updatedService.price === 'string' ? parseFloat(updatedService.price) : updatedService.price,
                 status: updatedService.status,
-                port_id: updatedService.port_id.toString(),
-                service_category_id: updatedService.service_category_id?.toString() || '',
+                port_id: updatedService.port_id,
+                service_category_id: updatedService.service_category_id || '',
             });
         }
 
@@ -209,7 +209,7 @@ export default function EditServicePage({
                             </SelectTrigger>
                             <SelectContent>
                                 {ports.map((port) => (
-                                    <SelectItem key={port.id} value={port.id.toString()}>
+                                    <SelectItem key={port.id} value={port.id}>
                                         {port.name}
                                     </SelectItem>
                                 ))}
@@ -226,7 +226,7 @@ export default function EditServicePage({
                             </SelectTrigger>
                             <SelectContent>
                                 {serviceCategories.map((category) => (
-                                    <SelectItem key={category.id} value={category.id.toString()}>
+                                    <SelectItem key={category.id} value={category.id}>
                                         {category.name}
                                     </SelectItem>
                                 ))}

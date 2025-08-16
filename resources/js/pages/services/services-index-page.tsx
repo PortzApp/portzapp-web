@@ -189,8 +189,8 @@ export default function ServicesIndexPage({ services: initialServices, ports, se
                                     >
                                         {ports.map((port) => (
                                             <div className="flex items-center gap-2" key={port.id}>
-                                                <RadioGroupItem value={port.name} id={port.id.toString()} />
-                                                <Label htmlFor={port.id.toString()}>
+                                                <RadioGroupItem value={port.name} id={port.id} />
+                                                <Label htmlFor={port.id}>
                                                     {port.name}
                                                     {typeof port.services_count === 'number' && (
                                                         <span className="ml-1 text-muted-foreground">({port.services_count})</span>
@@ -216,8 +216,8 @@ export default function ServicesIndexPage({ services: initialServices, ports, se
                                     >
                                         {service_categories.map((category) => (
                                             <div className="flex items-center gap-2" key={category.id}>
-                                                <RadioGroupItem value={category.name} id={category.id.toString()} />
-                                                <Label htmlFor={category.id.toString()}>
+                                                <RadioGroupItem value={category.name} id={category.id} />
+                                                <Label htmlFor={category.id}>
                                                     {category.name}
                                                     {typeof category.services_count === 'number' && (
                                                         <span className="ml-1 text-muted-foreground">({category.services_count})</span>
