@@ -65,7 +65,7 @@ class ServiceController extends Controller
 
         // Get ports with service counts
         $portsWithCounts = Port::query()
-            ->withCount(['services' => function ($query) use ($countQuery) {
+            ->withCount(['services' => function ($query) use ($countQuery): void {
                 $query->whereIn('id', $countQuery->pluck('id'));
             }])
             ->orderBy('name')
@@ -73,7 +73,7 @@ class ServiceController extends Controller
 
         // Get service categories with service counts
         $categoriesWithCounts = ServiceCategory::query()
-            ->withCount(['services' => function ($query) use ($countQuery) {
+            ->withCount(['services' => function ($query) use ($countQuery): void {
                 $query->whereIn('id', $countQuery->pluck('id'));
             }])
             ->orderBy('service_categories.name')

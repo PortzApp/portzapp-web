@@ -194,7 +194,7 @@ export default function CreateServicePage({ ports, serviceCategories }: { ports:
                             </SelectTrigger>
                             <SelectContent>
                                 {ports.map((port) => (
-                                    <SelectItem key={port.id} value={port.id.toString()}>
+                                    <SelectItem key={port.id} value={port.id}>
                                         {port.name}
                                     </SelectItem>
                                 ))}
@@ -211,7 +211,7 @@ export default function CreateServicePage({ ports, serviceCategories }: { ports:
                             </SelectTrigger>
                             <SelectContent>
                                 {serviceCategories.map((category) => (
-                                    <SelectItem key={category.id} value={category.id.toString()}>
+                                    <SelectItem key={category.id} value={category.id}>
                                         {category.name}
                                     </SelectItem>
                                 ))}

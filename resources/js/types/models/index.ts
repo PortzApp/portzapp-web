@@ -67,10 +67,12 @@ export interface Service extends BaseModel {
     description: string | null;
     price: string;
     status: ServiceStatus;
-    organization_id: number;
-    port_id: number;
-    service_category_id: number;
+    organization_id: string;
+    port_id: string;
+    service_category_id: string;
     organization?: Organization;
+    port?: Port;
+    category?: ServiceCategory;
     order_service?: {
         order_id: string;
         service_id: string;
