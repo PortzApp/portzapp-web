@@ -1,8 +1,6 @@
-import { Check } from 'lucide-react';
-
 import type { WizardStep } from '@/types/wizard';
 
-import { cn } from '@/lib/utils';
+import { Stepper, StepperDescription, StepperIndicator, StepperItem, StepperSeparator, StepperTitle, StepperTrigger } from '@/components/ui/stepper';
 
 interface WizardProgressBarProps {
     currentStep: WizardStep;
@@ -10,66 +8,40 @@ interface WizardProgressBarProps {
 }
 
 const steps = [
-    { key: 'vessel_port', label: 'Vessel & Port', description: 'Select destination and vessel' },
-    { key: 'categories', label: 'Categories', description: 'Choose service categories' },
-    { key: 'services', label: 'Services', description: 'Select specific services' },
-    { key: 'review', label: 'Review', description: 'Review and place order' },
+    { key: 'vessel_port', step: 1, title: 'Vessel & Port', description: 'Select destination and vessel' },
+    { key: 'categories', step: 2, title: 'Categories', description: 'Choose service categories' },
+    { key: 'services', step: 3, title: 'Services', description: 'Select specific services' },
+    { key: 'review', step: 4, title: 'Review', description: 'Review and place order' },
 ] as const;
 
 export function WizardProgressBar({ currentStep, className }: WizardProgressBarProps) {
     const currentStepIndex = steps.findIndex((step) => step.key === currentStep);
+    const activeStepNumber = currentStepIndex + 1;
 
     return (
-        <nav className={cn('', className)}>
-            <ol className="flex w-full items-center">
-                {steps.map((step, index) => {
-                    const isCompleted = index < currentStepIndex;
-                    const isCurrent = index === currentStepIndex;
-                    const isUpcoming = index > currentStepIndex;
+        <div className={className}>
+            <Stepper value={activeStepNumber}>
+                {steps.map(({ step, title, description, key }) => {
+                    const isCompleted = step < activeStepNumber;
 
                     return (
-                        <li
-                            key={step.key}
-                            className={cn('flex w-full items-center', {
-                                'text-primary': isCurrent || isCompleted,
-                                'text-muted-foreground': isUpcoming,
-                            })}
-                        >
-                            <div className="flex flex-col items-center">
-                                <div
-                                    className={cn('flex h-8 w-8 items-center justify-center rounded-full border-2 text-sm font-semibold', {
-                                        'border-primary bg-primary text-primary-foreground': isCompleted,
-                                        'border-primary bg-background text-primary': isCurrent,
-                                        'border-muted-foreground/30 bg-background text-muted-foreground': isUpcoming,
-                                    })}
-                                >
-                                    {isCompleted ? <Check className="h-4 w-4" /> : <span>{index + 1}</span>}
-                                </div>
-                                <div className="mt-2 text-center">
-                                    <div
-                                        className={cn('text-xs font-medium', {
-                                            'text-foreground': isCurrent || isCompleted,
-                                            'text-muted-foreground': isUpcoming,
-                                        })}
-                                    >
-                                        {step.label}
+                        <StepperItem key={key} step={step} completed={isCompleted} className="relative flex-1 flex-col!">
+                            <StepperTrigger asChild className="flex-col gap-3 rounded">
+                                <div className="flex flex-col items-center gap-3">
+                                    <StepperIndicator />
+                                    <div className="space-y-0.5 px-2 text-center">
+                                        <StepperTitle>{title}</StepperTitle>
+                                        <StepperDescription className="max-sm:hidden">{description}</StepperDescription>
                                     </div>
-                                    <div className="mt-1 max-w-24 text-xs text-muted-foreground">{step.description}</div>
                                 </div>
-                            </div>
-
-                            {index < steps.length - 1 && (
-                                <div
-                                    className={cn('mx-4 mb-6 h-0.5 flex-1', {
-                                        'bg-primary': isCompleted,
-                                        'bg-muted-foreground/30': !isCompleted,
-                                    })}
-                                />
+                            </StepperTrigger>
+                            {step < steps.length && (
+                                <StepperSeparator className="absolute inset-x-0 top-3 left-[calc(50%+0.75rem+0.125rem)] -order-1 m-0 -translate-y-1/2 group-data-[orientation=horizontal]/stepper:w-[calc(100%-1.5rem-0.25rem)] group-data-[orientation=horizontal]/stepper:flex-none" />
                             )}
-                        </li>
+                        </StepperItem>
                     );
                 })}
-            </ol>
-        </nav>
+            </Stepper>
+        </div>
     );
 }
