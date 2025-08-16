@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import { Calendar, Clock, MapPin, Plus, Ship, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { route } from 'ziggy-js';
 
 import type { BreadcrumbItem } from '@/types';
 import type { OrderWizardSession } from '@/types/wizard';
