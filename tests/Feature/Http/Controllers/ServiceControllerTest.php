@@ -7,6 +7,7 @@ use App\Models\Organization;
 use App\Models\Port;
 use App\Models\Service;
 use App\Models\ServiceCategory;
+use App\Models\ServiceSubCategory;
 use App\Models\User;
 use Illuminate\Support\Facades\Event;
 
@@ -89,6 +90,11 @@ beforeEach(function (): void {
         'name' => 'Test Category',
     ]);
 
+    $this->serviceSubCategory = ServiceSubCategory::factory()->create([
+        'service_category_id' => $this->serviceCategory->id,
+        'name' => 'Test Sub Category',
+    ]);
+
     // Create services
     $this->service = Service::factory()->create([
         'organization_id' => $this->shippingAgencyOrg->id,
@@ -157,7 +163,7 @@ test('shipping agency admin can create service', function (): void {
         'price' => 7500.00,
         'status' => ServiceStatus::ACTIVE->value,
         'port_id' => $this->port->id,
-        'service_category_id' => $this->serviceCategory->id,
+        'service_sub_category_id' => $this->serviceSubCategory->id,
     ];
 
     $response = $this->actingAs($this->shippingAgencyAdmin)
@@ -179,7 +185,7 @@ test('shipping agency viewer cannot create service', function (): void {
         'price' => 2500.00,
         'status' => ServiceStatus::ACTIVE->value,
         'port_id' => $this->port->id,
-        'service_category_id' => $this->serviceCategory->id,
+        'service_sub_category_id' => $this->serviceSubCategory->id,
     ];
 
     $response = $this->actingAs($this->shippingAgencyMember)
@@ -199,7 +205,7 @@ test('vessel owner cannot create service', function (): void {
         'price' => 1000.00,
         'status' => ServiceStatus::ACTIVE->value,
         'port_id' => $this->port->id,
-        'service_category_id' => $this->serviceCategory->id,
+        'service_sub_category_id' => $this->serviceSubCategory->id,
     ];
 
     $response = $this->actingAs($this->vesselOwnerAdmin)
@@ -220,7 +226,7 @@ test('user without shipping agency org cannot create service', function (): void
         'price' => 1000.00,
         'status' => ServiceStatus::ACTIVE->value,
         'port_id' => $this->port->id,
-        'service_category_id' => $this->serviceCategory->id,
+        'service_sub_category_id' => $this->serviceSubCategory->id,
     ];
 
     $response = $this->actingAs($userWithoutOrg)
@@ -236,7 +242,7 @@ test('shipping agency admin can update own service', function (): void {
         'price' => 6000.00,
         'status' => ServiceStatus::INACTIVE->value,
         'port_id' => $this->port->id,
-        'service_category_id' => $this->serviceCategory->id,
+        'service_sub_category_id' => $this->serviceSubCategory->id,
     ];
 
     $response = $this->actingAs($this->shippingAgencyAdmin)
@@ -259,7 +265,7 @@ test('shipping agency viewer cannot update service', function (): void {
         'price' => 4500.00,
         'status' => ServiceStatus::ACTIVE->value,
         'port_id' => $this->port->id,
-        'service_category_id' => $this->serviceCategory->id,
+        'service_sub_category_id' => $this->serviceSubCategory->id,
     ];
 
     $response = $this->actingAs($this->shippingAgencyMember)
@@ -275,7 +281,7 @@ test('vessel owner cannot update service', function (): void {
         'price' => 1000.00,
         'status' => ServiceStatus::ACTIVE->value,
         'port_id' => $this->port->id,
-        'service_category_id' => $this->serviceCategory->id,
+        'service_sub_category_id' => $this->serviceSubCategory->id,
     ];
 
     $response = $this->actingAs($this->vesselOwnerAdmin)
@@ -296,7 +302,7 @@ test('user cannot update service from different organization', function (): void
         'price' => 1000.00,
         'status' => ServiceStatus::ACTIVE->value,
         'port_id' => $this->port->id,
-        'service_category_id' => $this->serviceCategory->id,
+        'service_sub_category_id' => $this->serviceSubCategory->id,
     ];
 
     $response = $this->actingAs($this->shippingAgencyAdmin)
