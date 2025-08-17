@@ -11,6 +11,7 @@ use App\Models\OrderWizardSession;
 use App\Models\Port;
 use App\Models\Service;
 use App\Models\ServiceCategory;
+use App\Models\ServiceSubCategory;
 use App\Models\Vessel;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -155,17 +156,24 @@ class OrderWizardSessionController extends Controller
         //        Gate::authorize('update', $session);
 
         $validated = $request->validate([
-            'selected_categories' => 'required|array|min:1',
-            'selected_categories.*' => 'exists:service_categories,id',
+            'selected_sub_categories' => 'required|array|min:1',
+            'selected_sub_categories.*' => 'exists:service_sub_categories,id',
         ]);
 
         // Clear existing category selections
         $session->categorySelections()->delete();
 
-        // Create new category selections
-        foreach ($validated['selected_categories'] as $index => $categoryId) {
+        // Get the parent categories from the selected sub-categories
+        $subCategories = ServiceSubCategory::whereIn('id', $validated['selected_sub_categories'])
+            ->with('category')
+            ->get();
+
+        $uniqueCategories = $subCategories->pluck('category')->unique('id');
+
+        // Create category selections for the unique parent categories
+        foreach ($uniqueCategories as $index => $category) {
             $session->categorySelections()->create([
-                'service_category_id' => $categoryId,
+                'service_category_id' => $category->id,
                 'order_index' => $index,
             ]);
         }
@@ -198,7 +206,7 @@ class OrderWizardSessionController extends Controller
 
         // Get the actual service objects with their details
         $services = Service::whereIn('id', $validated['selected_services'])
-            ->with(['organization', 'category'])
+            ->with(['organization', 'subCategory.category'])
             ->get();
 
         // Create new service selections
@@ -393,8 +401,10 @@ class OrderWizardSessionController extends Controller
             $session->update(['current_step' => WizardStep::CATEGORIES]);
         }
 
-        // Get service categories
-        $serviceCategories = ServiceCategory::orderBy('name')->get();
+        // Get service categories with their sub-categories
+        $serviceCategories = ServiceCategory::with(['subCategories' => function ($query): void {
+            $query->orderBy('sort_order')->orderBy('name');
+        }])->orderBy('name')->get();
 
         return Inertia::render('orders/wizard/order-wizard-step-categories', [
             'session' => $session->load(['vessel', 'port', 'categorySelections.serviceCategory']),
@@ -431,10 +441,12 @@ class OrderWizardSessionController extends Controller
         }
 
         // Filter services by BOTH port AND selected categories
-        $filteredServices = Service::with(['organization', 'category'])
+        $filteredServices = Service::with(['organization', 'subCategory.category'])
             ->where('status', 'active')
             ->where('port_id', $session->port_id)  // Filter by selected port
-            ->whereIn('service_category_id', $selectedCategoryIds)  // Filter by selected categories
+            ->whereHas('subCategory', function ($query) use ($selectedCategoryIds): void {
+                $query->whereIn('service_category_id', $selectedCategoryIds);
+            })  // Filter by selected categories
             ->orderBy('organization_id')  // Group by organization
             ->orderBy('name')
             ->get();
@@ -448,7 +460,8 @@ class OrderWizardSessionController extends Controller
             'filtered_services' => $filteredServices->take(5)->map(fn ($s) => [
                 'id' => $s->id,
                 'name' => $s->name,
-                'category_id' => $s->service_category_id,
+                'sub_category_id' => $s->service_sub_category_id,
+                'category_id' => $s->subCategory?->service_category_id,
                 'port_id' => $s->port_id,
                 'org_name' => $s->organization->name ?? 'N/A',
             ])->toArray(),
@@ -530,7 +543,7 @@ class OrderWizardSessionController extends Controller
         $serviceCategories = ServiceCategory::orderBy('name')->get();
 
         // Get all services with their organization and category relationships
-        $services = Service::with(['organization', 'category'])
+        $services = Service::with(['organization', 'subCategory.category'])
             ->where('status', 'active')
             ->orderBy('name')
             ->get();

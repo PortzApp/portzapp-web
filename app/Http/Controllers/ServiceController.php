@@ -26,7 +26,7 @@ class ServiceController extends Controller
         Gate::authorize('viewAny', Service::class);
 
         $user = request()->user();
-        $query = Service::query()->with(['organization', 'port', 'category', 'orders']);
+        $query = Service::query()->with(['organization', 'port', 'subCategory.category', 'orders']);
 
         // Apply organization-based filtering
         if ($user->isInOrganizationWithBusinessType(OrganizationBusinessType::SHIPPING_AGENCY)) {
@@ -50,7 +50,7 @@ class ServiceController extends Controller
             $categoryFilter = request()->get('category');
 
             // Filter by category name
-            $query->whereHas('category', function ($q) use ($categoryFilter): void {
+            $query->whereHas('subCategory.category', function ($q) use ($categoryFilter): void {
                 $q->where('name', 'like', '%'.$categoryFilter.'%');
             });
         }
@@ -74,7 +74,7 @@ class ServiceController extends Controller
         // Get service categories with service counts
         $categoriesWithCounts = ServiceCategory::query()
             ->withCount(['services' => function ($query) use ($countQuery): void {
-                $query->whereIn('id', $countQuery->pluck('id'));
+                $query->whereIn('services.id', $countQuery->pluck('id'));
             }])
             ->orderBy('service_categories.name')
             ->get();
@@ -102,11 +102,11 @@ class ServiceController extends Controller
             'price' => $validated['price'],
             'status' => $validated['status'],
             'port_id' => $validated['port_id'],
-            'service_category_id' => $validated['service_category_id'],
+            'service_sub_category_id' => $validated['service_sub_category_id'],
         ]);
 
         // Load relationships for the created service
-        $service->load(['organization:id,name', 'port:id,name', 'category:id,name', 'orders']);
+        $service->load(['organization:id,name', 'port:id,name', 'subCategory.category:id,name', 'orders']);
 
         ServiceCreated::dispatch($request->user(), $service);
 
@@ -122,7 +122,7 @@ class ServiceController extends Controller
 
         return Inertia::render('services/create-service-page', [
             'ports' => Port::query()->get(),
-            'serviceCategories' => ServiceCategory::query()->get(),
+            'serviceCategories' => ServiceCategory::query()->with('subCategories')->get(),
         ]);
     }
 
@@ -133,7 +133,7 @@ class ServiceController extends Controller
     {
         Gate::authorize('view', $service);
 
-        $service->load(['organization:id,name', 'port:id,name', 'category:id,name', 'orders']);
+        $service->load(['organization:id,name', 'port:id,name', 'subCategory.category:id,name', 'orders']);
 
         return Inertia::render('services/show-service-page', [
             'service' => $service,
@@ -147,12 +147,12 @@ class ServiceController extends Controller
     {
         Gate::authorize('update', $service);
 
-        $service->load(['organization:id,name', 'port:id,name', 'orders']);
+        $service->load(['organization:id,name', 'port:id,name', 'subCategory.category:id,name', 'orders']);
 
         return Inertia::render('services/edit-service-page', [
             'service' => $service,
             'ports' => Port::query()->get(),
-            'serviceCategories' => ServiceCategory::query()->get(),
+            'serviceCategories' => ServiceCategory::query()->with('subCategories')->get(),
         ]);
     }
 
@@ -174,7 +174,7 @@ class ServiceController extends Controller
         ]);
 
         // Refresh the service with relationships to get the latest data
-        $service->refresh()->load(['organization:id,name', 'port:id,name', 'orders']);
+        $service->refresh()->load(['organization:id,name', 'port:id,name', 'subCategory.category:id,name', 'orders']);
 
         ServiceUpdated::dispatch($request->user(), $service);
 
