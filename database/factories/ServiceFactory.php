@@ -6,7 +6,7 @@ use App\Enums\ServiceStatus;
 use App\Models\Organization;
 use App\Models\Port;
 use App\Models\Service;
-use App\Models\ServiceCategory;
+use App\Models\ServiceSubCategory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -58,7 +58,7 @@ class ServiceFactory extends Factory
         return [
             'organization_id' => Organization::factory(),
             'port_id' => Port::factory(),
-            'service_category_id' => ServiceCategory::factory(),
+            'service_sub_category_id' => ServiceSubCategory::factory(),
             'name' => fake()->randomElement($serviceNames),
             'description' => fake()->randomElement($descriptions),
             'price' => fake()->randomFloat(2, 500, 50000), // Between $500 and $50,000 for maritime services

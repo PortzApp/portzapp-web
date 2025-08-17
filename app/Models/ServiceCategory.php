@@ -9,10 +9,11 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Carbon;
 
 /**
- * @property int $id
+ * @property string $id
  * @property string $name
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -39,8 +40,20 @@ class ServiceCategory extends Model
         'name',
     ];
 
-    public function services(): HasMany
+    public function subCategories(): HasMany
     {
-        return $this->hasMany(Service::class);
+        return $this->hasMany(ServiceSubCategory::class, 'service_category_id');
+    }
+
+    public function services(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            Service::class,
+            ServiceSubCategory::class,
+            'service_category_id',    // Foreign key on sub_categories table
+            'service_sub_category_id', // Foreign key on services table
+            'id',                      // Local key on categories table
+            'id'                       // Local key on sub_categories table
+        );
     }
 }

@@ -15,17 +15,18 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Carbon;
 
 /**
- * @property int $id
- * @property int $organization_id
- * @property int $port_id
+ * @property string $id
+ * @property string $organization_id
+ * @property string $port_id
  * @property string $name
  * @property string|null $description
  * @property string $price
  * @property string $status
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property int $service_category_id
- * @property-read ServiceCategory $category
+ * @property string|null $service_sub_category_id
+ * @property-read ServiceSubCategory|null $subCategory
+ * @property-read ServiceCategory|null $category
  * @property-read Collection<int, Order> $orders
  * @property-read int|null $orders_count
  * @property-read Organization $organization
@@ -65,7 +66,7 @@ class Service extends Model
         'status',
         'organization_id',
         'port_id',
-        'service_category_id',
+        'service_sub_category_id',
     ];
 
     /**
@@ -84,9 +85,17 @@ class Service extends Model
         return $this->belongsTo(Port::class);
     }
 
-    public function category(): BelongsTo
+    public function subCategory(): BelongsTo
     {
-        return $this->belongsTo(ServiceCategory::class, 'service_category_id');
+        return $this->belongsTo(ServiceSubCategory::class, 'service_sub_category_id');
+    }
+
+    /**
+     * Get the parent category through the sub-category.
+     */
+    public function getCategoryAttribute(): ?ServiceCategory
+    {
+        return $this->subCategory?->category;
     }
 
     /**

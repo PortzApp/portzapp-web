@@ -14,17 +14,23 @@ class ServiceCategorySeeder extends Seeder
     {
         $categories = [
             'Bunker Supply',
-            'Diving Service',
+            'Diving service',
+            'Diving services',
             'Documentation & Shipment',
-            'Freight Forwarding',
-            'Fresh Water Supply',
-            'Hull Cleaning',
-            'Underwater Inspection',
-            'Provision Supply',
-            'Waste Disposal',
-            'Medical Assistance',
-            'Spare Parts Delivery',
-            'Crew Change',
+            'Freight Forwarding services',
+            'GENERAL',
+            'General Purpose Container',
+            'Husbandry Services',
+            'Immigration Services',
+            'Launch & Anchorage',
+            'Marine Services',
+            'Ports/Ship Agency',
+            'Provision/ Store Supply',
+            'Ship Repair',
+            'Ship working',
+            'Ship- item delivery',
+            'Spare Parts Supply',
+            'Spare Supply',
         ];
 
         foreach ($categories as $category) {
