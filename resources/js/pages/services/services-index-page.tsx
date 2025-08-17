@@ -260,7 +260,7 @@ export default function ServicesIndexPage({ services: initialServices, ports, se
                                         <div className="flex gap-2">
                                             <Badge variant="secondary">
                                                 <Box />
-                                                {service.category.name}
+                                                {service.category?.name || service.sub_category?.category?.name || 'No Category'}
                                             </Badge>
                                             <Badge variant="secondary">
                                                 <MapPin />

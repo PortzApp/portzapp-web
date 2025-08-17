@@ -1,4 +1,4 @@
-import { Building2, Package } from 'lucide-react';
+import { Building2, Package, Tag } from 'lucide-react';
 
 import { Service } from '@/types/models';
 
@@ -13,7 +13,25 @@ export default function OrderServicesTab({ services }: OrderServicesTabProps) {
     const safeServices = services || [];
     const totalServicePrice = safeServices.reduce((sum, service) => sum + parseFloat(service.price), 0);
 
-    // Group services by organization
+    // Group services by sub-category
+    const servicesBySubCategory = safeServices.reduce(
+        (acc, service) => {
+            if (!service.sub_category) return acc;
+            const subCatId = service.sub_category.id;
+            if (!acc[subCatId]) {
+                acc[subCatId] = {
+                    subCategory: service.sub_category,
+                    category: service.sub_category.category || service.category,
+                    services: [],
+                };
+            }
+            acc[subCatId].services.push(service);
+            return acc;
+        },
+        {} as Record<string, { subCategory: NonNullable<Service['sub_category']>; category: NonNullable<Service['category']>; services: Service[] }>,
+    );
+
+    // Also keep organization grouping for summary stats
     const servicesByOrganization = safeServices.reduce(
         (acc, service) => {
             if (!service.organization) return acc;
@@ -42,10 +60,14 @@ export default function OrderServicesTab({ services }: OrderServicesTabProps) {
                     <CardDescription>Overview of all services in this order</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
                         <div className="text-center">
                             <div className="text-2xl font-bold">{safeServices.length}</div>
                             <div className="text-sm text-muted-foreground">Total Services</div>
+                        </div>
+                        <div className="text-center">
+                            <div className="text-2xl font-bold">{Object.keys(servicesBySubCategory).length}</div>
+                            <div className="text-sm text-muted-foreground">Sub-Categories</div>
                         </div>
                         <div className="text-center">
                             <div className="text-2xl font-bold">{Object.keys(servicesByOrganization).length}</div>
@@ -59,35 +81,37 @@ export default function OrderServicesTab({ services }: OrderServicesTabProps) {
                 </CardContent>
             </Card>
 
-            {/* Services by Organization */}
+            {/* Services by Sub-Category */}
             <div className="space-y-6">
-                {Object.values(servicesByOrganization).map(({ organization, services: orgServices }) => {
-                    const orgTotal = orgServices.reduce((sum, service) => sum + parseFloat(service.price), 0);
+                {Object.values(servicesBySubCategory).map(({ subCategory, category, services: subCatServices }) => {
+                    const subCatTotal = subCatServices.reduce((sum, service) => sum + parseFloat(service.price), 0);
 
                     return (
-                        <Card key={organization.id}>
+                        <Card key={subCategory.id}>
                             <CardHeader>
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <CardTitle className="flex items-center gap-2">
-                                            <Building2 className="h-5 w-5" />
-                                            {organization.name}
+                                            <Tag className="h-5 w-5" />
+                                            {subCategory.name}
+                                            <span className="text-sm font-normal text-muted-foreground">({category?.name || 'No Category'})</span>
                                         </CardTitle>
                                         <CardDescription>
-                                            {organization.business_type.replace('_', ' ')} • {organization.registration_code}
+                                            {subCategory.description || 'Service sub-category'} • {subCatServices.length} service
+                                            {subCatServices.length !== 1 ? 's' : ''}
                                         </CardDescription>
                                     </div>
                                     <div className="text-right">
-                                        <div className="text-lg font-semibold">${orgTotal.toLocaleString()}</div>
+                                        <div className="text-lg font-semibold">${subCatTotal.toLocaleString()}</div>
                                         <div className="text-sm text-muted-foreground">
-                                            {orgServices.length} service{orgServices.length !== 1 ? 's' : ''}
+                                            {subCatServices.length} service{subCatServices.length !== 1 ? 's' : ''}
                                         </div>
                                     </div>
                                 </div>
                             </CardHeader>
                             <CardContent>
                                 <div className="space-y-4">
-                                    {orgServices.map((service) => (
+                                    {subCatServices.map((service) => (
                                         <div key={service.id} className="flex items-start justify-between rounded-lg border p-4">
                                             <div className="flex-1">
                                                 <div className="mb-2 flex items-center gap-2">
@@ -95,8 +119,21 @@ export default function OrderServicesTab({ services }: OrderServicesTabProps) {
                                                     <Badge variant={service.status === 'active' ? 'default' : 'secondary'} className="text-xs">
                                                         {service.status}
                                                     </Badge>
+                                                    <Badge variant="outline" className="text-xs">
+                                                        <Building2 className="mr-1 h-3 w-3" />
+                                                        {service.organization?.name || 'Unknown Provider'}
+                                                    </Badge>
                                                 </div>
                                                 <p className="mb-3 text-sm text-muted-foreground">{service.description}</p>
+                                                <div className="mb-2 flex items-center gap-2">
+                                                    <Badge variant="secondary" className="text-xs">
+                                                        <Tag className="mr-1 h-3 w-3" />
+                                                        {subCategory.name}
+                                                    </Badge>
+                                                    <Badge variant="outline" className="text-xs">
+                                                        Category: {category?.name || 'No Category'}
+                                                    </Badge>
+                                                </div>
                                                 <div className="flex items-center gap-4 text-xs text-muted-foreground">
                                                     <span>Service ID: {service.id}</span>
                                                     <span>
@@ -135,6 +172,16 @@ export default function OrderServicesTab({ services }: OrderServicesTabProps) {
                                     <div>
                                         <div className="font-medium">{service.name}</div>
                                         <div className="text-xs text-muted-foreground">by {service.organization?.name || 'Unknown'}</div>
+                                        <div className="mt-1 flex items-center gap-1">
+                                            <Badge variant="secondary" className="text-xs">
+                                                {service.sub_category?.name || service.category?.name || 'No Sub-Category'}
+                                            </Badge>
+                                            {service.sub_category?.category && (
+                                                <Badge variant="outline" className="text-xs">
+                                                    {service.sub_category.category.name}
+                                                </Badge>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="text-right">
