@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Support\Carbon;
 
 /**
@@ -103,11 +104,18 @@ class Service extends Model
     }
 
     /**
-     * Get the parent category through the sub-category as an accessor.
+     * Get the parent category through the sub-category.
      */
-    public function getCategoryAttribute(): ?ServiceCategory
+    public function category(): HasOneThrough
     {
-        return $this->subCategory?->category;
+        return $this->hasOneThrough(
+            ServiceCategory::class,    // Final model
+            ServiceSubCategory::class, // Intermediate model
+            'id',                      // Foreign key on intermediate table pointing to this table (sub_categories.id)
+            'id',                      // Foreign key on final table (categories.id)
+            'service_sub_category_id', // Local key on this table (services.service_sub_category_id)
+            'service_category_id'      // Local key on intermediate table pointing to final table (sub_categories.service_category_id)
+        );
     }
 
     /**
