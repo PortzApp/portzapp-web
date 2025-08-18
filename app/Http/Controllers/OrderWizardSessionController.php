@@ -163,17 +163,16 @@ class OrderWizardSessionController extends Controller
         // Clear existing category selections
         $session->categorySelections()->delete();
 
-        // Get the parent categories from the selected sub-categories
+        // Get the selected sub-categories with their parent categories
         $subCategories = ServiceSubCategory::whereIn('id', $validated['selected_sub_categories'])
             ->with('category')
             ->get();
 
-        $uniqueCategories = $subCategories->pluck('category')->unique('id');
-
-        // Create category selections for the unique parent categories
-        foreach ($uniqueCategories as $index => $category) {
+        // Create category selections for EACH selected sub-category (not just unique parent categories)
+        foreach ($subCategories as $index => $subCategory) {
             $session->categorySelections()->create([
-                'service_category_id' => $category->id,
+                'service_category_id' => $subCategory->service_category_id,
+                'service_sub_category_id' => $subCategory->id,
                 'order_index' => $index,
             ]);
         }
@@ -182,7 +181,7 @@ class OrderWizardSessionController extends Controller
             'current_step' => WizardStep::SERVICES,
         ]);
 
-        $session->load(['vessel', 'port', 'categorySelections.serviceCategory']);
+        $session->load(['vessel', 'port', 'categorySelections.serviceCategory', 'categorySelections.serviceSubCategory']);
 
         return back()->with([
             'session' => $session,
@@ -432,8 +431,8 @@ class OrderWizardSessionController extends Controller
             ])->withErrors(['error' => 'Please select a vessel and port first.']);
         }
 
-        $selectedCategoryIds = $session->categorySelections()->pluck('service_category_id')->toArray();
-        if (empty($selectedCategoryIds)) {
+        $selectedSubCategoryIds = $session->categorySelections()->pluck('service_sub_category_id')->toArray();
+        if (empty($selectedSubCategoryIds)) {
             return to_route('order-wizard.step', [
                 'session' => $session->id,
                 'step' => 'categories',
@@ -445,13 +444,11 @@ class OrderWizardSessionController extends Controller
             $session->update(['current_step' => WizardStep::SERVICES]);
         }
 
-        // Filter services by BOTH port AND selected categories
+        // Filter services by BOTH port AND selected sub-categories
         $filteredServices = Service::with(['organization', 'subCategory.category'])
             ->where('status', 'active')
             ->where('port_id', $session->port_id)  // Filter by selected port
-            ->whereHas('subCategory', function ($query) use ($selectedCategoryIds): void {
-                $query->whereIn('service_category_id', $selectedCategoryIds);
-            })  // Filter by selected categories
+            ->whereIn('service_sub_category_id', $selectedSubCategoryIds)  // Filter by selected sub-categories directly
             ->orderBy('organization_id')  // Group by organization
             ->orderBy('name')
             ->get();
@@ -460,7 +457,7 @@ class OrderWizardSessionController extends Controller
         \Log::info('🔍 DEBUG Services Step:', [
             'session_id' => $session->id,
             'port_id' => $session->port_id,
-            'selected_category_ids' => $selectedCategoryIds,
+            'selected_sub_category_ids' => $selectedSubCategoryIds,
             'filtered_services_count' => $filteredServices->count(),
             'filtered_services' => $filteredServices->take(5)->map(fn ($s) => [
                 'id' => $s->id,
@@ -473,7 +470,7 @@ class OrderWizardSessionController extends Controller
         ]);
 
         return Inertia::render('orders/wizard/order-wizard-step-services', [
-            'session' => $session->load(['vessel', 'port', 'categorySelections.serviceCategory', 'serviceSelections.service']),
+            'session' => $session->load(['vessel', 'port', 'categorySelections.serviceCategory', 'categorySelections.serviceSubCategory', 'serviceSelections.service']),
             'services' => $filteredServices,
         ]);
     }

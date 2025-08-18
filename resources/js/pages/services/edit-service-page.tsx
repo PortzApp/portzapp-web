@@ -72,7 +72,7 @@ export default function EditServicePage({
         price: number;
         status: 'active' | 'inactive';
         port_id: string;
-        service_category_id: string;
+        service_sub_category_id: string;
     };
 
     const { data, setData, put, processing, errors } = useForm<ServiceForm>({
@@ -81,7 +81,7 @@ export default function EditServicePage({
         price: typeof service.price === 'string' ? parseFloat(service.price) : service.price,
         status: service.status,
         port_id: service.port_id,
-        service_category_id: service.sub_category?.service_category_id || '',
+        service_sub_category_id: service.service_sub_category_id || '',
     });
 
     // Listen for service events
@@ -107,7 +107,7 @@ export default function EditServicePage({
                 price: typeof updatedService.price === 'string' ? parseFloat(updatedService.price) : updatedService.price,
                 status: updatedService.status,
                 port_id: updatedService.port_id,
-                service_category_id: updatedService.sub_category?.service_category_id || '',
+                service_sub_category_id: updatedService.service_sub_category_id || '',
             });
         }
 
@@ -219,20 +219,24 @@ export default function EditServicePage({
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="service_category">Service Category</Label>
-                        <Select value={data.service_category_id} onValueChange={(value) => setData('service_category_id', value)}>
+                        <Label htmlFor="service_sub_category">Service Category</Label>
+                        <Select value={data.service_sub_category_id} onValueChange={(value) => setData('service_sub_category_id', value)}>
                             <SelectTrigger>
                                 <SelectValue placeholder="Select service category" />
                             </SelectTrigger>
                             <SelectContent>
                                 {serviceCategories.map((category) => (
-                                    <SelectItem key={category.id} value={category.id}>
-                                        {category.name}
-                                    </SelectItem>
+                                    <div key={category.id}>
+                                        {category.sub_categories?.map((subCategory) => (
+                                            <SelectItem key={subCategory.id} value={subCategory.id}>
+                                                {category.name} → {subCategory.name}
+                                            </SelectItem>
+                                        ))}
+                                    </div>
                                 ))}
                             </SelectContent>
                         </Select>
-                        <InputError message={errors.service_category_id} />
+                        <InputError message={errors.service_sub_category_id} />
                     </div>
 
                     <div className="flex flex-col gap-2">

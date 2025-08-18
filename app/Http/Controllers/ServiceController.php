@@ -171,6 +171,7 @@ class ServiceController extends Controller
             'price' => $validated['price'],
             'status' => $validated['status'],
             'port_id' => $validated['port_id'],
+            'service_sub_category_id' => $validated['service_sub_category_id'],
         ]);
 
         // Refresh the service with relationships to get the latest data

@@ -220,6 +220,26 @@ export default function ShowServicePage({ service: initialService }: { service: 
                                     ).organization?.name || 'No organization'}
                                 </span>
                             </div>
+                            <div className="flex justify-between">
+                                <span className="text-sm font-medium text-muted-foreground">Category:</span>
+                                <span className="text-sm font-medium">
+                                    {(
+                                        service as Service & {
+                                            sub_category?: { category?: { name: string } };
+                                        }
+                                    ).sub_category?.category?.name || 'No category'}
+                                </span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-sm font-medium text-muted-foreground">Sub-Category:</span>
+                                <span className="text-sm font-medium">
+                                    {(
+                                        service as Service & {
+                                            sub_category?: { name: string };
+                                        }
+                                    ).sub_category?.name || 'No sub-category'}
+                                </span>
+                            </div>
                         </CardContent>
                     </Card>
 
