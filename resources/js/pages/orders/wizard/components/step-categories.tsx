@@ -106,18 +106,17 @@ export function StepCategories({ serviceCategories, session }: StepCategoriesPro
                 <div>
                     <h3 className="flex items-center gap-2 text-xl font-semibold">
                         <Box className="h-5 w-5" />
-                        Select Service Sub-Categories
+                        Select Categories
                     </h3>
                     <p className="mt-1 text-muted-foreground">
-                        Choose the specific types of services you need for {session?.port?.name || 'your destination port'}. Sub-categories are
-                        grouped by their parent categories.
+                        Choose the specific types of services you need for {session?.port?.name || 'your destination port'}.
                     </p>
                 </div>
 
                 {/* Search */}
                 <div className="relative">
                     <Search className="absolute top-3 left-3 h-4 w-4 text-muted-foreground" />
-                    <Input placeholder="Search sub-categories..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+                    <Input placeholder="Search categories..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
                 </div>
 
                 {/* Sub-Categories grouped by Categories */}
@@ -132,7 +131,7 @@ export function StepCategories({ serviceCategories, session }: StepCategoriesPro
                                         return <IconComponent className="h-5 w-5 text-muted-foreground" />;
                                     })()}
                                     <h4 className="text-lg font-semibold">{category.name}</h4>
-                                    <span className="text-sm text-muted-foreground">({category.sub_categories?.length || 0} sub-categories)</span>
+                                    <span className="text-sm text-muted-foreground">({category.sub_categories?.length || 0} options)</span>
                                 </div>
 
                                 {/* Sub-Categories Grid */}
@@ -179,7 +178,7 @@ export function StepCategories({ serviceCategories, session }: StepCategoriesPro
                         ))}
                     </div>
                 ) : (
-                    <div className="py-8 text-center text-sm text-muted-foreground">No sub-categories found. Try adjusting your search.</div>
+                    <div className="py-8 text-center text-sm text-muted-foreground">No categories found. Try adjusting your search.</div>
                 )}
             </div>
 
@@ -188,7 +187,7 @@ export function StepCategories({ serviceCategories, session }: StepCategoriesPro
                 <Card className="sticky top-6 bg-muted/50">
                     <CardHeader>
                         <CardTitle className="text-lg">
-                            Selected Sub-Categories
+                            Selected Categories
                             {tempSelectedSubCategories.length > 0 && (
                                 <span className="ml-2 text-sm font-normal text-muted-foreground">({tempSelectedSubCategories.length})</span>
                             )}
@@ -197,8 +196,8 @@ export function StepCategories({ serviceCategories, session }: StepCategoriesPro
                     <CardContent className="space-y-4">
                         <p className="text-sm text-muted-foreground">
                             {tempSelectedSubCategories.length > 0
-                                ? 'You will be able to select services from these sub-categories in the next step'
-                                : 'Choose the specific types of services you need. You can select multiple sub-categories.'}
+                                ? 'You will be able to select services from these categories in the next step'
+                                : 'Choose the specific types of services you need. You can select multiple categories.'}
                         </p>
 
                         {/* Selected Sub-Categories List */}
@@ -212,7 +211,7 @@ export function StepCategories({ serviceCategories, session }: StepCategoriesPro
                                         })()}
                                         <div className="min-w-0 flex-1">
                                             <div className="font-semibold text-foreground">{subCategory.name}</div>
-                                            <div className="text-xs text-muted-foreground">Category: {subCategory.category.name}</div>
+                                            <div className="text-xs text-muted-foreground">from {subCategory.category.name}</div>
                                             {subCategory.services_count !== undefined && (
                                                 <div className="text-xs text-muted-foreground">
                                                     {subCategory.services_count} service{subCategory.services_count !== 1 ? 's' : ''} available
@@ -228,7 +227,7 @@ export function StepCategories({ serviceCategories, session }: StepCategoriesPro
                                     </div>
                                 ))
                             ) : (
-                                <div className="py-8 text-center text-sm text-muted-foreground italic">No sub-categories selected yet</div>
+                                <div className="py-8 text-center text-sm text-muted-foreground italic">No categories selected yet</div>
                             )}
                         </div>
 
@@ -239,7 +238,7 @@ export function StepCategories({ serviceCategories, session }: StepCategoriesPro
                                     {isSaving ? 'Saving...' : 'Continue to Service Selection'}
                                 </Button>
                             ) : (
-                                <div className="text-center text-sm text-muted-foreground">Select at least one sub-category to continue</div>
+                                <div className="text-center text-sm text-muted-foreground">Select at least one category to continue</div>
                             )}
                         </div>
                     </CardContent>

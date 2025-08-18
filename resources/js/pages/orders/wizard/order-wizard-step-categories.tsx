@@ -49,7 +49,7 @@ export default function OrderWizardStepCategories({ session, serviceCategories }
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-2xl font-bold">Create New Order</h1>
-                        <p className="text-muted-foreground">Step 2: Choose service categories for your order</p>
+                        <p className="text-muted-foreground">Step 2: Choose categories for your order</p>
                         <p className="mt-1 text-sm text-muted-foreground">
                             Selected: {session.vessel?.name} → {session.port?.name}
                         </p>
