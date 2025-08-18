@@ -21,14 +21,14 @@ export default function OrderServicesTab({ services }: OrderServicesTabProps) {
             if (!acc[subCatId]) {
                 acc[subCatId] = {
                     subCategory: service.sub_category,
-                    category: service.sub_category.category!,
+                    category: service.sub_category.category,
                     services: [],
                 };
             }
             acc[subCatId].services.push(service);
             return acc;
         },
-        {} as Record<string, { subCategory: NonNullable<Service['sub_category']>; category: NonNullable<Service['category']>; services: Service[] }>,
+        {} as Record<string, { subCategory: NonNullable<Service['sub_category']>; category: Service['category']; services: Service[] }>,
     );
 
     // Also keep organization grouping for summary stats
