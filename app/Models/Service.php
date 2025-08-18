@@ -103,16 +103,6 @@ class Service extends Model
     }
 
     /**
-     * Get the parent category through the sub-category.
-     */
-    public function category(): BelongsTo
-    {
-        return $this->belongsTo(ServiceCategory::class, 'service_sub_category_id')
-            ->join('service_sub_categories', 'service_categories.id', '=', 'service_sub_categories.service_category_id')
-            ->where('service_sub_categories.id', '=', 'services.service_sub_category_id');
-    }
-
-    /**
      * Get the parent category through the sub-category as an accessor.
      */
     public function getCategoryAttribute(): ?ServiceCategory
@@ -146,6 +136,14 @@ class Service extends Model
     protected function isActive(Builder $query): Builder
     {
         return $query->where('status');
+    }
+
+    /**
+     * Scope a query to include services in a specific category.
+     */
+    public function scopeInCategory(Builder $query, string $categoryId): Builder
+    {
+        return $query->whereHas('subCategory', fn ($q) => $q->where('service_category_id', $categoryId));
     }
 
     /**
