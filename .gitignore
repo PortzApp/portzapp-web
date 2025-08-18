@@ -24,12 +24,6 @@ yarn-error.log
 /.zed
 .docker-container-volumes
 **/.DS_Store
-CLAUDE.md
-.claude
-.cursor
-.junie
-.github/copilot-instructions.md
-.mcp.json
 
 # Logs
 logs
@@ -51,7 +45,3 @@ node_modules/
 *.sw?
 # OS specific
 .DS_Store
-
-# Task files
-tasks.json
-tasks/ 

@@ -1,0 +1,11 @@
+{
+    "mcpServers": {
+        "laravel-boost": {
+            "command": "php",
+            "args": [
+                "/Users/aryan/Developer/portzapp/portzapp-web/artisan",
+                "boost:mcp"
+            ]
+        }
+    }
+}
