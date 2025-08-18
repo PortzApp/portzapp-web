@@ -47,7 +47,6 @@ interface ServiceUpdatedEvent extends ServiceEvent {
 
 interface ServiceDeletedEvent extends ServiceEvent {
     serviceId: string;
-    serviceName: string;
 }
 
 interface ServicesPageProps {
@@ -105,7 +104,7 @@ export default function ServicesIndexPage({ services: initialServices, ports, se
         setServices((prevServices) => [newService, ...prevServices]);
 
         toast('Service created', {
-            description: `ID: #${newService.id} — "${newService.name}"`,
+            description: `Service #${newService.id} created`,
             action: {
                 label: 'View Service',
                 onClick: () => {
@@ -122,7 +121,7 @@ export default function ServicesIndexPage({ services: initialServices, ports, se
         );
 
         toast('Service updated', {
-            description: `ID: #${updatedService.id} — "${updatedService.name}"`,
+            description: `Service #${updatedService.id} updated`,
             action: {
                 label: 'View Service',
                 onClick: () => {
@@ -251,7 +250,7 @@ export default function ServicesIndexPage({ services: initialServices, ports, se
                                                     href={route('services.show', service.id)}
                                                     className="text-base font-medium hover:underline hover:underline-offset-4"
                                                 >
-                                                    {service.name}
+                                                    {service.sub_category?.name || 'Service'} - Service #{service.id}
                                                 </Link>
                                             </div>
                                             <ServicesPageColumnActions service={service} />

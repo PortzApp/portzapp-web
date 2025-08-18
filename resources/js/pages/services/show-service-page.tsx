@@ -46,7 +46,6 @@ interface ServiceUpdatedEvent extends ServiceEvent {
 
 interface ServiceDeletedEvent extends ServiceEvent {
     serviceId: string;
-    serviceName: string;
 }
 
 export default function ShowServicePage({ service: initialService }: { service: Service }) {
@@ -83,10 +82,10 @@ export default function ShowServicePage({ service: initialService }: { service: 
     });
 
     // Listen for service deleted events
-    useEcho<ServiceDeletedEvent>('services', 'ServiceDeleted', ({ serviceId, serviceName }) => {
+    useEcho<ServiceDeletedEvent>('services', 'ServiceDeleted', ({ serviceId }) => {
         if (serviceId === service.id) {
             toast('Service deleted', {
-                description: `ID: #${serviceId} — "${serviceName}"`,
+                description: `Service #${serviceId} deleted`,
                 action: {
                     label: 'View All',
                     onClick: () => {
@@ -168,8 +167,8 @@ export default function ShowServicePage({ service: initialService }: { service: 
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="flex justify-between">
-                                <span className="text-sm font-medium text-muted-foreground">Name:</span>
-                                <span className="text-sm font-medium">Service #{service.id}</span>
+                                <span className="text-sm font-medium text-muted-foreground">ID:</span>
+                                <span className="text-sm font-medium">#{service.id}</span>
                             </div>
                             <div className="flex justify-between">
                                 <span className="text-sm font-medium text-muted-foreground">Description:</span>

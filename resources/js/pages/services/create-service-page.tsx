@@ -56,7 +56,6 @@ interface ServiceUpdatedEvent extends ServiceEvent {
 
 interface ServiceDeletedEvent extends ServiceEvent {
     serviceId: number;
-    serviceName: string;
 }
 
 export default function CreateServicePage({ ports, serviceCategories }: { ports: Port[]; serviceCategories: ServiceCategory[] }) {
@@ -93,9 +92,9 @@ export default function CreateServicePage({ ports, serviceCategories }: { ports:
         });
     });
 
-    useEcho<ServiceDeletedEvent>('services', 'ServiceDeleted', ({ serviceId, serviceName }) => {
+    useEcho<ServiceDeletedEvent>('services', 'ServiceDeleted', ({ serviceId }) => {
         toast('Service deleted', {
-            description: `ID: #${serviceId} — "${serviceName}"`,
+            description: `Service #${serviceId} deleted`,
             action: {
                 label: 'View All',
                 onClick: () => {

@@ -38,7 +38,6 @@ interface ServiceUpdatedEvent extends ServiceEvent {
 
 interface ServiceDeletedEvent extends ServiceEvent {
     serviceId: number;
-    serviceName: string;
 }
 
 export default function EditServicePage({
@@ -119,9 +118,9 @@ export default function EditServicePage({
         });
     });
 
-    useEcho<ServiceDeletedEvent>('services', 'ServiceDeleted', ({ serviceId, serviceName }) => {
+    useEcho<ServiceDeletedEvent>('services', 'ServiceDeleted', ({ serviceId }) => {
         toast('Service deleted', {
-            description: `ID: #${serviceId} — "${serviceName}"`,
+            description: `Service #${serviceId} deleted`,
             action: {
                 label: 'View All',
                 onClick: () => {
