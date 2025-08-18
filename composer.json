@@ -23,6 +23,7 @@
         "fakerphp/faker": "^1.23",
         "larastan/larastan": "^3.0",
         "laravel/boost": "^1.0",
+        "laravel/dusk": "^8.3",
         "laravel/pail": "^1.2.2",
         "laravel/pint": "^1.24",
         "laravel/sail": "^1.41",
@@ -79,6 +80,7 @@
         "test:coverage": "XDEBUG_MODE=coverage ./vendor/bin/pest --coverage",
         "test:coverage:html": "XDEBUG_MODE=coverage ./vendor/bin/pest --coverage-html=coverage-report",
         "test:coverage:min": "XDEBUG_MODE=coverage ./vendor/bin/pest --coverage --min=60",
+        "test:dusk": "@php artisan dusk",
         "lint": [
             "@lint:backend",
             "@lint:frontend"
