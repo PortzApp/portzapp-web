@@ -155,7 +155,6 @@ export default function EditServicePage({
                 </div>
 
                 <div className="grid max-w-4xl gap-4 md:grid-cols-2">
-
                     <div className="flex flex-col gap-2">
                         <Label htmlFor="price">Price</Label>
                         <Input

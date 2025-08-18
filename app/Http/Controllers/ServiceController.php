@@ -97,7 +97,6 @@ class ServiceController extends Controller
 
         $service = Service::create([
             'organization_id' => $request->user()->current_organization_id,
-            'name' => $validated['name'],
             'description' => $validated['description'],
             'price' => $validated['price'],
             'status' => $validated['status'],
@@ -166,7 +165,6 @@ class ServiceController extends Controller
         $validated = $request->validated();
 
         $service->update([
-            'name' => $validated['name'],
             'description' => $validated['description'],
             'price' => $validated['price'],
             'status' => $validated['status'],
@@ -190,11 +188,10 @@ class ServiceController extends Controller
         Gate::authorize('delete', $service);
 
         $serviceId = (string) $service->id;
-        $serviceName = $service->name;
 
         $service->delete();
 
-        ServiceDeleted::dispatch(request()->user(), $serviceId, $serviceName);
+        ServiceDeleted::dispatch(request()->user(), $serviceId);
 
         return to_route('services.index')->with('message', 'Service deleted successfully!');
     }

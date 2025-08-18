@@ -461,7 +461,6 @@ class OrderWizardSessionController extends Controller
             'filtered_services_count' => $filteredServices->count(),
             'filtered_services' => $filteredServices->take(5)->map(fn ($s) => [
                 'id' => $s->id,
-                'name' => $s->name,
                 'sub_category_id' => $s->service_sub_category_id,
                 'category_id' => $s->subCategory?->service_category_id,
                 'port_id' => $s->port_id,

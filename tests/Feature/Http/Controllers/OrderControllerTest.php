@@ -81,7 +81,6 @@ beforeEach(function (): void {
     // Create services
     $this->service = Service::factory()->create([
         'organization_id' => $this->shippingAgencyOrg->id,
-        'name' => 'Port Agency Services',
         'description' => 'Professional port services',
         'price' => 5000.00,
         'status' => ServiceStatus::ACTIVE,
@@ -89,7 +88,6 @@ beforeEach(function (): void {
 
     $this->serviceFromOtherOrg = Service::factory()->create([
         'organization_id' => $this->shippingAgencyOrg2->id,
-        'name' => 'Cargo Handling',
         'description' => 'Expert cargo handling services',
         'price' => 3000.00,
         'status' => ServiceStatus::ACTIVE,

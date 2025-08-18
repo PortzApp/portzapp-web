@@ -262,7 +262,9 @@ export default function OrderSystemTab({ order }: OrderSystemTabProps) {
                                         <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-xs font-medium">
                                             {index + 1}
                                         </div>
-                                        <span className="font-medium">{service.sub_category?.name || 'Service'} - {service.organization?.name || 'Unknown'}</span>
+                                        <span className="font-medium">
+                                            {service.sub_category?.name || 'Service'} - {service.organization?.name || 'Unknown'}
+                                        </span>
                                     </div>
                                     <Badge variant="outline">Service Attached</Badge>
                                 </div>

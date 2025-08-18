@@ -125,7 +125,9 @@ export default function EditOrderPage({
                                                     disabled={processing}
                                                 />
                                                 <Label htmlFor={`service-${service.id}`} className="flex-1 cursor-pointer">
-                                                    <div className="font-medium">{service.sub_category?.name || 'Service'} - {service.organization?.name || 'Unknown'}</div>
+                                                    <div className="font-medium">
+                                                        {service.sub_category?.name || 'Service'} - {service.organization?.name || 'Unknown'}
+                                                    </div>
                                                     <div className="text-sm text-muted-foreground">Price: ${service.price}</div>
                                                     {service.description && (
                                                         <div className="mt-1 text-sm text-muted-foreground">{service.description}</div>

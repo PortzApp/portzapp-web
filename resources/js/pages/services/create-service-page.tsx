@@ -127,7 +127,6 @@ export default function CreateServicePage({ ports, serviceCategories }: { ports:
                 </div>
 
                 <div className="flex max-w-md flex-col gap-4">
-
                     <div className="flex flex-col gap-2">
                         <Label htmlFor="description">Description</Label>
                         <Input
