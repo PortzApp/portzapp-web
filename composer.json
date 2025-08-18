@@ -79,32 +79,33 @@
         "test:coverage": "XDEBUG_MODE=coverage ./vendor/bin/pest --coverage",
         "test:coverage:html": "XDEBUG_MODE=coverage ./vendor/bin/pest --coverage-html=coverage-report",
         "test:coverage:min": "XDEBUG_MODE=coverage ./vendor/bin/pest --coverage --min=60",
-        "test:lint": [
-            "@test:lint:frontend",
-            "@test:lint:backend"
+        "lint": [
+            "@lint:backend",
+            "@lint:frontend"
         ],
-        "test:lint:frontend": [
+        "lint:backend": "pint",
+        "lint:frontend": [
             "npm run lint:check",
             "npm run format:check"
         ],
-        "test:lint:backend": "pint",
-        "test:spellcheck": "peck",
-        "test:types": "phpstan analyse --memory-limit=2G",
-        "test:refactor": "rector --dry-run",
+        "spellcheck": "peck",
+        "peck": "@spellcheck",
+        "typecheck": [
+            "@typecheck:backend",
+            "@typecheck:frontend"
+        ],
+        "typecheck:backend": "phpstan analyse --memory-limit=2G",
+        "typecheck:frontend": "npm run typecheck",
+        "refactor": "rector --dry-run",
+        "rector": "@refactor",
         "test:all": [
             "@test:unit",
-            "@test:lint",
-            "@test:spellcheck",
-            "@test:types",
-            "@test:refactor"
+            "@lint",
+            "@spellcheck",
+            "@typecheck",
+            "@refactor"
         ],
-        "test": "@test:all",
-        "test:ci": [
-            "@test:lint",
-            "@test:spellcheck",
-            "@test:types",
-            "@test:refactor"
-        ]
+        "test": "@test:all"
     },
     "extra": {
         "laravel": {

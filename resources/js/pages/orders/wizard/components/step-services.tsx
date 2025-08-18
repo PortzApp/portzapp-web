@@ -47,7 +47,7 @@ export function StepServices({ services, session }: StepServicesProps) {
     // Find categories that have no services available (use full services array, not filtered)
     const emptyCategorySelections = useMemo(() => {
         const categoriesSet = new Set(
-            services.filter((service) => service.sub_category?.category?.id != null).map((service) => service.sub_category.category.id),
+            services.filter((service) => service.sub_category?.category?.id != null).map((service) => service.sub_category?.category?.id),
         );
         return selectedCategories.filter((selection) => !categoriesSet.has(selection.service_category_id));
     }, [services, selectedCategories]);

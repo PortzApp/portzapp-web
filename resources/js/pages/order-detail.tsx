@@ -95,7 +95,7 @@ export default function OrderDetail({ order }: { order: OrderWithFullRelations }
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div>
-                                <h3 className="text-lg font-semibold">{service.name}</h3>
+                                <h3 className="text-lg font-semibold">{service?.sub_category?.name}</h3>
                                 <p className="mt-1 text-sm text-muted-foreground">{service.description}</p>
                             </div>
                             <Separator />

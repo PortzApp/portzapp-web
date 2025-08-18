@@ -190,7 +190,7 @@ export default function ShowOrderGroupPage({
                                 {orderGroup.services?.map((service) => (
                                     <div key={service.id} className="flex items-center justify-between rounded-lg bg-muted/50 p-3">
                                         <div>
-                                            <h4 className="font-medium">{service.name}</h4>
+                                            <h4 className="font-medium">{service?.sub_category?.name}</h4>
                                             {service.description && <p className="text-sm text-muted-foreground">{service.description}</p>}
                                         </div>
                                         <div className="text-right">
