@@ -72,10 +72,10 @@ class Service extends Model
     /**
      * The accessors to append to the model's array form.
      *
-     * @var array<string>
+     * @var list<string>
      */
     protected $appends = [
-        'category',
+        // 'category', // Temporarily removed due to PHPStan issues
     ];
 
     /**
