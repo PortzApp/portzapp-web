@@ -29,7 +29,6 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export type ServiceForm = {
-    name: string;
     description: string;
     price: string;
     status: 'active' | 'inactive';
@@ -62,7 +61,6 @@ interface ServiceDeletedEvent extends ServiceEvent {
 
 export default function CreateServicePage({ ports, serviceCategories }: { ports: Port[]; serviceCategories: ServiceCategory[] }) {
     const { data, setData, post, processing, errors, reset } = useForm<ServiceForm>({
-        name: '',
         description: '',
         price: '',
         status: 'active',
@@ -73,7 +71,7 @@ export default function CreateServicePage({ ports, serviceCategories }: { ports:
     // Listen for service events to show real-time updates
     useEcho<ServiceCreatedEvent>('services', 'ServiceCreated', ({ service }) => {
         toast('Service created', {
-            description: `ID: #${service.id} — "${service.name}"`,
+            description: `Service #${service.id} created`,
             action: {
                 label: 'View Service',
                 onClick: () => {
@@ -85,7 +83,7 @@ export default function CreateServicePage({ ports, serviceCategories }: { ports:
 
     useEcho<ServiceUpdatedEvent>('services', 'ServiceUpdated', ({ service }) => {
         toast('Service updated', {
-            description: `ID: #${service.id} — "${service.name}"`,
+            description: `Service #${service.id} updated`,
             action: {
                 label: 'View Service',
                 onClick: () => {
@@ -124,25 +122,11 @@ export default function CreateServicePage({ ports, serviceCategories }: { ports:
                 <div className="flex flex-col gap-1">
                     <h1 className="text-xl font-semibold">Create Service</h1>
                     <p className="text-base text-muted-foreground">
-                        Fill out the form below to create a new service. You can specify the service name, description, price, and status.
+                        Fill out the form below to create a new service. You can specify the description, price, and status.
                     </p>
                 </div>
 
                 <div className="flex max-w-md flex-col gap-4">
-                    <div className="flex flex-col gap-2">
-                        <Label htmlFor="name">Service Name</Label>
-                        <Input
-                            id="name"
-                            type="text"
-                            value={data.name}
-                            onChange={(e) => setData('name', e.target.value)}
-                            placeholder="Enter service name"
-                            disabled={processing}
-                            required
-                        />
-                        <InputError message={errors.name} />
-                    </div>
-
                     <div className="flex flex-col gap-2">
                         <Label htmlFor="description">Description</Label>
                         <Input

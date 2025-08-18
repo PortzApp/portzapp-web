@@ -91,7 +91,9 @@ export default function OrderGroupsTab({ orderGroups }: OrderGroupsTabProps) {
                                         <div className="space-y-2">
                                             {group.services.map((service) => (
                                                 <div key={service.id} className="flex items-center justify-between text-sm">
-                                                    <span>{service.name}</span>
+                                                    <span>
+                                                        {service.sub_category?.name || 'Service'} - {service.organization?.name || 'Unknown'}
+                                                    </span>
                                                     <span className="font-mono">${parseFloat(service.price).toFixed(2)}</span>
                                                 </div>
                                             ))}

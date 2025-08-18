@@ -56,7 +56,7 @@ export default function ShowServicePage({ service: initialService }: { service: 
     // Listen for service updated events
     useEcho<ServiceCreatedEvent>('services', 'ServiceCreated', ({ service: newService }) => {
         toast('Service created', {
-            description: `ID: #${newService.id} — "${newService.name}"`,
+            description: `Service #${newService.id} created`,
             action: {
                 label: 'View Service',
                 onClick: () => {
@@ -72,7 +72,7 @@ export default function ShowServicePage({ service: initialService }: { service: 
         }
 
         toast('Service updated', {
-            description: `ID: #${updatedService.id} — "${updatedService.name}"`,
+            description: `Service #${updatedService.id} updated`,
             action: {
                 label: 'View Service',
                 onClick: () => {
@@ -103,7 +103,7 @@ export default function ShowServicePage({ service: initialService }: { service: 
             href: route('services.index'),
         },
         {
-            title: service.name,
+            title: `Service #${service.id}`,
             href: `/services/${service.id}`,
         },
     ];
@@ -113,19 +113,19 @@ export default function ShowServicePage({ service: initialService }: { service: 
 
         router.delete(route('services.destroy', service.id), {
             onSuccess: () => {
-                toast(`Service "${service.name}" deleted successfully!`);
+                toast(`Service #${service.id} deleted successfully!`);
             },
         });
     }
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={service.name} />
+            <Head title={`Service #${service.id}`} />
 
             <div className="flex flex-col gap-8 p-8">
                 <div className="flex items-center justify-between">
                     <div className="flex flex-col gap-1">
-                        <h1 className="text-2xl font-semibold">{service.name}</h1>
+                        <h1 className="text-2xl font-semibold">Service #{service.id}</h1>
                         <p className="text-base text-muted-foreground">Service details and information</p>
                     </div>
                     <div className="flex gap-2">
@@ -144,7 +144,7 @@ export default function ShowServicePage({ service: initialService }: { service: 
                                 <DialogHeader>
                                     <DialogTitle>Delete Service</DialogTitle>
                                     <DialogDescription>
-                                        Are you sure you want to delete "{service.name}"? This action cannot be undone.
+                                        Are you sure you want to delete Service #{service.id}? This action cannot be undone.
                                     </DialogDescription>
                                 </DialogHeader>
                                 <DialogFooter>
@@ -169,7 +169,7 @@ export default function ShowServicePage({ service: initialService }: { service: 
                         <CardContent className="space-y-4">
                             <div className="flex justify-between">
                                 <span className="text-sm font-medium text-muted-foreground">Name:</span>
-                                <span className="text-sm font-medium">{service.name}</span>
+                                <span className="text-sm font-medium">Service #{service.id}</span>
                             </div>
                             <div className="flex justify-between">
                                 <span className="text-sm font-medium text-muted-foreground">Description:</span>

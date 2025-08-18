@@ -19,7 +19,6 @@ use Illuminate\Support\Carbon;
  * @property string $id
  * @property string $organization_id
  * @property string $port_id
- * @property string $name
  * @property string|null $description
  * @property string $price
  * @property string $status
@@ -41,7 +40,6 @@ use Illuminate\Support\Carbon;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Service whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Service whereDescription($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Service whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Service whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Service whereOrganizationId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Service wherePortId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Service wherePrice($value)
@@ -61,7 +59,6 @@ class Service extends Model
      * @var list<string>
      */
     protected $fillable = [
-        'name',
         'description',
         'price',
         'status',

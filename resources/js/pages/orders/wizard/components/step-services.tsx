@@ -37,7 +37,7 @@ export function StepServices({ services, session }: StepServicesProps) {
     const filteredServices = services.filter((service) => {
         const matchesSearch =
             search === '' ||
-            service.name.toLowerCase().includes(search.toLowerCase()) ||
+            service.sub_category?.name.toLowerCase().includes(search.toLowerCase()) ||
             service.description?.toLowerCase().includes(search.toLowerCase()) ||
             service.organization?.name.toLowerCase().includes(search.toLowerCase());
 
@@ -256,7 +256,7 @@ export function StepServices({ services, session }: StepServicesProps) {
                                                                     />
                                                                     <div className="min-w-0 flex-1">
                                                                         <Label htmlFor={service.id} className="cursor-pointer font-medium">
-                                                                            {service.name}
+                                                                            {service.sub_category?.name || 'Service'}
                                                                         </Label>
                                                                         {service.description && (
                                                                             <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
@@ -390,7 +390,7 @@ export function StepServices({ services, session }: StepServicesProps) {
                                                 {selectedCategoryServices.map((service) => (
                                                     <div key={service.id} className="flex items-center justify-between text-sm">
                                                         <div className="flex-1">
-                                                            <span className="text-foreground">{service.name}</span>
+                                                            <span className="text-foreground">{service.sub_category?.name || 'Service'}</span>
                                                             {service.organization && (
                                                                 <span className="ml-2 text-xs text-muted-foreground">
                                                                     by {service.organization.name}

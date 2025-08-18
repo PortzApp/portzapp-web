@@ -63,7 +63,6 @@ export interface Port extends BaseModel {
 }
 
 export interface Service extends BaseModel {
-    name: string;
     description: string | null;
     price: string;
     status: ServiceStatus;

@@ -233,7 +233,7 @@ export function StepReview({ session }: StepReviewProps) {
                                             {services.map((service) => (
                                                 <div key={service.id} className="flex items-center justify-between">
                                                     <div className="flex-1">
-                                                        <div className="font-medium">{service.name}</div>
+                                                        <div className="font-medium">{service.sub_category?.name || 'Service'}</div>
                                                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                                             {service.organization && (
                                                                 <div className="flex items-center gap-1">

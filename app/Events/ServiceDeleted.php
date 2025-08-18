@@ -19,7 +19,6 @@ class ServiceDeleted implements ShouldBroadcastNow
     public function __construct(
         public User $user,
         public string $serviceId,
-        public string $serviceName,
     ) {}
 
     /**
@@ -45,7 +44,6 @@ class ServiceDeleted implements ShouldBroadcastNow
                 'email' => $this->user->email,
             ],
             'serviceId' => $this->serviceId,
-            'serviceName' => $this->serviceName,
             'timestamp' => now()->toISOString(),
         ];
     }

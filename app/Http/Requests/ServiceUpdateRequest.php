@@ -22,7 +22,6 @@ class ServiceUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:1000'],
             'price' => ['required', 'numeric', 'min:0', 'max:99999999.99'],
             'status' => ['required', 'in:active,inactive'],

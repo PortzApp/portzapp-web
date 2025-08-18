@@ -29,8 +29,8 @@ export const servicesPageColumns: ColumnDef<Service>[] = [
         header: ({ column }) => <DataTableColumnHeader column={column} title="ID" />,
     },
     {
-        accessorKey: 'name',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
+        accessorKey: 'sub_category.name',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Sub-Category" />,
     },
     {
         accessorKey: 'description',

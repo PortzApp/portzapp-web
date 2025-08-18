@@ -99,7 +99,6 @@ beforeEach(function (): void {
     $this->service = Service::factory()->create([
         'organization_id' => $this->shippingAgencyOrg->id,
         'port_id' => $this->port->id,
-        'name' => 'Port Agency Services',
         'description' => 'Professional port services',
         'price' => 5000.00,
         'status' => ServiceStatus::ACTIVE,
@@ -108,7 +107,6 @@ beforeEach(function (): void {
     $this->serviceFromOtherOrg = Service::factory()->create([
         'organization_id' => $this->shippingAgencyOrg2->id,
         'port_id' => $this->port->id,
-        'name' => 'Cargo Handling',
         'description' => 'Expert cargo handling services',
         'price' => 3000.00,
         'status' => ServiceStatus::ACTIVE,
@@ -158,7 +156,6 @@ test('portzapp team can view all services across organizations', function (): vo
 
 test('shipping agency admin can create service', function (): void {
     $serviceData = [
-        'name' => 'New Maritime Service',
         'description' => 'A new professional service',
         'price' => 7500.00,
         'status' => ServiceStatus::ACTIVE->value,
@@ -173,14 +170,13 @@ test('shipping agency admin can create service', function (): void {
     $response->assertSessionHas('message', 'Service created successfully!');
 
     $this->assertDatabaseHas('services', [
-        'name' => 'New Maritime Service',
+        'description' => 'A new professional service',
         'organization_id' => $this->shippingAgencyOrg->id,
     ]);
 });
 
 test('shipping agency viewer cannot create service', function (): void {
     $serviceData = [
-        'name' => 'Member Created Service',
         'description' => 'Service created by member',
         'price' => 2500.00,
         'status' => ServiceStatus::ACTIVE->value,
@@ -194,13 +190,12 @@ test('shipping agency viewer cannot create service', function (): void {
     $response->assertStatus(403);
 
     $this->assertDatabaseMissing('services', [
-        'name' => 'Member Created Service',
+        'description' => 'Service created by member',
     ]);
 });
 
 test('vessel owner cannot create service', function (): void {
     $serviceData = [
-        'name' => 'Unauthorized Service',
         'description' => 'This should not be created',
         'price' => 1000.00,
         'status' => ServiceStatus::ACTIVE->value,
@@ -213,7 +208,7 @@ test('vessel owner cannot create service', function (): void {
 
     $response->assertStatus(403);
     $this->assertDatabaseMissing('services', [
-        'name' => 'Unauthorized Service',
+        'description' => 'This should not be created',
     ]);
 });
 
@@ -221,7 +216,6 @@ test('user without shipping agency org cannot create service', function (): void
     $userWithoutOrg = User::factory()->create();
 
     $serviceData = [
-        'name' => 'Unauthorized Service',
         'description' => 'This should not be created',
         'price' => 1000.00,
         'status' => ServiceStatus::ACTIVE->value,
@@ -237,7 +231,6 @@ test('user without shipping agency org cannot create service', function (): void
 
 test('shipping agency admin can update own service', function (): void {
     $updateData = [
-        'name' => 'Updated Service Name',
         'description' => 'Updated description',
         'price' => 6000.00,
         'status' => ServiceStatus::INACTIVE->value,
@@ -253,14 +246,13 @@ test('shipping agency admin can update own service', function (): void {
 
     $this->assertDatabaseHas('services', [
         'id' => $this->service->id,
-        'name' => 'Updated Service Name',
+        'description' => 'Updated description',
         'price' => 6000.00,
     ]);
 });
 
 test('shipping agency viewer cannot update service', function (): void {
     $updateData = [
-        'name' => 'Member Updated Service',
         'description' => 'Updated by member',
         'price' => 4500.00,
         'status' => ServiceStatus::ACTIVE->value,
@@ -276,7 +268,6 @@ test('shipping agency viewer cannot update service', function (): void {
 
 test('vessel owner cannot update service', function (): void {
     $updateData = [
-        'name' => 'Unauthorized Update',
         'description' => 'This should not work',
         'price' => 1000.00,
         'status' => ServiceStatus::ACTIVE->value,
@@ -291,13 +282,12 @@ test('vessel owner cannot update service', function (): void {
 
     $this->assertDatabaseMissing('services', [
         'id' => $this->service->id,
-        'name' => 'Unauthorized Update',
+        'description' => 'This should not work',
     ]);
 });
 
 test('user cannot update service from different organization', function (): void {
     $updateData = [
-        'name' => 'Cross-Org Update Attempt',
         'description' => 'This should not work',
         'price' => 1000.00,
         'status' => ServiceStatus::ACTIVE->value,

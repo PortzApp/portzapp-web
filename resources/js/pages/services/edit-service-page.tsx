@@ -57,7 +57,7 @@ export default function EditServicePage({
             href: route('services.index'),
         },
         {
-            title: service.name,
+            title: `Service #${service.id}`,
             href: `/services/${service.id}`,
         },
         {
@@ -67,7 +67,6 @@ export default function EditServicePage({
     ];
 
     type ServiceForm = {
-        name: string;
         description: string;
         price: number;
         status: 'active' | 'inactive';
@@ -76,7 +75,6 @@ export default function EditServicePage({
     };
 
     const { data, setData, put, processing, errors } = useForm<ServiceForm>({
-        name: service.name,
         description: service.description || '',
         price: typeof service.price === 'string' ? parseFloat(service.price) : service.price,
         status: service.status,
@@ -87,7 +85,7 @@ export default function EditServicePage({
     // Listen for service events
     useEcho<ServiceCreatedEvent>('services', 'ServiceCreated', ({ service: newService }) => {
         toast('Service created', {
-            description: `ID: #${newService.id} — "${newService.name}"`,
+            description: `Service #${newService.id} created`,
             action: {
                 label: 'View Service',
                 onClick: () => {
@@ -102,7 +100,6 @@ export default function EditServicePage({
             setService({ ...service, ...updatedService });
             // Update form data if this service was updated
             setData({
-                name: updatedService.name,
                 description: updatedService.description || '',
                 price: typeof updatedService.price === 'string' ? parseFloat(updatedService.price) : updatedService.price,
                 status: updatedService.status,
@@ -112,7 +109,7 @@ export default function EditServicePage({
         }
 
         toast('Service updated', {
-            description: `ID: #${updatedService.id} — "${updatedService.name}"`,
+            description: `Service #${updatedService.id} updated`,
             action: {
                 label: 'View Service',
                 onClick: () => {
@@ -147,31 +144,17 @@ export default function EditServicePage({
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`Edit ${service.name}`} />
+            <Head title={`Edit Service #${service.id}`} />
 
             <form onSubmit={submit} className="flex flex-col gap-8 p-8">
                 <div className="flex flex-col gap-1">
                     <h1 className="text-xl font-semibold">Edit Service</h1>
                     <p className="text-base text-muted-foreground">
-                        Update the service information below. You can modify the service name, description, price, port assignment, and status.
+                        Update the service information below. You can modify the description, price, port assignment, and status.
                     </p>
                 </div>
 
                 <div className="grid max-w-4xl gap-4 md:grid-cols-2">
-                    <div className="flex flex-col gap-2">
-                        <Label htmlFor="name">Service Name</Label>
-                        <Input
-                            id="name"
-                            type="text"
-                            value={data.name}
-                            onChange={(e) => setData('name', e.target.value)}
-                            placeholder="Enter service name"
-                            disabled={processing}
-                            required
-                        />
-                        <InputError message={errors.name} />
-                    </div>
-
                     <div className="flex flex-col gap-2">
                         <Label htmlFor="price">Price</Label>
                         <Input

@@ -115,7 +115,9 @@ export default function OrderServicesTab({ services }: OrderServicesTabProps) {
                                         <div key={service.id} className="flex items-start justify-between rounded-lg border p-4">
                                             <div className="flex-1">
                                                 <div className="mb-2 flex items-center gap-2">
-                                                    <h4 className="font-medium">{service.name}</h4>
+                                                    <h4 className="font-medium">
+                                                        {service.sub_category?.name || 'Service'} - {service.organization?.name || 'Unknown Provider'}
+                                                    </h4>
                                                     <Badge variant={service.status === 'active' ? 'default' : 'secondary'} className="text-xs">
                                                         {service.status}
                                                     </Badge>
@@ -170,7 +172,9 @@ export default function OrderServicesTab({ services }: OrderServicesTabProps) {
                                         {index + 1}
                                     </div>
                                     <div>
-                                        <div className="font-medium">{service.name}</div>
+                                        <div className="font-medium">
+                                            {service.sub_category?.name || 'Service'} - {service.organization?.name || 'Unknown Provider'}
+                                        </div>
                                         <div className="text-xs text-muted-foreground">by {service.organization?.name || 'Unknown'}</div>
                                         <div className="mt-1 flex items-center gap-1">
                                             <Badge variant="secondary" className="text-xs">
