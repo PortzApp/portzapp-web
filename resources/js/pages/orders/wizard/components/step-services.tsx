@@ -157,15 +157,24 @@ export function StepServices({ services, session }: StepServicesProps) {
                 <div>
                     <Label className="text-sm font-medium">Selected Categories:</Label>
                     <div className="mt-2 flex flex-wrap gap-2">
-                        {selectedCategories.map((selection: { service_category_id: string; service_category?: { name: string }; service_sub_category?: { name: string } }, index: number) => (
-                            <Badge key={selection.service_category_id || index} variant="secondary">
-                                {selection.service_sub_category?.name && selection.service_category?.name
-                                    ? `${selection.service_sub_category.name} (${selection.service_category.name})`
-                                    : selection.service_sub_category?.name ||
-                                      selection.service_category?.name ||
-                                      `Category ${selection.service_category_id}`}
-                            </Badge>
-                        ))}
+                        {selectedCategories.map(
+                            (
+                                selection: {
+                                    service_category_id: string;
+                                    service_category?: { name: string };
+                                    service_sub_category?: { name: string };
+                                },
+                                index: number,
+                            ) => (
+                                <Badge key={selection.service_category_id || index} variant="secondary">
+                                    {selection.service_sub_category?.name && selection.service_category?.name
+                                        ? `${selection.service_sub_category.name} (${selection.service_category.name})`
+                                        : selection.service_sub_category?.name ||
+                                          selection.service_category?.name ||
+                                          `Category ${selection.service_category_id}`}
+                                </Badge>
+                            ),
+                        )}
                     </div>
                 </div>
 

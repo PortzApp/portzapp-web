@@ -55,7 +55,9 @@ export function StepReview({ session }: StepReviewProps) {
     );
 
     // Get categories ONLY from services that were actually selected
-    const uniqueCategories = Array.from(new Set(selectedServices.map((selection) => selection.service?.sub_category?.category?.name).filter(Boolean)));
+    const uniqueCategories = Array.from(
+        new Set(selectedServices.map((selection) => selection.service?.sub_category?.category?.name).filter(Boolean)),
+    );
 
     // Calculate totals
     const totalServices = selectedServices.length;
