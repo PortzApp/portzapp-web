@@ -62,9 +62,11 @@ export default function OrderWizardStepServices({ session, services }: ServicesS
                                         variant="secondary"
                                         className="text-xs"
                                     >
-                                        {selection.service_sub_category?.name ||
-                                            selection.service_category?.name ||
-                                            `Category ${selection.service_category_id}`}
+                                        {selection.service_sub_category?.name && selection.service_category?.name
+                                            ? `${selection.service_sub_category.name} (${selection.service_category.name})`
+                                            : selection.service_sub_category?.name ||
+                                              selection.service_category?.name ||
+                                              `Category ${selection.service_category_id}`}
                                     </Badge>
                                 ))}
                             </div>

@@ -211,7 +211,7 @@ class OrderWizardSessionController extends Controller
         // Create new service selections
         foreach ($services as $service) {
             $session->serviceSelections()->create([
-                'service_category_id' => $service->category->id,
+                'service_category_id' => $service->subCategory->service_category_id,
                 'service_id' => $service->id,
                 'organization_id' => $service->organization_id,
                 'price_snapshot' => $service->price,
@@ -516,7 +516,8 @@ class OrderWizardSessionController extends Controller
                 'vessel',
                 'port',
                 'categorySelections.serviceCategory',
-                'serviceSelections.service.category',
+                'categorySelections.serviceSubCategory',
+                'serviceSelections.service.subCategory.category',
                 'serviceSelections.service.organization',
             ]),
         ]);

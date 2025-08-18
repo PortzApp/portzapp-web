@@ -51,15 +51,15 @@ export function StepServices({ services, session }: StepServicesProps) {
     // Group services by category first, then by organization within each category
     const servicesByCategory = filteredServices.reduce(
         (acc, service) => {
-            if (!service.category || !service.organization) return acc;
+            if (!service.sub_category?.category || !service.organization) return acc;
 
-            const categoryId = service.category.id;
+            const categoryId = service.sub_category.category.id;
             const orgId = service.organization.id;
 
             // Initialize category if it doesn't exist
             if (!acc[categoryId]) {
                 acc[categoryId] = {
-                    category: service.category,
+                    category: service.sub_category.category,
                     organizationGroups: {},
                 };
             }
@@ -157,9 +157,13 @@ export function StepServices({ services, session }: StepServicesProps) {
                 <div>
                     <Label className="text-sm font-medium">Selected Categories:</Label>
                     <div className="mt-2 flex flex-wrap gap-2">
-                        {selectedCategories.map((selection: { service_category_id: string; service_category?: { name: string } }, index: number) => (
+                        {selectedCategories.map((selection: { service_category_id: string; service_category?: { name: string }; service_sub_category?: { name: string } }, index: number) => (
                             <Badge key={selection.service_category_id || index} variant="secondary">
-                                {selection.service_category?.name || `Category ${selection.service_category_id}`}
+                                {selection.service_sub_category?.name && selection.service_category?.name
+                                    ? `${selection.service_sub_category.name} (${selection.service_category.name})`
+                                    : selection.service_sub_category?.name ||
+                                      selection.service_category?.name ||
+                                      `Category ${selection.service_category_id}`}
                             </Badge>
                         ))}
                     </div>
@@ -342,12 +346,12 @@ export function StepServices({ services, session }: StepServicesProps) {
                                 Object.values(
                                     tempSelectedServices.reduce(
                                         (acc, service) => {
-                                            if (!service.category) return acc;
+                                            if (!service.sub_category?.category) return acc;
 
-                                            const categoryId = service.category.id;
+                                            const categoryId = service.sub_category.category.id;
                                             if (!acc[categoryId]) {
                                                 acc[categoryId] = {
-                                                    category: service.category,
+                                                    category: service.sub_category.category,
                                                     services: [],
                                                 };
                                             }

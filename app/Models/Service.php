@@ -70,6 +70,15 @@ class Service extends Model
     ];
 
     /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array<string>
+     */
+    protected $appends = [
+        'category',
+    ];
+
+    /**
      * Get the organization that created the service.
      */
     public function organization(): BelongsTo
@@ -85,6 +94,9 @@ class Service extends Model
         return $this->belongsTo(Port::class);
     }
 
+    /**
+     * Get the service sub-category relationship.
+     */
     public function subCategory(): BelongsTo
     {
         return $this->belongsTo(ServiceSubCategory::class, 'service_sub_category_id');
@@ -92,6 +104,16 @@ class Service extends Model
 
     /**
      * Get the parent category through the sub-category.
+     */
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(ServiceCategory::class, 'service_sub_category_id')
+            ->join('service_sub_categories', 'service_categories.id', '=', 'service_sub_categories.service_category_id')
+            ->where('service_sub_categories.id', '=', 'services.service_sub_category_id');
+    }
+
+    /**
+     * Get the parent category through the sub-category as an accessor.
      */
     public function getCategoryAttribute(): ?ServiceCategory
     {

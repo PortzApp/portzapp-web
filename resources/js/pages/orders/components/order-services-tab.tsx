@@ -21,7 +21,7 @@ export default function OrderServicesTab({ services }: OrderServicesTabProps) {
             if (!acc[subCatId]) {
                 acc[subCatId] = {
                     subCategory: service.sub_category,
-                    category: service.sub_category.category || service.category!,
+                    category: service.sub_category.category!,
                     services: [],
                 };
             }
@@ -174,7 +174,7 @@ export default function OrderServicesTab({ services }: OrderServicesTabProps) {
                                         <div className="text-xs text-muted-foreground">by {service.organization?.name || 'Unknown'}</div>
                                         <div className="mt-1 flex items-center gap-1">
                                             <Badge variant="secondary" className="text-xs">
-                                                {service.sub_category?.name || service.category?.name || 'No Sub-Category'}
+                                                {service.sub_category?.name || 'No Sub-Category'}
                                             </Badge>
                                             {service.sub_category?.category && (
                                                 <Badge variant="outline" className="text-xs">

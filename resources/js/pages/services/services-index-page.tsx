@@ -273,7 +273,7 @@ export default function ServicesIndexPage({ services: initialServices, ports, se
                                             {!service.sub_category && (
                                                 <Badge variant="secondary">
                                                     <Box className="mr-1 h-3 w-3" />
-                                                    {service.category?.name || 'No Category'}
+                                                    No Category
                                                 </Badge>
                                             )}
                                             <Badge variant="secondary">
