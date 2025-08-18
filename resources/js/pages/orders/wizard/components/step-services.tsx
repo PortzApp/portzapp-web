@@ -45,7 +45,7 @@ export function StepServices({ services, session }: StepServicesProps) {
     });
 
     // Find categories that have no services available
-    const categoriesWithServices = new Set(filteredServices.map((service) => service.service_category_id));
+    const categoriesWithServices = new Set(filteredServices.map((service) => service.sub_category?.category?.id));
     const emptyCategorySelections = selectedCategories.filter((selection) => !categoriesWithServices.has(selection.service_category_id));
 
     // Group services by category first, then by organization within each category

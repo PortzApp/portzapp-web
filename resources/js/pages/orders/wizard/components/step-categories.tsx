@@ -159,14 +159,16 @@ export function StepCategories({ serviceCategories, session }: StepCategoriesPro
                                                         {isSelected && <span className="text-xs">✓</span>}
                                                     </div>
                                                     <div className="min-w-0 flex-1">
-                                                        <h5 className="font-medium text-foreground">{subCategory.name}</h5>
+                                                        <h5 className="font-medium text-foreground">
+                                                            {subCategory.name}
+                                                            {subCategory.services_count !== undefined && (
+                                                                <span className="ml-1 text-xs text-muted-foreground">
+                                                                    ({subCategory.services_count})
+                                                                </span>
+                                                            )}
+                                                        </h5>
                                                         {subCategory.description && (
                                                             <p className="mt-1 text-xs text-muted-foreground">{subCategory.description}</p>
-                                                        )}
-                                                        {subCategory.services_count !== undefined && (
-                                                            <p className="mt-1 text-xs text-muted-foreground">
-                                                                {subCategory.services_count} service{subCategory.services_count !== 1 ? 's' : ''}
-                                                            </p>
                                                         )}
                                                     </div>
                                                 </div>

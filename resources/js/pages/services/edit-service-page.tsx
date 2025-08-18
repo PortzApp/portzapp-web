@@ -81,7 +81,7 @@ export default function EditServicePage({
         price: typeof service.price === 'string' ? parseFloat(service.price) : service.price,
         status: service.status,
         port_id: service.port_id,
-        service_category_id: service.service_category_id || '',
+        service_category_id: service.sub_category?.service_category_id || '',
     });
 
     // Listen for service events
@@ -107,7 +107,7 @@ export default function EditServicePage({
                 price: typeof updatedService.price === 'string' ? parseFloat(updatedService.price) : updatedService.price,
                 status: updatedService.status,
                 port_id: updatedService.port_id,
-                service_category_id: updatedService.service_category_id || '',
+                service_category_id: updatedService.sub_category?.service_category_id || '',
             });
         }
 

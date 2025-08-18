@@ -401,9 +401,14 @@ class OrderWizardSessionController extends Controller
             $session->update(['current_step' => WizardStep::CATEGORIES]);
         }
 
-        // Get service categories with their sub-categories
-        $serviceCategories = ServiceCategory::with(['subCategories' => function ($query): void {
-            $query->orderBy('sort_order')->orderBy('name');
+        // Get service categories with their sub-categories and port-filtered service counts
+        $serviceCategories = ServiceCategory::with(['subCategories' => function ($query) use ($session): void {
+            $query->withCount(['services' => function ($q) use ($session): void {
+                $q->where('port_id', $session->port_id)
+                    ->where('status', 'active');
+            }])
+                ->orderBy('sort_order')
+                ->orderBy('name');
         }])->orderBy('name')->get();
 
         return Inertia::render('orders/wizard/order-wizard-step-categories', [

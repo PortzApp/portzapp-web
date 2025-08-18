@@ -21,7 +21,7 @@ export default function OrderServicesTab({ services }: OrderServicesTabProps) {
             if (!acc[subCatId]) {
                 acc[subCatId] = {
                     subCategory: service.sub_category,
-                    category: service.sub_category.category || service.category,
+                    category: service.sub_category.category || service.category!,
                     services: [],
                 };
             }
