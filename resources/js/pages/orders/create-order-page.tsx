@@ -75,7 +75,7 @@ export default function CreateOrderPage({ vessels, services, ports }: { vessels:
                                 {services.map((service) => (
                                     <SelectItem key={service.id} value={service.id.toString()}>
                                         <div className="flex flex-col">
-                                            <span className="font-medium">{service.name}</span>
+                                            <span className="font-medium">{service.sub_category?.name || 'Service'} - {service.organization?.name || 'Unknown'}</span>
                                             <span className="text-sm text-muted-foreground">${service.price}</span>
                                         </div>
                                     </SelectItem>
