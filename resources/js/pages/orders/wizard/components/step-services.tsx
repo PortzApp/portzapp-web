@@ -1,10 +1,10 @@
-import { useState, useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 import { router } from '@inertiajs/react';
 import { AlertCircle, ArrowLeft, Building2, Check, Search, Users } from 'lucide-react';
 
 import type { Service } from '@/types/models';
-import type { OrderWizardSession, OrderWizardCategorySelection } from '@/types/wizard';
+import type { OrderWizardCategorySelection, OrderWizardSession } from '@/types/wizard';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -47,13 +47,9 @@ export function StepServices({ services, session }: StepServicesProps) {
     // Find categories that have no services available (use full services array, not filtered)
     const emptyCategorySelections = useMemo(() => {
         const categoriesSet = new Set(
-            services
-                .filter(service => service.sub_category?.category?.id != null)
-                .map(service => service.sub_category.category.id)
+            services.filter((service) => service.sub_category?.category?.id != null).map((service) => service.sub_category.category.id),
         );
-        return selectedCategories.filter(
-            selection => !categoriesSet.has(selection.service_category_id)
-        );
+        return selectedCategories.filter((selection) => !categoriesSet.has(selection.service_category_id));
     }, [services, selectedCategories]);
 
     // Group services by category first, then by organization within each category
@@ -166,8 +162,8 @@ export function StepServices({ services, session }: StepServicesProps) {
                     <Label className="text-sm font-medium">Selected Categories:</Label>
                     <div className="mt-2 flex flex-wrap gap-2">
                         {selectedCategories.map((selection: OrderWizardCategorySelection, index: number) => (
-                            <Badge 
-                                key={`${selection.service_category_id}:${selection.service_sub_category_id || 'no-sub'}:${index}`} 
+                            <Badge
+                                key={`${selection.service_category_id}:${selection.service_sub_category_id || 'no-sub'}:${index}`}
                                 variant="secondary"
                             >
                                 {selection.service_sub_category?.name && selection.service_category?.name
