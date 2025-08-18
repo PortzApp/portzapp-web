@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { router } from '@inertiajs/react';
 import { AlertCircle, ArrowLeft, Building2, Check, Search, Users } from 'lucide-react';
 
 import type { Service } from '@/types/models';
-import type { OrderWizardSession } from '@/types/wizard';
+import type { OrderWizardCategorySelection, OrderWizardSession } from '@/types/wizard';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -31,7 +31,7 @@ export function StepServices({ services, session }: StepServicesProps) {
     const [search, setSearch] = useState('');
 
     // Get selected categories from session for display
-    const selectedCategories = session?.category_selections || [];
+    const selectedCategories = useMemo(() => session?.category_selections || [], [session?.category_selections]);
 
     // Filter services by search only (they're already filtered by port and category from backend)
     const filteredServices = services.filter((service) => {
@@ -44,22 +44,26 @@ export function StepServices({ services, session }: StepServicesProps) {
         return matchesSearch;
     });
 
-    // Find categories that have no services available
-    const categoriesWithServices = new Set(filteredServices.map((service) => service.service_category_id));
-    const emptyCategorySelections = selectedCategories.filter((selection) => !categoriesWithServices.has(selection.service_category_id));
+    // Find categories that have no services available (use full services array, not filtered)
+    const emptyCategorySelections = useMemo(() => {
+        const categoriesSet = new Set(
+            services.filter((service) => service.sub_category?.category?.id != null).map((service) => service.sub_category.category.id),
+        );
+        return selectedCategories.filter((selection) => !categoriesSet.has(selection.service_category_id));
+    }, [services, selectedCategories]);
 
     // Group services by category first, then by organization within each category
     const servicesByCategory = filteredServices.reduce(
         (acc, service) => {
-            if (!service.category || !service.organization) return acc;
+            if (!service.sub_category?.category || !service.organization) return acc;
 
-            const categoryId = service.category.id;
+            const categoryId = service.sub_category.category.id;
             const orgId = service.organization.id;
 
             // Initialize category if it doesn't exist
             if (!acc[categoryId]) {
                 acc[categoryId] = {
-                    category: service.category,
+                    category: service.sub_category.category,
                     organizationGroups: {},
                 };
             }
@@ -157,9 +161,16 @@ export function StepServices({ services, session }: StepServicesProps) {
                 <div>
                     <Label className="text-sm font-medium">Selected Categories:</Label>
                     <div className="mt-2 flex flex-wrap gap-2">
-                        {selectedCategories.map((selection: { service_category_id: string; service_category?: { name: string } }, index: number) => (
-                            <Badge key={selection.service_category_id || index} variant="secondary">
-                                {selection.service_category?.name || `Category ${selection.service_category_id}`}
+                        {selectedCategories.map((selection: OrderWizardCategorySelection, index: number) => (
+                            <Badge
+                                key={`${selection.service_category_id}:${selection.service_sub_category_id || 'no-sub'}:${index}`}
+                                variant="secondary"
+                            >
+                                {selection.service_sub_category?.name && selection.service_category?.name
+                                    ? `${selection.service_sub_category.name} (${selection.service_category.name})`
+                                    : selection.service_sub_category?.name ||
+                                      selection.service_category?.name ||
+                                      `Category ${selection.service_category_id}`}
                             </Badge>
                         ))}
                     </div>
@@ -342,12 +353,12 @@ export function StepServices({ services, session }: StepServicesProps) {
                                 Object.values(
                                     tempSelectedServices.reduce(
                                         (acc, service) => {
-                                            if (!service.category) return acc;
+                                            if (!service.sub_category?.category) return acc;
 
-                                            const categoryId = service.category.id;
+                                            const categoryId = service.sub_category.category.id;
                                             if (!acc[categoryId]) {
                                                 acc[categoryId] = {
-                                                    category: service.category,
+                                                    category: service.sub_category.category,
                                                     services: [],
                                                 };
                                             }

@@ -3,17 +3,15 @@ import { useState } from 'react';
 import { router } from '@inertiajs/react';
 import { Anchor, Box, Droplets, FileText, Fuel, Heart, Package, Search, Ship, Trash2, Truck, Users, Waves } from 'lucide-react';
 
-import type { ServiceCategory } from '@/types/models';
+import type { ServiceCategory, ServiceSubCategory } from '@/types/models';
 import type { OrderWizardSession } from '@/types/wizard';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 
-import { CategorySelectionGrid } from '@/components/category-selection-grid';
-
 interface StepCategoriesProps {
-    serviceCategories: ServiceCategory[];
+    serviceCategories: (ServiceCategory & { sub_categories?: ServiceSubCategory[] })[];
     session: OrderWizardSession | null;
 }
 
@@ -40,47 +38,52 @@ const getCategoryIcon = (categoryName: string) => {
 export function StepCategories({ serviceCategories, session }: StepCategoriesProps) {
     const [isSaving, setIsSaving] = useState(false);
 
-    // Initialize with session data using category_selections relationship
-    const initialCategories = session?.category_selections
-        ? serviceCategories.filter((cat) => session.category_selections?.some((sel) => sel.service_category_id === cat.id))
+    // Get all sub-categories from all categories
+    const allSubCategories = serviceCategories.flatMap((category) =>
+        (category.sub_categories || []).map((subCat) => ({
+            ...subCat,
+            category: category,
+        })),
+    );
+
+    // Initialize with session data - find sub-categories that belong to selected categories
+    const initialSubCategories = session?.category_selections
+        ? allSubCategories.filter((subCat) => session.category_selections?.some((sel) => sel.service_category_id === subCat.category.id))
         : [];
 
-    const [tempSelectedCategories, setTempSelectedCategories] = useState<ServiceCategory[]>(initialCategories);
+    const [tempSelectedSubCategories, setTempSelectedSubCategories] =
+        useState<(ServiceSubCategory & { category: ServiceCategory })[]>(initialSubCategories);
     const [search, setSearch] = useState('');
 
-    const filteredCategories = serviceCategories.filter((category) => category.name.toLowerCase().includes(search.toLowerCase()));
+    // Filter categories and sub-categories based on search
+    const filteredCategories = serviceCategories
+        .map((category) => ({
+            ...category,
+            sub_categories: (category.sub_categories || []).filter(
+                (subCat) => subCat.name.toLowerCase().includes(search.toLowerCase()) || category.name.toLowerCase().includes(search.toLowerCase()),
+            ),
+        }))
+        .filter((category) => category.name.toLowerCase().includes(search.toLowerCase()) || category.sub_categories.length > 0);
 
-    // Convert categories to CategorySelectionGrid format
-    const categoryItems = filteredCategories.map((category) => ({
-        value: category.id,
-        label: category.name,
-        icon: getCategoryIcon(category.name),
-        subtitle:
-            category.services_count !== undefined
-                ? `${category.services_count} service${category.services_count !== 1 ? 's' : ''} available`
-                : undefined,
-        checked: tempSelectedCategories.some((c) => c.id === category.id),
-    }));
-
-    const handleCategoryToggle = (categoryId: string, checked: boolean) => {
-        const category = serviceCategories.find((c) => c.id === categoryId);
-        if (!category) return;
+    const handleSubCategoryToggle = (subCategoryId: string, checked: boolean) => {
+        const subCategory = allSubCategories.find((sc) => sc.id === subCategoryId);
+        if (!subCategory) return;
 
         if (checked) {
-            setTempSelectedCategories((prev) => [...prev, category]);
+            setTempSelectedSubCategories((prev) => [...prev, subCategory]);
         } else {
-            setTempSelectedCategories((prev) => prev.filter((c) => c.id !== category.id));
+            setTempSelectedSubCategories((prev) => prev.filter((sc) => sc.id !== subCategory.id));
         }
     };
 
     const handleContinue = () => {
-        if (tempSelectedCategories.length > 0 && session) {
+        if (tempSelectedSubCategories.length > 0 && session) {
             setIsSaving(true);
 
             router.patch(
                 route('order-wizard-sessions.set-categories', session.id),
                 {
-                    selected_categories: tempSelectedCategories.map((cat) => cat.id),
+                    selected_sub_categories: tempSelectedSubCategories.map((subCat) => subCat.id),
                 },
                 {
                     onSuccess: () => {
@@ -93,7 +96,7 @@ export function StepCategories({ serviceCategories, session }: StepCategoriesPro
         }
     };
 
-    const canContinue = tempSelectedCategories.length > 0 && !isSaving;
+    const canContinue = tempSelectedSubCategories.length > 0 && !isSaving;
 
     return (
         <div className="grid gap-6 lg:grid-cols-3">
@@ -103,23 +106,79 @@ export function StepCategories({ serviceCategories, session }: StepCategoriesPro
                 <div>
                     <h3 className="flex items-center gap-2 text-xl font-semibold">
                         <Box className="h-5 w-5" />
-                        Select Service Categories
+                        Select Categories
                     </h3>
                     <p className="mt-1 text-muted-foreground">
-                        Choose the types of services you need for {session?.port?.name || 'your destination port'}. You can select multiple
-                        categories.
+                        Choose the specific types of services you need for {session?.port?.name || 'your destination port'}.
                     </p>
                 </div>
 
                 {/* Search */}
                 <div className="relative">
                     <Search className="absolute top-3 left-3 h-4 w-4 text-muted-foreground" />
-                    <Input placeholder="Search service categories..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+                    <Input placeholder="Search categories..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
                 </div>
 
-                {/* Categories Grid */}
-                {categoryItems.length > 0 ? (
-                    <CategorySelectionGrid items={categoryItems} onItemChange={handleCategoryToggle} />
+                {/* Sub-Categories grouped by Categories */}
+                {filteredCategories.length > 0 ? (
+                    <div className="space-y-6">
+                        {filteredCategories.map((category) => (
+                            <div key={category.id} className="space-y-3">
+                                {/* Category Header */}
+                                <div className="flex items-center gap-2 border-b pb-2">
+                                    {(() => {
+                                        const IconComponent = getCategoryIcon(category.name);
+                                        return <IconComponent className="h-5 w-5 text-muted-foreground" />;
+                                    })()}
+                                    <h4 className="text-lg font-semibold">{category.name}</h4>
+                                    <span className="text-sm text-muted-foreground">({category.sub_categories?.length || 0} options)</span>
+                                </div>
+
+                                {/* Sub-Categories Grid */}
+                                <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
+                                    {category.sub_categories?.map((subCategory) => {
+                                        const isSelected = tempSelectedSubCategories.some((sc) => sc.id === subCategory.id);
+                                        return (
+                                            <div
+                                                key={subCategory.id}
+                                                className={`relative cursor-pointer rounded-lg border p-4 transition-all hover:shadow-md ${
+                                                    isSelected
+                                                        ? 'border-primary bg-primary/5 ring-2 ring-primary/20'
+                                                        : 'border-border bg-background hover:border-primary/50'
+                                                }`}
+                                                onClick={() => handleSubCategoryToggle(subCategory.id, !isSelected)}
+                                            >
+                                                <div className="flex items-start gap-3">
+                                                    <div
+                                                        className={`flex h-5 w-5 items-center justify-center rounded border-2 ${
+                                                            isSelected
+                                                                ? 'border-primary bg-primary text-primary-foreground'
+                                                                : 'border-muted-foreground'
+                                                        }`}
+                                                    >
+                                                        {isSelected && <span className="text-xs">✓</span>}
+                                                    </div>
+                                                    <div className="min-w-0 flex-1">
+                                                        <h5 className="font-medium text-foreground">
+                                                            {subCategory.name}
+                                                            {subCategory.services_count !== undefined && (
+                                                                <span className="ml-1 text-xs text-muted-foreground">
+                                                                    ({subCategory.services_count})
+                                                                </span>
+                                                            )}
+                                                        </h5>
+                                                        {subCategory.description && (
+                                                            <p className="mt-1 text-xs text-muted-foreground">{subCategory.description}</p>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 ) : (
                     <div className="py-8 text-center text-sm text-muted-foreground">No categories found. Try adjusting your search.</div>
                 )}
@@ -131,37 +190,38 @@ export function StepCategories({ serviceCategories, session }: StepCategoriesPro
                     <CardHeader>
                         <CardTitle className="text-lg">
                             Selected Categories
-                            {tempSelectedCategories.length > 0 && (
-                                <span className="ml-2 text-sm font-normal text-muted-foreground">({tempSelectedCategories.length})</span>
+                            {tempSelectedSubCategories.length > 0 && (
+                                <span className="ml-2 text-sm font-normal text-muted-foreground">({tempSelectedSubCategories.length})</span>
                             )}
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <p className="text-sm text-muted-foreground">
-                            {tempSelectedCategories.length > 0
+                            {tempSelectedSubCategories.length > 0
                                 ? 'You will be able to select services from these categories in the next step'
-                                : 'Choose the types of services you need. You can select multiple categories.'}
+                                : 'Choose the specific types of services you need. You can select multiple categories.'}
                         </p>
 
-                        {/* Selected Categories List */}
+                        {/* Selected Sub-Categories List */}
                         <div className="space-y-3">
-                            {tempSelectedCategories.length > 0 ? (
-                                tempSelectedCategories.map((category) => (
-                                    <div key={category.id} className="flex items-start gap-3 rounded-md border bg-background p-3">
+                            {tempSelectedSubCategories.length > 0 ? (
+                                tempSelectedSubCategories.map((subCategory) => (
+                                    <div key={subCategory.id} className="flex items-start gap-3 rounded-md border bg-background p-3">
                                         {(() => {
-                                            const IconComponent = getCategoryIcon(category.name);
+                                            const IconComponent = getCategoryIcon(subCategory.category.name);
                                             return <IconComponent className="mt-0.5 h-4 w-4 text-muted-foreground" />;
                                         })()}
                                         <div className="min-w-0 flex-1">
-                                            <div className="font-semibold text-foreground">{category.name}</div>
-                                            {category.services_count !== undefined && (
+                                            <div className="font-semibold text-foreground">{subCategory.name}</div>
+                                            <div className="text-xs text-muted-foreground">from {subCategory.category.name}</div>
+                                            {subCategory.services_count !== undefined && (
                                                 <div className="text-xs text-muted-foreground">
-                                                    {category.services_count} service{category.services_count !== 1 ? 's' : ''} available
+                                                    {subCategory.services_count} service{subCategory.services_count !== 1 ? 's' : ''} available
                                                 </div>
                                             )}
                                         </div>
                                         <button
-                                            onClick={() => handleCategoryToggle(category.id, false)}
+                                            onClick={() => handleSubCategoryToggle(subCategory.id, false)}
                                             className="text-lg leading-none text-muted-foreground transition-colors hover:text-destructive"
                                         >
                                             ×

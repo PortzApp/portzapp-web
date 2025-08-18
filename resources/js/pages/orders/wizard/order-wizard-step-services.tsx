@@ -57,8 +57,16 @@ export default function OrderWizardStepServices({ session, services }: ServicesS
                             </p>
                             <div className="flex flex-wrap gap-1">
                                 {session.category_selections?.map((selection, index) => (
-                                    <Badge key={selection.service_category_id || index} variant="secondary" className="text-xs">
-                                        {selection.service_category?.name || `Category ${selection.service_category_id}`}
+                                    <Badge
+                                        key={selection.service_sub_category_id || selection.service_category_id || index}
+                                        variant="secondary"
+                                        className="text-xs"
+                                    >
+                                        {selection.service_sub_category?.name && selection.service_category?.name
+                                            ? `${selection.service_sub_category.name} (${selection.service_category.name})`
+                                            : selection.service_sub_category?.name ||
+                                              selection.service_category?.name ||
+                                              `Category ${selection.service_category_id}`}
                                     </Badge>
                                 ))}
                             </div>

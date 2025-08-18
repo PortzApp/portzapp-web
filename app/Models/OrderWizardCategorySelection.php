@@ -17,6 +17,7 @@ class OrderWizardCategorySelection extends Model
     protected $fillable = [
         'session_id',
         'service_category_id',
+        'service_sub_category_id',
         'order_index',
     ];
 
@@ -32,5 +33,10 @@ class OrderWizardCategorySelection extends Model
     public function serviceCategory(): BelongsTo
     {
         return $this->belongsTo(ServiceCategory::class);
+    }
+
+    public function serviceSubCategory(): BelongsTo
+    {
+        return $this->belongsTo(ServiceSubCategory::class);
     }
 }

@@ -37,14 +37,14 @@ export function StepReview({ session }: StepReviewProps) {
         (acc, selection) => {
             const service = selection.service;
 
-            if (!service?.category) {
+            if (!service?.sub_category?.category) {
                 return acc;
             }
 
-            const categoryId = service.category.id;
+            const categoryId = service.sub_category.category.id;
             if (!acc[categoryId]) {
                 acc[categoryId] = {
-                    category: service.category,
+                    category: service.sub_category.category,
                     services: [],
                 };
             }
@@ -55,7 +55,9 @@ export function StepReview({ session }: StepReviewProps) {
     );
 
     // Get categories ONLY from services that were actually selected
-    const uniqueCategories = Array.from(new Set(selectedServices.map((selection) => selection.service?.category?.name).filter(Boolean)));
+    const uniqueCategories = Array.from(
+        new Set(selectedServices.map((selection) => selection.service?.sub_category?.category?.name).filter(Boolean)),
+    );
 
     // Calculate totals
     const totalServices = selectedServices.length;

@@ -12,20 +12,22 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Support\Carbon;
 
 /**
- * @property int $id
- * @property int $organization_id
- * @property int $port_id
+ * @property string $id
+ * @property string $organization_id
+ * @property string $port_id
  * @property string $name
  * @property string|null $description
  * @property string $price
  * @property string $status
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property int $service_category_id
- * @property-read ServiceCategory $category
+ * @property string|null $service_sub_category_id
+ * @property-read ServiceSubCategory|null $subCategory
+ * @property-read ServiceCategory|null $category
  * @property-read Collection<int, Order> $orders
  * @property-read int|null $orders_count
  * @property-read Organization $organization
@@ -65,7 +67,16 @@ class Service extends Model
         'status',
         'organization_id',
         'port_id',
-        'service_category_id',
+        'service_sub_category_id',
+    ];
+
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var list<string>
+     */
+    protected $appends = [
+        // 'category', // Temporarily removed due to PHPStan issues
     ];
 
     /**
@@ -84,9 +95,27 @@ class Service extends Model
         return $this->belongsTo(Port::class);
     }
 
-    public function category(): BelongsTo
+    /**
+     * Get the service sub-category relationship.
+     */
+    public function subCategory(): BelongsTo
     {
-        return $this->belongsTo(ServiceCategory::class, 'service_category_id');
+        return $this->belongsTo(ServiceSubCategory::class, 'service_sub_category_id');
+    }
+
+    /**
+     * Get the parent category through the sub-category.
+     */
+    public function category(): HasOneThrough
+    {
+        return $this->hasOneThrough(
+            ServiceCategory::class,    // Final model
+            ServiceSubCategory::class, // Intermediate model
+            'id',                      // Foreign key on intermediate table pointing to this table (sub_categories.id)
+            'id',                      // Foreign key on final table (categories.id)
+            'service_sub_category_id', // Local key on this table (services.service_sub_category_id)
+            'service_category_id'      // Local key on intermediate table pointing to final table (sub_categories.service_category_id)
+        );
     }
 
     /**
@@ -115,6 +144,14 @@ class Service extends Model
     protected function isActive(Builder $query): Builder
     {
         return $query->where('status');
+    }
+
+    /**
+     * Scope a query to include services in a specific category.
+     */
+    public function scopeInCategory(Builder $query, string $categoryId): Builder
+    {
+        return $query->whereHas('subCategory', fn ($q) => $q->where('service_category_id', $categoryId));
     }
 
     /**

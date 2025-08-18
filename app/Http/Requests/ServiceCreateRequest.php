@@ -28,7 +28,7 @@ class ServiceCreateRequest extends FormRequest
             'price' => ['required', 'numeric', 'min:0', 'max:99999999.99'],
             'status' => ['required', 'in:active,inactive'],
             'port_id' => ['required', 'string', 'exists:ports,id'],
-            'service_category_id' => ['required', 'string', 'exists:service_categories,id'],
+            'service_sub_category_id' => ['required', 'string', 'exists:service_sub_categories,id'],
         ];
     }
 }

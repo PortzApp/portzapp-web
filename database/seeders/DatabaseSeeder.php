@@ -12,12 +12,13 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Call the ServiceSeeder which creates users and services
+        // Call seeders in correct dependency order
         $this->call([
             UserSeeder::class,
             VesselSeeder::class,
             PortSeeder::class,
             ServiceCategorySeeder::class,
+            ServiceSubCategorySeeder::class,
             ServiceSeeder::class,
             OrderSeeder::class,
         ]);

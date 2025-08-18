@@ -242,28 +242,42 @@ export default function ServicesIndexPage({ services: initialServices, ports, se
                                     <div className="flex flex-1 flex-col gap-4">
                                         <div className="flex justify-between">
                                             <div className="flex flex-col gap-2">
-                                                <Link
-                                                    href={route('services.show', service.id)}
-                                                    className="text-lg font-semibold hover:underline hover:underline-offset-4"
-                                                >
-                                                    {service.name}
-                                                </Link>
-
-                                                <h3 className="inline-flex items-center gap-2 text-sm font-normal">
+                                                <h3 className="inline-flex items-center gap-2 text-lg font-semibold">
                                                     <div className="size-4 rounded-full bg-neutral-200" />
                                                     <span>{service.organization.name}</span>
                                                 </h3>
+
+                                                <Link
+                                                    href={route('services.show', service.id)}
+                                                    className="text-base font-medium hover:underline hover:underline-offset-4"
+                                                >
+                                                    {service.name}
+                                                </Link>
                                             </div>
                                             <ServicesPageColumnActions service={service} />
                                         </div>
 
-                                        <div className="flex gap-2">
+                                        <div className="flex flex-wrap gap-2">
+                                            {service.sub_category?.category && (
+                                                <Badge variant="secondary">
+                                                    <Box className="mr-1 h-3 w-3" />
+                                                    {service.sub_category.category.name}
+                                                </Badge>
+                                            )}
+                                            {service.sub_category && (
+                                                <Badge variant="outline">
+                                                    <Box className="mr-1 h-3 w-3" />
+                                                    {service.sub_category.name}
+                                                </Badge>
+                                            )}
+                                            {!service.sub_category && (
+                                                <Badge variant="secondary">
+                                                    <Box className="mr-1 h-3 w-3" />
+                                                    No Category
+                                                </Badge>
+                                            )}
                                             <Badge variant="secondary">
-                                                <Box />
-                                                {service.category.name}
-                                            </Badge>
-                                            <Badge variant="secondary">
-                                                <MapPin />
+                                                <MapPin className="mr-1 h-3 w-3" />
                                                 {service.port.name} ({service.port.country}, {service.port.city})
                                             </Badge>
                                         </div>

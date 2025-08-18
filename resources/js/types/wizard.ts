@@ -1,4 +1,4 @@
-import { Port, Service, ServiceCategory, Vessel } from '@/types/models';
+import { Port, Service, ServiceCategory, ServiceSubCategory, Vessel } from '@/types/models';
 
 export type WizardStep = 'vessel_port' | 'categories' | 'services' | 'review';
 
@@ -6,8 +6,10 @@ export interface OrderWizardCategorySelection {
     id: string;
     session_id: string;
     service_category_id: string;
+    service_sub_category_id?: string;
     order_index: number;
     service_category?: ServiceCategory;
+    service_sub_category?: ServiceSubCategory;
 }
 
 export interface OrderWizardServiceSelection {

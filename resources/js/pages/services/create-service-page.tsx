@@ -34,7 +34,7 @@ export type ServiceForm = {
     price: string;
     status: 'active' | 'inactive';
     port_id: string;
-    service_category_id: string;
+    service_sub_category_id: string;
 };
 
 interface ServiceEvent {
@@ -67,7 +67,7 @@ export default function CreateServicePage({ ports, serviceCategories }: { ports:
         price: '',
         status: 'active',
         port_id: '',
-        service_category_id: '',
+        service_sub_category_id: '',
     });
 
     // Listen for service events to show real-time updates
@@ -204,20 +204,24 @@ export default function CreateServicePage({ ports, serviceCategories }: { ports:
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <Label htmlFor="service_category">Service Category</Label>
-                        <Select value={data.service_category_id} onValueChange={(value) => setData('service_category_id', value)}>
+                        <Label htmlFor="service_sub_category">Service Category</Label>
+                        <Select value={data.service_sub_category_id} onValueChange={(value) => setData('service_sub_category_id', value)}>
                             <SelectTrigger>
                                 <SelectValue placeholder="Select service category" />
                             </SelectTrigger>
                             <SelectContent>
                                 {serviceCategories.map((category) => (
-                                    <SelectItem key={category.id} value={category.id}>
-                                        {category.name}
-                                    </SelectItem>
+                                    <div key={category.id}>
+                                        {category.sub_categories?.map((subCategory) => (
+                                            <SelectItem key={subCategory.id} value={subCategory.id}>
+                                                {category.name} → {subCategory.name}
+                                            </SelectItem>
+                                        ))}
+                                    </div>
                                 ))}
                             </SelectContent>
                         </Select>
-                        <InputError message={errors.service_category_id} />
+                        <InputError message={errors.service_sub_category_id} />
                     </div>
                 </div>
 

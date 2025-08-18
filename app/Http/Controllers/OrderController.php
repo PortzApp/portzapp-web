@@ -163,8 +163,8 @@ class OrderController extends Controller
             'orderGroups.services.organization',
         ]);
 
-        // Get all services through order groups
-        $allServices = $order->allServices()->get();
+        // Get all services through order groups with sub-categories and categories
+        $allServices = $order->allServices()->with(['subCategory.category', 'organization'])->get();
 
         return Inertia::render('orders/show-order-page', [
             'order' => array_merge($order->toArray(), [

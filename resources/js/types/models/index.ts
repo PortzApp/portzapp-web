@@ -69,10 +69,11 @@ export interface Service extends BaseModel {
     status: ServiceStatus;
     organization_id: string;
     port_id: string;
-    service_category_id: string;
+    service_sub_category_id: string;
     organization?: Organization;
     port?: Port;
-    category?: ServiceCategory;
+    sub_category?: ServiceSubCategory;
+    category?: ServiceCategory; // Computed accessor from sub_category.category
     order_service?: {
         order_id: string;
         service_id: string;
@@ -83,6 +84,16 @@ export interface Service extends BaseModel {
 
 export interface ServiceCategory extends BaseModel {
     name: string;
+    services_count?: number;
+    sub_categories?: ServiceSubCategory[];
+}
+
+export interface ServiceSubCategory extends BaseModel {
+    name: string;
+    description?: string | null;
+    sort_order?: number;
+    service_category_id: string;
+    category?: ServiceCategory;
     services_count?: number;
 }
 
@@ -134,7 +145,7 @@ export interface OrderWithRelations extends OrderBase {
         id: string;
         organization_id: string;
         port_id: string;
-        service_category_id: string;
+        service_sub_category_id: string;
         name: string;
         description: string;
         price: string;
@@ -148,5 +159,7 @@ export interface OrderWithRelations extends OrderBase {
             updated_at: string;
         };
         organization: Organization;
+        sub_category?: ServiceSubCategory;
+        category?: ServiceCategory;
     }[];
 }
