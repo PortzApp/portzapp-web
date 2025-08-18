@@ -52,7 +52,8 @@
       "mcp__git__git_checkout",
       "mcp__git__git_add",
       "mcp__git__git_commit",
-      "Bash(composer typecheck:frontend:*)"
+      "Bash(composer typecheck:frontend:*)",
+      "Bash(touch:*)"
     ],
     "deny": [],
     "ask": []
