@@ -65,11 +65,11 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
 
     // Additional Order wizard session routes
     Route::patch('order-wizard-sessions/{session}/vessel-port', [OrderWizardSessionController::class, 'setVesselAndPort'])
-        ->name('order-wizard-sessions.set-vessel-port');
+        ->name('order-wizard-sessions.vessel-port');
     Route::patch('order-wizard-sessions/{session}/categories', [OrderWizardSessionController::class, 'setCategories'])
-        ->name('order-wizard-sessions.set-categories');
+        ->name('order-wizard-sessions.categories');
     Route::patch('order-wizard-sessions/{session}/services', [OrderWizardSessionController::class, 'setServices'])
-        ->name('order-wizard-sessions.set-services');
+        ->name('order-wizard-sessions.services');
     Route::post('order-wizard-sessions/{session}/complete', [OrderWizardSessionController::class, 'complete'])
         ->name('order-wizard-sessions.complete');
 

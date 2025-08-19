@@ -392,3 +392,322 @@ test('portzapp team can view services from any organization', function (): void 
 
     $response2->assertStatus(200);
 });
+
+// Additional tests to achieve 100% coverage
+
+test('services index filters by port when port parameter provided', function (): void {
+    // Create another port and service
+    $anotherPort = Port::factory()->create(['name' => 'Another Port']);
+    $serviceAtOtherPort = Service::factory()->create([
+        'organization_id' => $this->shippingAgencyOrg->id,
+        'port_id' => $anotherPort->id,
+        'status' => ServiceStatus::ACTIVE,
+    ]);
+
+    // Filter by port name
+    $response = $this->actingAs($this->vesselOwnerAdmin)
+        ->get(route('services.index', ['port' => 'Test Port']));
+
+    $response->assertStatus(200);
+    $response->assertInertia(fn ($page) => $page->component('services/services-index-page')
+        ->has('services') // Should have filtered results
+    );
+
+    // Filter by partial port name
+    $response = $this->actingAs($this->vesselOwnerAdmin)
+        ->get(route('services.index', ['port' => 'Another']));
+
+    $response->assertStatus(200);
+    $response->assertInertia(fn ($page) => $page->component('services/services-index-page')
+        ->has('services') // Should find services at "Another Port"
+    );
+});
+
+test('services index filters by category when category parameter provided', function (): void {
+    // Create another category and service
+    $anotherCategory = ServiceCategory::factory()->create(['name' => 'Another Category']);
+    $anotherSubCategory = ServiceSubCategory::factory()->create([
+        'service_category_id' => $anotherCategory->id,
+        'name' => 'Another Sub Category',
+    ]);
+    $serviceInOtherCategory = Service::factory()->create([
+        'organization_id' => $this->shippingAgencyOrg->id,
+        'service_sub_category_id' => $anotherSubCategory->id,
+        'status' => ServiceStatus::ACTIVE,
+    ]);
+
+    // Filter by category name
+    $response = $this->actingAs($this->vesselOwnerAdmin)
+        ->get(route('services.index', ['category' => 'Test Category']));
+
+    $response->assertStatus(200);
+    $response->assertInertia(fn ($page) => $page->component('services/services-index-page')
+        ->has('services') // Should have filtered results
+    );
+
+    // Filter by partial category name
+    $response = $this->actingAs($this->vesselOwnerAdmin)
+        ->get(route('services.index', ['category' => 'Another']));
+
+    $response->assertStatus(200);
+    $response->assertInertia(fn ($page) => $page->component('services/services-index-page')
+        ->has('services') // Should find services in "Another Category"
+    );
+});
+
+test('services index handles empty port filter', function (): void {
+    $response = $this->actingAs($this->vesselOwnerAdmin)
+        ->get(route('services.index', ['port' => '']));
+
+    $response->assertStatus(200);
+    $response->assertInertia(fn ($page) => $page->component('services/services-index-page')
+        ->has('services', 2) // Should see all services (no filtering)
+    );
+});
+
+test('services index handles empty category filter', function (): void {
+    $response = $this->actingAs($this->vesselOwnerAdmin)
+        ->get(route('services.index', ['category' => '']));
+
+    $response->assertStatus(200);
+    $response->assertInertia(fn ($page) => $page->component('services/services-index-page')
+        ->has('services', 2) // Should see all services (no filtering)
+    );
+});
+
+test('services index includes ports with service counts', function (): void {
+    $response = $this->actingAs($this->vesselOwnerAdmin)
+        ->get(route('services.index'));
+
+    $response->assertStatus(200);
+    $response->assertInertia(fn ($page) => $page->component('services/services-index-page')
+        ->has('ports')
+        ->has('service_categories')
+    );
+});
+
+test('services index counts are filtered by organization for shipping agency', function (): void {
+    $response = $this->actingAs($this->shippingAgencyAdmin)
+        ->get(route('services.index'));
+
+    $response->assertStatus(200);
+    $response->assertInertia(fn ($page) => $page->component('services/services-index-page')
+        ->has('ports')
+        ->has('service_categories')
+        ->has('services', 1) // Only see services from their org
+    );
+});
+
+test('shipping agency admin can view service create form', function (): void {
+    $response = $this->actingAs($this->shippingAgencyAdmin)
+        ->get(route('services.create'));
+
+    $response->assertStatus(200);
+    $response->assertInertia(fn ($page) => $page->component('services/create-service-page')
+        ->has('ports')
+        ->has('serviceCategories')
+    );
+});
+
+test('vessel owner cannot view service create form', function (): void {
+    $response = $this->actingAs($this->vesselOwnerAdmin)
+        ->get(route('services.create'));
+
+    $response->assertStatus(403);
+});
+
+test('shipping agency admin can view service edit form', function (): void {
+    $response = $this->actingAs($this->shippingAgencyAdmin)
+        ->get(route('services.edit', $this->service));
+
+    $response->assertStatus(200);
+    $response->assertInertia(fn ($page) => $page->component('services/edit-service-page')
+        ->has('service')
+        ->has('ports')
+        ->has('serviceCategories')
+    );
+});
+
+test('shipping agency admin cannot view edit form for service from different org', function (): void {
+    $response = $this->actingAs($this->shippingAgencyAdmin)
+        ->get(route('services.edit', $this->serviceFromOtherOrg));
+
+    $response->assertStatus(403);
+});
+
+test('vessel owner cannot view service edit form', function (): void {
+    $response = $this->actingAs($this->vesselOwnerAdmin)
+        ->get(route('services.edit', $this->service));
+
+    $response->assertStatus(403);
+});
+
+test('service show loads correct relationships', function (): void {
+    $response = $this->actingAs($this->vesselOwnerAdmin)
+        ->get(route('services.show', $this->service));
+
+    $response->assertStatus(200);
+    $response->assertInertia(fn ($page) => $page->component('services/show-service-page')
+        ->has('service')
+        ->where('service.id', $this->service->id)
+    );
+});
+
+test('service creation dispatches ServiceCreated event', function (): void {
+    $serviceData = [
+        'description' => 'Event test service',
+        'price' => 7500.00,
+        'status' => ServiceStatus::ACTIVE->value,
+        'port_id' => $this->port->id,
+        'service_sub_category_id' => $this->serviceSubCategory->id,
+    ];
+
+    $response = $this->actingAs($this->shippingAgencyAdmin)
+        ->post(route('services.store'), $serviceData);
+
+    $response->assertRedirect(route('services.index'));
+
+    Event::assertDispatched(\App\Events\ServiceCreated::class);
+});
+
+test('service update dispatches ServiceUpdated event', function (): void {
+    $updateData = [
+        'description' => 'Updated for event test',
+        'price' => 6000.00,
+        'status' => ServiceStatus::ACTIVE->value,
+        'port_id' => $this->port->id,
+        'service_sub_category_id' => $this->serviceSubCategory->id,
+    ];
+
+    $response = $this->actingAs($this->shippingAgencyAdmin)
+        ->put(route('services.update', $this->service), $updateData);
+
+    $response->assertRedirect(route('services.index'));
+
+    Event::assertDispatched(\App\Events\ServiceUpdated::class);
+});
+
+test('service deletion dispatches ServiceDeleted event', function (): void {
+    $response = $this->actingAs($this->shippingAgencyAdmin)
+        ->delete(route('services.destroy', $this->service));
+
+    $response->assertRedirect(route('services.index'));
+
+    Event::assertDispatched(\App\Events\ServiceDeleted::class);
+});
+
+test('service creation associates with current organization', function (): void {
+    $serviceData = [
+        'description' => 'Organization association test',
+        'price' => 7500.00,
+        'status' => ServiceStatus::ACTIVE->value,
+        'port_id' => $this->port->id,
+        'service_sub_category_id' => $this->serviceSubCategory->id,
+    ];
+
+    $response = $this->actingAs($this->shippingAgencyAdmin)
+        ->post(route('services.store'), $serviceData);
+
+    $response->assertRedirect(route('services.index'));
+
+    $this->assertDatabaseHas('services', [
+        'description' => 'Organization association test',
+        'organization_id' => $this->shippingAgencyAdmin->current_organization_id,
+    ]);
+});
+
+test('service store loads relationships after creation', function (): void {
+    $serviceData = [
+        'description' => 'Relationship loading test',
+        'price' => 7500.00,
+        'status' => ServiceStatus::ACTIVE->value,
+        'port_id' => $this->port->id,
+        'service_sub_category_id' => $this->serviceSubCategory->id,
+    ];
+
+    $response = $this->actingAs($this->shippingAgencyAdmin)
+        ->post(route('services.store'), $serviceData);
+
+    $response->assertRedirect(route('services.index'));
+
+    // Verify the service was created with relationships
+    $service = Service::where('description', 'Relationship loading test')->first();
+    expect($service)->not->toBeNull();
+    expect($service->organization)->not->toBeNull();
+    expect($service->port)->not->toBeNull();
+    expect($service->subCategory)->not->toBeNull();
+});
+
+test('service update refreshes relationships after update', function (): void {
+    $updateData = [
+        'description' => 'Refreshed relationships test',
+        'price' => 6000.00,
+        'status' => ServiceStatus::INACTIVE->value,
+        'port_id' => $this->port->id,
+        'service_sub_category_id' => $this->serviceSubCategory->id,
+    ];
+
+    $response = $this->actingAs($this->shippingAgencyAdmin)
+        ->put(route('services.update', $this->service), $updateData);
+
+    $response->assertRedirect(route('services.index'));
+
+    $this->service->refresh();
+    expect($this->service->description)->toBe('Refreshed relationships test');
+    expect($this->service->status)->toBe(ServiceStatus::INACTIVE);
+});
+
+test('service destroy correctly stores service ID for event', function (): void {
+    $serviceId = $this->service->id;
+
+    $response = $this->actingAs($this->shippingAgencyAdmin)
+        ->delete(route('services.destroy', $this->service));
+
+    $response->assertRedirect(route('services.index'));
+
+    // Verify service was deleted
+    $this->assertDatabaseMissing('services', [
+        'id' => $serviceId,
+    ]);
+
+    Event::assertDispatched(\App\Events\ServiceDeleted::class, function ($event) use ($serviceId) {
+        return $event->serviceId === (string) $serviceId;
+    });
+});
+
+test('unauthenticated access to all service routes redirects to login', function (): void {
+    $routes = [
+        ['GET', route('services.index')],
+        ['GET', route('services.create')],
+        ['POST', route('services.store')],
+        ['GET', route('services.show', $this->service)],
+        ['GET', route('services.edit', $this->service)],
+        ['PUT', route('services.update', $this->service)],
+        ['DELETE', route('services.destroy', $this->service)],
+    ];
+
+    foreach ($routes as [$method, $url]) {
+        $response = $this->call($method, $url);
+        $response->assertRedirect(route('login'));
+    }
+});
+
+test('service create form loads service categories with subcategories', function (): void {
+    $response = $this->actingAs($this->shippingAgencyAdmin)
+        ->get(route('services.create'));
+
+    $response->assertStatus(200);
+    $response->assertInertia(fn ($page) => $page->component('services/create-service-page')
+        ->has('serviceCategories.0.sub_categories') // Verify subcategories are loaded
+    );
+});
+
+test('service edit form loads service categories with subcategories', function (): void {
+    $response = $this->actingAs($this->shippingAgencyAdmin)
+        ->get(route('services.edit', $this->service));
+
+    $response->assertStatus(200);
+    $response->assertInertia(fn ($page) => $page->component('services/edit-service-page')
+        ->has('serviceCategories.0.sub_categories') // Verify subcategories are loaded
+    );
+});

@@ -3,6 +3,7 @@
 namespace App\Policies;
 
 use App\Enums\OrganizationBusinessType;
+use App\Enums\UserRoles;
 use App\Models\OrderGroup;
 use App\Models\User;
 
@@ -13,6 +14,11 @@ class OrderGroupPolicy
      */
     public function viewAny(User $user): bool
     {
+        // User must have a current organization
+        if (! $user->current_organization_id) {
+            return false;
+        }
+
         // PORTZAPP_TEAM can view all order groups
         if ($user->isInOrganizationWithBusinessType(OrganizationBusinessType::PORTZAPP_TEAM)) {
             return true;
@@ -27,14 +33,19 @@ class OrderGroupPolicy
      */
     public function view(User $user, OrderGroup $orderGroup): bool
     {
+        // User must have a current organization
+        if (! $user->current_organization_id) {
+            return false;
+        }
+
         // PORTZAPP_TEAM can view any order group
         if ($user->isInOrganizationWithBusinessType(OrganizationBusinessType::PORTZAPP_TEAM)) {
             return true;
         }
 
-        // VESSEL_OWNER can view order groups for their orders
+        // VESSEL_OWNER should use orders.index instead - not allowed to view individual order groups
         if ($user->isInOrganizationWithBusinessType(OrganizationBusinessType::VESSEL_OWNER)) {
-            return $orderGroup->order->placed_by_organization_id === $user->current_organization_id;
+            return false;
         }
 
         // SHIPPING_AGENCY can view their own order groups
@@ -60,14 +71,20 @@ class OrderGroupPolicy
      */
     public function update(User $user, OrderGroup $orderGroup): bool
     {
-        // PORTZAPP_TEAM can update any order group
-        if ($user->isInOrganizationWithBusinessType(OrganizationBusinessType::PORTZAPP_TEAM)) {
-            return true;
+        // User must have a current organization
+        if (! $user->current_organization_id) {
+            return false;
         }
 
-        // SHIPPING_AGENCY can update their own order groups (accept/reject/progress)
+        // PORTZAPP_TEAM can update any order group, but must have admin role
+        if ($user->isInOrganizationWithBusinessType(OrganizationBusinessType::PORTZAPP_TEAM)) {
+            return $user->getRoleInCurrentOrganization() === UserRoles::ADMIN;
+        }
+
+        // SHIPPING_AGENCY can update their own order groups, but must have admin role
         if ($user->isInOrganizationWithBusinessType(OrganizationBusinessType::SHIPPING_AGENCY)) {
-            return $orderGroup->fulfilling_organization_id === $user->current_organization_id;
+            return $orderGroup->fulfilling_organization_id === $user->current_organization_id &&
+                   $user->getRoleInCurrentOrganization() === UserRoles::ADMIN;
         }
 
         return false;
@@ -78,8 +95,14 @@ class OrderGroupPolicy
      */
     public function delete(User $user, OrderGroup $orderGroup): bool
     {
-        // Only PORTZAPP_TEAM can delete order groups
-        return $user->isInOrganizationWithBusinessType(OrganizationBusinessType::PORTZAPP_TEAM);
+        // User must have a current organization
+        if (! $user->current_organization_id) {
+            return false;
+        }
+
+        // Only PORTZAPP_TEAM with admin role can delete order groups
+        return $user->isInOrganizationWithBusinessType(OrganizationBusinessType::PORTZAPP_TEAM) &&
+               $user->getRoleInCurrentOrganization() === UserRoles::ADMIN;
     }
 
     /**
@@ -87,8 +110,14 @@ class OrderGroupPolicy
      */
     public function restore(User $user, OrderGroup $orderGroup): bool
     {
-        // Only PORTZAPP_TEAM can restore order groups
-        return $user->isInOrganizationWithBusinessType(OrganizationBusinessType::PORTZAPP_TEAM);
+        // User must have a current organization
+        if (! $user->current_organization_id) {
+            return false;
+        }
+
+        // Only PORTZAPP_TEAM with admin role can restore order groups
+        return $user->isInOrganizationWithBusinessType(OrganizationBusinessType::PORTZAPP_TEAM) &&
+               $user->getRoleInCurrentOrganization() === UserRoles::ADMIN;
     }
 
     /**
@@ -96,7 +125,13 @@ class OrderGroupPolicy
      */
     public function forceDelete(User $user, OrderGroup $orderGroup): bool
     {
-        // Only PORTZAPP_TEAM can permanently delete order groups
-        return $user->isInOrganizationWithBusinessType(OrganizationBusinessType::PORTZAPP_TEAM);
+        // User must have a current organization
+        if (! $user->current_organization_id) {
+            return false;
+        }
+
+        // Only PORTZAPP_TEAM with admin role can permanently delete order groups
+        return $user->isInOrganizationWithBusinessType(OrganizationBusinessType::PORTZAPP_TEAM) &&
+               $user->getRoleInCurrentOrganization() === UserRoles::ADMIN;
     }
 }

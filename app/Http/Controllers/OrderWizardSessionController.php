@@ -29,7 +29,7 @@ class OrderWizardSessionController extends Controller
      */
     public function index()
     {
-        Gate::authorize('view-any', OrderWizardSession::class);
+        Gate::authorize('viewAny', OrderWizardSession::class);
 
         $user = auth()->user();
         $sessions = OrderWizardSession::where('user_id', $user->id)
@@ -39,7 +39,13 @@ class OrderWizardSessionController extends Controller
             ->latest()
             ->get();
 
-        return back()->with([
+        if (request()->header('referer')) {
+            return back()->with([
+                'sessions' => $sessions,
+            ]);
+        }
+
+        return redirect()->route('dashboard')->with([
             'sessions' => $sessions,
         ]);
     }
@@ -73,23 +79,29 @@ class OrderWizardSessionController extends Controller
     /**
      * Display the specified wizard session.
      */
-    public function show(OrderWizardSession $session)
+    public function show(OrderWizardSession $orderWizardSession)
     {
-        Gate::authorize('view', $session);
+        Gate::authorize('view', $orderWizardSession);
 
-        $session->load(['user', 'organization', 'vessel', 'port']);
+        $orderWizardSession->load(['user', 'organization', 'vessel', 'port']);
 
-        return back()->with([
-            'session' => $session,
+        if (request()->header('referer')) {
+            return back()->with([
+                'session' => $orderWizardSession,
+            ]);
+        }
+
+        return redirect()->route('dashboard')->with([
+            'session' => $orderWizardSession,
         ]);
     }
 
     /**
      * Update the specified wizard session.
      */
-    public function update(Request $request, OrderWizardSession $session)
+    public function update(Request $request, OrderWizardSession $orderWizardSession)
     {
-        //        Gate::authorize('update', $session);
+        Gate::authorize('update', $orderWizardSession);
 
         $validator = Validator::make($request->all(), [
             'vessel_id' => 'nullable|exists:vessels,id',
@@ -107,19 +119,17 @@ class OrderWizardSessionController extends Controller
 
         $validated = $validator->validated();
 
-        // Only update the fields that were provided
-        $updateData = array_filter($validated, function ($value, $key) {
-            return $value !== null || in_array($key, ['current_step']);
-        }, ARRAY_FILTER_USE_BOTH);
+        // Only update the fields that were provided (allow null values to be set)
+        $updateData = array_intersect_key($validated, array_flip(array_keys($request->all())));
 
-        $session->update($updateData);
+        $orderWizardSession->update($updateData);
 
         // Refresh the session and load relationships
-        $session->refresh();
-        $session->load(['vessel', 'port', 'categorySelections.serviceCategory', 'serviceSelections.service']);
+        $orderWizardSession->refresh();
+        $orderWizardSession->load(['vessel', 'port', 'categorySelections.serviceCategory', 'serviceSelections.service']);
 
         return back()->with([
-            'session' => $session,
+            'session' => $orderWizardSession,
         ]);
     }
 
@@ -128,7 +138,7 @@ class OrderWizardSessionController extends Controller
      */
     public function setVesselAndPort(Request $request, OrderWizardSession $session)
     {
-        //        Gate::authorize('update', $session);
+        Gate::authorize('update', $session);
 
         $validated = $request->validate([
             'vessel_id' => 'required|exists:vessels,id',
@@ -153,7 +163,7 @@ class OrderWizardSessionController extends Controller
      */
     public function setCategories(Request $request, OrderWizardSession $session)
     {
-        //        Gate::authorize('update', $session);
+        Gate::authorize('update', $session);
 
         $validated = $request->validate([
             'selected_sub_categories' => 'required|array|min:1',
@@ -193,7 +203,7 @@ class OrderWizardSessionController extends Controller
      */
     public function setServices(Request $request, OrderWizardSession $session)
     {
-        //        Gate::authorize('update', $session);
+        Gate::authorize('update', $session);
 
         $validated = $request->validate([
             'selected_services' => 'required|array|min:1',
@@ -235,14 +245,9 @@ class OrderWizardSessionController extends Controller
      */
     public function destroy(OrderWizardSession $orderWizardSession)
     {
-        // Gate::authorize('delete', $orderWizardSession);
+        Gate::authorize('delete', $orderWizardSession);
 
-        \Log::emergency('🚨 DESTROY METHOD CALLED - Session ID: '.$orderWizardSession->id);
-        \Log::info('Attempting to delete session: '.$orderWizardSession->id);
-
-        $result = $orderWizardSession->delete();
-
-        \Log::info('Delete result: '.($result ? 'true' : 'false'));
+        $orderWizardSession->delete();
 
         // Get updated sessions list for the dashboard
         $user = auth()->user();
@@ -252,8 +257,6 @@ class OrderWizardSessionController extends Controller
             ->with(['vessel', 'port', 'categorySelections.serviceCategory', 'serviceSelections.service'])
             ->latest()
             ->get();
-
-        \Log::info('Remaining sessions after delete: '.$sessions->count());
 
         return back()->with([
             'sessions' => $sessions,
@@ -452,21 +455,6 @@ class OrderWizardSessionController extends Controller
             ->orderBy('organization_id')  // Group by organization
             ->orderBy('name')
             ->get();
-
-        // Debug logging
-        \Log::info('🔍 DEBUG Services Step:', [
-            'session_id' => $session->id,
-            'port_id' => $session->port_id,
-            'selected_sub_category_ids' => $selectedSubCategoryIds,
-            'filtered_services_count' => $filteredServices->count(),
-            'filtered_services' => $filteredServices->take(5)->map(fn ($s) => [
-                'id' => $s->id,
-                'sub_category_id' => $s->service_sub_category_id,
-                'category_id' => $s->subCategory?->service_category_id,
-                'port_id' => $s->port_id,
-                'org_name' => $s->organization->name ?? 'N/A',
-            ])->toArray(),
-        ]);
 
         return Inertia::render('orders/wizard/order-wizard-step-services', [
             'session' => $session->load(['vessel', 'port', 'categorySelections.serviceCategory', 'categorySelections.serviceSubCategory', 'serviceSelections.service']),
