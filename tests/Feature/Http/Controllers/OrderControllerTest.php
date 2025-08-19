@@ -443,3 +443,230 @@ test('user in multiple organizations sees orders from all their orgs', function 
         ->has('orders', 1) // Only one order matches the criteria
     );
 });
+
+// Additional tests to achieve 100% coverage
+
+test('vessel owner admin can view create order form', function (): void {
+    $response = $this->actingAs($this->vesselOwnerAdmin)
+        ->get(route('orders.create'));
+
+    $response->assertStatus(200);
+    $response->assertInertia(fn ($page) => $page->component('orders/create-order-page')
+        ->has('vessels')
+        ->has('services')
+        ->has('ports')
+    );
+});
+
+test('user without vessel owner organization cannot view create form', function (): void {
+    $userWithoutVesselOrg = User::factory()->create();
+    $userWithoutVesselOrg->organizations()->attach($this->shippingAgencyOrg, [
+        'role' => UserRoles::ADMIN->value,
+    ]);
+    $userWithoutVesselOrg->current_organization_id = $this->shippingAgencyOrg->id;
+    $userWithoutVesselOrg->save();
+
+    $response = $this->actingAs($userWithoutVesselOrg)
+        ->get(route('orders.create'));
+
+    $response->assertStatus(403);
+});
+
+test('vessel owner admin can view edit order form', function (): void {
+    $response = $this->actingAs($this->vesselOwnerAdmin)
+        ->get(route('orders.edit', $this->order));
+
+    $response->assertStatus(200);
+    $response->assertInertia(fn ($page) => $page->component('orders/edit-order-page')
+        ->has('order')
+        ->has('vessels')
+        ->has('services')
+    );
+});
+
+test('order creation handles single service ID as non-array', function (): void {
+    $orderData = [
+        'service_ids' => $this->service->id, // Single ID, not array
+        'vessel_id' => $this->vessel->id,
+        'port_id' => $this->port->id,
+        'notes' => 'Single service order',
+    ];
+
+    $response = $this->actingAs($this->vesselOwnerAdmin)
+        ->post(route('orders.store'), $orderData);
+
+    $response->assertRedirect();
+    $response->assertSessionHas('message', 'Order created successfully!');
+
+    $newOrder = Order::where('notes', 'Single service order')->first();
+    expect($newOrder)->not->toBeNull();
+    expect($newOrder->orderGroups)->toHaveCount(1);
+    expect($newOrder->orderGroups->first()->services)->toHaveCount(1);
+});
+
+test('order creation with multiple services from different organizations creates multiple order groups', function (): void {
+    $orderData = [
+        'service_ids' => [$this->service->id, $this->serviceFromOtherOrg->id], // Different orgs
+        'vessel_id' => $this->vessel->id,
+        'port_id' => $this->port->id,
+        'notes' => 'Multi-org order',
+    ];
+
+    $response = $this->actingAs($this->vesselOwnerAdmin)
+        ->post(route('orders.store'), $orderData);
+
+    $response->assertRedirect();
+    $response->assertSessionHas('message', 'Order created successfully!');
+
+    $newOrder = Order::where('notes', 'Multi-org order')->first();
+    expect($newOrder)->not->toBeNull();
+    expect($newOrder->orderGroups)->toHaveCount(2); // Two organizations
+
+    $orgIds = $newOrder->orderGroups->pluck('fulfilling_organization_id');
+    expect($orgIds)->toContain($this->shippingAgencyOrg->id);
+    expect($orgIds)->toContain($this->shippingAgencyOrg2->id);
+});
+
+test('order creation without notes sets null', function (): void {
+    $orderData = [
+        'service_ids' => [$this->service->id],
+        'vessel_id' => $this->vessel->id,
+        'port_id' => $this->port->id,
+        // No notes provided
+    ];
+
+    $response = $this->actingAs($this->vesselOwnerAdmin)
+        ->post(route('orders.store'), $orderData);
+
+    $response->assertRedirect();
+
+    $newOrder = Order::where('placed_by_organization_id', $this->vesselOwnerOrg->id)
+        ->whereNull('notes')
+        ->latest()
+        ->first();
+
+    expect($newOrder)->not->toBeNull();
+    expect($newOrder->notes)->toBeNull();
+});
+
+test('order update with vessel_id updates vessel', function (): void {
+    $newVessel = Vessel::factory()->create([
+        'organization_id' => $this->vesselOwnerOrg->id,
+    ]);
+
+    $updateData = [
+        'vessel_id' => $newVessel->id,
+        'notes' => 'Updated with new vessel',
+    ];
+
+    $response = $this->actingAs($this->vesselOwnerAdmin)
+        ->put(route('orders.update', $this->order), $updateData);
+
+    $response->assertRedirect();
+    $response->assertSessionHas('message', 'Order updated successfully!');
+
+    $this->order->refresh();
+    expect($this->order->vessel_id)->toBe($newVessel->id);
+    expect($this->order->notes)->toBe('Updated with new vessel');
+});
+
+test('order update with service_ids syncs services', function (): void {
+    $newService = Service::factory()->create([
+        'organization_id' => $this->shippingAgencyOrg->id,
+        'status' => ServiceStatus::ACTIVE,
+    ]);
+
+    $updateData = [
+        'service_ids' => [$newService->id],
+        'notes' => 'Updated with new services',
+    ];
+
+    $response = $this->actingAs($this->vesselOwnerAdmin)
+        ->put(route('orders.update', $this->order), $updateData);
+
+    $response->assertRedirect();
+    $response->assertSessionHas('message', 'Order updated successfully!');
+
+    $this->order->refresh();
+    $this->order->load('services');
+    expect($this->order->services)->toHaveCount(1);
+    expect($this->order->services->first()->id)->toBe($newService->id);
+});
+
+test('show order loads all_services relationship correctly', function (): void {
+    $response = $this->actingAs($this->vesselOwnerAdmin)
+        ->get(route('orders.show', $this->order));
+
+    $response->assertStatus(200);
+    $response->assertInertia(fn ($page) => $page->component('orders/show-order-page')
+        ->has('order.all_services') // Check that all_services is included
+        ->where('order.id', $this->order->id)
+    );
+});
+
+test('create form shows only vessels from user vessel owner organizations', function (): void {
+    // Create vessel from organization user doesn't belong to
+    $otherOrg = Organization::factory()->create([
+        'business_type' => OrganizationBusinessType::VESSEL_OWNER,
+    ]);
+    $otherVessel = Vessel::factory()->create([
+        'organization_id' => $otherOrg->id,
+    ]);
+
+    $response = $this->actingAs($this->vesselOwnerAdmin)
+        ->get(route('orders.create'));
+
+    $response->assertStatus(200);
+    $response->assertInertia(fn ($page) => $page
+        ->where('vessels', function ($vessels) use ($otherVessel) {
+            return ! collect($vessels)->contains('id', $otherVessel->id);
+        })
+    );
+});
+
+test('create form shows only active services', function (): void {
+    // Create inactive service
+    $inactiveService = Service::factory()->create([
+        'organization_id' => $this->shippingAgencyOrg->id,
+        'status' => ServiceStatus::INACTIVE,
+    ]);
+
+    $response = $this->actingAs($this->vesselOwnerAdmin)
+        ->get(route('orders.create'));
+
+    $response->assertStatus(200);
+    $response->assertInertia(fn ($page) => $page
+        ->where('services', function ($services) use ($inactiveService) {
+            return ! collect($services)->contains('id', $inactiveService->id);
+        })
+    );
+});
+
+test('edit form loads order with services and vessel relationships', function (): void {
+    $response = $this->actingAs($this->vesselOwnerAdmin)
+        ->get(route('orders.edit', $this->order));
+
+    $response->assertStatus(200);
+    $response->assertInertia(fn ($page) => $page
+        ->has('order.services')
+        ->has('order.vessel')
+        ->where('order.id', $this->order->id)
+    );
+});
+
+test('unauthenticated access to all routes redirects to login', function (): void {
+    $routes = [
+        ['GET', route('orders.index')],
+        ['GET', route('orders.create')],
+        ['POST', route('orders.store')],
+        ['GET', route('orders.show', $this->order)],
+        ['GET', route('orders.edit', $this->order)],
+        ['PUT', route('orders.update', $this->order)],
+        ['DELETE', route('orders.destroy', $this->order)],
+    ];
+
+    foreach ($routes as [$method, $url]) {
+        $response = $this->call($method, $url);
+        $response->assertRedirect(route('login'));
+    }
+});
