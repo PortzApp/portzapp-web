@@ -15,7 +15,7 @@ class PortController extends Controller
      */
     public function index()
     {
-        Gate::authorize('view-any', Port::class);
+        Gate::authorize('viewAny', Port::class);
 
         $ports = Port::query()->latest()->get();
 
