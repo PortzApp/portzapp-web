@@ -53,7 +53,9 @@
       "mcp__git__git_add",
       "mcp__git__git_commit",
       "Bash(composer typecheck:frontend:*)",
-      "Bash(touch:*)"
+      "Bash(touch:*)",
+      "mcp__laravel-boost__application-info",
+      "mcp__laravel-boost__search-docs"
     ],
     "deny": [],
     "ask": []
