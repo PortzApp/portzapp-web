@@ -52,37 +52,37 @@ export function StepServices({ services, session }: StepServicesProps) {
         return selectedCategories.filter((selection) => !categoriesSet.has(selection.service_category_id));
     }, [services, selectedCategories]);
 
-    // Group services by category first, then by organization within each category
-    const servicesByCategory = filteredServices.reduce(
+    // Group services by sub-category first, then by organization within each sub-category
+    const servicesBySubCategory = filteredServices.reduce(
         (acc, service) => {
-            if (!service.sub_category?.category || !service.organization) return acc;
+            if (!service.sub_category || !service.organization) return acc;
 
-            const categoryId = service.sub_category.category.id;
+            const subCategoryId = service.sub_category.id;
             const orgId = service.organization.id;
 
-            // Initialize category if it doesn't exist
-            if (!acc[categoryId]) {
-                acc[categoryId] = {
-                    category: service.sub_category.category,
+            // Initialize sub-category if it doesn't exist
+            if (!acc[subCategoryId]) {
+                acc[subCategoryId] = {
+                    subCategory: service.sub_category,
                     organizationGroups: {},
                 };
             }
 
-            // Initialize organization within category if it doesn't exist
-            if (!acc[categoryId].organizationGroups[orgId]) {
-                acc[categoryId].organizationGroups[orgId] = {
+            // Initialize organization within sub-category if it doesn't exist
+            if (!acc[subCategoryId].organizationGroups[orgId]) {
+                acc[subCategoryId].organizationGroups[orgId] = {
                     organization: service.organization,
                     services: [],
                 };
             }
 
-            acc[categoryId].organizationGroups[orgId].services.push(service);
+            acc[subCategoryId].organizationGroups[orgId].services.push(service);
             return acc;
         },
         {} as Record<
             string,
             {
-                category: { id: string; name: string };
+                subCategory: { id: string; name: string; category?: { id: string; name: string } };
                 organizationGroups: Record<string, { organization: { id: string; name: string }; services: Service[] }>;
             }
         >,
@@ -96,22 +96,13 @@ export function StepServices({ services, session }: StepServicesProps) {
         }
     };
 
-    const handleOrganizationToggle = (orgServices: Service[], checked: boolean) => {
-        if (checked) {
-            const newServices = orgServices.filter((service) => !tempSelectedServices.some((s) => s.id === service.id));
-            setTempSelectedServices((prev) => [...prev, ...newServices]);
-        } else {
-            const orgServiceIds = orgServices.map((s) => s.id);
-            setTempSelectedServices((prev) => prev.filter((s) => !orgServiceIds.includes(s.id)));
-        }
-    };
 
     const handleContinue = () => {
         if (tempSelectedServices.length > 0 && session) {
             setIsSaving(true);
 
             router.patch(
-                route('order-wizard-sessions.set-services', session.id),
+                route('order-wizard-sessions.services', session.id),
                 {
                     selected_services: tempSelectedServices.map((service) => service.id),
                 },
@@ -128,13 +119,6 @@ export function StepServices({ services, session }: StepServicesProps) {
 
     const canContinue = tempSelectedServices.length > 0 && !isSaving;
 
-    const getSelectedServicesCount = (orgServices: Service[]) => {
-        return orgServices.filter((service) => tempSelectedServices.some((s) => s.id === service.id)).length;
-    };
-
-    const isOrganizationFullySelected = (orgServices: Service[]) => {
-        return orgServices.length > 0 && orgServices.every((service) => tempSelectedServices.some((s) => s.id === service.id));
-    };
 
     return (
         <div className="grid gap-6 lg:grid-cols-3">
@@ -176,109 +160,72 @@ export function StepServices({ services, session }: StepServicesProps) {
                     </div>
                 </div>
 
-                {/* Services by Category */}
+                {/* Services by Sub-Category */}
                 <div className="space-y-6">
-                    {Object.values(servicesByCategory).map(({ category, organizationGroups }) => (
-                        <Card key={category.id} className="overflow-hidden">
+                    {Object.values(servicesBySubCategory).map(({ subCategory, organizationGroups }) => (
+                        <Card key={subCategory.id} className="overflow-hidden">
                             <CardHeader className="pb-3">
-                                <CardTitle className="text-xl">{category.name}</CardTitle>
+                                <CardTitle className="text-xl">{subCategory.name}</CardTitle>
                                 <CardDescription>
-                                    {Object.values(organizationGroups).reduce((total, org) => total + org.services.length, 0)} service(s) available
+                                    {Object.keys(organizationGroups).length} agenc{Object.keys(organizationGroups).length === 1 ? 'y' : 'ies'} offering services
                                 </CardDescription>
                             </CardHeader>
 
                             <CardContent className="space-y-4">
-                                {Object.values(organizationGroups).map(({ organization, services: orgServices }) => {
-                                    const selectedCount = getSelectedServicesCount(orgServices);
-                                    const isFullySelected = isOrganizationFullySelected(orgServices);
-                                    const isPartiallySelected = selectedCount > 0 && !isFullySelected;
+                                <div className="grid gap-4 sm:grid-cols-2">
+                                    {Object.values(organizationGroups).map(({ organization, services: orgServices }) => {
+                                        // Since each organization only offers one service per sub-category,
+                                        // we can simplify this to show one card per organization-service combination
+                                        const service = orgServices[0]; // Take the first (and only) service
+                                        const isSelected = tempSelectedServices.some((s) => s.id === service.id);
 
-                                    return (
-                                        <div key={organization.id} className="rounded-lg border bg-muted/30">
-                                            <div className="p-4 pb-3">
-                                                <div className="flex items-start justify-between">
-                                                    <div className="flex items-center gap-3">
-                                                        <Checkbox
-                                                            checked={isFullySelected}
-                                                            ref={(el) => {
-                                                                if (el && el.querySelector('input')) {
-                                                                    const input = el.querySelector('input') as HTMLInputElement;
-                                                                    input.indeterminate = isPartiallySelected;
-                                                                }
-                                                            }}
-                                                            onCheckedChange={(checked) => handleOrganizationToggle(orgServices, checked as boolean)}
-                                                        />
-                                                        <div>
-                                                            <div className="flex items-center gap-2 font-medium">
-                                                                <Building2 className="h-4 w-4 text-muted-foreground" />
-                                                                {organization.name}
-                                                            </div>
-                                                            <p className="text-sm text-muted-foreground">
-                                                                {orgServices.length} service{orgServices.length !== 1 ? 's' : ''} available
-                                                                {selectedCount > 0 && (
-                                                                    <span className="ml-2 text-primary">• {selectedCount} selected</span>
-                                                                )}
-                                                            </p>
+                                        return (
+                                            <div
+                                                key={`${organization.id}-${service.id}`}
+                                                className={`relative cursor-pointer rounded-lg border p-4 transition-colors ${
+                                                    isSelected
+                                                        ? 'border-primary bg-primary/5'
+                                                        : 'border-border hover:border-muted-foreground/50'
+                                                }`}
+                                                onClick={() => handleServiceToggle(service, !isSelected)}
+                                            >
+                                                <div className="flex items-start space-x-3">
+                                                    <Checkbox
+                                                        id={service.id}
+                                                        checked={isSelected}
+                                                        onCheckedChange={(checked) =>
+                                                            handleServiceToggle(service, checked as boolean)
+                                                        }
+                                                        onClick={(e) => e.stopPropagation()}
+                                                    />
+                                                    
+                                                    {/* Agency Logo Placeholder */}
+                                                    <div className="h-12 w-12 rounded-md bg-muted flex-shrink-0" />
+                                                    
+                                                    <div className="min-w-0 flex-1">
+                                                        <div className="flex items-center gap-2 mb-1">
+                                                            <Label htmlFor={service.id} className="cursor-pointer font-semibold text-base">
+                                                                {service.organization?.name || 'Agency'}
+                                                            </Label>
+                                                            <Building2 className="h-4 w-4 text-muted-foreground" />
                                                         </div>
+                                                        {service.description && (
+                                                            <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
+                                                                {service.description}
+                                                            </p>
+                                                        )}
+                                                        {service.price && (
+                                                            <p className="mt-2 text-sm font-semibold text-green-600">
+                                                                ${service.price}
+                                                            </p>
+                                                        )}
                                                     </div>
-                                                    {selectedCount > 0 && (
-                                                        <Badge variant="outline" className="border-primary text-primary">
-                                                            {selectedCount}/{orgServices.length}
-                                                        </Badge>
-                                                    )}
+                                                    {isSelected && <Check className="h-5 w-5 text-primary" />}
                                                 </div>
                                             </div>
-
-                                            <div className="px-4 pb-4">
-                                                <Separator className="mb-3" />
-                                                <div className="grid gap-3 sm:grid-cols-2">
-                                                    {orgServices.map((service) => {
-                                                        const isSelected = tempSelectedServices.some((s) => s.id === service.id);
-
-                                                        return (
-                                                            <div
-                                                                key={service.id}
-                                                                className={`relative cursor-pointer rounded-lg border p-3 transition-colors ${
-                                                                    isSelected
-                                                                        ? 'border-primary bg-primary/5'
-                                                                        : 'border-border hover:border-muted-foreground/50'
-                                                                }`}
-                                                                onClick={() => handleServiceToggle(service, !isSelected)}
-                                                            >
-                                                                <div className="flex items-start space-x-3">
-                                                                    <Checkbox
-                                                                        id={service.id}
-                                                                        checked={isSelected}
-                                                                        onCheckedChange={(checked) =>
-                                                                            handleServiceToggle(service, checked as boolean)
-                                                                        }
-                                                                        onClick={(e) => e.stopPropagation()}
-                                                                    />
-                                                                    <div className="min-w-0 flex-1">
-                                                                        <Label htmlFor={service.id} className="cursor-pointer font-medium">
-                                                                            {service.sub_category?.name || 'Service'}
-                                                                        </Label>
-                                                                        {service.description && (
-                                                                            <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
-                                                                                {service.description}
-                                                                            </p>
-                                                                        )}
-                                                                        {service.price && (
-                                                                            <p className="mt-1 text-sm font-medium text-green-600">
-                                                                                ${service.price}
-                                                                            </p>
-                                                                        )}
-                                                                    </div>
-                                                                    {isSelected && <Check className="h-5 w-5 text-primary" />}
-                                                                </div>
-                                                            </div>
-                                                        );
-                                                    })}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
+                                        );
+                                    })}
+                                </div>
                             </CardContent>
                         </Card>
                     ))}
@@ -318,7 +265,7 @@ export function StepServices({ services, session }: StepServicesProps) {
                         </Card>
                     )}
 
-                    {Object.keys(servicesByCategory).length === 0 && emptyCategorySelections.length === 0 && (
+                    {Object.keys(servicesBySubCategory).length === 0 && emptyCategorySelections.length === 0 && (
                         <Card>
                             <CardContent className="py-8 text-center text-sm text-muted-foreground">
                                 No services available for the selected categories. Try selecting different categories in the previous step.

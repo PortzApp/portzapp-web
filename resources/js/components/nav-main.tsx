@@ -2,6 +2,7 @@ import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 
 import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
+import { Badge } from '@/components/ui/badge';
 
 export function NavMain({ items = [] }: { items: NavItem[] }) {
     const page = usePage();
@@ -15,6 +16,11 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                             <Link href={item.href} prefetch>
                                 {item.icon && <item.icon />}
                                 <span>{item.title}</span>
+                                {item.badge && (
+                                    <Badge variant="secondary" className="ml-auto h-5 w-auto min-w-5 text-xs px-1.5">
+                                        {item.badge}
+                                    </Badge>
+                                )}
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
