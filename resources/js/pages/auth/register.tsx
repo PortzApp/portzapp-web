@@ -34,7 +34,7 @@ export default function Register() {
     // Clear any existing onboarding storage when user visits registration
     useEffect(() => {
         try {
-            Object.keys(localStorage).forEach(key => {
+            Object.keys(localStorage).forEach((key) => {
                 if (key.startsWith('portzapp_onboarding_state_')) {
                     localStorage.removeItem(key);
                 }

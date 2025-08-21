@@ -1,14 +1,17 @@
 import { useState } from 'react';
-import { Building, Users, Send } from 'lucide-react';
+
 import { router } from '@inertiajs/react';
+import { Building, Send, Users } from 'lucide-react';
 import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Label } from '@/components/ui/label';
+
 import type { SearchableOrganization } from '@/types';
 import { OrganizationBusinessType } from '@/types/enums';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 
 interface JoinRequestFormProps {
     organization: SearchableOrganization;
@@ -29,12 +32,7 @@ const businessTypeColors = {
     [OrganizationBusinessType.PORTZAPP_TEAM]: 'bg-purple-100 text-purple-800 border-purple-200',
 };
 
-export function JoinRequestForm({
-    organization,
-    onSuccess,
-    onCancel,
-    isSubmitting: externalIsSubmitting = false,
-}: JoinRequestFormProps) {
+export function JoinRequestForm({ organization, onSuccess, onCancel, isSubmitting: externalIsSubmitting = false }: JoinRequestFormProps) {
     const [message, setMessage] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -44,7 +42,7 @@ export function JoinRequestForm({
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         if (isSubmitting || externalIsSubmitting) return;
 
         setIsSubmitting(true);
@@ -52,44 +50,46 @@ export function JoinRequestForm({
 
         try {
             await new Promise<void>((resolve, reject) => {
-                router.post('/api/join-requests', {
-                    organization_id: organization.id,
-                    message: message.trim() || undefined,
-                }, {
-                    onSuccess: () => {
-                        toast.success('Join Request Sent', {
-                            description: `Your request to join ${organization.name} has been sent successfully.`,
-                        });
-                        setMessage('');
-                        onSuccess?.();
-                        resolve();
+                router.post(
+                    '/api/join-requests',
+                    {
+                        organization_id: organization.id,
+                        message: message.trim() || undefined,
                     },
-                    onError: (responseErrors) => {
-                        const formattedErrors: { [key: string]: string } = {};
-                        
-                        Object.entries(responseErrors).forEach(([key, messages]) => {
-                            if (Array.isArray(messages)) {
-                                formattedErrors[key] = messages[0];
-                            } else {
-                                formattedErrors[key] = String(messages);
-                            }
-                        });
-                        
-                        setErrors(formattedErrors);
-                        
-                        const errorMessage = formattedErrors.organization_id || 
-                                           formattedErrors.message || 
-                                           'Failed to send join request';
-                        
-                        toast.error('Request Failed', {
-                            description: errorMessage,
-                        });
-                        
-                        reject(new Error(errorMessage));
+                    {
+                        onSuccess: () => {
+                            toast.success('Join Request Sent', {
+                                description: `Your request to join ${organization.name} has been sent successfully.`,
+                            });
+                            setMessage('');
+                            onSuccess?.();
+                            resolve();
+                        },
+                        onError: (responseErrors) => {
+                            const formattedErrors: { [key: string]: string } = {};
+
+                            Object.entries(responseErrors).forEach(([key, messages]) => {
+                                if (Array.isArray(messages)) {
+                                    formattedErrors[key] = messages[0];
+                                } else {
+                                    formattedErrors[key] = String(messages);
+                                }
+                            });
+
+                            setErrors(formattedErrors);
+
+                            const errorMessage = formattedErrors.organization_id || formattedErrors.message || 'Failed to send join request';
+
+                            toast.error('Request Failed', {
+                                description: errorMessage,
+                            });
+
+                            reject(new Error(errorMessage));
+                        },
                     },
-                });
+                );
             });
-        } catch (error) {
+        } catch {
             // Error already handled in onError callback
         } finally {
             setIsSubmitting(false);
@@ -103,28 +103,18 @@ export function JoinRequestForm({
             {/* Organization Confirmation */}
             <Card>
                 <CardHeader className="pb-3">
-                    <CardTitle className="text-lg flex items-center gap-2">
+                    <CardTitle className="flex items-center gap-2 text-lg">
                         <Building className="h-5 w-5" />
                         Join Request Confirmation
                     </CardTitle>
-                    <CardDescription>
-                        You are requesting to join the following organization:
-                    </CardDescription>
+                    <CardDescription>You are requesting to join the following organization:</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <div className="flex items-start justify-between p-4 bg-muted rounded-lg">
-                        <div className="flex-1 min-w-0">
-                            <h3 className="font-semibold text-lg text-foreground mb-1">
-                                {organization.name}
-                            </h3>
-                            <p className="text-sm text-muted-foreground mb-2">
-                                @{organization.slug}
-                            </p>
-                            {organization.description && (
-                                <p className="text-sm text-muted-foreground mb-3">
-                                    {organization.description}
-                                </p>
-                            )}
+                    <div className="flex items-start justify-between rounded-lg bg-muted p-4">
+                        <div className="min-w-0 flex-1">
+                            <h3 className="mb-1 text-lg font-semibold text-foreground">{organization.name}</h3>
+                            <p className="mb-2 text-sm text-muted-foreground">@{organization.slug}</p>
+                            {organization.description && <p className="mb-3 text-sm text-muted-foreground">{organization.description}</p>}
                             <div className="flex items-center gap-4 text-sm text-muted-foreground">
                                 <div className="flex items-center gap-1">
                                     <Users className="h-4 w-4" />
@@ -143,9 +133,7 @@ export function JoinRequestForm({
 
             {/* Optional Message */}
             <div className="space-y-2">
-                <Label htmlFor="message">
-                    Message to Organization Admins (Optional)
-                </Label>
+                <Label htmlFor="message">Message to Organization Admins (Optional)</Label>
                 <Textarea
                     id="message"
                     placeholder="Introduce yourself and explain why you'd like to join this organization..."
@@ -156,31 +144,23 @@ export function JoinRequestForm({
                     className={errors.message ? 'border-destructive' : ''}
                     disabled={isLoading}
                 />
-                {errors.message && (
-                    <p className="text-sm text-destructive">{errors.message}</p>
-                )}
-                <p className="text-xs text-muted-foreground">
-                    {message.length}/500 characters
-                </p>
+                {errors.message && <p className="text-sm text-destructive">{errors.message}</p>}
+                <p className="text-xs text-muted-foreground">{message.length}/500 characters</p>
             </div>
 
             {/* General Errors */}
             {errors.organization_id && (
-                <div className="p-3 rounded-md bg-destructive/10 border border-destructive/20">
+                <div className="rounded-md border border-destructive/20 bg-destructive/10 p-3">
                     <p className="text-sm text-destructive">{errors.organization_id}</p>
                 </div>
             )}
 
             {/* Action Buttons */}
             <div className="flex items-center gap-3 pt-4">
-                <Button
-                    type="submit"
-                    disabled={isLoading}
-                    className="flex items-center gap-2"
-                >
+                <Button type="submit" disabled={isLoading} className="flex items-center gap-2">
                     {isLoading ? (
                         <>
-                            <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                            <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
                             Sending Request...
                         </>
                     ) : (
@@ -190,14 +170,9 @@ export function JoinRequestForm({
                         </>
                     )}
                 </Button>
-                
+
                 {onCancel && (
-                    <Button
-                        type="button"
-                        variant="outline"
-                        onClick={onCancel}
-                        disabled={isLoading}
-                    >
+                    <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading}>
                         Cancel
                     </Button>
                 )}

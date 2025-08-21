@@ -19,10 +19,10 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
 
     const handleLogout = () => {
         cleanup();
-        
+
         // Clear any onboarding storage before logout
         try {
-            Object.keys(localStorage).forEach(key => {
+            Object.keys(localStorage).forEach((key) => {
                 if (key.startsWith('portzapp_onboarding_state_')) {
                     localStorage.removeItem(key);
                 }
@@ -30,7 +30,7 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
         } catch (error) {
             console.warn('Failed to clear onboarding storage on logout:', error);
         }
-        
+
         router.flushAll();
     };
 

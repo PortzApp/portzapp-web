@@ -1,18 +1,18 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Search, X } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+
 import { router } from '@inertiajs/react';
+import { Search, X } from 'lucide-react';
+import { toast } from 'sonner';
+
+import type { OrganizationSearchResponse, SearchableOrganization, OrganizationSearchFilters as SearchFilters } from '@/types';
+
+import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { SearchableOrganizationList } from './searchable-organization-list';
+
 import { OrganizationSearchFilters } from './organization-search-filters';
-import { toast } from 'sonner';
-import type { 
-    SearchableOrganization, 
-    OrganizationSearchFilters as SearchFilters,
-    OrganizationSearchResponse 
-} from '@/types';
+import { SearchableOrganizationList } from './searchable-organization-list';
 
 interface OrganizationSearchModalProps {
     isOpen: boolean;
@@ -37,12 +37,7 @@ function useDebounce<T>(value: T, delay: number): T {
     return debouncedValue;
 }
 
-export function OrganizationSearchModal({
-    isOpen,
-    onClose,
-    currentUserOrganizations = [],
-}: OrganizationSearchModalProps) {
-    
+export function OrganizationSearchModal({ isOpen, onClose, currentUserOrganizations = [] }: OrganizationSearchModalProps) {
     // Search state
     const [searchQuery, setSearchQuery] = useState('');
     const [filters, setFilters] = useState<SearchFilters>({});
@@ -56,74 +51,74 @@ export function OrganizationSearchModal({
     const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
     // Search function
-    const performSearch = useCallback(async (
-        query: string = debouncedSearchQuery,
-        searchFilters: SearchFilters = filters,
-        page: number = 1,
-        append: boolean = false
-    ) => {
-        // Don't search if no query and no filters
-        if (!query.trim() && !searchFilters.business_type) {
-            if (!append) {
-                setOrganizations([]);
-                setMeta(undefined);
-                setHasSearched(false);
-            }
-            return;
-        }
-
-        setIsLoading(true);
-        setIsError(false);
-        setHasSearched(true);
-
-        try {
-            const searchParams = new URLSearchParams();
-            if (query.trim()) searchParams.append('query', query.trim());
-            if (searchFilters.business_type) searchParams.append('business_type', searchFilters.business_type);
-            if (page > 1) searchParams.append('page', page.toString());
-
-            const response = await fetch(`/api/organizations/search?${searchParams.toString()}`, {
-                headers: {
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                },
-            });
-
-            if (!response.ok) {
-                throw new Error(`Search failed: ${response.status}`);
+    const performSearch = useCallback(
+        async (query: string = debouncedSearchQuery, searchFilters: SearchFilters = filters, page: number = 1, append: boolean = false) => {
+            // Don't search if no query and no filters
+            if (!query.trim() && !searchFilters.business_type) {
+                if (!append) {
+                    setOrganizations([]);
+                    setMeta(undefined);
+                    setHasSearched(false);
+                }
+                return;
             }
 
-            const data: OrganizationSearchResponse = await response.json();
+            setIsLoading(true);
+            setIsError(false);
+            setHasSearched(true);
 
-            if (append) {
-                setOrganizations(prev => [...prev, ...data.data]);
-            } else {
-                setOrganizations(data.data);
+            try {
+                const searchParams = new URLSearchParams();
+                if (query.trim()) searchParams.append('query', query.trim());
+                if (searchFilters.business_type) searchParams.append('business_type', searchFilters.business_type);
+                if (page > 1) searchParams.append('page', page.toString());
+
+                const response = await fetch(`/api/organizations/search?${searchParams.toString()}`, {
+                    headers: {
+                        Accept: 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Search failed: ${response.status}`);
+                }
+
+                const data: OrganizationSearchResponse = await response.json();
+
+                if (append) {
+                    setOrganizations((prev) => [...prev, ...data.data]);
+                } else {
+                    setOrganizations(data.data);
+                }
+                setMeta(data.meta);
+            } catch (error) {
+                console.error('Organization search error:', error);
+                setIsError(true);
+                toast.error('Search Error', {
+                    description: 'Failed to search organizations. Please try again.',
+                });
+            } finally {
+                setIsLoading(false);
             }
-            setMeta(data.meta);
-        } catch (error) {
-            console.error('Organization search error:', error);
-            setIsError(true);
-            toast.error('Search Error', {
-                description: 'Failed to search organizations. Please try again.',
-            });
-        } finally {
-            setIsLoading(false);
-        }
-    }, [debouncedSearchQuery, filters]);
+        },
+        [debouncedSearchQuery, filters],
+    );
 
     // Handle search when debounced query or filters change
     useEffect(() => {
         performSearch();
-    }, [debouncedSearchQuery, filters]);
+    }, [debouncedSearchQuery, filters, performSearch]);
 
     // Handle join request
     const handleJoinRequest = async (organizationId: string) => {
-        try {
-            await new Promise<void>((resolve, reject) => {
-                router.post('/api/join-requests', {
+        await new Promise<void>((resolve, reject) => {
+            router.post(
+                '/api/join-requests',
+                {
                     organization_id: organizationId,
-                }, {
+                },
+                {
                     onSuccess: () => {
                         toast.success('Join Request Sent', {
                             description: 'Your request to join the organization has been sent.',
@@ -137,11 +132,9 @@ export function OrganizationSearchModal({
                         });
                         reject(new Error(errorMessage));
                     },
-                });
-            });
-        } catch (error) {
-            throw error; // Re-throw to handle in OrganizationCard
-        }
+                },
+            );
+        });
     };
 
     // Handle load more (infinite scroll)
@@ -185,7 +178,7 @@ export function OrganizationSearchModal({
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-w-4xl max-h-[80vh] flex flex-col">
+            <DialogContent className="flex max-h-[80vh] max-w-4xl flex-col">
                 <DialogHeader>
                     <div className="flex items-center justify-between">
                         <DialogTitle>Find Organizations to Join</DialogTitle>
@@ -195,22 +188,22 @@ export function OrganizationSearchModal({
                     </div>
                 </DialogHeader>
 
-                <div className="flex flex-col gap-4 flex-1 min-h-0">
+                <div className="flex min-h-0 flex-1 flex-col gap-4">
                     {/* Search Input */}
                     <div className="relative">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
                         <Input
                             placeholder="Search organizations by name..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="pl-9 pr-4"
+                            className="pr-4 pl-9"
                         />
                         {searchQuery && (
                             <Button
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => setSearchQuery('')}
-                                className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
+                                className="absolute top-1/2 right-2 h-6 w-6 -translate-y-1/2 transform p-0"
                             >
                                 <X className="h-3 w-3" />
                             </Button>
@@ -218,11 +211,7 @@ export function OrganizationSearchModal({
                     </div>
 
                     {/* Search Filters */}
-                    <OrganizationSearchFilters
-                        filters={filters}
-                        onFiltersChange={setFilters}
-                        onClearFilters={handleClearFilters}
-                    />
+                    <OrganizationSearchFilters filters={filters} onFiltersChange={setFilters} onClearFilters={handleClearFilters} />
 
                     {/* Results */}
                     <ScrollArea className="flex-1">

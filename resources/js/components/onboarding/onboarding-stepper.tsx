@@ -1,6 +1,8 @@
-import { Stepper, StepperDescription, StepperIndicator, StepperItem, StepperSeparator, StepperTitle, StepperTrigger } from '@/components/ui/stepper';
 import { useOnboarding } from '@/contexts/onboarding-context';
+
 import { cn } from '@/lib/utils';
+
+import { Stepper, StepperDescription, StepperIndicator, StepperItem, StepperSeparator, StepperTitle, StepperTrigger } from '@/components/ui/stepper';
 
 interface OnboardingStep {
     step: number;
@@ -67,7 +69,7 @@ export default function OnboardingStepper({ className }: OnboardingStepperProps)
 
     // Determine which step sequence to use
     const steps = currentStep === 'join-organization' ? joinSteps : createSteps;
-    const currentStepIndex = steps.findIndex(step => step.id === currentStep);
+    const currentStepIndex = steps.findIndex((step) => step.id === currentStep);
 
     // Handle step click for navigation
     const handleStepClick = (stepId: string, stepIndex: number) => {
@@ -85,23 +87,12 @@ export default function OnboardingStepper({ className }: OnboardingStepperProps)
                     const isClickable = index < currentStepIndex && canGoPrevious();
 
                     return (
-                        <StepperItem 
-                            key={step} 
-                            step={step} 
-                            completed={isCompleted}
-                            disabled={!isClickable}
-                            className="relative flex-1 flex-col!"
-                        >
-                            <StepperTrigger 
-                                className="flex-col gap-3 rounded"
-                                onClick={() => isClickable ? handleStepClick(id, index) : undefined}
-                            >
+                        <StepperItem key={step} step={step} completed={isCompleted} disabled={!isClickable} className="relative flex-1 flex-col!">
+                            <StepperTrigger className="flex-col gap-3 rounded" onClick={() => (isClickable ? handleStepClick(id, index) : undefined)}>
                                 <StepperIndicator />
                                 <div className="space-y-0.5 px-2">
                                     <StepperTitle>{title}</StepperTitle>
-                                    <StepperDescription className="max-sm:hidden">
-                                        {description}
-                                    </StepperDescription>
+                                    <StepperDescription className="max-sm:hidden">{description}</StepperDescription>
                                 </div>
                             </StepperTrigger>
                             {step < steps.length && (

@@ -1,19 +1,22 @@
 import React, { FormEventHandler, useState } from 'react';
+
 import { useForm } from '@inertiajs/react';
-import { Plus, X, CheckCircle, AlertCircle } from 'lucide-react';
+import { AlertCircle, CheckCircle, Plus, X } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import InputError from '@/components/input-error';
 import LoadingSpinner, { LoadingOverlay } from '@/components/ui/loading-spinner';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
+import InputError from '@/components/input-error';
 
 interface MemberInvite {
     email: string;
     role: string;
+    [key: string]: any;
 }
 
 interface Props {
@@ -26,17 +29,15 @@ interface Props {
     }>;
 }
 
-interface MemberInviteFormData {
+interface MemberInviteFormData extends Record<string, any> {
     organization_id: string;
     invites: MemberInvite[];
 }
 
 export default function MemberInviteForm({ organizationId, onSuccess, onSkip, availableRoles }: Props) {
-    const [invites, setInvites] = useState<MemberInvite[]>([
-        { email: '', role: '' }
-    ]);
+    const [invites, setInvites] = useState<MemberInvite[]>([{ email: '', role: '' }]);
 
-    const { setData, post, processing, errors } = useForm<MemberInviteFormData>({
+    const { setData, post, processing, errors } = useForm({
         organization_id: organizationId,
         invites: invites,
     });
@@ -57,9 +58,7 @@ export default function MemberInviteForm({ organizationId, onSuccess, onSkip, av
     };
 
     const updateInvite = (index: number, field: keyof MemberInvite, value: string) => {
-        const updated = invites.map((invite, i) => 
-            i === index ? { ...invite, [field]: value } : invite
-        );
+        const updated = invites.map((invite, i) => (i === index ? { ...invite, [field]: value } : invite));
         setInvites(updated);
     };
 
@@ -69,17 +68,11 @@ export default function MemberInviteForm({ organizationId, onSuccess, onSkip, av
     };
 
     const getValidInvites = (): MemberInvite[] => {
-        return invites.filter(invite => 
-            invite.email.trim() !== '' && 
-            invite.role !== '' && 
-            isValidEmail(invite.email.trim())
-        );
+        return invites.filter((invite) => invite.email.trim() !== '' && invite.role !== '' && isValidEmail(invite.email.trim()));
     };
 
     const hasDuplicateEmails = (): boolean => {
-        const emails = invites
-            .map(invite => invite.email.trim().toLowerCase())
-            .filter(email => email !== '');
+        const emails = invites.map((invite) => invite.email.trim().toLowerCase()).filter((email) => email !== '');
         return emails.length !== new Set(emails).size;
     };
 
@@ -97,14 +90,17 @@ export default function MemberInviteForm({ organizationId, onSuccess, onSkip, av
 
         const validInvites = getValidInvites();
 
-        post(route('invitations.bulk-create'), {
+        // Update form data before submitting
+        setData({
             organization_id: organizationId,
             invites: validInvites,
-        }, {
+        });
+
+        post(route('invitations.bulk-create'), {
             onSuccess: () => {
                 onSuccess(validInvites.length);
             },
-            onError: (errors) => {
+            onError: (errors: Record<string, string>) => {
                 console.log('Bulk invitation errors:', errors);
             },
         });
@@ -130,13 +126,11 @@ export default function MemberInviteForm({ organizationId, onSuccess, onSkip, av
     };
 
     const getEmailError = (index: number): string | undefined => {
-        const inviteErrors = errors[`invites.${index}` as keyof typeof errors];
-        return inviteErrors?.email;
+        return errors[`invites.${index}.email` as keyof typeof errors] as string | undefined;
     };
 
     const getRoleError = (index: number): string | undefined => {
-        const inviteErrors = errors[`invites.${index}` as keyof typeof errors];
-        return inviteErrors?.role;
+        return errors[`invites.${index}.role` as keyof typeof errors] as string | undefined;
     };
 
     // Validation feedback component
@@ -151,27 +145,16 @@ export default function MemberInviteForm({ organizationId, onSuccess, onSkip, av
     };
 
     return (
-        <LoadingOverlay 
-            isLoading={processing} 
-            message="Sending invitations..."
-        >
+        <LoadingOverlay isLoading={processing} message="Sending invitations...">
             <div className="space-y-6">
                 <form onSubmit={submit} className="space-y-6">
                     <div className="space-y-4">
                         {invites.map((invite, index) => (
-                            <div key={index} className="grid gap-4 p-4 border rounded-lg">
+                            <div key={index} className="grid gap-4 rounded-lg border p-4">
                                 <div className="flex items-center justify-between">
-                                    <Label className="font-medium">
-                                        Invite #{index + 1}
-                                    </Label>
+                                    <Label className="font-medium">Invite #{index + 1}</Label>
                                     {invites.length > 1 && (
-                                        <Button
-                                            type="button"
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={() => removeInvite(index)}
-                                            disabled={processing}
-                                        >
+                                        <Button type="button" variant="ghost" size="sm" onClick={() => removeInvite(index)} disabled={processing}>
                                             <X className="h-4 w-4" />
                                         </Button>
                                     )}
@@ -180,9 +163,9 @@ export default function MemberInviteForm({ organizationId, onSuccess, onSkip, av
                                 <div className="grid gap-2">
                                     <Label htmlFor={`email-${index}`} className="flex items-center gap-2">
                                         Email Address
-                                        <ValidationIcon 
-                                            isValid={isValidEmail(invite.email.trim()) && !getEmailError(index)} 
-                                            hasError={!!getEmailError(index)} 
+                                        <ValidationIcon
+                                            isValid={isValidEmail(invite.email.trim()) && !getEmailError(index)}
+                                            hasError={!!getEmailError(index)}
                                         />
                                     </Label>
                                     <Input
@@ -194,7 +177,7 @@ export default function MemberInviteForm({ organizationId, onSuccess, onSkip, av
                                         placeholder="colleague@company.com"
                                         className={cn(
                                             getEmailError(index) && 'border-destructive',
-                                            isValidEmail(invite.email.trim()) && !getEmailError(index) && invite.email.trim() && 'border-green-500'
+                                            isValidEmail(invite.email.trim()) && !getEmailError(index) && invite.email.trim() && 'border-green-500',
                                         )}
                                     />
                                     <InputError message={getEmailError(index)} />
@@ -203,20 +186,15 @@ export default function MemberInviteForm({ organizationId, onSuccess, onSkip, av
                                 <div className="grid gap-2">
                                     <Label htmlFor={`role-${index}`} className="flex items-center gap-2">
                                         Role
-                                        <ValidationIcon 
-                                            isValid={invite.role !== '' && !getRoleError(index)} 
-                                            hasError={!!getRoleError(index)} 
-                                        />
+                                        <ValidationIcon isValid={invite.role !== '' && !getRoleError(index)} hasError={!!getRoleError(index)} />
                                     </Label>
-                                    <Select
-                                        value={invite.role}
-                                        onValueChange={(value) => updateInvite(index, 'role', value)}
-                                        disabled={processing}
-                                    >
-                                        <SelectTrigger className={cn(
-                                            getRoleError(index) && 'border-destructive',
-                                            invite.role && !getRoleError(index) && 'border-green-500'
-                                        )}>
+                                    <Select value={invite.role} onValueChange={(value) => updateInvite(index, 'role', value)} disabled={processing}>
+                                        <SelectTrigger
+                                            className={cn(
+                                                getRoleError(index) && 'border-destructive',
+                                                invite.role && !getRoleError(index) && 'border-green-500',
+                                            )}
+                                        >
                                             <SelectValue placeholder="Select a role" />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -224,9 +202,7 @@ export default function MemberInviteForm({ organizationId, onSuccess, onSkip, av
                                                 <SelectItem key={role.value} value={role.value}>
                                                     <div>
                                                         <div className="font-medium">{role.label}</div>
-                                                        <div className="text-xs text-muted-foreground">
-                                                            {getRoleDescription(role.value)}
-                                                        </div>
+                                                        <div className="text-xs text-muted-foreground">{getRoleDescription(role.value)}</div>
                                                     </div>
                                                 </SelectItem>
                                             ))}
@@ -238,23 +214,15 @@ export default function MemberInviteForm({ organizationId, onSuccess, onSkip, av
                         ))}
                     </div>
 
-                    <Button
-                        type="button"
-                        variant="outline"
-                        onClick={addInvite}
-                        disabled={processing || invites.length >= 10}
-                        className="w-full"
-                    >
-                        <Plus className="h-4 w-4 mr-2" />
+                    <Button type="button" variant="outline" onClick={addInvite} disabled={processing || invites.length >= 10} className="w-full">
+                        <Plus className="mr-2 h-4 w-4" />
                         Add Another Invite
-                        {invites.length >= 10 && " (Maximum reached)"}
+                        {invites.length >= 10 && ' (Maximum reached)'}
                     </Button>
 
                     {/* Validation Status */}
                     <div className="space-y-2 text-sm">
-                        {hasDuplicateEmails() && (
-                            <p className="text-destructive">⚠️ Duplicate email addresses found</p>
-                        )}
+                        {hasDuplicateEmails() && <p className="text-destructive">⚠️ Duplicate email addresses found</p>}
                         {getValidInvites().length > 0 && (
                             <p className="text-muted-foreground">
                                 ✓ {getValidInvites().length} valid invitation{getValidInvites().length !== 1 ? 's' : ''} ready to send
@@ -268,26 +236,16 @@ export default function MemberInviteForm({ organizationId, onSuccess, onSkip, av
 
                     {/* Form Actions */}
                     <div className="flex gap-4 pt-6">
-                        <Button
-                            type="button"
-                            variant="outline"
-                            onClick={onSkip}
-                            disabled={processing}
-                            className="flex-1 py-3"
-                        >
+                        <Button type="button" variant="outline" onClick={onSkip} disabled={processing} className="flex-1 py-3">
                             Skip for Now
                         </Button>
-                        <Button
-                            type="submit"
-                            disabled={!canSubmit() || processing}
-                            className="flex-1 py-3"
-                        >
+                        <Button type="submit" disabled={!canSubmit() || processing} className="flex-1 py-3">
                             {processing && <LoadingSpinner size="sm" className="mr-2" />}
                             {processing ? 'Sending...' : `Send ${getValidInvites().length} Invitation${getValidInvites().length !== 1 ? 's' : ''}`}
                         </Button>
                     </div>
 
-                    <p className="text-xs text-muted-foreground text-center">
+                    <p className="text-center text-xs text-muted-foreground">
                         Invitations will expire in 7 days. You can resend or manage invitations from your organization settings.
                     </p>
                 </form>

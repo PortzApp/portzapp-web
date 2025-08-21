@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
+
+import { useOnboarding } from '@/contexts/onboarding-context';
 import { router } from '@inertiajs/react';
-import { Building2, Users, CheckCircle, ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Building2, CheckCircle, Users } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useOnboarding } from '@/contexts/onboarding-context';
-import OnboardingStepper from './onboarding-stepper';
-import OrganizationSetupForm from './organization-setup-form';
+import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { CompletionCelebration, InvitationSuccessCelebration, SuccessCelebration } from '@/components/ui/celebration';
+
 import JoinOrganizationForm from './join-organization-form';
 import MemberInviteForm from './member-invite-form';
-import { SuccessCelebration, InvitationSuccessCelebration, CompletionCelebration } from '@/components/ui/celebration';
+import OnboardingStepper from './onboarding-stepper';
+import OrganizationSetupForm from './organization-setup-form';
 
 interface Props {
     businessTypes: Array<{
@@ -25,17 +27,7 @@ export default function EnhancedOrganizationWizard({ businessTypes }: Props) {
     const [showCompletionCelebration, setShowCompletionCelebration] = useState(false);
     const [invitationCount, setInvitationCount] = useState(0);
 
-
-    const { 
-        state, 
-        setStep, 
-        setOrganizationData, 
-        setLoading, 
-        setError,
-        goToPreviousStep,
-        canGoPrevious,
-        resetState 
-    } = useOnboarding();
+    const { state, setStep, setOrganizationData, setLoading, setError, goToPreviousStep, canGoPrevious, resetState } = useOnboarding();
 
     const { currentStep, organizationData, isLoading, error } = state;
 
@@ -47,19 +39,19 @@ export default function EnhancedOrganizationWizard({ businessTypes }: Props) {
         }
     };
 
-    const handleOrganizationCreated = (data: unknown) => {
+    const handleOrganizationCreated = (data: any) => {
         console.log('Organization created data received:', data);
         const orgData = data as { id?: string; name?: string };
-        
+
         setOrganizationData(data);
-        
+
         // Show celebration before moving to next step
         setShowOrgCreationCelebration(true);
         toast.success('Organization Created!', {
             description: `${orgData?.name || 'Your organization'} is ready to use.`,
-            duration: 3000
+            duration: 3000,
         });
-        
+
         // Move to next step after celebration
         setTimeout(() => {
             setShowOrgCreationCelebration(false);
@@ -74,14 +66,14 @@ export default function EnhancedOrganizationWizard({ businessTypes }: Props) {
 
     const handleInvitationsSuccess = (inviteCount: number) => {
         setInvitationCount(inviteCount);
-        
+
         // Show celebration before completing onboarding
         setShowInvitationCelebration(true);
         toast.success('Invitations Sent!', {
             description: `${inviteCount} invitation${inviteCount !== 1 ? 's' : ''} sent successfully.`,
-            duration: 3000
+            duration: 3000,
         });
-        
+
         // Complete onboarding after celebration
         setTimeout(() => {
             setShowInvitationCelebration(false);
@@ -91,37 +83,41 @@ export default function EnhancedOrganizationWizard({ businessTypes }: Props) {
 
     const completeOnboarding = () => {
         setLoading(true);
-        router.patch(route('onboarding.update'), {
-            onboarding_status: 'completed',
-        }, {
-            onSuccess: () => {
-                setStep('complete');
-                
-                // Show completion celebration
-                setShowCompletionCelebration(true);
-                toast.success('Welcome to PortzApp!', {
-                    description: "You're all set up and ready to go.",
-                    duration: 4000
-                });
-                
-                // Clear onboarding state and redirect after celebration
-                setTimeout(() => {
-                    setShowCompletionCelebration(false);
-                    resetState();
-                    router.visit('/dashboard');
-                }, 3000);
+        router.patch(
+            route('onboarding.update'),
+            {
+                onboarding_status: 'completed',
             },
-            onError: (errors) => {
-                setError('Failed to complete onboarding. Please try again.');
-                toast.error('Onboarding Failed', {
-                    description: 'There was an issue completing your onboarding. Please try again.'
-                });
-                console.error('Onboarding completion error:', errors);
+            {
+                onSuccess: () => {
+                    setStep('complete');
+
+                    // Show completion celebration
+                    setShowCompletionCelebration(true);
+                    toast.success('Welcome to PortzApp!', {
+                        description: "You're all set up and ready to go.",
+                        duration: 4000,
+                    });
+
+                    // Clear onboarding state and redirect after celebration
+                    setTimeout(() => {
+                        setShowCompletionCelebration(false);
+                        resetState();
+                        router.visit('/dashboard');
+                    }, 3000);
+                },
+                onError: (errors) => {
+                    setError('Failed to complete onboarding. Please try again.');
+                    toast.error('Onboarding Failed', {
+                        description: 'There was an issue completing your onboarding. Please try again.',
+                    });
+                    console.error('Onboarding completion error:', errors);
+                },
+                onFinish: () => {
+                    setLoading(false);
+                },
             },
-            onFinish: () => {
-                setLoading(false);
-            }
-        });
+        );
     };
 
     const handleStartOver = () => {
@@ -144,21 +140,19 @@ export default function EnhancedOrganizationWizard({ businessTypes }: Props) {
             case 'choose-action':
                 return (
                     <div className="space-y-6">
-                        <div className="text-center space-y-2">
+                        <div className="space-y-2 text-center">
                             <h2 className="text-2xl font-bold text-foreground">Let's get you started</h2>
-                            <p className="text-muted-foreground">
-                                Choose how you'd like to proceed with PortzApp
-                            </p>
+                            <p className="text-muted-foreground">Choose how you'd like to proceed with PortzApp</p>
                         </div>
 
                         <div className="space-y-6">
-                            <Card 
-                                className="cursor-pointer transition-all duration-200 hover:shadow-lg border-2 hover:border-blue-200 hover:bg-blue-50/50"
+                            <Card
+                                className="cursor-pointer border-2 transition-all duration-200 hover:border-blue-200 hover:bg-blue-50/50 hover:shadow-lg"
                                 onClick={() => handleActionChoice('create')}
                             >
                                 <CardHeader className="pb-4">
                                     <div className="flex items-center space-x-4">
-                                        <div className="p-3 bg-blue-100 rounded-lg">
+                                        <div className="rounded-lg bg-blue-100 p-3">
                                             <Building2 className="h-6 w-6 text-blue-600" />
                                         </div>
                                         <div>
@@ -177,17 +171,17 @@ export default function EnhancedOrganizationWizard({ businessTypes }: Props) {
                                     <div className="w-full border-t border-border/40"></div>
                                 </div>
                                 <div className="relative flex justify-center text-xs uppercase">
-                                    <span className="bg-background px-3 text-muted-foreground font-medium">OR</span>
+                                    <span className="bg-background px-3 font-medium text-muted-foreground">OR</span>
                                 </div>
                             </div>
 
-                            <Card 
-                                className="cursor-pointer transition-all duration-200 hover:shadow-lg border-2 hover:border-blue-200 hover:bg-blue-50/50"
+                            <Card
+                                className="cursor-pointer border-2 transition-all duration-200 hover:border-blue-200 hover:bg-blue-50/50 hover:shadow-lg"
                                 onClick={() => handleActionChoice('join')}
                             >
                                 <CardHeader className="pb-4">
                                     <div className="flex items-center space-x-4">
-                                        <div className="p-3 bg-green-100 rounded-lg">
+                                        <div className="rounded-lg bg-green-100 p-3">
                                             <Users className="h-6 w-6 text-green-600" />
                                         </div>
                                         <div>
@@ -206,48 +200,36 @@ export default function EnhancedOrganizationWizard({ businessTypes }: Props) {
             case 'create-organization':
                 return (
                     <div className="space-y-6">
-                        <div className="text-center space-y-2">
+                        <div className="space-y-2 text-center">
                             <h2 className="text-2xl font-bold text-foreground">Create Your Organization</h2>
-                            <p className="text-muted-foreground">
-                                Set up your organization details and get started
-                            </p>
+                            <p className="text-muted-foreground">Set up your organization details and get started</p>
                         </div>
 
-                        <OrganizationSetupForm
-                            businessTypes={businessTypes}
-                            onSuccess={handleOrganizationCreated}
-                            onCancel={goToPreviousStep}
-                        />
+                        <OrganizationSetupForm businessTypes={businessTypes} onSuccess={handleOrganizationCreated} onCancel={goToPreviousStep} />
                     </div>
                 );
 
             case 'join-organization':
                 return (
                     <div className="space-y-6">
-                        <div className="text-center space-y-2">
+                        <div className="space-y-2 text-center">
                             <h2 className="text-2xl font-bold text-foreground">Join Organization</h2>
-                            <p className="text-muted-foreground">
-                                Enter your invitation details or request to join an organization
-                            </p>
+                            <p className="text-muted-foreground">Enter your invitation details or request to join an organization</p>
                         </div>
 
-                        <JoinOrganizationForm
-                            onCancel={goToPreviousStep}
-                        />
+                        <JoinOrganizationForm onCancel={goToPreviousStep} />
                     </div>
                 );
 
             case 'invite-members':
                 return (
                     <div className="space-y-6">
-                        <div className="text-center space-y-4">
-                            <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                        <div className="space-y-4 text-center">
+                            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
                                 <CheckCircle className="h-8 w-8 text-green-600" />
                             </div>
                             <h2 className="text-2xl font-bold text-foreground">Organization Created Successfully!</h2>
-                            <p className="text-muted-foreground">
-                                Your organization "{organizationData?.name}" is ready to use
-                            </p>
+                            <p className="text-muted-foreground">Your organization "{organizationData?.name}" is ready to use</p>
                         </div>
 
                         <div>
@@ -260,26 +242,18 @@ export default function EnhancedOrganizationWizard({ businessTypes }: Props) {
                                 />
                             ) : (
                                 <div className="space-y-6">
-                                    <div className="text-center space-y-4">
+                                    <div className="space-y-4 text-center">
                                         <p className="text-muted-foreground">
-                                            Your organization has been created successfully! You can now invite team members or continue to your dashboard.
+                                            Your organization has been created successfully! You can now invite team members or continue to your
+                                            dashboard.
                                         </p>
                                     </div>
-                                    
-                                    <div className="flex gap-4 justify-center">
-                                        <Button
-                                            variant="outline"
-                                            onClick={handleInvitationsSkipped}
-                                            disabled={isLoading}
-                                            className="px-8 py-3"
-                                        >
+
+                                    <div className="flex justify-center gap-4">
+                                        <Button variant="outline" onClick={handleInvitationsSkipped} disabled={isLoading} className="px-8 py-3">
                                             Skip & Go to Dashboard
                                         </Button>
-                                        <Button
-                                            onClick={handleInvitationsSkipped}
-                                            disabled={isLoading}
-                                            className="px-8 py-3"
-                                        >
+                                        <Button onClick={handleInvitationsSkipped} disabled={isLoading} className="px-8 py-3">
                                             Continue to Dashboard
                                             <ArrowRight className="ml-2 h-5 w-5" />
                                         </Button>
@@ -293,8 +267,8 @@ export default function EnhancedOrganizationWizard({ businessTypes }: Props) {
             case 'complete':
                 return (
                     <div className="space-y-6">
-                        <div className="text-center space-y-4">
-                            <div className="mx-auto w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
+                        <div className="space-y-4 text-center">
+                            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-green-100">
                                 <CheckCircle className="h-10 w-10 text-green-600" />
                             </div>
                             <h2 className="text-2xl font-bold text-foreground">Welcome to PortzApp!</h2>
@@ -304,10 +278,7 @@ export default function EnhancedOrganizationWizard({ businessTypes }: Props) {
                         </div>
 
                         <div className="flex justify-center">
-                            <Button 
-                                onClick={() => router.visit('/dashboard')}
-                                className="w-full"
-                            >
+                            <Button onClick={() => router.visit('/dashboard')} className="w-full">
                                 Go to Dashboard
                                 <ArrowRight className="ml-2 h-4 w-4" />
                             </Button>
@@ -325,7 +296,7 @@ export default function EnhancedOrganizationWizard({ businessTypes }: Props) {
             {/* Progress and Navigation - Full width container */}
             {currentStep !== 'complete' && (
                 <div className="w-full">
-                    <div className="rounded-lg p-4 border border-border/20">
+                    <div className="rounded-lg border border-border/20 p-4">
                         <OnboardingStepper className="justify-center" />
                     </div>
                 </div>
@@ -335,12 +306,12 @@ export default function EnhancedOrganizationWizard({ businessTypes }: Props) {
             <div className="mx-auto max-w-md space-y-6">
                 {/* Error Display */}
                 {error && (
-                    <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-lg">
+                    <div className="rounded-lg border border-destructive/20 bg-destructive/10 px-4 py-3 text-destructive">
                         <p className="font-medium">Error</p>
                         <p className="text-sm">{error}</p>
-                        <Button 
-                            variant="outline" 
-                            size="sm" 
+                        <Button
+                            variant="outline"
+                            size="sm"
                             onClick={() => setError(null)}
                             className="mt-2 border-destructive/20 text-destructive hover:bg-destructive/20"
                         >
@@ -350,27 +321,17 @@ export default function EnhancedOrganizationWizard({ businessTypes }: Props) {
                 )}
 
                 {/* Main Content */}
-                <div className="space-y-6">
-                    {renderStepContent()}
-                </div>
+                <div className="space-y-6">{renderStepContent()}</div>
 
                 {/* Navigation Footer */}
                 {currentStep !== 'choose-action' && currentStep !== 'complete' && (
-                    <div className="flex justify-between pt-4 border-t border-border/10">
-                        <Button
-                            variant="outline"
-                            onClick={goToPreviousStep}
-                            disabled={!canGoPrevious() || isLoading}
-                        >
+                    <div className="flex justify-between border-t border-border/10 pt-4">
+                        <Button variant="outline" onClick={goToPreviousStep} disabled={!canGoPrevious() || isLoading}>
                             <ArrowLeft className="mr-2 h-4 w-4" />
                             Back
                         </Button>
 
-                        <Button
-                            variant="ghost"
-                            onClick={handleStartOver}
-                            disabled={isLoading}
-                        >
+                        <Button variant="ghost" onClick={handleStartOver} disabled={isLoading}>
                             Start Over
                         </Button>
                     </div>
@@ -378,22 +339,19 @@ export default function EnhancedOrganizationWizard({ businessTypes }: Props) {
             </div>
 
             {/* Celebration overlays */}
-            <SuccessCelebration 
+            <SuccessCelebration
                 isVisible={showOrgCreationCelebration}
                 organizationName={organizationData?.name}
                 onComplete={() => setShowOrgCreationCelebration(false)}
             />
-            
-            <InvitationSuccessCelebration 
+
+            <InvitationSuccessCelebration
                 isVisible={showInvitationCelebration}
                 inviteCount={invitationCount}
                 onComplete={() => setShowInvitationCelebration(false)}
             />
-            
-            <CompletionCelebration 
-                isVisible={showCompletionCelebration}
-                onComplete={() => setShowCompletionCelebration(false)}
-            />
+
+            <CompletionCelebration isVisible={showCompletionCelebration} onComplete={() => setShowCompletionCelebration(false)} />
         </div>
     );
 }

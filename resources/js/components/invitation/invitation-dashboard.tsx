@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { router } from '@inertiajs/react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Plus, Users, Clock, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+
 import { Invitation, InvitationStatistics } from '@/types';
+import { AlertTriangle, CheckCircle, Clock, Plus, Users, XCircle } from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+
 import InvitationList from './invitation-list';
 import InviteUserModal from './invite-user-modal';
 
@@ -20,10 +22,7 @@ interface InvitationDashboardProps {
     initialStatistics?: InvitationStatistics;
 }
 
-const InvitationDashboard: React.FC<InvitationDashboardProps> = ({
-    initialInvitations,
-    initialStatistics
-}) => {
+const InvitationDashboard: React.FC<InvitationDashboardProps> = ({ initialInvitations, initialStatistics }) => {
     const [invitations, setInvitations] = useState<Invitation[]>(initialInvitations?.data || []);
     const [meta, setMeta] = useState(initialInvitations?.meta || { current_page: 1, last_page: 1, per_page: 20, total: 0 });
     const [statistics, setStatistics] = useState<InvitationStatistics | null>(initialStatistics || null);
@@ -41,9 +40,9 @@ const InvitationDashboard: React.FC<InvitationDashboardProps> = ({
 
             const response = await fetch(`/api/invitations?${params}`, {
                 headers: {
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
+                    Accept: 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
             });
 
             if (response.ok) {
@@ -63,9 +62,9 @@ const InvitationDashboard: React.FC<InvitationDashboardProps> = ({
         try {
             const response = await fetch('/api/invitations/statistics', {
                 headers: {
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
+                    Accept: 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
             });
 
             if (response.ok) {
@@ -101,10 +100,10 @@ const InvitationDashboard: React.FC<InvitationDashboardProps> = ({
             const response = await fetch(`/api/invitations/${invitationId}/${action}`, {
                 method: 'POST',
                 headers: {
-                    'Accept': 'application/json',
+                    Accept: 'application/json',
                     'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
-                }
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                },
             });
 
             if (response.ok) {
@@ -124,7 +123,7 @@ const InvitationDashboard: React.FC<InvitationDashboardProps> = ({
         if (!initialStatistics) {
             loadStatistics();
         }
-    }, []);
+    }, [initialInvitations, initialStatistics]);
 
     return (
         <div className="space-y-6">
@@ -132,19 +131,17 @@ const InvitationDashboard: React.FC<InvitationDashboardProps> = ({
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-bold">Invitations</h1>
-                    <p className="text-muted-foreground">
-                        Manage and track organization invitations
-                    </p>
+                    <p className="text-muted-foreground">Manage and track organization invitations</p>
                 </div>
                 <Button onClick={() => setShowInviteModal(true)}>
-                    <Plus className="h-4 w-4 mr-2" />
+                    <Plus className="mr-2 h-4 w-4" />
                     Invite Users
                 </Button>
             </div>
 
             {/* Statistics Cards */}
             {statistics && (
-                <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-6">
                     <Card>
                         <CardContent className="p-4">
                             <div className="flex items-center justify-between">
@@ -156,7 +153,7 @@ const InvitationDashboard: React.FC<InvitationDashboardProps> = ({
                             </div>
                         </CardContent>
                     </Card>
-                    
+
                     <Card>
                         <CardContent className="p-4">
                             <div className="flex items-center justify-between">
@@ -168,7 +165,7 @@ const InvitationDashboard: React.FC<InvitationDashboardProps> = ({
                             </div>
                         </CardContent>
                     </Card>
-                    
+
                     <Card>
                         <CardContent className="p-4">
                             <div className="flex items-center justify-between">
@@ -180,7 +177,7 @@ const InvitationDashboard: React.FC<InvitationDashboardProps> = ({
                             </div>
                         </CardContent>
                     </Card>
-                    
+
                     <Card>
                         <CardContent className="p-4">
                             <div className="flex items-center justify-between">
@@ -192,7 +189,7 @@ const InvitationDashboard: React.FC<InvitationDashboardProps> = ({
                             </div>
                         </CardContent>
                     </Card>
-                    
+
                     <Card>
                         <CardContent className="p-4">
                             <div className="flex items-center justify-between">
@@ -204,7 +201,7 @@ const InvitationDashboard: React.FC<InvitationDashboardProps> = ({
                             </div>
                         </CardContent>
                     </Card>
-                    
+
                     <Card>
                         <CardContent className="p-4">
                             <div className="flex items-center justify-between">
@@ -231,12 +228,7 @@ const InvitationDashboard: React.FC<InvitationDashboardProps> = ({
             />
 
             {/* Invite User Modal */}
-            {showInviteModal && (
-                <InviteUserModal
-                    onClose={() => setShowInviteModal(false)}
-                    onSuccess={handleInvitationSent}
-                />
-            )}
+            {showInviteModal && <InviteUserModal onClose={() => setShowInviteModal(false)} onSuccess={handleInvitationSent} />}
         </div>
     );
 };

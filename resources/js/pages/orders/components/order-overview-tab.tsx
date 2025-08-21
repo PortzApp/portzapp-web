@@ -13,9 +13,10 @@ interface OrderOverviewTabProps {
 
 export default function OrderOverviewTab({ order }: OrderOverviewTabProps) {
     // Use total_price from order if available, otherwise calculate from all_services or services
-    const totalServicePrice = order.total_price || 
-        (order.all_services?.reduce((sum, service) => sum + parseFloat(service.price), 0)) ||
-        (order.services?.reduce((sum, service) => sum + parseFloat(service.price), 0)) || 
+    const totalServicePrice =
+        order.total_price ||
+        order.all_services?.reduce((sum, service) => sum + parseFloat(service.price), 0) ||
+        order.services?.reduce((sum, service) => sum + parseFloat(service.price), 0) ||
         0;
 
     return (

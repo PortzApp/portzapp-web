@@ -12,7 +12,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
 
 interface StepServicesProps {
     services: Service[];
@@ -96,7 +95,6 @@ export function StepServices({ services, session }: StepServicesProps) {
         }
     };
 
-
     const handleContinue = () => {
         if (tempSelectedServices.length > 0 && session) {
             setIsSaving(true);
@@ -118,7 +116,6 @@ export function StepServices({ services, session }: StepServicesProps) {
     };
 
     const canContinue = tempSelectedServices.length > 0 && !isSaving;
-
 
     return (
         <div className="grid gap-6 lg:grid-cols-3">
@@ -167,7 +164,8 @@ export function StepServices({ services, session }: StepServicesProps) {
                             <CardHeader className="pb-3">
                                 <CardTitle className="text-xl">{subCategory.name}</CardTitle>
                                 <CardDescription>
-                                    {Object.keys(organizationGroups).length} agenc{Object.keys(organizationGroups).length === 1 ? 'y' : 'ies'} offering services
+                                    {Object.keys(organizationGroups).length} agenc{Object.keys(organizationGroups).length === 1 ? 'y' : 'ies'}{' '}
+                                    offering services
                                 </CardDescription>
                             </CardHeader>
 
@@ -183,9 +181,7 @@ export function StepServices({ services, session }: StepServicesProps) {
                                             <div
                                                 key={`${organization.id}-${service.id}`}
                                                 className={`relative cursor-pointer rounded-lg border p-4 transition-colors ${
-                                                    isSelected
-                                                        ? 'border-primary bg-primary/5'
-                                                        : 'border-border hover:border-muted-foreground/50'
+                                                    isSelected ? 'border-primary bg-primary/5' : 'border-border hover:border-muted-foreground/50'
                                                 }`}
                                                 onClick={() => handleServiceToggle(service, !isSelected)}
                                             >
@@ -193,31 +189,25 @@ export function StepServices({ services, session }: StepServicesProps) {
                                                     <Checkbox
                                                         id={service.id}
                                                         checked={isSelected}
-                                                        onCheckedChange={(checked) =>
-                                                            handleServiceToggle(service, checked as boolean)
-                                                        }
+                                                        onCheckedChange={(checked) => handleServiceToggle(service, checked as boolean)}
                                                         onClick={(e) => e.stopPropagation()}
                                                     />
-                                                    
+
                                                     {/* Agency Logo Placeholder */}
-                                                    <div className="h-12 w-12 rounded-md bg-muted flex-shrink-0" />
-                                                    
+                                                    <div className="h-12 w-12 flex-shrink-0 rounded-md bg-muted" />
+
                                                     <div className="min-w-0 flex-1">
-                                                        <div className="flex items-center gap-2 mb-1">
-                                                            <Label htmlFor={service.id} className="cursor-pointer font-semibold text-base">
+                                                        <div className="mb-1 flex items-center gap-2">
+                                                            <Label htmlFor={service.id} className="cursor-pointer text-base font-semibold">
                                                                 {service.organization?.name || 'Agency'}
                                                             </Label>
                                                             <Building2 className="h-4 w-4 text-muted-foreground" />
                                                         </div>
                                                         {service.description && (
-                                                            <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
-                                                                {service.description}
-                                                            </p>
+                                                            <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{service.description}</p>
                                                         )}
                                                         {service.price && (
-                                                            <p className="mt-2 text-sm font-semibold text-green-600">
-                                                                ${service.price}
-                                                            </p>
+                                                            <p className="mt-2 text-sm font-semibold text-green-600">${service.price}</p>
                                                         )}
                                                     </div>
                                                     {isSelected && <Check className="h-5 w-5 text-primary" />}

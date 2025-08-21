@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+
 import { router } from '@inertiajs/react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { ArrowRight, Bell, CheckCircle, Clock, Users, XCircle } from 'lucide-react';
+
 import { Badge } from '@/components/ui/badge';
-import { Bell, Users, ArrowRight, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface JoinRequestNotificationStats {
     pending: number;
@@ -26,9 +28,9 @@ const JoinRequestNotificationCard: React.FC<JoinRequestNotificationCardProps> = 
         try {
             const response = await fetch('/api/admin/join-requests/statistics', {
                 headers: {
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
+                    Accept: 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
             });
 
             if (response.ok) {
@@ -60,8 +62,8 @@ const JoinRequestNotificationCard: React.FC<JoinRequestNotificationCardProps> = 
         return (
             <Card className={className}>
                 <CardContent className="p-4">
-                    <div className="flex items-center justify-center h-20">
-                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+                    <div className="flex h-20 items-center justify-center">
+                        <div className="h-6 w-6 animate-spin rounded-full border-b-2 border-primary"></div>
                     </div>
                 </CardContent>
             </Card>
@@ -73,16 +75,12 @@ const JoinRequestNotificationCard: React.FC<JoinRequestNotificationCardProps> = 
             <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                        <div className="p-2 bg-orange-100 rounded-lg">
+                        <div className="rounded-lg bg-orange-100 p-2">
                             <Bell className="h-4 w-4 text-orange-600" />
                         </div>
                         <div>
-                            <CardTitle className="text-sm font-medium text-orange-900">
-                                Join Requests Pending
-                            </CardTitle>
-                            <CardDescription className="text-xs text-orange-700">
-                                New members waiting for approval
-                            </CardDescription>
+                            <CardTitle className="text-sm font-medium text-orange-900">Join Requests Pending</CardTitle>
+                            <CardDescription className="text-xs text-orange-700">New members waiting for approval</CardDescription>
                         </div>
                     </div>
                     <Badge variant="secondary" className="bg-orange-200 text-orange-800">
@@ -118,13 +116,9 @@ const JoinRequestNotificationCard: React.FC<JoinRequestNotificationCardProps> = 
                             </div>
                         </div>
 
-                        <Button
-                            onClick={handleViewRequests}
-                            size="sm"
-                            className="w-full bg-orange-600 hover:bg-orange-700"
-                        >
+                        <Button onClick={handleViewRequests} size="sm" className="w-full bg-orange-600 hover:bg-orange-700">
                             Review Requests
-                            <ArrowRight className="h-4 w-4 ml-1" />
+                            <ArrowRight className="ml-1 h-4 w-4" />
                         </Button>
                     </div>
                 )}

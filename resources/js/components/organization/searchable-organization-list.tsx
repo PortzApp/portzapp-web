@@ -1,8 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
+
 import { Loader2 } from 'lucide-react';
+
+import type { OrganizationSearchResponse, SearchableOrganization } from '@/types';
+
 import { OrganizationCard } from './organization-card';
 import { OrganizationSearchEmptyStates } from './organization-search-empty-states';
-import type { SearchableOrganization, OrganizationSearchResponse } from '@/types';
 
 interface SearchableOrganizationListProps {
     organizations: SearchableOrganization[];
@@ -53,7 +56,7 @@ export function SearchableOrganizationList({
             {
                 threshold: 0.1,
                 rootMargin: '100px',
-            }
+            },
         );
 
         const currentRef = loadMoreRef.current;
@@ -75,32 +78,17 @@ export function SearchableOrganizationList({
 
     // Show error state
     if (isError && isEmpty) {
-        return (
-            <OrganizationSearchEmptyStates
-                type="network-error"
-                onRetry={onRetry}
-            />
-        );
+        return <OrganizationSearchEmptyStates type="network-error" onRetry={onRetry} />;
     }
 
     // Show initial state when no search has been performed
     if (isEmpty && !isLoading && !searchQuery) {
-        return (
-            <OrganizationSearchEmptyStates
-                type="initial-state"
-            />
-        );
+        return <OrganizationSearchEmptyStates type="initial-state" />;
     }
 
     // Show no results state
     if (isEmpty && !isLoading) {
-        return (
-            <OrganizationSearchEmptyStates
-                type="no-results"
-                searchQuery={searchQuery}
-                onClearSearch={onClearSearch}
-            />
-        );
+        return <OrganizationSearchEmptyStates type="no-results" searchQuery={searchQuery} onClearSearch={onClearSearch} />;
     }
 
     return (
@@ -109,14 +97,12 @@ export function SearchableOrganizationList({
             {meta && organizations.length > 0 && (
                 <div className="text-sm text-muted-foreground">
                     Showing {meta.from} to {meta.to} of {meta.total} organizations
-                    {searchQuery && (
-                        <span> for "{searchQuery}"</span>
-                    )}
+                    {searchQuery && <span> for "{searchQuery}"</span>}
                 </div>
             )}
 
             {/* Organization grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {organizations.map((organization) => (
                     <OrganizationCard
                         key={organization.id}
@@ -130,10 +116,10 @@ export function SearchableOrganizationList({
 
             {/* Loading states */}
             {isLoading && isEmpty && (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {Array.from({ length: 6 }).map((_, index) => (
                         <div key={index} className="animate-pulse">
-                            <div className="bg-muted rounded-lg h-48 w-full" />
+                            <div className="h-48 w-full rounded-lg bg-muted" />
                         </div>
                     ))}
                 </div>
@@ -153,9 +139,7 @@ export function SearchableOrganizationList({
 
             {/* End of results indicator */}
             {!hasNextPage && organizations.length > 0 && meta && meta.total > 6 && (
-                <div className="text-center py-6 text-sm text-muted-foreground">
-                    You've reached the end of the results
-                </div>
+                <div className="py-6 text-center text-sm text-muted-foreground">You've reached the end of the results</div>
             )}
         </div>
     );

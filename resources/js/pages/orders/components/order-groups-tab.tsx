@@ -76,10 +76,12 @@ export default function OrderGroupsTab({ orderGroups }: OrderGroupsTabProps) {
                                 <div>
                                     <span className="font-medium text-muted-foreground">Total Price:</span>
                                     <p className="font-semibold tabular-nums">
-                                        ${(group.total_price || 
-                                           group.services?.reduce((sum, service) => sum + parseFloat(service.price || '0'), 0) || 
-                                           0
-                                         ).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                        $
+                                        {(
+                                            group.total_price ||
+                                            group.services?.reduce((sum, service) => sum + parseFloat(service.price || '0'), 0) ||
+                                            0
+                                        ).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                     </p>
                                 </div>
                                 <div>

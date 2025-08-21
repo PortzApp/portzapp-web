@@ -4,6 +4,7 @@ import { Head, router } from '@inertiajs/react';
 import { LogOut } from 'lucide-react';
 
 import AuthLayout from '@/layouts/auth-layout';
+
 import { Button } from '@/components/ui/button';
 
 import EnhancedOrganizationWizard from '@/components/onboarding/enhanced-organization-wizard';
@@ -29,7 +30,7 @@ function OnboardingContent({ businessTypes }: { businessTypes: Props['businessTy
     return (
         <div className="relative min-h-screen">
             <Head title="Complete Setup" />
-            
+
             {/* Logout button positioned in top-right */}
             <div className="absolute top-4 right-4 z-10">
                 <Button variant="outline" size="sm" onClick={handleLogout}>

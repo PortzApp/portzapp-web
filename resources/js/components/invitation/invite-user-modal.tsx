@@ -1,22 +1,17 @@
 import React, { useState } from 'react';
+
+import { AlertCircle, CheckCircle, Mail, Plus, X } from 'lucide-react';
+
+import { UserRoles } from '@/types/enums';
+
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-    Mail, 
-    Plus, 
-    X, 
-    Upload, 
-    Users, 
-    AlertCircle,
-    CheckCircle
-} from 'lucide-react';
-import { UserRoles } from '@/types/enums';
+import { Textarea } from '@/components/ui/textarea';
 
 interface InviteUserModalProps {
     onClose: () => void;
@@ -36,18 +31,18 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ onClose, onSuccess })
         emails: [''],
         role: '',
         message: '',
-        expires_in_days: 7
+        expires_in_days: 7,
     });
     const [bulkEmails, setBulkEmails] = useState('');
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
-    const [successResults, setSuccessResults] = useState<{ invitations: any[], errors: Record<string, string> } | null>(null);
+    const [successResults, setSuccessResults] = useState<{ invitations: unknown[]; errors: Record<string, string> } | null>(null);
 
     // Handle form field changes
-    const handleInputChange = (field: keyof InvitationForm, value: any) => {
-        setFormData(prev => ({ ...prev, [field]: value }));
+    const handleInputChange = (field: keyof InvitationForm, value: unknown) => {
+        setFormData((prev) => ({ ...prev, [field]: value }));
         if (errors[field]) {
-            setErrors(prev => ({ ...prev, [field]: '' }));
+            setErrors((prev) => ({ ...prev, [field]: '' }));
         }
     };
 
@@ -55,22 +50,22 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ onClose, onSuccess })
     const handleEmailChange = (index: number, email: string) => {
         const newEmails = [...formData.emails];
         newEmails[index] = email;
-        setFormData(prev => ({ ...prev, emails: newEmails }));
+        setFormData((prev) => ({ ...prev, emails: newEmails }));
         if (errors[`emails.${index}`]) {
-            setErrors(prev => ({ ...prev, [`emails.${index}`]: '' }));
+            setErrors((prev) => ({ ...prev, [`emails.${index}`]: '' }));
         }
     };
 
     // Add new email field
     const addEmailField = () => {
-        setFormData(prev => ({ ...prev, emails: [...prev.emails, ''] }));
+        setFormData((prev) => ({ ...prev, emails: [...prev.emails, ''] }));
     };
 
     // Remove email field
     const removeEmailField = (index: number) => {
         if (formData.emails.length > 1) {
             const newEmails = formData.emails.filter((_, i) => i !== index);
-            setFormData(prev => ({ ...prev, emails: newEmails }));
+            setFormData((prev) => ({ ...prev, emails: newEmails }));
         }
     };
 
@@ -78,8 +73,8 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ onClose, onSuccess })
     const parseBulkEmails = (): string[] => {
         return bulkEmails
             .split(/[,\n\r\t;]+/)
-            .map(email => email.trim())
-            .filter(email => email.length > 0);
+            .map((email) => email.trim())
+            .filter((email) => email.length > 0);
     };
 
     // Validate email format
@@ -99,10 +94,10 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ onClose, onSuccess })
 
         // Validate emails based on active tab
         let emailsToValidate: string[] = [];
-        
+
         if (activeTab === 'single') {
-            emailsToValidate = formData.emails.filter(email => email.trim().length > 0);
-            
+            emailsToValidate = formData.emails.filter((email) => email.trim().length > 0);
+
             if (emailsToValidate.length === 0) {
                 newErrors['emails.0'] = 'At least one email address is required';
             } else {
@@ -114,11 +109,11 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ onClose, onSuccess })
             }
         } else {
             emailsToValidate = parseBulkEmails();
-            
+
             if (emailsToValidate.length === 0) {
                 newErrors.bulk_emails = 'Please enter at least one email address';
             } else {
-                const invalidEmails = emailsToValidate.filter(email => !isValidEmail(email));
+                const invalidEmails = emailsToValidate.filter((email) => !isValidEmail(email));
                 if (invalidEmails.length > 0) {
                     newErrors.bulk_emails = `Invalid email addresses: ${invalidEmails.join(', ')}`;
                 }
@@ -137,7 +132,7 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ onClose, onSuccess })
     // Handle form submission
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         if (!validateForm()) {
             return;
         }
@@ -146,26 +141,24 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ onClose, onSuccess })
         setErrors({});
 
         try {
-            const emailsToSend = activeTab === 'single' 
-                ? formData.emails.filter(email => email.trim().length > 0)
-                : parseBulkEmails();
+            const emailsToSend = activeTab === 'single' ? formData.emails.filter((email) => email.trim().length > 0) : parseBulkEmails();
 
             const payload = {
                 emails: emailsToSend,
                 role: formData.role,
                 message: formData.message || null,
-                expires_in_days: formData.expires_in_days
+                expires_in_days: formData.expires_in_days,
             };
 
             const response = await fetch('/api/invitations/bulk', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Accept': 'application/json',
+                    Accept: 'application/json',
                     'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
                 },
-                body: JSON.stringify(payload)
+                body: JSON.stringify(payload),
             });
 
             const data = await response.json();
@@ -185,7 +178,7 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ onClose, onSuccess })
                     setErrors({ general: data.message || 'An error occurred while sending invitations' });
                 }
             }
-        } catch (error) {
+        } catch {
             setErrors({ general: 'An unexpected error occurred' });
         } finally {
             setLoading(false);
@@ -200,26 +193,21 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ onClose, onSuccess })
             MANAGER: 'Manager - Team and operations management',
             OPERATIONS: 'Operations - Operational management',
             FINANCE: 'Finance - Financial management',
-            VIEWER: 'Viewer - View-only access'
+            VIEWER: 'Viewer - View-only access',
         };
         return labels[role as keyof typeof labels] || role;
     };
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <Card className="max-w-3xl w-full max-h-[90vh] overflow-auto">
+        <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black p-4">
+            <Card className="max-h-[90vh] w-full max-w-3xl overflow-auto">
                 <CardHeader className="border-b">
                     <div className="flex items-center justify-between">
                         <CardTitle className="flex items-center gap-2">
                             <Mail className="h-5 w-5" />
                             Invite Users to Organization
                         </CardTitle>
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={onClose}
-                            disabled={loading}
-                        >
+                        <Button variant="ghost" size="sm" onClick={onClose} disabled={loading}>
                             <X className="h-4 w-4" />
                         </Button>
                     </div>
@@ -229,22 +217,22 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ onClose, onSuccess })
                     {successResults ? (
                         <div className="space-y-4">
                             <div className="text-center">
-                                <CheckCircle className="h-12 w-12 text-green-600 mx-auto mb-4" />
+                                <CheckCircle className="mx-auto mb-4 h-12 w-12 text-green-600" />
                                 <h3 className="text-lg font-medium">Invitations Sent!</h3>
                                 <p className="text-muted-foreground">
                                     {successResults.invitations.length} invitation(s) sent successfully
-                                    {Object.keys(successResults.errors).length > 0 && 
-                                        `, ${Object.keys(successResults.errors).length} failed`
-                                    }
+                                    {Object.keys(successResults.errors).length > 0 && `, ${Object.keys(successResults.errors).length} failed`}
                                 </p>
                             </div>
 
                             {Object.keys(successResults.errors).length > 0 && (
-                                <div className="bg-red-50 border border-red-200 rounded-md p-4">
-                                    <h4 className="font-medium text-red-800 mb-2">Failed Invitations:</h4>
-                                    <ul className="text-sm text-red-700 space-y-1">
+                                <div className="rounded-md border border-red-200 bg-red-50 p-4">
+                                    <h4 className="mb-2 font-medium text-red-800">Failed Invitations:</h4>
+                                    <ul className="space-y-1 text-sm text-red-700">
                                         {Object.entries(successResults.errors).map(([email, error]) => (
-                                            <li key={email}>{email}: {error}</li>
+                                            <li key={email}>
+                                                {email}: {error}
+                                            </li>
                                         ))}
                                     </ul>
                                 </div>
@@ -266,7 +254,7 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ onClose, onSuccess })
                                 <TabsContent value="single" className="space-y-4">
                                     <div>
                                         <Label>Email Addresses</Label>
-                                        <div className="space-y-2 mt-2">
+                                        <div className="mt-2 space-y-2">
                                             {formData.emails.map((email, index) => (
                                                 <div key={index} className="flex items-center gap-2">
                                                     <Input
@@ -277,31 +265,18 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ onClose, onSuccess })
                                                         className={errors[`emails.${index}`] ? 'border-red-500' : ''}
                                                     />
                                                     {formData.emails.length > 1 && (
-                                                        <Button
-                                                            type="button"
-                                                            variant="outline"
-                                                            size="sm"
-                                                            onClick={() => removeEmailField(index)}
-                                                        >
+                                                        <Button type="button" variant="outline" size="sm" onClick={() => removeEmailField(index)}>
                                                             <X className="h-4 w-4" />
                                                         </Button>
                                                     )}
                                                 </div>
                                             ))}
-                                            <Button
-                                                type="button"
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={addEmailField}
-                                                className="w-full"
-                                            >
-                                                <Plus className="h-4 w-4 mr-2" />
+                                            <Button type="button" variant="outline" size="sm" onClick={addEmailField} className="w-full">
+                                                <Plus className="mr-2 h-4 w-4" />
                                                 Add Another Email
                                             </Button>
                                         </div>
-                                        {errors['emails.0'] && (
-                                            <p className="text-sm text-red-600 mt-1">{errors['emails.0']}</p>
-                                        )}
+                                        {errors['emails.0'] && <p className="mt-1 text-sm text-red-600">{errors['emails.0']}</p>}
                                     </div>
                                 </TabsContent>
 
@@ -316,21 +291,21 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ onClose, onSuccess })
                                             rows={6}
                                             className={errors.bulk_emails ? 'border-red-500' : ''}
                                         />
-                                        <p className="text-xs text-muted-foreground mt-1">
+                                        <p className="mt-1 text-xs text-muted-foreground">
                                             Separate email addresses with commas, semicolons, or new lines
                                         </p>
-                                        {errors.bulk_emails && (
-                                            <p className="text-sm text-red-600 mt-1">{errors.bulk_emails}</p>
-                                        )}
+                                        {errors.bulk_emails && <p className="mt-1 text-sm text-red-600">{errors.bulk_emails}</p>}
                                         {bulkEmails && (
                                             <div className="mt-2">
                                                 <p className="text-sm font-medium">Preview ({parseBulkEmails().length} emails):</p>
-                                                <div className="flex flex-wrap gap-1 mt-1">
-                                                    {parseBulkEmails().slice(0, 10).map((email, index) => (
-                                                        <Badge key={index} variant="outline" className="text-xs">
-                                                            {email}
-                                                        </Badge>
-                                                    ))}
+                                                <div className="mt-1 flex flex-wrap gap-1">
+                                                    {parseBulkEmails()
+                                                        .slice(0, 10)
+                                                        .map((email, index) => (
+                                                            <Badge key={index} variant="outline" className="text-xs">
+                                                                {email}
+                                                            </Badge>
+                                                        ))}
                                                     {parseBulkEmails().length > 10 && (
                                                         <Badge variant="outline" className="text-xs">
                                                             +{parseBulkEmails().length - 10} more
@@ -358,9 +333,7 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ onClose, onSuccess })
                                         <SelectItem value="ADMIN">{getRoleLabel('ADMIN')}</SelectItem>
                                     </SelectContent>
                                 </Select>
-                                {errors.role && (
-                                    <p className="text-sm text-red-600 mt-1">{errors.role}</p>
-                                )}
+                                {errors.role && <p className="mt-1 text-sm text-red-600">{errors.role}</p>}
                             </div>
 
                             {/* Personal Message */}
@@ -374,9 +347,7 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ onClose, onSuccess })
                                     rows={3}
                                     maxLength={500}
                                 />
-                                <p className="text-xs text-muted-foreground mt-1">
-                                    {formData.message.length}/500 characters
-                                </p>
+                                <p className="mt-1 text-xs text-muted-foreground">{formData.message.length}/500 characters</p>
                             </div>
 
                             {/* Expiration Days */}
@@ -391,14 +362,12 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ onClose, onSuccess })
                                     onChange={(e) => handleInputChange('expires_in_days', parseInt(e.target.value) || 7)}
                                     className={errors.expires_in_days ? 'border-red-500' : ''}
                                 />
-                                {errors.expires_in_days && (
-                                    <p className="text-sm text-red-600 mt-1">{errors.expires_in_days}</p>
-                                )}
+                                {errors.expires_in_days && <p className="mt-1 text-sm text-red-600">{errors.expires_in_days}</p>}
                             </div>
 
                             {/* General error message */}
                             {errors.general && (
-                                <div className="p-4 bg-red-50 border border-red-200 rounded-md">
+                                <div className="rounded-md border border-red-200 bg-red-50 p-4">
                                     <div className="flex items-center gap-2">
                                         <AlertCircle className="h-4 w-4 text-red-600" />
                                         <p className="text-sm text-red-600">{errors.general}</p>
@@ -407,22 +376,14 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ onClose, onSuccess })
                             )}
 
                             {/* Form Actions */}
-                            <div className="flex items-center gap-3 pt-6 border-t">
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    onClick={onClose}
-                                    disabled={loading}
-                                >
+                            <div className="flex items-center gap-3 border-t pt-6">
+                                <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
                                     Cancel
                                 </Button>
-                                <Button
-                                    type="submit"
-                                    disabled={loading || !formData.role}
-                                >
+                                <Button type="submit" disabled={loading || !formData.role}>
                                     {loading ? (
                                         <div className="flex items-center gap-2">
-                                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                            <div className="h-4 w-4 animate-spin rounded-full border-b-2 border-white"></div>
                                             Sending Invitations...
                                         </div>
                                     ) : (

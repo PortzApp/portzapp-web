@@ -1,7 +1,7 @@
 import { LucideIcon } from 'lucide-react';
 
 import type { Config } from 'ziggy-js';
-import { OrganizationBusinessType, UserRoles, OnboardingStatus } from '@/types/enums';
+import { OnboardingStatus, OrganizationBusinessType, UserRoles } from '@/types/enums';
 
 export interface SharedData {
     name: string;
@@ -32,6 +32,7 @@ export interface User {
     email: string;
     phone_number: string;
     email_verified_at: string | null;
+    onboarding_status: OnboardingStatus;
     current_organization: Organization | null;
     organizations: Organization[] | null;
     avatar: string | null;
@@ -136,7 +137,7 @@ export interface Invitation {
     expires_at: string;
     created_at: string;
     updated_at: string;
-    metadata?: Record<string, any>;
+    metadata?: Record<string, unknown>;
     invited_by_user?: Pick<User, 'id' | 'first_name' | 'last_name' | 'email'>;
     organization?: Pick<SearchableOrganization, 'id' | 'name' | 'business_type'>;
 }

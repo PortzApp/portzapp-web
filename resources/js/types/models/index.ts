@@ -1,4 +1,13 @@
-import { JoinRequestStatus, OrderGroupStatus, OrderStatus, OrganizationBusinessType, ServiceStatus, UserRoles, VesselStatus, VesselType } from '@/types/enums';
+import {
+    JoinRequestStatus,
+    OrderGroupStatus,
+    OrderStatus,
+    OrganizationBusinessType,
+    ServiceStatus,
+    UserRoles,
+    VesselStatus,
+    VesselType,
+} from '@/types/enums';
 
 export interface BaseModel {
     id: string;

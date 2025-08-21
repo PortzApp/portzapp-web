@@ -1,6 +1,11 @@
 import { useState } from 'react';
-import { AlertTriangle, Trash2 } from 'lucide-react';
+
 import { router } from '@inertiajs/react';
+import { AlertTriangle, Trash2 } from 'lucide-react';
+import { toast } from 'sonner';
+
+import type { JoinRequest } from '@/types';
+
 import {
     AlertDialog,
     AlertDialogAction,
@@ -12,8 +17,6 @@ import {
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
-import type { JoinRequest } from '@/types';
 
 interface JoinRequestWithdrawalDialogProps {
     joinRequest: JoinRequest;
@@ -22,12 +25,7 @@ interface JoinRequestWithdrawalDialogProps {
     onSuccess?: () => void;
 }
 
-export function JoinRequestWithdrawalDialog({
-    joinRequest,
-    isOpen,
-    onClose,
-    onSuccess,
-}: JoinRequestWithdrawalDialogProps) {
+export function JoinRequestWithdrawalDialog({ joinRequest, isOpen, onClose, onSuccess }: JoinRequestWithdrawalDialogProps) {
     const [isWithdrawing, setIsWithdrawing] = useState(false);
 
     const handleWithdraw = async () => {
@@ -55,7 +53,7 @@ export function JoinRequestWithdrawalDialog({
                     },
                 });
             });
-        } catch (error) {
+        } catch {
             // Error already handled in onError callback
         } finally {
             setIsWithdrawing(false);
@@ -76,15 +74,12 @@ export function JoinRequestWithdrawalDialog({
                             <span className="font-semibold">{joinRequest.organization?.name}</span>?
                         </p>
                         <p className="text-sm">
-                            This action cannot be undone. You'll need to submit a new request 
-                            if you want to join this organization in the future.
+                            This action cannot be undone. You'll need to submit a new request if you want to join this organization in the future.
                         </p>
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                    <AlertDialogCancel disabled={isWithdrawing}>
-                        Cancel
-                    </AlertDialogCancel>
+                    <AlertDialogCancel disabled={isWithdrawing}>Cancel</AlertDialogCancel>
                     <AlertDialogAction
                         onClick={handleWithdraw}
                         disabled={isWithdrawing}
@@ -92,12 +87,12 @@ export function JoinRequestWithdrawalDialog({
                     >
                         {isWithdrawing ? (
                             <>
-                                <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
+                                <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
                                 Withdrawing...
                             </>
                         ) : (
                             <>
-                                <Trash2 className="h-4 w-4 mr-2" />
+                                <Trash2 className="mr-2 h-4 w-4" />
                                 Withdraw Request
                             </>
                         )}
@@ -117,13 +112,7 @@ interface WithdrawRequestButtonProps {
     disabled?: boolean;
 }
 
-export function WithdrawRequestButton({
-    joinRequest,
-    onSuccess,
-    variant = 'outline',
-    size = 'sm',
-    disabled = false,
-}: WithdrawRequestButtonProps) {
+export function WithdrawRequestButton({ joinRequest, onSuccess, variant = 'outline', size = 'sm', disabled = false }: WithdrawRequestButtonProps) {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
 
     if (joinRequest.status !== 'pending') {
@@ -139,7 +128,7 @@ export function WithdrawRequestButton({
                 disabled={disabled}
                 className="text-destructive hover:text-destructive"
             >
-                <Trash2 className="h-3 w-3 mr-1" />
+                <Trash2 className="mr-1 h-3 w-3" />
                 Withdraw
             </Button>
 

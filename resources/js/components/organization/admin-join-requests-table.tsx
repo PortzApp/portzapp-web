@@ -1,14 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { router } from '@inertiajs/react';
+import React, { useEffect, useState } from 'react';
+
+import { JoinRequest } from '@/types';
+import { Calendar, CheckCircle, CheckSquare, Clock, Eye, Mail, User, XCircle } from 'lucide-react';
+
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { CheckCircle, XCircle, Clock, Eye, User, Mail, Calendar, CheckSquare, Users } from 'lucide-react';
-import { JoinRequest } from '@/types';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+
 import JoinRequestActionModal from './join-request-action-modal';
 
 interface AdminJoinRequestsTableProps {
@@ -53,9 +55,9 @@ const AdminJoinRequestsTable: React.FC<AdminJoinRequestsTableProps> = ({ initial
 
             const response = await fetch(`/api/admin/join-requests?${params}`, {
                 headers: {
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
+                    Accept: 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
             });
 
             if (response.ok) {
@@ -75,9 +77,9 @@ const AdminJoinRequestsTable: React.FC<AdminJoinRequestsTableProps> = ({ initial
         try {
             const response = await fetch('/api/admin/join-requests/statistics', {
                 headers: {
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
+                    Accept: 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
             });
 
             if (response.ok) {
@@ -117,7 +119,7 @@ const AdminJoinRequestsTable: React.FC<AdminJoinRequestsTableProps> = ({ initial
     // Handle selection changes
     const handleSelectAll = (checked: boolean) => {
         if (checked) {
-            const pendingIds = joinRequests.filter(req => req.status === 'pending').map(req => req.id);
+            const pendingIds = joinRequests.filter((req) => req.status === 'pending').map((req) => req.id);
             setSelectedItems(new Set(pendingIds));
         } else {
             setSelectedItems(new Set());
@@ -143,7 +145,7 @@ const AdminJoinRequestsTable: React.FC<AdminJoinRequestsTableProps> = ({ initial
 
     const executeBulkAction = async () => {
         if (!showBulkConfirm) return;
-        
+
         setBulkProcessing(true);
         const { action } = showBulkConfirm;
         const requestIds = Array.from(selectedItems);
@@ -151,34 +153,30 @@ const AdminJoinRequestsTable: React.FC<AdminJoinRequestsTableProps> = ({ initial
         try {
             // Process each request individually since we don't have a bulk API endpoint
             const promises = requestIds.map(async (requestId) => {
-                const endpoint = action === 'approve' 
-                    ? `/api/admin/join-requests/${requestId}/approve`
-                    : `/api/admin/join-requests/${requestId}/reject`;
+                const endpoint =
+                    action === 'approve' ? `/api/admin/join-requests/${requestId}/approve` : `/api/admin/join-requests/${requestId}/reject`;
 
-                const body = action === 'approve' 
-                    ? { role: 'VIEWER', admin_notes: 'Bulk approved' }
-                    : { admin_notes: 'Bulk rejected' };
+                const body = action === 'approve' ? { role: 'VIEWER', admin_notes: 'Bulk approved' } : { admin_notes: 'Bulk rejected' };
 
                 return fetch(endpoint, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Accept': 'application/json',
+                        Accept: 'application/json',
                         'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
                     },
-                    body: JSON.stringify(body)
+                    body: JSON.stringify(body),
                 });
             });
 
             await Promise.all(promises);
-            
+
             // Reload data and clear selection
             await loadJoinRequests(statusFilter === 'all' ? undefined : statusFilter);
             await loadStatistics();
             setSelectedItems(new Set());
             setShowBulkConfirm(null);
-            
         } catch (error) {
             console.error('Bulk operation failed:', error);
         } finally {
@@ -196,14 +194,14 @@ const AdminJoinRequestsTable: React.FC<AdminJoinRequestsTableProps> = ({ initial
     // Get status badge color
     const getStatusBadge = (status: string) => {
         const variants = {
-            pending: { variant: 'secondary' as const, icon: <Clock className="w-3 h-3" />, color: 'text-yellow-600' },
-            approved: { variant: 'success' as const, icon: <CheckCircle className="w-3 h-3" />, color: 'text-green-600' },
-            rejected: { variant: 'destructive' as const, icon: <XCircle className="w-3 h-3" />, color: 'text-red-600' },
-            withdrawn: { variant: 'outline' as const, icon: <XCircle className="w-3 h-3" />, color: 'text-gray-600' }
+            pending: { variant: 'secondary' as const, icon: <Clock className="h-3 w-3" />, color: 'text-yellow-600' },
+            approved: { variant: 'success' as const, icon: <CheckCircle className="h-3 w-3" />, color: 'text-green-600' },
+            rejected: { variant: 'destructive' as const, icon: <XCircle className="h-3 w-3" />, color: 'text-red-600' },
+            withdrawn: { variant: 'outline' as const, icon: <XCircle className="h-3 w-3" />, color: 'text-gray-600' },
         };
 
         const config = variants[status as keyof typeof variants] || variants.pending;
-        
+
         return (
             <Badge variant={config.variant} className={`flex items-center gap-1 ${config.color}`}>
                 {config.icon}
@@ -219,7 +217,7 @@ const AdminJoinRequestsTable: React.FC<AdminJoinRequestsTableProps> = ({ initial
             month: 'short',
             day: 'numeric',
             hour: '2-digit',
-            minute: '2-digit'
+            minute: '2-digit',
         });
     };
 
@@ -229,13 +227,13 @@ const AdminJoinRequestsTable: React.FC<AdminJoinRequestsTableProps> = ({ initial
             loadJoinRequests();
         }
         loadStatistics();
-    }, []);
+    }, [initialData]);
 
     return (
         <div className="space-y-6">
             {/* Statistics Cards */}
             {stats && (
-                <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-5">
                     <Card>
                         <CardContent className="p-4">
                             <div className="flex items-center justify-between">
@@ -314,10 +312,10 @@ const AdminJoinRequestsTable: React.FC<AdminJoinRequestsTableProps> = ({ initial
                             </Select>
                         </div>
                     </div>
-                    
+
                     {/* Bulk Actions Bar */}
                     {selectedItems.size > 0 && (
-                        <div className="flex items-center justify-between p-3 bg-blue-50 border border-blue-200 rounded-md">
+                        <div className="flex items-center justify-between rounded-md border border-blue-200 bg-blue-50 p-3">
                             <div className="flex items-center gap-2">
                                 <CheckSquare className="h-4 w-4 text-blue-600" />
                                 <span className="text-sm font-medium text-blue-900">
@@ -331,24 +329,14 @@ const AdminJoinRequestsTable: React.FC<AdminJoinRequestsTableProps> = ({ initial
                                     className="bg-green-600 hover:bg-green-700"
                                     disabled={bulkProcessing}
                                 >
-                                    <CheckCircle className="h-4 w-4 mr-1" />
+                                    <CheckCircle className="mr-1 h-4 w-4" />
                                     Bulk Approve
                                 </Button>
-                                <Button
-                                    size="sm"
-                                    variant="destructive"
-                                    onClick={() => handleBulkAction('reject')}
-                                    disabled={bulkProcessing}
-                                >
-                                    <XCircle className="h-4 w-4 mr-1" />
+                                <Button size="sm" variant="destructive" onClick={() => handleBulkAction('reject')} disabled={bulkProcessing}>
+                                    <XCircle className="mr-1 h-4 w-4" />
                                     Bulk Reject
                                 </Button>
-                                <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => setSelectedItems(new Set())}
-                                    disabled={bulkProcessing}
-                                >
+                                <Button size="sm" variant="outline" onClick={() => setSelectedItems(new Set())} disabled={bulkProcessing}>
                                     Clear
                                 </Button>
                             </div>
@@ -357,11 +345,11 @@ const AdminJoinRequestsTable: React.FC<AdminJoinRequestsTableProps> = ({ initial
                 </CardHeader>
                 <CardContent>
                     {loading ? (
-                        <div className="flex items-center justify-center h-32">
-                            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+                        <div className="flex h-32 items-center justify-center">
+                            <div className="h-6 w-6 animate-spin rounded-full border-b-2 border-primary"></div>
                         </div>
                     ) : joinRequests.length === 0 ? (
-                        <div className="text-center py-8">
+                        <div className="py-8 text-center">
                             <p className="text-muted-foreground">No join requests found.</p>
                         </div>
                     ) : (
@@ -371,9 +359,12 @@ const AdminJoinRequestsTable: React.FC<AdminJoinRequestsTableProps> = ({ initial
                                     <TableRow>
                                         <TableHead className="w-12">
                                             <Checkbox
-                                                checked={selectedItems.size > 0 && joinRequests.filter(req => req.status === 'pending').every(req => selectedItems.has(req.id))}
+                                                checked={
+                                                    selectedItems.size > 0 &&
+                                                    joinRequests.filter((req) => req.status === 'pending').every((req) => selectedItems.has(req.id))
+                                                }
                                                 onCheckedChange={handleSelectAll}
-                                                disabled={joinRequests.filter(req => req.status === 'pending').length === 0}
+                                                disabled={joinRequests.filter((req) => req.status === 'pending').length === 0}
                                             />
                                         </TableHead>
                                         <TableHead>User</TableHead>
@@ -398,10 +389,7 @@ const AdminJoinRequestsTable: React.FC<AdminJoinRequestsTableProps> = ({ initial
                                                 <div className="flex items-center gap-2">
                                                     <User className="h-4 w-4 text-muted-foreground" />
                                                     <span className="font-medium">
-                                                        {request.user ? 
-                                                            `${request.user.first_name} ${request.user.last_name}` : 
-                                                            'Unknown User'
-                                                        }
+                                                        {request.user ? `${request.user.first_name} ${request.user.last_name}` : 'Unknown User'}
                                                     </span>
                                                 </div>
                                             </TableCell>
@@ -413,14 +401,12 @@ const AdminJoinRequestsTable: React.FC<AdminJoinRequestsTableProps> = ({ initial
                                             </TableCell>
                                             <TableCell>
                                                 <div className="max-w-xs">
-                                                    <p className="text-sm truncate" title={request.message || 'No message'}>
+                                                    <p className="truncate text-sm" title={request.message || 'No message'}>
                                                         {request.message || 'No message provided'}
                                                     </p>
                                                 </div>
                                             </TableCell>
-                                            <TableCell>
-                                                {getStatusBadge(request.status)}
-                                            </TableCell>
+                                            <TableCell>{getStatusBadge(request.status)}</TableCell>
                                             <TableCell>
                                                 <div className="flex items-center gap-2">
                                                     <Calendar className="h-4 w-4 text-muted-foreground" />
@@ -429,11 +415,7 @@ const AdminJoinRequestsTable: React.FC<AdminJoinRequestsTableProps> = ({ initial
                                             </TableCell>
                                             <TableCell>
                                                 <div className="flex items-center gap-2">
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        onClick={() => handleViewRequest(request)}
-                                                    >
+                                                    <Button variant="outline" size="sm" onClick={() => handleViewRequest(request)}>
                                                         <Eye className="h-4 w-4" />
                                                     </Button>
                                                     {request.status === 'pending' && (
@@ -447,11 +429,7 @@ const AdminJoinRequestsTable: React.FC<AdminJoinRequestsTableProps> = ({ initial
                                                                 <CheckCircle className="h-4 w-4" />
                                                                 Approve
                                                             </Button>
-                                                            <Button
-                                                                variant="destructive"
-                                                                size="sm"
-                                                                onClick={() => handleReject(request)}
-                                                            >
+                                                            <Button variant="destructive" size="sm" onClick={() => handleReject(request)}>
                                                                 <XCircle className="h-4 w-4" />
                                                                 Reject
                                                             </Button>
@@ -466,9 +444,10 @@ const AdminJoinRequestsTable: React.FC<AdminJoinRequestsTableProps> = ({ initial
 
                             {/* Pagination */}
                             {meta.last_page > 1 && (
-                                <div className="flex items-center justify-between mt-4">
+                                <div className="mt-4 flex items-center justify-between">
                                     <p className="text-sm text-muted-foreground">
-                                        Showing {((meta.current_page - 1) * meta.per_page) + 1} to {Math.min(meta.current_page * meta.per_page, meta.total)} of {meta.total} results
+                                        Showing {(meta.current_page - 1) * meta.per_page + 1} to{' '}
+                                        {Math.min(meta.current_page * meta.per_page, meta.total)} of {meta.total} results
                                     </p>
                                     <div className="flex items-center gap-2">
                                         <Button
@@ -500,16 +479,12 @@ const AdminJoinRequestsTable: React.FC<AdminJoinRequestsTableProps> = ({ initial
 
             {/* Request Details Modal */}
             {selectedRequest && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                    <Card className="max-w-2xl w-full max-h-[80vh] overflow-auto">
+                <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black p-4">
+                    <Card className="max-h-[80vh] w-full max-w-2xl overflow-auto">
                         <CardHeader>
                             <div className="flex items-center justify-between">
                                 <CardTitle>Join Request Details</CardTitle>
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => setSelectedRequest(null)}
-                                >
+                                <Button variant="ghost" size="sm" onClick={() => setSelectedRequest(null)}>
                                     ×
                                 </Button>
                             </div>
@@ -518,43 +493,32 @@ const AdminJoinRequestsTable: React.FC<AdminJoinRequestsTableProps> = ({ initial
                             <div>
                                 <label className="text-sm font-medium">User</label>
                                 <p className="text-sm text-muted-foreground">
-                                    {selectedRequest.user ? 
-                                        `${selectedRequest.user.first_name} ${selectedRequest.user.last_name} (${selectedRequest.user.email})` : 
-                                        'Unknown User'
-                                    }
+                                    {selectedRequest.user
+                                        ? `${selectedRequest.user.first_name} ${selectedRequest.user.last_name} (${selectedRequest.user.email})`
+                                        : 'Unknown User'}
                                 </p>
                             </div>
                             <div>
                                 <label className="text-sm font-medium">Status</label>
-                                <div className="mt-1">
-                                    {getStatusBadge(selectedRequest.status)}
-                                </div>
+                                <div className="mt-1">{getStatusBadge(selectedRequest.status)}</div>
                             </div>
                             <div>
                                 <label className="text-sm font-medium">Message</label>
-                                <p className="text-sm text-muted-foreground mt-1">
-                                    {selectedRequest.message || 'No message provided'}
-                                </p>
+                                <p className="mt-1 text-sm text-muted-foreground">{selectedRequest.message || 'No message provided'}</p>
                             </div>
                             {selectedRequest.admin_notes && (
                                 <div>
                                     <label className="text-sm font-medium">Admin Notes</label>
-                                    <p className="text-sm text-muted-foreground mt-1">
-                                        {selectedRequest.admin_notes}
-                                    </p>
+                                    <p className="mt-1 text-sm text-muted-foreground">{selectedRequest.admin_notes}</p>
                                 </div>
                             )}
                             <div>
                                 <label className="text-sm font-medium">Requested</label>
-                                <p className="text-sm text-muted-foreground">
-                                    {formatDate(selectedRequest.created_at)}
-                                </p>
+                                <p className="text-sm text-muted-foreground">{formatDate(selectedRequest.created_at)}</p>
                             </div>
                             <div>
                                 <label className="text-sm font-medium">Last Updated</label>
-                                <p className="text-sm text-muted-foreground">
-                                    {formatDate(selectedRequest.updated_at)}
-                                </p>
+                                <p className="text-sm text-muted-foreground">{formatDate(selectedRequest.updated_at)}</p>
                             </div>
                         </CardContent>
                     </Card>
@@ -585,20 +549,15 @@ const AdminJoinRequestsTable: React.FC<AdminJoinRequestsTableProps> = ({ initial
                                 Bulk {showBulkConfirm.action === 'approve' ? 'Approve' : 'Reject'} Requests
                             </DialogTitle>
                             <DialogDescription>
-                                Are you sure you want to {showBulkConfirm.action} {showBulkConfirm.count} join request{showBulkConfirm.count !== 1 ? 's' : ''}?
+                                Are you sure you want to {showBulkConfirm.action} {showBulkConfirm.count} join request
+                                {showBulkConfirm.count !== 1 ? 's' : ''}?
                                 {showBulkConfirm.action === 'approve' && (
-                                    <span className="block mt-2 text-sm">
-                                        All approved users will be granted "Viewer" role by default.
-                                    </span>
+                                    <span className="mt-2 block text-sm">All approved users will be granted "Viewer" role by default.</span>
                                 )}
                             </DialogDescription>
                         </DialogHeader>
                         <DialogFooter>
-                            <Button
-                                variant="outline"
-                                onClick={() => setShowBulkConfirm(null)}
-                                disabled={bulkProcessing}
-                            >
+                            <Button variant="outline" onClick={() => setShowBulkConfirm(null)} disabled={bulkProcessing}>
                                 Cancel
                             </Button>
                             <Button
@@ -608,7 +567,7 @@ const AdminJoinRequestsTable: React.FC<AdminJoinRequestsTableProps> = ({ initial
                             >
                                 {bulkProcessing ? (
                                     <div className="flex items-center gap-2">
-                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                        <div className="h-4 w-4 animate-spin rounded-full border-b-2 border-white"></div>
                                         Processing...
                                     </div>
                                 ) : (

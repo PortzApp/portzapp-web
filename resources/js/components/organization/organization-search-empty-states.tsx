@@ -1,4 +1,5 @@
-import { Search, Building, AlertCircle, Wifi } from 'lucide-react';
+import { AlertCircle, Building, Search } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 
 interface EmptyStateProps {
@@ -13,12 +14,10 @@ interface EmptyStateProps {
 
 function EmptyState({ title, description, icon, action }: EmptyStateProps) {
     return (
-        <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
-            <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
-                {icon}
-            </div>
-            <h3 className="text-lg font-semibold text-foreground mb-2">{title}</h3>
-            <p className="text-sm text-muted-foreground max-w-md mb-6">{description}</p>
+        <div className="flex flex-col items-center justify-center px-4 py-12 text-center">
+            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">{icon}</div>
+            <h3 className="mb-2 text-lg font-semibold text-foreground">{title}</h3>
+            <p className="mb-6 max-w-md text-sm text-muted-foreground">{description}</p>
             {action && (
                 <Button onClick={action.onClick} variant="outline">
                     {action.label}
@@ -35,12 +34,7 @@ interface OrganizationSearchEmptyStatesProps {
     onClearSearch?: () => void;
 }
 
-export function OrganizationSearchEmptyStates({
-    type,
-    searchQuery,
-    onRetry,
-    onClearSearch,
-}: OrganizationSearchEmptyStatesProps) {
+export function OrganizationSearchEmptyStates({ type, searchQuery, onRetry, onClearSearch }: OrganizationSearchEmptyStatesProps) {
     switch (type) {
         case 'no-results':
             return (
@@ -50,7 +44,7 @@ export function OrganizationSearchEmptyStates({
                     description={
                         searchQuery
                             ? `We couldn't find any organizations matching "${searchQuery}". Try adjusting your search terms or filters.`
-                            : "No organizations match your current filters. Try adjusting your search criteria."
+                            : 'No organizations match your current filters. Try adjusting your search criteria.'
                     }
                     action={
                         searchQuery && onClearSearch

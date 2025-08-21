@@ -1,10 +1,13 @@
 import { useState } from 'react';
-import { Building, Users, MapPin } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+
+import { Building, Users } from 'lucide-react';
+
 import type { SearchableOrganization } from '@/types';
 import { OrganizationBusinessType } from '@/types/enums';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface OrganizationCardProps {
     organization: SearchableOrganization;
@@ -34,12 +37,12 @@ export function OrganizationCard({
     currentUserOrganizations = [],
 }: OrganizationCardProps) {
     const [isRequesting, setIsRequesting] = useState(false);
-    
+
     const isAlreadyMember = currentUserOrganizations.includes(organization.id);
-    
+
     const handleJoinRequest = async () => {
         if (isRequesting || isAlreadyMember) return;
-        
+
         setIsRequesting(true);
         try {
             await onJoinRequest(organization.id);
@@ -55,30 +58,22 @@ export function OrganizationCard({
         <Card className="h-full transition-all hover:shadow-md">
             <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
-                    <div className="flex items-center space-x-2 min-w-0 flex-1">
-                        <Building className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                    <div className="flex min-w-0 flex-1 items-center space-x-2">
+                        <Building className="h-5 w-5 flex-shrink-0 text-muted-foreground" />
                         <div className="min-w-0 flex-1">
-                            <CardTitle className="text-lg leading-tight truncate">
-                                {organization.name}
-                            </CardTitle>
-                            <CardDescription className="text-sm mt-1 truncate">
-                                @{organization.slug}
-                            </CardDescription>
+                            <CardTitle className="truncate text-lg leading-tight">{organization.name}</CardTitle>
+                            <CardDescription className="mt-1 truncate text-sm">@{organization.slug}</CardDescription>
                         </div>
                     </div>
-                    <Badge variant="outline" className={`text-xs ${businessTypeColor} flex-shrink-0 ml-2`}>
+                    <Badge variant="outline" className={`text-xs ${businessTypeColor} ml-2 flex-shrink-0`}>
                         {businessTypeLabel}
                     </Badge>
                 </div>
             </CardHeader>
 
             <CardContent className="pb-3">
-                {organization.description && (
-                    <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                        {organization.description}
-                    </p>
-                )}
-                
+                {organization.description && <p className="mb-3 line-clamp-2 text-sm text-muted-foreground">{organization.description}</p>}
+
                 <div className="flex items-center justify-between text-sm text-muted-foreground">
                     <div className="flex items-center space-x-1">
                         <Users className="h-4 w-4" />
@@ -86,24 +81,22 @@ export function OrganizationCard({
                             {organization.member_count} member{organization.member_count !== 1 ? 's' : ''}
                         </span>
                     </div>
-                    
-                    <div className="text-xs">
-                        Created {new Date(organization.created_at).toLocaleDateString()}
-                    </div>
+
+                    <div className="text-xs">Created {new Date(organization.created_at).toLocaleDateString()}</div>
                 </div>
             </CardContent>
 
             {showJoinButton && (
                 <CardFooter className="pt-3">
-                    <Button 
+                    <Button
                         onClick={handleJoinRequest}
                         disabled={isRequesting || isLoading || isAlreadyMember}
                         className="w-full"
-                        variant={isAlreadyMember ? "outline" : "default"}
+                        variant={isAlreadyMember ? 'outline' : 'default'}
                     >
                         {isRequesting ? (
                             <>
-                                <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
+                                <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
                                 Requesting...
                             </>
                         ) : isAlreadyMember ? (

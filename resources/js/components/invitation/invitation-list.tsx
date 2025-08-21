@@ -1,20 +1,13 @@
 import React from 'react';
+
+import { Invitation } from '@/types';
+import { AlertTriangle, Calendar, CheckCircle, Clock, Mail, RotateCcw, User, XCircle } from 'lucide-react';
+
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { 
-    CheckCircle, 
-    XCircle, 
-    Clock, 
-    AlertTriangle, 
-    Mail, 
-    RotateCcw, 
-    User,
-    Calendar
-} from 'lucide-react';
-import { Invitation } from '@/types';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 interface InvitationListProps {
     invitations: Invitation[];
@@ -38,20 +31,20 @@ const InvitationList: React.FC<InvitationListProps> = ({
     statusFilter,
     onStatusChange,
     onPageChange,
-    onInvitationAction
+    onInvitationAction,
 }) => {
     // Get status badge color and icon
     const getStatusBadge = (status: string) => {
         const variants = {
-            pending: { variant: 'secondary' as const, icon: <Clock className="w-3 h-3" />, color: 'text-yellow-600' },
-            accepted: { variant: 'success' as const, icon: <CheckCircle className="w-3 h-3" />, color: 'text-green-600' },
-            declined: { variant: 'destructive' as const, icon: <XCircle className="w-3 h-3" />, color: 'text-red-600' },
-            expired: { variant: 'outline' as const, icon: <AlertTriangle className="w-3 h-3" />, color: 'text-gray-600' },
-            cancelled: { variant: 'outline' as const, icon: <XCircle className="w-3 h-3" />, color: 'text-gray-600' }
+            pending: { variant: 'secondary' as const, icon: <Clock className="h-3 w-3" />, color: 'text-yellow-600' },
+            accepted: { variant: 'success' as const, icon: <CheckCircle className="h-3 w-3" />, color: 'text-green-600' },
+            declined: { variant: 'destructive' as const, icon: <XCircle className="h-3 w-3" />, color: 'text-red-600' },
+            expired: { variant: 'outline' as const, icon: <AlertTriangle className="h-3 w-3" />, color: 'text-gray-600' },
+            cancelled: { variant: 'outline' as const, icon: <XCircle className="h-3 w-3" />, color: 'text-gray-600' },
         };
 
         const config = variants[status as keyof typeof variants] || variants.pending;
-        
+
         return (
             <Badge variant={config.variant} className={`flex items-center gap-1 ${config.color}`}>
                 {config.icon}
@@ -68,7 +61,7 @@ const InvitationList: React.FC<InvitationListProps> = ({
             MANAGER: 'bg-blue-100 text-blue-800',
             OPERATIONS: 'bg-green-100 text-green-800',
             FINANCE: 'bg-yellow-100 text-yellow-800',
-            VIEWER: 'bg-gray-100 text-gray-800'
+            VIEWER: 'bg-gray-100 text-gray-800',
         };
 
         const colorClass = roleColors[role as keyof typeof roleColors] || roleColors.VIEWER;
@@ -87,7 +80,7 @@ const InvitationList: React.FC<InvitationListProps> = ({
             month: 'short',
             day: 'numeric',
             hour: '2-digit',
-            minute: '2-digit'
+            minute: '2-digit',
         });
     };
 
@@ -120,18 +113,15 @@ const InvitationList: React.FC<InvitationListProps> = ({
             </CardHeader>
             <CardContent>
                 {loading ? (
-                    <div className="flex items-center justify-center h-32">
-                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+                    <div className="flex h-32 items-center justify-center">
+                        <div className="h-6 w-6 animate-spin rounded-full border-b-2 border-primary"></div>
                     </div>
                 ) : invitations.length === 0 ? (
-                    <div className="text-center py-8">
-                        <Mail className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <div className="py-8 text-center">
+                        <Mail className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
                         <h3 className="text-lg font-medium">No invitations found</h3>
-                        <p className="text-muted-foreground mt-1">
-                            {statusFilter === 'all' 
-                                ? 'Start by inviting users to your organization.' 
-                                : `No ${statusFilter} invitations found.`
-                            }
+                        <p className="mt-1 text-muted-foreground">
+                            {statusFilter === 'all' ? 'Start by inviting users to your organization.' : `No ${statusFilter} invitations found.`}
                         </p>
                     </div>
                 ) : (
@@ -157,14 +147,12 @@ const InvitationList: React.FC<InvitationListProps> = ({
                                                 <span className="font-medium">{invitation.email}</span>
                                             </div>
                                         </TableCell>
-                                        <TableCell>
-                                            {getRoleBadge(invitation.role)}
-                                        </TableCell>
+                                        <TableCell>{getRoleBadge(invitation.role)}</TableCell>
                                         <TableCell>
                                             {getStatusBadge(invitation.status)}
                                             {invitation.status === 'pending' && isExpired(invitation) && (
                                                 <Badge variant="outline" className="ml-2 text-red-600">
-                                                    <AlertTriangle className="w-3 h-3 mr-1" />
+                                                    <AlertTriangle className="mr-1 h-3 w-3" />
                                                     Expired
                                                 </Badge>
                                             )}
@@ -178,7 +166,7 @@ const InvitationList: React.FC<InvitationListProps> = ({
                                                     </span>
                                                 </div>
                                             ) : (
-                                                <span className="text-muted-foreground text-sm">Unknown</span>
+                                                <span className="text-sm text-muted-foreground">Unknown</span>
                                             )}
                                         </TableCell>
                                         <TableCell>
@@ -190,7 +178,7 @@ const InvitationList: React.FC<InvitationListProps> = ({
                                         <TableCell>
                                             <div className="flex items-center gap-2">
                                                 <Calendar className="h-4 w-4 text-muted-foreground" />
-                                                <span className={`text-sm ${isExpired(invitation) ? 'text-red-600 font-medium' : ''}`}>
+                                                <span className={`text-sm ${isExpired(invitation) ? 'font-medium text-red-600' : ''}`}>
                                                     {formatDate(invitation.expires_at)}
                                                 </span>
                                             </div>
@@ -219,12 +207,14 @@ const InvitationList: React.FC<InvitationListProps> = ({
                                                 )}
                                                 {invitation.status === 'accepted' && (
                                                     <Badge variant="success" className="text-green-600">
-                                                        <CheckCircle className="w-3 h-3 mr-1" />
+                                                        <CheckCircle className="mr-1 h-3 w-3" />
                                                         Joined
                                                     </Badge>
                                                 )}
-                                                {(invitation.status === 'declined' || invitation.status === 'expired' || invitation.status === 'cancelled') && (
-                                                    <span className="text-muted-foreground text-sm">No actions</span>
+                                                {(invitation.status === 'declined' ||
+                                                    invitation.status === 'expired' ||
+                                                    invitation.status === 'cancelled') && (
+                                                    <span className="text-sm text-muted-foreground">No actions</span>
                                                 )}
                                             </div>
                                         </TableCell>
@@ -235,9 +225,10 @@ const InvitationList: React.FC<InvitationListProps> = ({
 
                         {/* Pagination */}
                         {meta.last_page > 1 && (
-                            <div className="flex items-center justify-between mt-6">
+                            <div className="mt-6 flex items-center justify-between">
                                 <p className="text-sm text-muted-foreground">
-                                    Showing {((meta.current_page - 1) * meta.per_page) + 1} to {Math.min(meta.current_page * meta.per_page, meta.total)} of {meta.total} invitations
+                                    Showing {(meta.current_page - 1) * meta.per_page + 1} to {Math.min(meta.current_page * meta.per_page, meta.total)}{' '}
+                                    of {meta.total} invitations
                                 </p>
                                 <div className="flex items-center gap-2">
                                     <Button

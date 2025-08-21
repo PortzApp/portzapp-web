@@ -1,9 +1,11 @@
-import { Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import { CheckCircle, Clock, XCircle } from 'lucide-react';
+
 import { cn } from '@/lib/utils';
 
+import { Badge } from '@/components/ui/badge';
+
 interface JoinRequestStatusProps {
-    status: 'pending' | 'approved' | 'rejected';
+    status: 'pending' | 'approved' | 'rejected' | 'withdrawn';
     className?: string;
     size?: 'sm' | 'default' | 'lg';
     showIcon?: boolean;
@@ -29,15 +31,15 @@ const statusConfig = {
         className: 'bg-red-100 text-red-800 border-red-200',
         dotColor: 'bg-red-500',
     },
+    withdrawn: {
+        label: 'Withdrawn',
+        icon: XCircle,
+        className: 'bg-gray-100 text-gray-800 border-gray-200',
+        dotColor: 'bg-gray-500',
+    },
 };
 
-export function JoinRequestStatus({
-    status,
-    className,
-    size = 'default',
-    showIcon = true,
-    variant = 'badge',
-}: JoinRequestStatusProps) {
+export function JoinRequestStatus({ status, className, size = 'default', showIcon = true, variant = 'badge' }: JoinRequestStatusProps) {
     const config = statusConfig[status];
     const Icon = config.icon;
 
@@ -56,15 +58,15 @@ export function JoinRequestStatus({
     if (variant === 'inline') {
         return (
             <div className={cn('flex items-center gap-2', className)}>
-                {showIcon && (
-                    <div className={cn('w-2 h-2 rounded-full', config.dotColor)} />
-                )}
-                <span className={cn(
-                    'font-medium',
-                    status === 'pending' && 'text-yellow-700',
-                    status === 'approved' && 'text-green-700',
-                    status === 'rejected' && 'text-red-700'
-                )}>
+                {showIcon && <div className={cn('h-2 w-2 rounded-full', config.dotColor)} />}
+                <span
+                    className={cn(
+                        'font-medium',
+                        status === 'pending' && 'text-yellow-700',
+                        status === 'approved' && 'text-green-700',
+                        status === 'rejected' && 'text-red-700',
+                    )}
+                >
                     {config.label}
                 </span>
             </div>
@@ -72,18 +74,8 @@ export function JoinRequestStatus({
     }
 
     return (
-        <Badge 
-            variant="outline" 
-            className={cn(
-                config.className,
-                sizeClasses[size],
-                'font-medium border flex items-center gap-1.5',
-                className
-            )}
-        >
-            {showIcon && (
-                <Icon className={iconSizes[size]} />
-            )}
+        <Badge variant="outline" className={cn(config.className, sizeClasses[size], 'flex items-center gap-1.5 border font-medium', className)}>
+            {showIcon && <Icon className={iconSizes[size]} />}
             {config.label}
         </Badge>
     );
@@ -96,13 +88,7 @@ interface JoinRequestStatusWithDateProps extends JoinRequestStatusProps {
     showRelativeTime?: boolean;
 }
 
-export function JoinRequestStatusWithDate({
-    status,
-    createdAt,
-    updatedAt,
-    showRelativeTime = true,
-    ...props
-}: JoinRequestStatusWithDateProps) {
+export function JoinRequestStatusWithDate({ status, createdAt, updatedAt, showRelativeTime = true, ...props }: JoinRequestStatusWithDateProps) {
     const formatDate = (date: string) => {
         return new Date(date).toLocaleDateString('en-US', {
             month: 'short',
@@ -115,23 +101,23 @@ export function JoinRequestStatusWithDate({
         const now = new Date();
         const then = new Date(date);
         const diffInHours = Math.floor((now.getTime() - then.getTime()) / (1000 * 60 * 60));
-        
+
         if (diffInHours < 1) return 'Just now';
         if (diffInHours < 24) return `${diffInHours}h ago`;
-        
+
         const diffInDays = Math.floor(diffInHours / 24);
         if (diffInDays < 7) return `${diffInDays}d ago`;
-        
+
         const diffInWeeks = Math.floor(diffInDays / 7);
         if (diffInWeeks < 4) return `${diffInWeeks}w ago`;
-        
+
         const diffInMonths = Math.floor(diffInDays / 30);
         return `${diffInMonths}mo ago`;
     };
 
-    const relevantDate = status === 'pending' ? createdAt : (updatedAt || createdAt);
+    const relevantDate = status === 'pending' ? createdAt : updatedAt || createdAt;
     const dateText = showRelativeTime ? getRelativeTime(relevantDate) : formatDate(relevantDate);
-    
+
     return (
         <div className="flex items-center gap-3">
             <JoinRequestStatus status={status} {...props} />

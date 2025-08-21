@@ -1,13 +1,8 @@
-import React, { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
+import React, { createContext, ReactNode, useContext, useEffect, useReducer } from 'react';
+
+import { User } from '@/types';
 
 // Types
-interface User {
-    id: string;
-    first_name: string;
-    last_name: string;
-    email: string;
-    onboarding_status: string;
-}
 
 interface BusinessType {
     value: string;
@@ -115,7 +110,7 @@ interface OnboardingContextType {
 const OnboardingContext = createContext<OnboardingContextType | null>(null);
 
 // Storage key function - user-specific storage
-const getStorageKey = (userId: string | null): string | null => {
+const getStorageKey = (userId: string | number | null): string | null => {
     return userId ? `portzapp_onboarding_state_${userId}` : null;
 };
 
@@ -136,14 +131,12 @@ export function OnboardingProvider({ children, initialUser, initialBusinessTypes
     useEffect(() => {
         if (initialUser) {
             dispatch({ type: 'SET_USER', payload: initialUser });
-            
+
             // Check if this is a different user and clear invalid storage
-            const currentStorageKeys = Object.keys(localStorage).filter(key => 
-                key.startsWith('portzapp_onboarding_state_')
-            );
-            
+            const currentStorageKeys = Object.keys(localStorage).filter((key) => key.startsWith('portzapp_onboarding_state_'));
+
             const currentUserKey = getStorageKey(initialUser.id);
-            currentStorageKeys.forEach(key => {
+            currentStorageKeys.forEach((key) => {
                 if (key !== currentUserKey) {
                     try {
                         const saved = localStorage.getItem(key);
@@ -153,12 +146,12 @@ export function OnboardingProvider({ children, initialUser, initialBusinessTypes
                             const savedTime = new Date(parsed.timestamp || 0);
                             const now = new Date();
                             const hoursDiff = (now.getTime() - savedTime.getTime()) / (1000 * 60 * 60);
-                            
+
                             if (hoursDiff >= 24 || parsed.userId !== initialUser.id) {
                                 localStorage.removeItem(key);
                             }
                         }
-                    } catch (error) {
+                    } catch {
                         // Remove corrupted data
                         localStorage.removeItem(key);
                     }
@@ -173,7 +166,7 @@ export function OnboardingProvider({ children, initialUser, initialBusinessTypes
     // Load from storage on mount
     useEffect(() => {
         loadFromStorage();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // Auto-save to storage when state changes
@@ -181,7 +174,7 @@ export function OnboardingProvider({ children, initialUser, initialBusinessTypes
         if (state.currentStep !== 'choose-action' || state.organizationData || state.invitations.length > 0) {
             saveToStorage();
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [state]);
 
     // Helper functions
@@ -269,7 +262,7 @@ export function OnboardingProvider({ children, initialUser, initialBusinessTypes
         try {
             const currentUserId = state.user?.id || initialUser?.id;
             const storageKey = getStorageKey(currentUserId || null);
-            
+
             if (!storageKey || !currentUserId) {
                 console.warn('Cannot load onboarding state: no user ID available');
                 return;
@@ -278,19 +271,19 @@ export function OnboardingProvider({ children, initialUser, initialBusinessTypes
             const saved = localStorage.getItem(storageKey);
             if (saved) {
                 const parsed = JSON.parse(saved);
-                
+
                 // Validate that the saved data belongs to the current user
                 if (parsed.userId && parsed.userId !== currentUserId) {
                     console.warn('Onboarding state userId mismatch, clearing storage');
                     clearStorage();
                     return;
                 }
-                
+
                 // Check if data is not too old (24 hours)
                 const savedTime = new Date(parsed.timestamp || 0);
                 const now = new Date();
                 const hoursDiff = (now.getTime() - savedTime.getTime()) / (1000 * 60 * 60);
-                
+
                 if (hoursDiff < 24) {
                     dispatch({ type: 'LOAD_FROM_STORAGE', payload: parsed });
                 } else {
@@ -308,7 +301,7 @@ export function OnboardingProvider({ children, initialUser, initialBusinessTypes
         try {
             const currentUserId = state.user?.id || initialUser?.id;
             const storageKey = getStorageKey(currentUserId || null);
-            
+
             if (storageKey) {
                 localStorage.removeItem(storageKey);
             }
@@ -320,7 +313,7 @@ export function OnboardingProvider({ children, initialUser, initialBusinessTypes
     // Clear all onboarding storage for any user (useful on logout)
     const clearAllOnboardingStorage = () => {
         try {
-            Object.keys(localStorage).forEach(key => {
+            Object.keys(localStorage).forEach((key) => {
                 if (key.startsWith('portzapp_onboarding_state_')) {
                     localStorage.removeItem(key);
                 }
@@ -349,11 +342,7 @@ export function OnboardingProvider({ children, initialUser, initialBusinessTypes
         clearAllOnboardingStorage,
     };
 
-    return (
-        <OnboardingContext.Provider value={contextValue}>
-            {children}
-        </OnboardingContext.Provider>
-    );
+    return <OnboardingContext.Provider value={contextValue}>{children}</OnboardingContext.Provider>;
 }
 
 // Hook to use the context

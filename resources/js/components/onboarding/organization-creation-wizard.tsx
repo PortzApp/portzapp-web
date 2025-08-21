@@ -1,13 +1,14 @@
 import { useState } from 'react';
-import { router } from '@inertiajs/react';
-import { Building2, Users, CheckCircle } from 'lucide-react';
 
 import { User } from '@/types';
+import { router } from '@inertiajs/react';
+import { Building2, CheckCircle, Users } from 'lucide-react';
 
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import OrganizationSetupForm from './organization-setup-form';
+
 import JoinOrganizationForm from './join-organization-form';
 import MemberInviteForm from './member-invite-form';
+import OrganizationSetupForm from './organization-setup-form';
 
 interface Props {
     user: User;
@@ -74,47 +75,41 @@ export default function OrganizationCreationWizard({ businessTypes }: Props) {
             case 'choose-action':
                 return (
                     <div className="space-y-6">
-                        <div className="text-center space-y-2">
+                        <div className="space-y-2 text-center">
                             <h2 className="text-2xl font-semibold">Let's get you started</h2>
-                            <p className="text-muted-foreground">
-                                Choose how you'd like to proceed with PortzApp
-                            </p>
+                            <p className="text-muted-foreground">Choose how you'd like to proceed with PortzApp</p>
                         </div>
 
                         <div className="grid gap-4">
-                            <Card 
-                                className="cursor-pointer transition-colors hover:bg-muted/50 border-2 hover:border-primary/20"
+                            <Card
+                                className="cursor-pointer border-2 transition-colors hover:border-primary/20 hover:bg-muted/50"
                                 onClick={() => handleActionChoice('create')}
                             >
                                 <CardHeader className="pb-4">
                                     <div className="flex items-center space-x-3">
-                                        <div className="p-2 bg-primary/10 rounded-lg">
+                                        <div className="rounded-lg bg-primary/10 p-2">
                                             <Building2 className="h-6 w-6 text-primary" />
                                         </div>
                                         <div>
                                             <CardTitle className="text-lg">Create Organization</CardTitle>
-                                            <CardDescription>
-                                                Set up a new organization and invite your team
-                                            </CardDescription>
+                                            <CardDescription>Set up a new organization and invite your team</CardDescription>
                                         </div>
                                     </div>
                                 </CardHeader>
                             </Card>
 
-                            <Card 
-                                className="cursor-pointer transition-colors hover:bg-muted/50 border-2 hover:border-primary/20"
+                            <Card
+                                className="cursor-pointer border-2 transition-colors hover:border-primary/20 hover:bg-muted/50"
                                 onClick={() => handleActionChoice('join')}
                             >
                                 <CardHeader className="pb-4">
                                     <div className="flex items-center space-x-3">
-                                        <div className="p-2 bg-primary/10 rounded-lg">
+                                        <div className="rounded-lg bg-primary/10 p-2">
                                             <Users className="h-6 w-6 text-primary" />
                                         </div>
                                         <div>
                                             <CardTitle className="text-lg">Join Organization</CardTitle>
-                                            <CardDescription>
-                                                Join an existing organization with an invitation code
-                                            </CardDescription>
+                                            <CardDescription>Join an existing organization with an invitation code</CardDescription>
                                         </div>
                                     </div>
                                 </CardHeader>
@@ -126,11 +121,9 @@ export default function OrganizationCreationWizard({ businessTypes }: Props) {
             case 'create-organization':
                 return (
                     <div className="space-y-6">
-                        <div className="text-center space-y-2">
+                        <div className="space-y-2 text-center">
                             <h2 className="text-2xl font-semibold">Create Your Organization</h2>
-                            <p className="text-muted-foreground">
-                                Set up your organization details and get started
-                            </p>
+                            <p className="text-muted-foreground">Set up your organization details and get started</p>
                         </div>
 
                         <OrganizationSetupForm
@@ -144,30 +137,24 @@ export default function OrganizationCreationWizard({ businessTypes }: Props) {
             case 'join-organization':
                 return (
                     <div className="space-y-6">
-                        <div className="text-center space-y-2">
+                        <div className="space-y-2 text-center">
                             <h2 className="text-2xl font-semibold">Join Organization</h2>
-                            <p className="text-muted-foreground">
-                                Enter your invitation details or request to join an organization
-                            </p>
+                            <p className="text-muted-foreground">Enter your invitation details or request to join an organization</p>
                         </div>
 
-                        <JoinOrganizationForm
-                            onCancel={() => setCurrentStep('choose-action')}
-                        />
+                        <JoinOrganizationForm onCancel={() => setCurrentStep('choose-action')} />
                     </div>
                 );
 
             case 'invite-members':
                 return (
                     <div className="space-y-6">
-                        <div className="text-center space-y-2">
-                            <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                        <div className="space-y-2 text-center">
+                            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
                                 <CheckCircle className="h-8 w-8 text-green-600" />
                             </div>
                             <h2 className="text-2xl font-semibold">Organization Created Successfully!</h2>
-                            <p className="text-muted-foreground">
-                                Your organization "{organizationData?.name}" is ready to use
-                            </p>
+                            <p className="text-muted-foreground">Your organization "{organizationData?.name}" is ready to use</p>
                         </div>
 
                         {organizationData?.id && (
@@ -186,9 +173,5 @@ export default function OrganizationCreationWizard({ businessTypes }: Props) {
         }
     };
 
-    return (
-        <div className="w-full max-w-2xl mx-auto">
-            {renderStepContent()}
-        </div>
-    );
+    return <div className="mx-auto w-full max-w-2xl">{renderStepContent()}</div>;
 }
