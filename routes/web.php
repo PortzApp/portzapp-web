@@ -11,6 +11,14 @@ use App\Http\Controllers\VesselController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
+// Security.txt route
+Route::get('/.well-known/security.txt', function () {
+    $content = file_get_contents(public_path('.well-known/security.txt'));
+
+    return response($content, 200)
+        ->header('Content-Type', 'text/plain; charset=UTF-8');
+});
+
 Route::get('/', function () {
     return Inertia::render('welcome');
 })->name('home');
@@ -19,6 +27,13 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
+
+    // Onboarding routes
+    Route::prefix('onboarding')->name('onboarding.')->group(function (): void {
+        Route::get('/', [\App\Http\Controllers\OnboardingController::class, 'index'])->name('index');
+        Route::get('/{step}', [\App\Http\Controllers\OnboardingController::class, 'show'])->name('show');
+        Route::patch('/', [\App\Http\Controllers\OnboardingController::class, 'update'])->name('update');
+    });
 
     Route::put('/user/current-organization', SwitchOrganization::class)->name('user.current-organization.update');
 
@@ -86,7 +101,16 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
         Route::post('organizations/{organization}/members', [OrganizationController::class, 'addMember'])->name('organizations.members.add');
         Route::delete('organizations/{organization}/members/{user}', [OrganizationController::class, 'removeMember'])->name('organizations.members.remove');
         Route::put('organizations/{organization}/members/{user}/role', [OrganizationController::class, 'updateMemberRole'])->name('organizations.members.role.update');
+
     });
+
+    // Organization slug API routes (available to all authenticated users)
+    Route::post('api/organizations/check-slug', [\App\Http\Controllers\OrganizationController::class, 'checkSlugAvailability'])->name('organizations.slug.check');
+    Route::post('api/organizations/generate-slug', [\App\Http\Controllers\OrganizationController::class, 'generateSlug'])->name('organizations.slug.generate');
+
+    // Organization creation from onboarding flow
+    Route::post('api/organizations/create-from-onboarding', [\App\Http\Controllers\OrganizationController::class, 'storeFromOnboarding'])->name('organizations.store.onboarding');
+
 });
 
 require __DIR__.'/settings.php';
