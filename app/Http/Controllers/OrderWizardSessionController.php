@@ -178,9 +178,11 @@ class OrderWizardSessionController extends Controller
 
         // Create category selections for EACH selected sub-category (not just unique parent categories)
         foreach ($subCategories as $index => $subCategory) {
-            $session->categorySelections()->create([
-                'service_category_id' => $subCategory->service_category_id,
+            $session->categorySelections()->updateOrCreate([
+                'session_id' => $session->id,
                 'service_sub_category_id' => $subCategory->id,
+            ], [
+                'service_category_id' => $subCategory->service_category_id,
                 'order_index' => $index,
             ]);
         }
