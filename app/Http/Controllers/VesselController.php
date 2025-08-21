@@ -18,7 +18,10 @@ class VesselController extends Controller
         Gate::authorize('view-any', Vessel::class);
 
         return Inertia::render('vessels/vessels-index-page', [
-            'vessels' => Vessel::query()->latest()->get(),
+            'vessels' => Vessel::query()
+                ->where('organization_id', auth()->user()->current_organization_id)
+                ->latest()
+                ->get(),
         ]);
     }
 

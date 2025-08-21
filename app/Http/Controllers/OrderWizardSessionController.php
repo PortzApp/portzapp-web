@@ -153,9 +153,7 @@ class OrderWizardSessionController extends Controller
 
         $session->load(['vessel', 'port', 'categorySelections.serviceCategory', 'serviceSelections.service']);
 
-        return back()->with([
-            'session' => $session,
-        ]);
+        return to_route('order-wizard.step.categories', ['session' => $session->id]);
     }
 
     /**
@@ -373,8 +371,10 @@ class OrderWizardSessionController extends Controller
         // Get vessels for the user's current organization
         $vessels = Vessel::where('organization_id', $user->current_organization_id)->get();
 
-        // Get all ports
-        $ports = Port::orderBy('name')->get();
+        // Get all ports with active service counts
+        $ports = Port::withCount(['services' => function ($query) {
+            $query->where('status', 'active');
+        }])->orderBy('name')->get();
 
         return Inertia::render('orders/wizard/order-wizard-step-vessel-port', [
             'session' => $session->load(['vessel', 'port']),
@@ -453,7 +453,6 @@ class OrderWizardSessionController extends Controller
             ->where('port_id', $session->port_id)  // Filter by selected port
             ->whereIn('service_sub_category_id', $selectedSubCategoryIds)  // Filter by selected sub-categories directly
             ->orderBy('organization_id')  // Group by organization
-            ->orderBy('name')
             ->get();
 
         return Inertia::render('orders/wizard/order-wizard-step-services', [
@@ -526,8 +525,10 @@ class OrderWizardSessionController extends Controller
         // Get vessels for the user's current organization
         $vessels = Vessel::where('organization_id', $user->current_organization_id)->get();
 
-        // Get all ports
-        $ports = Port::orderBy('name')->get();
+        // Get all ports with active service counts
+        $ports = Port::withCount(['services' => function ($query) {
+            $query->where('status', 'active');
+        }])->orderBy('name')->get();
 
         // Get service categories
         $serviceCategories = ServiceCategory::orderBy('name')->get();
@@ -535,7 +536,6 @@ class OrderWizardSessionController extends Controller
         // Get all services with their organization and category relationships
         $services = Service::with(['organization', 'subCategory.category'])
             ->where('status', 'active')
-            ->orderBy('name')
             ->get();
 
         return Inertia::render('orders/wizard/order-wizard-flow', [
