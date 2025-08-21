@@ -116,6 +116,30 @@ describe('VesselController index', function (): void {
             ->where('vessels.0.name', 'Newer Vessel') // Should be first
         );
     });
+
+    it('only shows vessels from the current user organization', function (): void {
+        // User from org1 should only see vessels from their organization
+        $response = $this->actingAs($this->vesselOwnerAdmin)
+            ->get(route('vessels.index'));
+
+        $response->assertSuccessful();
+        $response->assertInertia(fn ($page) => $page
+            ->has('vessels') // Should have vessels
+            ->where('vessels', fn ($vessels) => collect($vessels)->every(fn ($vessel) => $vessel['organization_id'] === $this->vesselOwnerOrg->id)
+            )
+        );
+
+        // User from org2 should only see vessels from their organization
+        $response = $this->actingAs($this->vesselOwner2Admin)
+            ->get(route('vessels.index'));
+
+        $response->assertSuccessful();
+        $response->assertInertia(fn ($page) => $page
+            ->has('vessels') // Should have vessels
+            ->where('vessels', fn ($vessels) => collect($vessels)->every(fn ($vessel) => $vessel['organization_id'] === $this->vesselOwnerOrg2->id)
+            )
+        );
+    });
 });
 
 describe('VesselController create', function (): void {

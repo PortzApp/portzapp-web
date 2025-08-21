@@ -12,50 +12,42 @@ test('new users can register', function (): void {
         'last_name' => 'Test Last Name',
         'email' => 'test@example.com',
         'phone_number' => '+971 55 1234567',
-        'company_name' => 'Test Company Name',
-        'company_registration_code' => 'REG-TEST001',
         'password' => 'password',
         'password_confirmation' => 'password',
-        'user_role' => 'admin',
-        'organization_business_type' => 'vessel_owner',
     ]);
 
     $this->assertAuthenticated();
-    $response->assertRedirect(route('dashboard', absolute: false));
+    $response->assertRedirect(route('onboarding.index', absolute: false));
 });
 
-test('users can register as shipping agency admin', function (): void {
+test('users can register with valid phone number', function (): void {
     $response = $this->post('/register', [
         'first_name' => 'Agency Admin',
         'last_name' => 'User',
         'email' => 'admin@shipping.com',
         'phone_number' => '+971 55 9876543',
-        'company_name' => 'Test Shipping Agency',
-        'company_registration_code' => 'REG-SHIP001',
         'password' => 'password',
         'password_confirmation' => 'password',
-        'user_role' => 'admin',
-        'organization_business_type' => 'shipping_agency',
     ]);
 
     $this->assertAuthenticated();
-    $response->assertRedirect(route('dashboard', absolute: false));
+    $response->assertRedirect(route('onboarding.index', absolute: false));
 });
 
-test('users can register as organization member', function (): void {
+test('users get onboarding status after registration', function (): void {
     $response = $this->post('/register', [
         'first_name' => 'Team',
         'last_name' => 'Member',
         'email' => 'member@company.com',
         'phone_number' => '+971 55 5555555',
-        'company_name' => 'Test Vessel Company',
-        'company_registration_code' => 'REG-VESSEL001',
         'password' => 'password',
         'password_confirmation' => 'password',
-        'user_role' => 'viewer',
-        'organization_business_type' => 'vessel_owner',
     ]);
 
     $this->assertAuthenticated();
-    $response->assertRedirect(route('dashboard', absolute: false));
+    $response->assertRedirect(route('onboarding.index', absolute: false));
+
+    // Verify user has pending onboarding status (ready to start onboarding)
+    $user = \App\Models\User::where('email', 'member@company.com')->first();
+    expect($user->onboarding_status)->toBe(\App\Enums\OnboardingStatus::PENDING);
 });
