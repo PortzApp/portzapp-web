@@ -29,6 +29,7 @@ class UserPolicy
         }
 
         // Check if both users are in the same organization and requester has admin role
+        /** @var \App\Models\Organization|null $organization */
         $organization = $user->currentOrganization;
         if (! $organization) {
             return false;
@@ -61,6 +62,7 @@ class UserPolicy
         }
 
         // Admins and CEOs can update any user in their organization
+        /** @var \App\Models\Organization|null $organization */
         $organization = $user->currentOrganization;
         if (! $organization) {
             return false;
@@ -82,6 +84,7 @@ class UserPolicy
         }
 
         // Only admins and CEOs can remove members
+        /** @var \App\Models\Organization|null $organization */
         $organization = $user->currentOrganization;
         if (! $organization) {
             return false;

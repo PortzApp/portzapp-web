@@ -18,7 +18,7 @@ class OnboardingController extends Controller
      */
     public function index(): Response|RedirectResponse
     {
-        Gate::authorize('view', Auth::user(), Auth::user());
+        Gate::authorize('view', Auth::user());
 
         $user = Auth::user();
 
@@ -29,7 +29,7 @@ class OnboardingController extends Controller
 
         return Inertia::render('Onboarding/Index', [
             'user' => $user->only(['id', 'first_name', 'last_name', 'email', 'onboarding_status']),
-            'onboardingStatus' => $user->onboarding_status->value,
+            'onboardingStatus' => $user->onboarding_status,
             'businessTypes' => collect(OrganizationBusinessType::cases())->map(fn ($type) => [
                 'value' => $type->value,
                 'label' => $type->label(),
@@ -42,7 +42,7 @@ class OnboardingController extends Controller
      */
     public function show(string $step): Response|RedirectResponse
     {
-        Gate::authorize('view', Auth::user(), Auth::user());
+        Gate::authorize('view', Auth::user());
 
         $user = Auth::user();
 
@@ -60,7 +60,7 @@ class OnboardingController extends Controller
         return Inertia::render("Onboarding/{$step}", [
             'user' => $user->only(['id', 'first_name', 'last_name', 'email', 'onboarding_status']),
             'currentStep' => $step,
-            'onboardingStatus' => $user->onboarding_status->value,
+            'onboardingStatus' => $user->onboarding_status,
         ]);
     }
 
@@ -69,7 +69,7 @@ class OnboardingController extends Controller
      */
     public function update(Request $request): RedirectResponse
     {
-        Gate::authorize('update', Auth::user(), Auth::user());
+        Gate::authorize('update', Auth::user());
 
         $validated = $request->validate([
             'onboarding_status' => ['required', 'string', 'in:in_progress,completed'],
@@ -84,7 +84,7 @@ class OnboardingController extends Controller
 
         // If completed, redirect to dashboard with welcome message
         if ($validated['onboarding_status'] === 'completed') {
-            $organizationName = $user->currentOrganization?->name ?? 'your organization';
+            $organizationName = $user->currentOrganization->name ?? 'your organization';
             $welcomeMessage = "Welcome to PortzApp! You're all set up with {$organizationName}.";
 
             return redirect()->route('dashboard')->with([

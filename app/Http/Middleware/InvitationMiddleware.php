@@ -3,16 +3,12 @@
 namespace App\Http\Middleware;
 
 use App\Models\Invitation;
-use App\Services\InvitationTokenService;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class InvitationMiddleware
 {
-    public function __construct(
-        private InvitationTokenService $tokenService
-    ) {}
 
     /**
      * Handle an incoming request.

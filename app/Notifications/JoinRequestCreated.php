@@ -29,15 +29,21 @@ class JoinRequestCreated extends Notification implements ShouldQueue
      */
     public function toMail(object $notifiable): MailMessage
     {
+        /** @var \App\Models\Organization $organization */
         $organization = $this->joinRequest->organization;
-        $user = $this->joinRequest->user;
+        
+        /** @var \App\Models\User $requestingUser */
+        $requestingUser = $this->joinRequest->user;
+        
+        /** @var \App\Models\User $recipient */
+        $recipient = $notifiable;
 
         return (new MailMessage)
             ->subject("New Join Request for {$organization->name}")
-            ->greeting("Hello {$notifiable->first_name},")
+            ->greeting("Hello {$recipient->first_name},")
             ->line('A new user has requested to join your organization.')
-            ->line("**User:** {$user->first_name} {$user->last_name}")
-            ->line("**Email:** {$user->email}")
+            ->line("**User:** {$requestingUser->first_name} {$requestingUser->last_name}")
+            ->line("**Email:** {$requestingUser->email}")
             ->line("**Organization:** {$organization->name}")
             ->when($this->joinRequest->message, function ($mail) {
                 return $mail->line("**Message:** {$this->joinRequest->message}");

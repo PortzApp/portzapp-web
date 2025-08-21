@@ -27,12 +27,17 @@ class InvitationEmail extends Mailable implements ShouldQueue
      */
     public function envelope(): Envelope
     {
-        $organizationName = $this->invitation->organization->name;
+        /** @var \App\Models\Organization $organization */
+        $organization = $this->invitation->organization;
+        $organizationName = $organization->name;
+
+        /** @var \App\Models\User|null $invitedByUser */
+        $invitedByUser = $this->invitation->invitedByUser;
 
         return new Envelope(
             subject: "You're invited to join {$organizationName} on PortzApp",
             from: config('mail.from.address'),
-            replyTo: $this->invitation->invitedByUser?->email,
+            replyTo: $invitedByUser?->email ? [$invitedByUser->email] : [],
         );
     }
 

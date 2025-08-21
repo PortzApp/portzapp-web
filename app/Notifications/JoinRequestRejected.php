@@ -29,11 +29,15 @@ class JoinRequestRejected extends Notification implements ShouldQueue
      */
     public function toMail(object $notifiable): MailMessage
     {
+        /** @var \App\Models\Organization $organization */
         $organization = $this->joinRequest->organization;
+        
+        /** @var \App\Models\User $user */
+        $user = $notifiable;
 
         return (new MailMessage)
             ->subject("Join Request Update for {$organization->name}")
-            ->greeting("Hello {$notifiable->first_name},")
+            ->greeting("Hello {$user->first_name},")
             ->line("We received your request to join {$organization->name}.")
             ->line("After review, we're unable to approve your request at this time.")
             ->when($this->joinRequest->admin_notes, function ($mail) {
