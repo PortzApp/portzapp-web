@@ -52,3 +52,18 @@ export const VesselType = {
     CONTAINER: 'container',
 } as const;
 export type VesselType = (typeof VesselType)[keyof typeof VesselType];
+
+export const JoinRequestStatus = {
+    PENDING: 'pending',
+    APPROVED: 'approved',
+    REJECTED: 'rejected',
+    WITHDRAWN: 'withdrawn',
+} as const;
+export type JoinRequestStatus = (typeof JoinRequestStatus)[keyof typeof JoinRequestStatus];
+
+export const OnboardingStatus = {
+    PENDING: 'pending',
+    IN_PROGRESS: 'in_progress',
+    COMPLETED: 'completed',
+} as const;
+export type OnboardingStatus = (typeof OnboardingStatus)[keyof typeof OnboardingStatus];
