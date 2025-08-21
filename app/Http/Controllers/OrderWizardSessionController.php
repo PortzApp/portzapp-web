@@ -321,8 +321,7 @@ class OrderWizardSessionController extends Controller
 
             DB::commit();
 
-            return back()->with([
-                'order' => $order->load(['vessel', 'port', 'orderGroups.services']),
+            return to_route('orders.show', $order->id)->with([
                 'message' => 'Order created successfully!',
             ]);
         } catch (\Exception $e) {
