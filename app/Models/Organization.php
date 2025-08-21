@@ -54,8 +54,10 @@ class Organization extends Model
      */
     protected $fillable = [
         'name',
+        'slug',
         'registration_code',
         'business_type',
+        'description',
     ];
 
     /**
@@ -113,5 +115,21 @@ class Organization extends Model
         return [
             'business_type' => OrganizationBusinessType::class,
         ];
+    }
+
+    /**
+     * Get invitations for this organization.
+     */
+    public function invitations(): HasMany
+    {
+        return $this->hasMany(Invitation::class);
+    }
+
+    /**
+     * Get join requests for this organization.
+     */
+    public function joinRequests(): HasMany
+    {
+        return $this->hasMany(OrganizationJoinRequest::class);
     }
 }
