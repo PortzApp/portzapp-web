@@ -9,7 +9,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class InvitationMiddleware
 {
-
     /**
      * Handle an incoming request.
      * Check for pending invitations during login/registration flows.

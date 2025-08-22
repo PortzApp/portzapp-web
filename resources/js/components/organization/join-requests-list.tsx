@@ -161,7 +161,10 @@ export function JoinRequestsList({ initialRequests = [], isLoading: externalIsLo
                     />
                 </div>
 
-                <Select value={statusFilter} onValueChange={(value: string) => setStatusFilter(value as 'all' | 'pending' | 'approved' | 'rejected' | 'withdrawn')}>
+                <Select
+                    value={statusFilter}
+                    onValueChange={(value: string) => setStatusFilter(value as 'all' | 'pending' | 'approved' | 'rejected' | 'withdrawn')}
+                >
                     <SelectTrigger className="w-full sm:w-48">
                         <SelectValue placeholder="Filter by status" />
                     </SelectTrigger>

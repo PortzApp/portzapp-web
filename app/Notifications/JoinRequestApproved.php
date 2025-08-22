@@ -31,7 +31,7 @@ class JoinRequestApproved extends Notification implements ShouldQueue
     {
         /** @var \App\Models\Organization $organization */
         $organization = $this->joinRequest->organization;
-        
+
         /** @var \App\Models\User $user */
         $user = $notifiable;
 

@@ -28,7 +28,6 @@ interface Props {
     }>;
 }
 
-
 export default function MemberInviteForm({ organizationId, onSuccess, onSkip, availableRoles }: Props) {
     const [invites, setInvites] = useState<MemberInvite[]>([{ email: '', role: '' }]);
 

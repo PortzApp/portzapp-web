@@ -31,10 +31,10 @@ class JoinRequestCreated extends Notification implements ShouldQueue
     {
         /** @var \App\Models\Organization $organization */
         $organization = $this->joinRequest->organization;
-        
+
         /** @var \App\Models\User $requestingUser */
         $requestingUser = $this->joinRequest->user;
-        
+
         /** @var \App\Models\User $recipient */
         $recipient = $notifiable;
 

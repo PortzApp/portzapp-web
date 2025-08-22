@@ -15,7 +15,6 @@ interface Props {
     onCancel: () => void;
 }
 
-
 export default function JoinOrganizationForm({ onCancel }: Props) {
     const invitationForm = useForm({
         invitation_code: '',
