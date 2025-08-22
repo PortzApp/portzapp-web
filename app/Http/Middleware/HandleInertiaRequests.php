@@ -150,6 +150,11 @@ class HandleInertiaRequests extends Middleware
                     ],
                 ] : null,
             ],
+            'flash' => [
+                'data' => fn () => $request->session()->get('data'),
+                'message' => fn () => $request->session()->get('message'),
+                'error' => fn () => $request->session()->get('error'),
+            ],
             'ziggy' => fn (): array => [
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url(),

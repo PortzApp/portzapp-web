@@ -1,0 +1,10 @@
+Contact: security@portzapp.com
+Expires: 2025-12-31T23:59:59.000Z
+Encryption: https://keys.openpgp.org/vks/v1/by-fingerprint/
+Acknowledgments: https://portzapp.com/security/acknowledgments
+Preferred-Languages: en
+Canonical: https://portzapp.com/.well-known/security.txt
+Policy: https://portzapp.com/security/policy
+
+# Please report security vulnerabilities responsibly
+# We appreciate your help in keeping PortzApp secure

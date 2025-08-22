@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\OnboardingStatus;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -31,6 +32,7 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
+            'onboarding_status' => OnboardingStatus::COMPLETED, // Default to completed for existing test users
         ];
     }
 

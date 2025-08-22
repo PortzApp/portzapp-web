@@ -4,10 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Enums\OrganizationBusinessType;
 use App\Enums\UserRoles;
+use App\Http\Requests\StoreOrganizationRequest;
 use App\Models\Organization;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class OrganizationController extends Controller
@@ -56,11 +59,16 @@ class OrganizationController extends Controller
             'business_type' => ['required', 'in:'.implode(',', array_map(fn ($case) => $case->value, OrganizationBusinessType::cases()))],
         ]);
 
-        $organization = Organization::create([
-            'name' => $validated['name'],
-            'registration_code' => $validated['registration_code'],
-            'business_type' => OrganizationBusinessType::from($validated['business_type']),
-        ]);
+        // Generate slug from name
+        $baseSlug = Str::slug($validated['name']);
+        $slug = $this->generateUniqueSlugFromBase($baseSlug);
+
+        $organization = new Organization;
+        $organization->name = $validated['name'];
+        $organization->slug = $slug;
+        $organization->registration_code = $validated['registration_code'];
+        $organization->business_type = OrganizationBusinessType::from($validated['business_type']);
+        $organization->save();
 
         return redirect()->route('organizations.index')
             ->with('message', 'Organization created successfully!');
@@ -271,5 +279,119 @@ class OrganizationController extends Controller
         ]);
 
         return redirect()->back()->with('message', 'Member role updated successfully!');
+    }
+
+    /**
+     * Check if a slug is available for use.
+     */
+    public function checkSlugAvailability(Request $request): JsonResponse
+    {
+        Gate::authorize('create', Organization::class);
+
+        $request->validate([
+            'slug' => ['required', 'string', 'max:255', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/'],
+        ]);
+
+        $slug = $request->input('slug');
+        $exists = Organization::where('slug', $slug)->exists();
+
+        return response()->json([
+            'available' => ! $exists,
+            'slug' => $slug,
+        ]);
+    }
+
+    /**
+     * Generate a unique slug from organization name.
+     */
+    public function generateSlug(Request $request): JsonResponse
+    {
+        Gate::authorize('create', Organization::class);
+
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+        ]);
+
+        $name = $request->input('name');
+        $baseSlug = Str::slug($name);
+        $slug = $baseSlug;
+        $counter = 1;
+
+        // Find a unique slug by appending incremental numbers
+        while (Organization::where('slug', $slug)->exists()) {
+            $slug = $baseSlug.'-'.$counter;
+            $counter++;
+        }
+
+        return response()->json([
+            'slug' => $slug,
+            'original' => $baseSlug,
+            'modified' => $slug !== $baseSlug,
+        ]);
+    }
+
+    /**
+     * Store a newly created organization during onboarding flow.
+     */
+    public function storeFromOnboarding(StoreOrganizationRequest $request)
+    {
+        $validated = $request->validated();
+
+        // Use manual assignment due to model cache issues with fillable array
+        $organization = new Organization;
+        $organization->name = $validated['name'];
+        $organization->slug = $validated['slug'];
+        $organization->registration_code = $validated['registration_code'];
+        $organization->business_type = OrganizationBusinessType::from($validated['business_type']);
+
+        if (! empty($validated['description'])) {
+            $organization->description = $validated['description'];
+        }
+
+        $organization->save();
+
+        /** @var User $user */
+        $user = auth()->user();
+
+        // Add user to the organization as admin
+        $organization->users()->attach($user->id, [
+            'role' => UserRoles::ADMIN,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // Set as user's current organization
+        $user->update([
+            'current_organization_id' => $organization->id,
+        ]);
+
+        return back()->with([
+            'data' => [
+                'organization' => [
+                    'id' => $organization->id,
+                    'name' => $organization->name,
+                    'slug' => $organization->slug,
+                    'business_type' => $organization->business_type,
+                ],
+            ],
+            'message' => 'Organization created successfully!',
+        ]);
+    }
+
+    /**
+     * Generate a unique slug from a base slug.
+     */
+    private function generateUniqueSlugFromBase(string $baseSlug): string
+    {
+        $slug = $baseSlug;
+        $counter = 1;
+
+        // Find a unique slug by appending incremental numbers
+        while (Organization::where('slug', $slug)->exists()) {
+            $slug = $baseSlug.'-'.$counter;
+            $counter++;
+        }
+
+        return $slug;
     }
 }

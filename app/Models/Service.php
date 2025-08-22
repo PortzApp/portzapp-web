@@ -140,7 +140,7 @@ class Service extends Model
     #[Scope]
     protected function isActive(Builder $query): Builder
     {
-        return $query->where('status');
+        return $query->where('status', 'active');
     }
 
     /**

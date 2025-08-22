@@ -1,7 +1,7 @@
 import { LucideIcon } from 'lucide-react';
 
 import type { Config } from 'ziggy-js';
-import { OrganizationBusinessType, UserRoles } from '@/types/enums';
+import { OnboardingStatus, OrganizationBusinessType, UserRoles } from '@/types/enums';
 
 export interface SharedData {
     name: string;
@@ -32,6 +32,7 @@ export interface User {
     email: string;
     phone_number: string;
     email_verified_at: string | null;
+    onboarding_status: OnboardingStatus;
     current_organization: Organization | null;
     organizations: Organization[] | null;
     avatar: string | null;
@@ -74,4 +75,79 @@ export interface NavItem {
     href: string;
     icon?: LucideIcon | null;
     isActive?: boolean;
+    badge?: string;
+}
+
+// Organization Search Types
+export interface SearchableOrganization {
+    id: string;
+    name: string;
+    slug: string;
+    business_type: OrganizationBusinessType;
+    description?: string;
+    member_count: number;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface OrganizationSearchFilters {
+    query?: string;
+    business_type?: OrganizationBusinessType;
+    location?: string;
+}
+
+export interface OrganizationSearchResponse {
+    data: SearchableOrganization[];
+    meta: {
+        current_page: number;
+        last_page: number;
+        per_page: number;
+        total: number;
+        from: number;
+        to: number;
+    };
+}
+
+export interface JoinRequest {
+    id: string;
+    user_id: string;
+    organization_id: string;
+    message?: string;
+    status: 'pending' | 'approved' | 'rejected' | 'withdrawn';
+    admin_notes?: string;
+    approved_by?: string;
+    approved_at?: string;
+    rejected_by?: string;
+    rejected_at?: string;
+    created_at: string;
+    updated_at: string;
+    user?: Pick<User, 'id' | 'first_name' | 'last_name' | 'email'>;
+    organization?: Pick<SearchableOrganization, 'id' | 'name' | 'business_type'>;
+}
+
+export interface Invitation {
+    id: string;
+    type: 'user_invitation' | 'organization_invitation';
+    email: string;
+    invited_by_user_id: string;
+    organization_id: string;
+    role: UserRoles;
+    status: 'pending' | 'accepted' | 'declined' | 'expired' | 'cancelled';
+    token: string;
+    expires_at: string;
+    created_at: string;
+    updated_at: string;
+    metadata?: Record<string, unknown>;
+    invited_by_user?: Pick<User, 'id' | 'first_name' | 'last_name' | 'email'>;
+    organization?: Pick<SearchableOrganization, 'id' | 'name' | 'business_type'>;
+}
+
+export interface InvitationStatistics {
+    total: number;
+    pending: number;
+    accepted: number;
+    declined: number;
+    expired: number;
+    cancelled: number;
+    pending_expired: number;
 }

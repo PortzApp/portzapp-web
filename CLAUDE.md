@@ -31,18 +31,20 @@ composer run db:seed                # Alias for the above
 composer test                       # Run all tests (unit, lint, spellcheck, types, refactor)
 composer run test:unit              # Run Pest unit tests only
 composer run test:lint              # Run ESLint (frontend) and Pint (backend)
-composer run test:types             # Run PHPStan static analysis
+composer typecheck                  # Run PHPStan static analysis
 composer run test:spellcheck        # Run Peck spellchecker
 ```
 
 **IMPORTANT:** Use **Pest PHP** exclusively for all testing. Do not write PHPUnit tests. All tests should use Pest syntax with `it()`, `expect()`, and `describe()` functions.
+
+**CRITICAL:** When writing tests, ALWAYS use Pest - never PHPUnit. This is a strict requirement for all new tests and test modifications.
 
 **Linting and formatting:**
 
 ```bash
 npm run lint:fix                    # Fix ESLint issues
 npm run format:fix                  # Fix Prettier formatting
-composer run test:lint:backend      # Run Laravel Pint
+composer lint:backend               # Run Laravel Pint
 ```
 
 ## Architecture Overview
@@ -100,6 +102,14 @@ Access control patterns:
 - Use **shadcn/ui** components for all frontend UI components
 - shadcn/ui components are stored in `resources/js/components/ui/` folder
 - Always use **Lucide** icon library for icons on the frontend
+
+**Toast Notifications:**
+- Always use **Sonner** toasts via `import { toast } from 'sonner'` for all toast notifications
+- The `<Toaster />` component from `@/components/ui/sonner` is included in both `AppLayout` and `AuthLayout`
+- Pages using either layout can directly use `toast()` without adding `<Toaster />`
+- For standalone pages not using these layouts, add `<Toaster />` manually
+- Prefer the shadcn/ui components in `resources/js/components/ui/` directory for all UI needs
+- These are React components from shadcn/ui, pre-configured with our design system
 
 ### Database
 

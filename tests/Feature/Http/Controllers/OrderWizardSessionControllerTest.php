@@ -326,6 +326,32 @@ describe('OrderWizardSessionController setCategories', function (): void {
 
         $response->assertSessionHasErrors('selected_sub_categories.0');
     });
+
+    it('allows multiple sub-categories from the same parent category', function (): void {
+        // Create another sub-category under the same parent category
+        $secondSubCategory = ServiceSubCategory::factory()->create([
+            'service_category_id' => $this->serviceCategory->id,
+            'name' => 'Second Sub Category',
+        ]);
+
+        $data = [
+            'selected_sub_categories' => [$this->serviceSubCategory->id, $secondSubCategory->id],
+        ];
+
+        $response = $this->actingAs($this->vesselOwnerAdmin)
+            ->patch(route('order-wizard-sessions.categories', $this->wizardSession), $data);
+
+        $response->assertRedirect();
+
+        $this->wizardSession->refresh();
+        expect($this->wizardSession->current_step)->toBe(WizardStep::SERVICES);
+        expect($this->wizardSession->categorySelections)->toHaveCount(2);
+
+        // Both should have the same parent category but different sub-categories
+        $selections = $this->wizardSession->categorySelections;
+        expect($selections->pluck('service_category_id')->unique())->toHaveCount(1);
+        expect($selections->pluck('service_sub_category_id')->unique())->toHaveCount(2);
+    });
 });
 
 describe('OrderWizardSessionController setServices', function (): void {

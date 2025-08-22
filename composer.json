@@ -75,11 +75,10 @@
         "db:seed": "@php artisan migrate:fresh --seed",
         "test:unit": [
             "@php artisan config:clear --ansi",
-            "@php artisan test"
+            "php artisan test --parallel"
         ],
-        "test:coverage": "XDEBUG_MODE=coverage ./vendor/bin/pest --coverage",
-        "test:coverage:html": "XDEBUG_MODE=coverage ./vendor/bin/pest --coverage-html=coverage-report",
-        "test:coverage:min": "XDEBUG_MODE=coverage ./vendor/bin/pest --coverage --min=60",
+        "test:coverage": "XDEBUG_MODE=coverage php artisan test --parallel --coverage",
+        "test:coverage:min": "XDEBUG_MODE=coverage php artisan test --parallel --coverage --min=80",
         "lint": [
             "@lint:backend",
             "@lint:frontend"

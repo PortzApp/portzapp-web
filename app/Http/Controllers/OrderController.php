@@ -166,9 +166,18 @@ class OrderController extends Controller
         // Get all services through order groups with sub-categories and categories
         $allServices = $order->allServices()->with(['subCategory.category', 'organization'])->get();
 
+        // Manually append total_price to order groups for JSON serialization
+        $orderGroupsWithTotal = $order->orderGroups->map(function ($orderGroup) {
+            return array_merge($orderGroup->toArray(), [
+                'total_price' => $orderGroup->total_price,
+            ]);
+        });
+
         return Inertia::render('orders/show-order-page', [
             'order' => array_merge($order->toArray(), [
                 'all_services' => $allServices,
+                'total_price' => $order->total_price,
+                'order_groups' => $orderGroupsWithTotal,
             ]),
         ]);
     }

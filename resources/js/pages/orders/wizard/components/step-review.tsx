@@ -87,19 +87,9 @@ export function StepReview({ session }: StepReviewProps) {
                     notes: notes.trim() || '',
                 },
                 {
-                    onSuccess: (response: unknown) => {
+                    onSuccess: () => {
                         toast.success('Order created successfully!');
-                        // Check if response contains order data with ID
-                        const responseData = response as { props?: { order?: { id: string }; orders?: { id: string }[] } };
-                        if (responseData.props?.order?.id) {
-                            router.visit(route('orders.show', responseData.props.order.id));
-                        } else if (responseData.props?.orders && responseData.props.orders.length > 0) {
-                            // If multiple orders were created, redirect to the first one
-                            router.visit(route('orders.show', responseData.props.orders[0].id));
-                        } else {
-                            // Fallback to orders index if no specific order ID available
-                            router.visit(route('orders.index'));
-                        }
+                        // Backend handles the redirect to orders.show
                     },
                     onError: (errors) => {
                         console.error('Error completing order:', errors);

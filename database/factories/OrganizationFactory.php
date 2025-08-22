@@ -17,8 +17,11 @@ class OrganizationFactory extends Factory
      */
     public function definition(): array
     {
+        $name = fake()->company();
+
         return [
-            'name' => fake()->company(),
+            'name' => $name,
+            'slug' => \Illuminate\Support\Str::slug($name).'-'.fake()->randomNumber(3),
             'registration_code' => fake()->regexify('REG-[A-Z0-9]{6}'),
             'business_type' => fake()->randomElement(OrganizationBusinessType::cases()),
         ];
@@ -29,10 +32,15 @@ class OrganizationFactory extends Factory
      */
     public function shippingAgency(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'business_type' => OrganizationBusinessType::SHIPPING_AGENCY,
-            'name' => fake()->company().' Shipping',
-        ]);
+        return $this->state(function (array $attributes) {
+            $name = fake()->company().' Shipping';
+
+            return [
+                'business_type' => OrganizationBusinessType::SHIPPING_AGENCY,
+                'name' => $name,
+                'slug' => \Illuminate\Support\Str::slug($name).'-'.fake()->randomNumber(3),
+            ];
+        });
     }
 
     /**
@@ -40,10 +48,15 @@ class OrganizationFactory extends Factory
      */
     public function vesselOwner(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'business_type' => OrganizationBusinessType::VESSEL_OWNER,
-            'name' => fake()->company().' Vessels',
-        ]);
+        return $this->state(function (array $attributes) {
+            $name = fake()->company().' Vessels';
+
+            return [
+                'business_type' => OrganizationBusinessType::VESSEL_OWNER,
+                'name' => $name,
+                'slug' => \Illuminate\Support\Str::slug($name).'-'.fake()->randomNumber(3),
+            ];
+        });
     }
 
     /**
@@ -54,6 +67,7 @@ class OrganizationFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'business_type' => OrganizationBusinessType::PORTZAPP_TEAM,
             'name' => 'PortzApp Team',
+            'slug' => 'portzapp-team',
         ]);
     }
 }

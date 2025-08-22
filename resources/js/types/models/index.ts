@@ -1,4 +1,13 @@
-import { OrderGroupStatus, OrderStatus, OrganizationBusinessType, ServiceStatus, UserRoles, VesselStatus, VesselType } from '@/types/enums';
+import {
+    JoinRequestStatus,
+    OrderGroupStatus,
+    OrderStatus,
+    OrganizationBusinessType,
+    ServiceStatus,
+    UserRoles,
+    VesselStatus,
+    VesselType,
+} from '@/types/enums';
 
 export interface BaseModel {
     id: string;
@@ -161,4 +170,23 @@ export interface OrderWithRelations extends OrderBase {
         sub_category?: ServiceSubCategory;
         category?: ServiceCategory;
     }[];
+}
+
+export interface OrganizationJoinRequest extends BaseModel {
+    user_id: string;
+    organization_id: string;
+    message: string | null;
+    status: JoinRequestStatus;
+    admin_notes: string | null;
+    approved_by: string | null;
+    approved_at: string | null;
+    rejected_by: string | null;
+    rejected_at: string | null;
+    user: {
+        id: string;
+        first_name: string;
+        last_name: string;
+        email: string;
+        phone_number: string | null;
+    };
 }

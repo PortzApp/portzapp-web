@@ -12,7 +12,12 @@ interface OrderOverviewTabProps {
 }
 
 export default function OrderOverviewTab({ order }: OrderOverviewTabProps) {
-    const totalServicePrice = order.services?.reduce((sum, service) => sum + parseFloat(service.price), 0) || 0;
+    // Use total_price from order if available, otherwise calculate from all_services or services
+    const totalServicePrice =
+        order.total_price ||
+        order.all_services?.reduce((sum, service) => sum + parseFloat(service.price), 0) ||
+        order.services?.reduce((sum, service) => sum + parseFloat(service.price), 0) ||
+        0;
 
     return (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -61,7 +66,7 @@ export default function OrderOverviewTab({ order }: OrderOverviewTabProps) {
                         <span className="text-sm text-muted-foreground">Total Services:</span>
                         <Badge variant="outline" className="flex items-center gap-1">
                             <Package className="h-3 w-3" />
-                            {order.services?.length || 0}
+                            {order.all_services?.length || order.services?.length || 0}
                         </Badge>
                     </div>
                     <div className="flex justify-between">

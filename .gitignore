@@ -48,3 +48,7 @@ node_modules/
 tests/Browser/screenshots/
 .claude/settings.local.json
 test_output.xml
+
+# Task files
+# tasks.json
+# tasks/ 

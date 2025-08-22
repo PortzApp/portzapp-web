@@ -28,7 +28,31 @@ test('email can be verified', function (): void {
 
     Event::assertDispatched(Verified::class);
     expect($user->fresh()->hasVerifiedEmail())->toBeTrue();
-    $response->assertRedirect(route('dashboard', absolute: false).'?verified=1');
+    $response->assertRedirect(route('onboarding.index'));
+    $response->assertSessionHas('status', 'email-verified');
+});
+
+test('email can be verified when user is not authenticated', function (): void {
+    $user = User::factory()->unverified()->create();
+
+    Event::fake();
+
+    $verificationUrl = URL::temporarySignedRoute(
+        'verification.verify',
+        now()->addMinutes(60),
+        ['id' => $user->id, 'hash' => sha1($user->email)]
+    );
+
+    // Don't authenticate the user - they should be able to verify their email
+    $response = $this->get($verificationUrl);
+
+    Event::assertDispatched(Verified::class);
+    expect($user->fresh()->hasVerifiedEmail())->toBeTrue();
+    $response->assertRedirect(route('onboarding.index'));
+    $response->assertSessionHas('status', 'email-verified');
+
+    // Check that user is now authenticated after verification
+    $this->assertAuthenticated();
 });
 
 test('email is not verified with invalid hash', function (): void {

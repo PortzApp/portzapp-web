@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\OnboardingStatus;
 use App\Enums\OrganizationBusinessType;
 use App\Enums\UserRoles;
 use Database\Factories\UserFactory;
@@ -71,6 +72,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'phone_number',
         'password',
         'current_organization_id',
+        'onboarding_status',
     ];
 
     /**
@@ -93,6 +95,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'onboarding_status' => OnboardingStatus::class,
         ];
     }
 
@@ -166,5 +169,29 @@ class User extends Authenticatable implements MustVerifyEmail
         $pivot = $organization_with_pivot->pivot;
 
         return $pivot->role;
+    }
+
+    /**
+     * Get invitations sent by this user.
+     */
+    public function sentInvitations(): HasMany
+    {
+        return $this->hasMany(Invitation::class, 'invited_by_user_id');
+    }
+
+    /**
+     * Get join requests made by this user.
+     */
+    public function joinRequests(): HasMany
+    {
+        return $this->hasMany(OrganizationJoinRequest::class);
+    }
+
+    /**
+     * Get join requests reviewed by this user.
+     */
+    public function reviewedJoinRequests(): HasMany
+    {
+        return $this->hasMany(OrganizationJoinRequest::class, 'reviewed_by_user_id');
     }
 }

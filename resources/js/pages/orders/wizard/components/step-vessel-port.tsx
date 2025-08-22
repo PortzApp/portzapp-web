@@ -37,7 +37,7 @@ export function StepVesselPort({ vessels, ports, session }: StepVesselPortProps)
 
     const portItems = ports.map((port) => ({
         value: port.id,
-        label: port.name,
+        label: `${port.name}${port.services_count !== undefined ? ` (${port.services_count})` : ''}`,
         subtitle: `${port.city}, ${port.country} (${port.code})`,
         icon: MapPin,
     }));
@@ -50,16 +50,12 @@ export function StepVesselPort({ vessels, ports, session }: StepVesselPortProps)
             setIsSaving(true);
 
             router.patch(
-                route('order-wizard-sessions.set-vessel-port', session.id),
+                route('order-wizard-sessions.vessel-port', session.id),
                 {
                     vessel_id: selectedVesselId,
                     port_id: selectedPortId,
                 },
                 {
-                    onSuccess: () => {
-                        // Navigate to categories step
-                        router.visit(route('order-wizard.step.categories', { session: session.id }));
-                    },
                     onFinish: () => setIsSaving(false),
                 },
             );

@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\OnboardingStatus;
 use App\Enums\OrganizationBusinessType;
 use App\Enums\UserRoles;
 use App\Models\Organization;
@@ -30,6 +31,12 @@ class OrganizationPolicy
      */
     public function create(User $user): bool
     {
+        // Allow users to create organizations during onboarding
+        if ($user->onboarding_status === OnboardingStatus::PENDING) {
+            return true;
+        }
+
+        // For completed users, only PORTZAPP_TEAM admins can create organizations
         return $user->isInOrganizationWithBusinessType(OrganizationBusinessType::PORTZAPP_TEAM)
             && $user->isInOrganizationWithUserRole(UserRoles::ADMIN);
     }

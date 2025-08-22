@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Middleware\EnsureOnboardingCompleted;
 use App\Http\Middleware\EnsurePortzappTeamBusinessType;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\InvitationMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -22,6 +24,8 @@ return Application::configure(basePath: dirname(__DIR__))
             HandleAppearance::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
+            // InvitationMiddleware::class, // Commented out - requires InvitationTokenService
+            EnsureOnboardingCompleted::class,
         ]);
 
         $middleware->alias([

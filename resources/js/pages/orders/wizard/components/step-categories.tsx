@@ -81,7 +81,7 @@ export function StepCategories({ serviceCategories, session }: StepCategoriesPro
             setIsSaving(true);
 
             router.patch(
-                route('order-wizard-sessions.set-categories', session.id),
+                route('order-wizard-sessions.categories', session.id),
                 {
                     selected_sub_categories: tempSelectedSubCategories.map((subCat) => subCat.id),
                 },
