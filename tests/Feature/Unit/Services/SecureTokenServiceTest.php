@@ -11,13 +11,13 @@ use Illuminate\Support\Facades\Hash;
 
 uses(RefreshDatabase::class);
 
-beforeEach(function () {
+beforeEach(function (): void {
     Cache::flush();
     $this->service = new SecureTokenService;
 });
 
-describe('Token Generation', function () {
-    it('generates cryptographically secure tokens', function () {
+describe('Token Generation', function (): void {
+    it('generates cryptographically secure tokens', function (): void {
         $token = $this->service->generateSecureToken();
 
         expect($token)->toBeString();
@@ -25,7 +25,7 @@ describe('Token Generation', function () {
         expect(ctype_xdigit($token))->toBeTrue(); // Only hex characters
     });
 
-    it('generates unique tokens each time', function () {
+    it('generates unique tokens each time', function (): void {
         $tokens = [];
         for ($i = 0; $i < 100; $i++) {
             $tokens[] = $this->service->generateSecureToken();
@@ -34,7 +34,7 @@ describe('Token Generation', function () {
         expect(count(array_unique($tokens)))->toBe(100);
     });
 
-    it('generates tokens of custom length', function () {
+    it('generates tokens of custom length', function (): void {
         $token16 = $this->service->generateSecureToken(16);
         $token64 = $this->service->generateSecureToken(64);
 
@@ -42,7 +42,7 @@ describe('Token Generation', function () {
         expect(strlen($token64))->toBe(128); // 64 bytes = 128 hex chars
     });
 
-    it('generates invitation tokens without collisions', function () {
+    it('generates invitation tokens without collisions', function (): void {
         // Create an existing invitation with a known token
         $existingToken = 'existing_token_12345';
         Invitation::factory()->create(['token' => $existingToken]);
@@ -65,8 +65,8 @@ describe('Token Generation', function () {
     });
 });
 
-describe('Password Reset Tokens', function () {
-    it('generates password reset token with expiry', function () {
+describe('Password Reset Tokens', function (): void {
+    it('generates password reset token with expiry', function (): void {
         $user = User::factory()->create(['email' => 'test@example.com']);
 
         $result = $this->service->generatePasswordResetToken($user);
@@ -78,7 +78,7 @@ describe('Password Reset Tokens', function () {
         expect($result['expires_at']->diffInHours(now()))->toBe(1);
     });
 
-    it('invalidates existing password reset tokens', function () {
+    it('invalidates existing password reset tokens', function (): void {
         $user = User::factory()->create(['email' => 'test@example.com']);
 
         // Create existing token
@@ -96,7 +96,7 @@ describe('Password Reset Tokens', function () {
         expect(PasswordResetToken::where('email', $user->email)->count())->toBe(1);
     });
 
-    it('verifies valid password reset tokens', function () {
+    it('verifies valid password reset tokens', function (): void {
         $user = User::factory()->create(['email' => 'test@example.com']);
 
         $result = $this->service->generatePasswordResetToken($user);
@@ -106,7 +106,7 @@ describe('Password Reset Tokens', function () {
         expect($isValid)->toBeTrue();
     });
 
-    it('rejects invalid password reset tokens', function () {
+    it('rejects invalid password reset tokens', function (): void {
         $user = User::factory()->create(['email' => 'test@example.com']);
 
         $this->service->generatePasswordResetToken($user);
@@ -116,7 +116,7 @@ describe('Password Reset Tokens', function () {
         expect($isValid)->toBeFalse();
     });
 
-    it('rejects expired password reset tokens', function () {
+    it('rejects expired password reset tokens', function (): void {
         $user = User::factory()->create(['email' => 'test@example.com']);
 
         // Create expired token manually
@@ -134,15 +134,15 @@ describe('Password Reset Tokens', function () {
         expect(PasswordResetToken::where('email', $user->email)->count())->toBe(0);
     });
 
-    it('rejects tokens for non-existent emails', function () {
+    it('rejects tokens for non-existent emails', function (): void {
         $isValid = $this->service->verifyPasswordResetToken('nonexistent@example.com', 'any_token');
 
         expect($isValid)->toBeFalse();
     });
 });
 
-describe('API Key Generation', function () {
-    it('generates secure API keys', function () {
+describe('API Key Generation', function (): void {
+    it('generates secure API keys', function (): void {
         $user = User::factory()->create();
 
         $apiKey = $this->service->generateApiKey($user);
@@ -151,7 +151,7 @@ describe('API Key Generation', function () {
         expect(strlen($apiKey))->toBeGreaterThan(100); // Should be base64 encoded encrypted data
     });
 
-    it('generates unique API keys for different users', function () {
+    it('generates unique API keys for different users', function (): void {
         $user1 = User::factory()->create();
         $user2 = User::factory()->create();
 
@@ -161,7 +161,7 @@ describe('API Key Generation', function () {
         expect($key1)->not->toBe($key2);
     });
 
-    it('includes user and organization data in API key', function () {
+    it('includes user and organization data in API key', function (): void {
         $user = User::factory()->create(['current_organization_id' => 'test-org-id']);
 
         $apiKey = $this->service->generateApiKey($user);
@@ -177,8 +177,8 @@ describe('API Key Generation', function () {
     });
 });
 
-describe('Invitation Token Rotation', function () {
-    it('rotates invitation tokens', function () {
+describe('Invitation Token Rotation', function (): void {
+    it('rotates invitation tokens', function (): void {
         $invitation = Invitation::factory()->create(['token' => 'old_token']);
 
         $newToken = $this->service->rotateInvitationToken($invitation);
@@ -189,7 +189,7 @@ describe('Invitation Token Rotation', function () {
         expect($invitation->token_rotated_at)->not->toBeNull();
     });
 
-    it('ensures rotated tokens are unique', function () {
+    it('ensures rotated tokens are unique', function (): void {
         $invitation1 = Invitation::factory()->create(['token' => 'token1']);
         $invitation2 = Invitation::factory()->create(['token' => 'token2']);
 
@@ -200,22 +200,22 @@ describe('Invitation Token Rotation', function () {
     });
 });
 
-describe('Form Token Security', function () {
-    it('generates form tokens', function () {
+describe('Form Token Security', function (): void {
+    it('generates form tokens', function (): void {
         $token = $this->service->generateFormToken('login', 1);
 
         expect($token)->toBeString();
         expect(strlen($token))->toBe(64); // SHA256 hash
     });
 
-    it('generates different tokens for different actions', function () {
+    it('generates different tokens for different actions', function (): void {
         $loginToken = $this->service->generateFormToken('login', 1);
         $registerToken = $this->service->generateFormToken('register', 1);
 
         expect($loginToken)->not->toBe($registerToken);
     });
 
-    it('generates different tokens for different users', function () {
+    it('generates different tokens for different users', function (): void {
         $user1Token = $this->service->generateFormToken('login', 1);
         $user2Token = $this->service->generateFormToken('login', 2);
 
@@ -223,8 +223,8 @@ describe('Form Token Security', function () {
     });
 });
 
-describe('Session Token Management', function () {
-    it('generates session tokens', function () {
+describe('Session Token Management', function (): void {
+    it('generates session tokens', function (): void {
         $user = User::factory()->create();
         $this->actingAs($user);
 
@@ -234,7 +234,7 @@ describe('Session Token Management', function () {
         expect($token)->toContain('.'); // Should have sessionId.token format
     });
 
-    it('stores and retrieves session data', function () {
+    it('stores and retrieves session data', function (): void {
         $user = User::factory()->create();
         $this->actingAs($user);
 
@@ -249,7 +249,7 @@ describe('Session Token Management', function () {
         expect($retrievedData['user_id'])->toBe($user->id);
     });
 
-    it('rejects expired session tokens', function () {
+    it('rejects expired session tokens', function (): void {
         $user = User::factory()->create();
         $this->actingAs($user);
 
@@ -266,7 +266,7 @@ describe('Session Token Management', function () {
         expect($retrievedData)->toBeNull();
     });
 
-    it('rejects session tokens for different users', function () {
+    it('rejects session tokens for different users', function (): void {
         $user1 = User::factory()->create();
         $user2 = User::factory()->create();
 
@@ -279,7 +279,7 @@ describe('Session Token Management', function () {
         expect($retrievedData)->toBeNull();
     });
 
-    it('invalidates session tokens', function () {
+    it('invalidates session tokens', function (): void {
         $user = User::factory()->create();
         $this->actingAs($user);
 
@@ -293,8 +293,8 @@ describe('Session Token Management', function () {
     });
 });
 
-describe('Download Token Security', function () {
-    it('generates download tokens', function () {
+describe('Download Token Security', function (): void {
+    it('generates download tokens', function (): void {
         $user = User::factory()->create();
         $this->actingAs($user);
 
@@ -304,7 +304,7 @@ describe('Download Token Security', function () {
         expect(strlen($token))->toBeGreaterThan(50); // Base64 encoded encrypted data
     });
 
-    it('verifies valid download tokens', function () {
+    it('verifies valid download tokens', function (): void {
         $user = User::factory()->create();
         $this->actingAs($user);
 
@@ -318,7 +318,7 @@ describe('Download Token Security', function () {
         expect($payload['user_id'])->toBe($user->id);
     });
 
-    it('rejects expired download tokens', function () {
+    it('rejects expired download tokens', function (): void {
         $user = User::factory()->create();
         $this->actingAs($user);
 
@@ -329,7 +329,7 @@ describe('Download Token Security', function () {
         expect($payload)->toBeNull();
     });
 
-    it('rejects download tokens for different users', function () {
+    it('rejects download tokens for different users', function (): void {
         $user1 = User::factory()->create();
         $user2 = User::factory()->create();
 
@@ -342,7 +342,7 @@ describe('Download Token Security', function () {
         expect($payload)->toBeNull();
     });
 
-    it('rejects malformed download tokens', function () {
+    it('rejects malformed download tokens', function (): void {
         $user = User::factory()->create();
         $this->actingAs($user);
 
@@ -352,8 +352,8 @@ describe('Download Token Security', function () {
     });
 });
 
-describe('Rate Limiting', function () {
-    it('enforces token generation rate limits', function () {
+describe('Rate Limiting', function (): void {
+    it('enforces token generation rate limits', function (): void {
         // Generate tokens up to the limit (10 per minute)
         for ($i = 0; $i < 10; $i++) {
             expect($this->service->isTokenGenerationRateLimited('test'))->toBeFalse();
@@ -363,7 +363,7 @@ describe('Rate Limiting', function () {
         expect($this->service->isTokenGenerationRateLimited('test'))->toBeTrue();
     });
 
-    it('uses different rate limits for different token types', function () {
+    it('uses different rate limits for different token types', function (): void {
         // Exhaust limit for 'type1'
         for ($i = 0; $i < 10; $i++) {
             $this->service->isTokenGenerationRateLimited('type1');
@@ -374,8 +374,8 @@ describe('Rate Limiting', function () {
     });
 });
 
-describe('Token Cleanup', function () {
-    it('cleans up expired password reset tokens', function () {
+describe('Token Cleanup', function (): void {
+    it('cleans up expired password reset tokens', function (): void {
         $user1 = User::factory()->create(['email' => 'user1@example.com']);
         $user2 = User::factory()->create(['email' => 'user2@example.com']);
 
@@ -401,7 +401,7 @@ describe('Token Cleanup', function () {
         expect(PasswordResetToken::where('email', $user2->email)->exists())->toBeTrue();
     });
 
-    it('cleans up expired invitation tokens', function () {
+    it('cleans up expired invitation tokens', function (): void {
         $expiredInvitation = Invitation::factory()->create([
             'expires_at' => now()->subDay(),
             'accepted_at' => null,

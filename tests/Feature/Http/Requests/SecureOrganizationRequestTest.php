@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Storage;
 
 uses(RefreshDatabase::class);
 
-beforeEach(function () {
+beforeEach(function (): void {
     Cache::flush();
     Storage::fake('public');
 
@@ -20,16 +20,16 @@ beforeEach(function () {
     $this->actingAs($this->user);
 });
 
-describe('SecureOrganizationRequest Authorization', function () {
-    it('always allows organization requests for authenticated users', function () {
+describe('SecureOrganizationRequest Authorization', function (): void {
+    it('always allows organization requests for authenticated users', function (): void {
         $request = new SecureOrganizationRequest(new InputSanitizationService);
 
         expect($request->authorize())->toBeTrue();
     });
 });
 
-describe('Organization Creation Validation', function () {
-    it('accepts valid organization data', function () {
+describe('Organization Creation Validation', function (): void {
+    it('accepts valid organization data', function (): void {
         $this->post(route('organizations.store'), [
             'name' => 'Acme Corporation',
             'business_type' => 'shipping_agency',
@@ -40,14 +40,14 @@ describe('Organization Creation Validation', function () {
         ])->assertSessionDoesntHaveErrors();
     });
 
-    it('requires organization name', function () {
+    it('requires organization name', function (): void {
         $this->post(route('organizations.store'), [
             'business_type' => 'shipping_agency',
             '_token' => csrf_token(),
         ])->assertSessionHasErrors('name');
     });
 
-    it('validates name length limits', function () {
+    it('validates name length limits', function (): void {
         // Test minimum length
         $this->post(route('organizations.store'), [
             'name' => 'A', // Too short
@@ -64,7 +64,7 @@ describe('Organization Creation Validation', function () {
         ])->assertSessionHasErrors('name');
     });
 
-    it('sanitizes organization names', function () {
+    it('sanitizes organization names', function (): void {
         $this->post(route('organizations.store'), [
             'name' => 'Acme<script>alert("xss")</script>Corp',
             'business_type' => 'shipping_agency',
@@ -76,7 +76,7 @@ describe('Organization Creation Validation', function () {
         expect($organization->name)->not->toContain('<script>');
     });
 
-    it('validates business type values', function () {
+    it('validates business type values', function (): void {
         $validTypes = ['shipping_agency', 'vessel_owner', 'portzapp_team'];
 
         foreach ($validTypes as $type) {
@@ -95,7 +95,7 @@ describe('Organization Creation Validation', function () {
         ])->assertSessionHasErrors('business_type');
     });
 
-    it('validates website URLs', function () {
+    it('validates website URLs', function (): void {
         // Valid URLs
         $validUrls = [
             'https://example.com',
@@ -129,7 +129,7 @@ describe('Organization Creation Validation', function () {
         }
     });
 
-    it('validates phone number formats', function () {
+    it('validates phone number formats', function (): void {
         $validPhones = [
             '+1-555-123-4567',
             '+44-20-7946-0958',
@@ -156,8 +156,8 @@ describe('Organization Creation Validation', function () {
     });
 });
 
-describe('Organization Slug Generation', function () {
-    it('generates valid slugs from organization names', function () {
+describe('Organization Slug Generation', function (): void {
+    it('generates valid slugs from organization names', function (): void {
         $testCases = [
             'Acme Corporation' => 'acme-corporation',
             'Test & Associates' => 'test-associates',
@@ -176,7 +176,7 @@ describe('Organization Slug Generation', function () {
         }
     });
 
-    it('handles reserved slug names', function () {
+    it('handles reserved slug names', function (): void {
         $reservedNames = ['admin', 'api', 'www', 'portzapp'];
 
         foreach ($reservedNames as $reserved) {
@@ -191,7 +191,7 @@ describe('Organization Slug Generation', function () {
         }
     });
 
-    it('ensures slug uniqueness', function () {
+    it('ensures slug uniqueness', function (): void {
         // Create first organization
         Organization::factory()->create(['slug' => 'test-company']);
 
@@ -208,8 +208,8 @@ describe('Organization Slug Generation', function () {
     });
 });
 
-describe('File Upload Validation', function () {
-    it('validates logo file uploads', function () {
+describe('File Upload Validation', function (): void {
+    it('validates logo file uploads', function (): void {
         $validLogo = UploadedFile::fake()->image('logo.jpg', 200, 200)->size(500);
 
         $this->post(route('organizations.store'), [
@@ -220,7 +220,7 @@ describe('File Upload Validation', function () {
         ])->assertSessionDoesntHaveErrors('logo');
     });
 
-    it('rejects oversized logo files', function () {
+    it('rejects oversized logo files', function (): void {
         $largeLogo = UploadedFile::fake()->image('large.jpg')->size(6144); // 6MB
 
         $this->post(route('organizations.store'), [
@@ -231,7 +231,7 @@ describe('File Upload Validation', function () {
         ])->assertSessionHasErrors('logo');
     });
 
-    it('rejects non-image files as logos', function () {
+    it('rejects non-image files as logos', function (): void {
         $nonImage = UploadedFile::fake()->create('document.pdf', 100, 'application/pdf');
 
         $this->post(route('organizations.store'), [
@@ -242,7 +242,7 @@ describe('File Upload Validation', function () {
         ])->assertSessionHasErrors('logo');
     });
 
-    it('scans uploaded logos for malware', function () {
+    it('scans uploaded logos for malware', function (): void {
         // Create a file with suspicious content
         $tempFile = tempnam(sys_get_temp_dir(), 'malware_logo');
         file_put_contents($tempFile, '<script>alert("xss")</script>');
@@ -266,8 +266,8 @@ describe('File Upload Validation', function () {
     });
 });
 
-describe('Security Features', function () {
-    it('sanitizes input during preparation', function () {
+describe('Security Features', function (): void {
+    it('sanitizes input during preparation', function (): void {
         $sanitizer = $this->mock(InputSanitizationService::class);
 
         $sanitizer->shouldReceive('sanitizeOrganizationName')
@@ -296,7 +296,7 @@ describe('Security Features', function () {
         expect($request->slug)->toBe('test-company');
     });
 
-    it('prevents XSS in description fields', function () {
+    it('prevents XSS in description fields', function (): void {
         $this->post(route('organizations.store'), [
             'name' => 'Test Company',
             'business_type' => 'shipping_agency',
@@ -309,7 +309,7 @@ describe('Security Features', function () {
         expect($organization->description)->toBe('Great companyalert("xss")');
     });
 
-    it('validates description length limits', function () {
+    it('validates description length limits', function (): void {
         $longDescription = str_repeat('a', 2001); // Over 2000 char limit
 
         $this->post(route('organizations.store'), [
@@ -320,7 +320,7 @@ describe('Security Features', function () {
         ])->assertSessionHasErrors('description');
     });
 
-    it('strips dangerous HTML from all text fields', function () {
+    it('strips dangerous HTML from all text fields', function (): void {
         $dangerousInput = '<iframe src="javascript:alert(1)"></iframe>';
 
         $this->post(route('organizations.store'), [
@@ -338,8 +338,8 @@ describe('Security Features', function () {
     });
 });
 
-describe('Organization Update Validation', function () {
-    it('validates organization updates', function () {
+describe('Organization Update Validation', function (): void {
+    it('validates organization updates', function (): void {
         $organization = Organization::factory()->create();
 
         $this->patch(route('organizations.update', $organization), [
@@ -350,7 +350,7 @@ describe('Organization Update Validation', function () {
         ])->assertSessionDoesntHaveErrors();
     });
 
-    it('prevents slug changes on updates', function () {
+    it('prevents slug changes on updates', function (): void {
         $organization = Organization::factory()->create(['slug' => 'original-slug']);
 
         $this->patch(route('organizations.update', $organization), [
@@ -363,8 +363,8 @@ describe('Organization Update Validation', function () {
     });
 });
 
-describe('CSRF Protection', function () {
-    it('requires CSRF token for organization creation', function () {
+describe('CSRF Protection', function (): void {
+    it('requires CSRF token for organization creation', function (): void {
         $this->post(route('organizations.store'), [
             'name' => 'Test Company',
             'business_type' => 'shipping_agency',
@@ -372,7 +372,7 @@ describe('CSRF Protection', function () {
         ])->assertStatus(419);
     });
 
-    it('rejects invalid CSRF tokens', function () {
+    it('rejects invalid CSRF tokens', function (): void {
         $this->post(route('organizations.store'), [
             'name' => 'Test Company',
             'business_type' => 'shipping_agency',

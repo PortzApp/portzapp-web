@@ -10,15 +10,15 @@ use Illuminate\Support\Facades\RateLimiter;
 
 uses(RefreshDatabase::class);
 
-beforeEach(function () {
+beforeEach(function (): void {
     // Clear rate limiting between tests
     RateLimiter::clear('login_attempts:ip:127.0.0.1');
     RateLimiter::clear('login_attempts:email:test@example.com');
     Cache::flush();
 });
 
-describe('SecureAuthenticationRequest Authorization', function () {
-    it('always allows authentication requests', function () {
+describe('SecureAuthenticationRequest Authorization', function (): void {
+    it('always allows authentication requests', function (): void {
         $request = new SecureAuthenticationRequest(
             new InputSanitizationService,
             new AuditLogService,
@@ -29,8 +29,8 @@ describe('SecureAuthenticationRequest Authorization', function () {
     });
 });
 
-describe('Login Request Validation', function () {
-    it('accepts valid login data', function () {
+describe('Login Request Validation', function (): void {
+    it('accepts valid login data', function (): void {
         // Create a user with known credentials
         $user = \App\Models\User::factory()->create([
             'email' => 'testuser@example.com',
@@ -45,7 +45,7 @@ describe('Login Request Validation', function () {
         ])->assertRedirect(route('dashboard'));
     });
 
-    it('rejects invalid email formats', function () {
+    it('rejects invalid email formats', function (): void {
         $this->post(route('login'), [
             'email' => 'invalid-email',
             'password' => 'password',
@@ -53,14 +53,14 @@ describe('Login Request Validation', function () {
         ])->assertSessionHasErrors('email');
     });
 
-    it('rejects missing password', function () {
+    it('rejects missing password', function (): void {
         $this->post(route('login'), [
             'email' => 'test@example.com',
             '_token' => csrf_token(),
         ])->assertSessionHasErrors('password');
     });
 
-    it('rejects missing CSRF token', function () {
+    it('rejects missing CSRF token', function (): void {
         $this->post(route('login'), [
             'email' => 'test@example.com',
             'password' => 'password',
@@ -68,8 +68,8 @@ describe('Login Request Validation', function () {
     });
 });
 
-describe('Registration Request Validation', function () {
-    it('validates required fields for registration', function () {
+describe('Registration Request Validation', function (): void {
+    it('validates required fields for registration', function (): void {
         $request = new SecureAuthenticationRequest(
             new InputSanitizationService,
             new AuditLogService,
@@ -93,7 +93,7 @@ describe('Registration Request Validation', function () {
         expect($rules['phone_number'])->toContain('required', 'string', 'max:25');
     });
 
-    it('accepts valid registration data', function () {
+    it('accepts valid registration data', function (): void {
         $this->post(route('register'), [
             'first_name' => 'John',
             'last_name' => 'Doe',
@@ -110,7 +110,7 @@ describe('Registration Request Validation', function () {
         ]);
     });
 
-    it('rejects weak passwords', function () {
+    it('rejects weak passwords', function (): void {
         $this->post(route('register'), [
             'name' => 'John Doe',
             'email' => 'john.doe@example.com',
@@ -121,7 +121,7 @@ describe('Registration Request Validation', function () {
         ])->assertSessionHasErrors('password');
     });
 
-    it('rejects names with invalid characters', function () {
+    it('rejects names with invalid characters', function (): void {
         $this->post(route('register'), [
             'name' => 'John<script>alert("xss")</script>',
             'email' => 'john.doe@example.com',
@@ -132,7 +132,7 @@ describe('Registration Request Validation', function () {
         ])->assertSessionHasErrors('name');
     });
 
-    it('rejects duplicate email addresses', function () {
+    it('rejects duplicate email addresses', function (): void {
         // Create existing user
         \App\Models\User::factory()->create(['email' => 'existing@example.com']);
 
@@ -146,7 +146,7 @@ describe('Registration Request Validation', function () {
         ])->assertSessionHasErrors('email');
     });
 
-    it('rejects registration without accepting terms', function () {
+    it('rejects registration without accepting terms', function (): void {
         $this->post(route('register'), [
             'name' => 'John Doe',
             'email' => 'john.doe@example.com',
@@ -157,7 +157,7 @@ describe('Registration Request Validation', function () {
         ])->assertSessionHasErrors('terms');
     });
 
-    it('rejects short names', function () {
+    it('rejects short names', function (): void {
         $this->post(route('register'), [
             'name' => 'J',
             'email' => 'john.doe@example.com',
@@ -169,8 +169,8 @@ describe('Registration Request Validation', function () {
     });
 });
 
-describe('Password Reset Request Validation', function () {
-    it('validates email for password reset request', function () {
+describe('Password Reset Request Validation', function (): void {
+    it('validates email for password reset request', function (): void {
         $user = \App\Models\User::factory()->create(['email' => 'user@example.com']);
 
         $this->post(route('password.email'), [
@@ -179,7 +179,7 @@ describe('Password Reset Request Validation', function () {
         ])->assertSessionHas('status');
     });
 
-    it('rejects non-existent email for password reset', function () {
+    it('rejects non-existent email for password reset', function (): void {
         $this->post(route('password.email'), [
             'email' => 'nonexistent@example.com',
             '_token' => csrf_token(),
@@ -187,8 +187,8 @@ describe('Password Reset Request Validation', function () {
     });
 });
 
-describe('Security Features', function () {
-    it('sanitizes email input during preparation', function () {
+describe('Security Features', function (): void {
+    it('sanitizes email input during preparation', function (): void {
         // This test verifies the prepareForValidation method works
         $sanitizer = $this->mock(InputSanitizationService::class);
         $auditLogger = $this->mock(AuditLogService::class);
@@ -217,7 +217,7 @@ describe('Security Features', function () {
         expect($request->email)->toBe('test@example.com');
     });
 
-    it('blocks suspicious IP addresses', function () {
+    it('blocks suspicious IP addresses', function (): void {
         $sanitizer = $this->mock(InputSanitizationService::class);
         $auditLogger = $this->mock(AuditLogService::class);
         $tokenService = $this->mock(SecureTokenService::class);
@@ -242,7 +242,7 @@ describe('Security Features', function () {
         $method->invoke($request);
     });
 
-    it('enforces rate limiting for login attempts', function () {
+    it('enforces rate limiting for login attempts', function (): void {
         $user = \App\Models\User::factory()->create([
             'email' => 'test@example.com',
         ]);
@@ -266,7 +266,7 @@ describe('Security Features', function () {
         $response->assertStatus(429);
     });
 
-    it('detects weak password patterns', function () {
+    it('detects weak password patterns', function (): void {
         $weakPasswords = [
             '123456789',
             'password123',
@@ -288,7 +288,7 @@ describe('Security Features', function () {
         }
     });
 
-    it('detects suspicious registration patterns', function () {
+    it('detects suspicious registration patterns', function (): void {
         // Test rapid registrations from same IP
         for ($i = 0; $i < 3; $i++) {
             \Illuminate\Support\Facades\Cache::put('registrations:ip:127.0.0.1', $i, 3600);
@@ -314,7 +314,7 @@ describe('Security Features', function () {
         ])->assertSessionHasErrors('security');
     });
 
-    it('rejects temporary email domains', function () {
+    it('rejects temporary email domains', function (): void {
         $this->post(route('register'), [
             'name' => 'Test User',
             'email' => 'test@10minutemail.com',
@@ -325,7 +325,7 @@ describe('Security Features', function () {
         ])->assertSessionHasErrors('email');
     });
 
-    it('rejects suspicious names', function () {
+    it('rejects suspicious names', function (): void {
         $suspiciousNames = ['test user', 'admin user', 'demo account', 'spam bot'];
 
         foreach ($suspiciousNames as $name) {
@@ -340,7 +340,7 @@ describe('Security Features', function () {
         }
     });
 
-    it('logs successful and failed authentication attempts', function () {
+    it('logs successful and failed authentication attempts', function (): void {
         $auditLogger = $this->mock(AuditLogService::class);
 
         // Test failed attempt logging
@@ -368,7 +368,7 @@ describe('Security Features', function () {
         ]);
     });
 
-    it('clears rate limiting on successful authentication', function () {
+    it('clears rate limiting on successful authentication', function (): void {
         $user = \App\Models\User::factory()->create(['email' => 'test@example.com']);
 
         // Make a few failed attempts first

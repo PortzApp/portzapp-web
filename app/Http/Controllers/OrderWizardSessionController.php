@@ -373,7 +373,7 @@ class OrderWizardSessionController extends Controller
         $vessels = Vessel::where('organization_id', $user->current_organization_id)->get();
 
         // Get all ports with active service counts
-        $ports = Port::withCount(['services' => function ($query) {
+        $ports = Port::withCount(['services' => function ($query): void {
             $query->where('status', 'active');
         }])->orderBy('name')->get();
 
@@ -527,7 +527,7 @@ class OrderWizardSessionController extends Controller
         $vessels = Vessel::where('organization_id', $user->current_organization_id)->get();
 
         // Get all ports with active service counts
-        $ports = Port::withCount(['services' => function ($query) {
+        $ports = Port::withCount(['services' => function ($query): void {
             $query->where('status', 'active');
         }])->orderBy('name')->get();
 

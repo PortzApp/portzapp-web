@@ -7,16 +7,16 @@ use App\Services\SecureTokenService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\RateLimiter;
 
-beforeEach(function () {
+beforeEach(function (): void {
     // Clear cache and rate limits before each test
     Cache::flush();
     RateLimiter::clear('login_attempts:ip:127.0.0.1');
     RateLimiter::clear('registrations:ip:127.0.0.1');
 });
 
-describe('Comprehensive Security Validation Tests', function () {
-    describe('Registration Security Validation', function () {
-        it('accepts valid registration with all security checks', function () {
+describe('Comprehensive Security Validation Tests', function (): void {
+    describe('Registration Security Validation', function (): void {
+        it('accepts valid registration with all security checks', function (): void {
             $response = $this->post(route('register'), [
                 'first_name' => 'John',
                 'last_name' => 'Doe',
@@ -35,7 +35,7 @@ describe('Comprehensive Security Validation Tests', function () {
             ]);
         });
 
-        it('rejects weak passwords with specific patterns', function () {
+        it('rejects weak passwords with specific patterns', function (): void {
             $weakPasswords = [
                 '123456789',
                 'password123',
@@ -62,7 +62,7 @@ describe('Comprehensive Security Validation Tests', function () {
             }
         });
 
-        it('rejects temporary email domains', function () {
+        it('rejects temporary email domains', function (): void {
             $tempDomains = [
                 '10minutemail.com',
                 'guerrillamail.com',
@@ -84,7 +84,7 @@ describe('Comprehensive Security Validation Tests', function () {
             }
         });
 
-        it('rejects suspicious names', function () {
+        it('rejects suspicious names', function (): void {
             $suspiciousNames = [
                 ['first_name' => 'test', 'last_name' => 'user'],
                 ['first_name' => 'admin', 'last_name' => 'account'],
@@ -108,7 +108,7 @@ describe('Comprehensive Security Validation Tests', function () {
             }
         });
 
-        it('enforces rate limiting for rapid registrations', function () {
+        it('enforces rate limiting for rapid registrations', function (): void {
             // Attempt multiple registrations rapidly
             for ($i = 0; $i < 4; $i++) {
                 $response = $this->post(route('register'), [
@@ -135,7 +135,7 @@ describe('Comprehensive Security Validation Tests', function () {
             expect($response->status())->toBeIn([302, 422, 429]);
         });
 
-        it('validates phone number format', function () {
+        it('validates phone number format', function (): void {
             $invalidPhones = [
                 '123',           // too short
                 'abc123',        // contains letters
@@ -158,8 +158,8 @@ describe('Comprehensive Security Validation Tests', function () {
         });
     });
 
-    describe('SecureAuthenticationRequest Unit Tests', function () {
-        it('properly initializes security services', function () {
+    describe('SecureAuthenticationRequest Unit Tests', function (): void {
+        it('properly initializes security services', function (): void {
             $sanitizer = new InputSanitizationService;
             $auditLogger = new AuditLogService;
             $tokenService = new SecureTokenService;
@@ -170,7 +170,7 @@ describe('Comprehensive Security Validation Tests', function () {
             expect($request->authorize())->toBeTrue();
         });
 
-        it('validates registration data with security rules', function () {
+        it('validates registration data with security rules', function (): void {
             $validData = [
                 'first_name' => 'John',
                 'last_name' => 'Doe',
@@ -186,7 +186,7 @@ describe('Comprehensive Security Validation Tests', function () {
             expect($response->status())->toBeIn([302, 422]);
         });
 
-        it('validates login data with security rules', function () {
+        it('validates login data with security rules', function (): void {
             // Create a user for testing
             $user = \App\Models\User::factory()->create([
                 'email' => 'test@example.com',
@@ -202,7 +202,7 @@ describe('Comprehensive Security Validation Tests', function () {
             expect($response->status())->toBeIn([302, 422, 429]);
         });
 
-        it('provides comprehensive error messages', function () {
+        it('provides comprehensive error messages', function (): void {
             $request = new SecureAuthenticationRequest(
                 new InputSanitizationService,
                 new AuditLogService,
@@ -228,8 +228,8 @@ describe('Comprehensive Security Validation Tests', function () {
         });
     });
 
-    describe('Rate Limiting Integration', function () {
-        it('enforces IP-based rate limiting', function () {
+    describe('Rate Limiting Integration', function (): void {
+        it('enforces IP-based rate limiting', function (): void {
             $ip = '127.0.0.1';
 
             // Simulate rate limit key
@@ -243,7 +243,7 @@ describe('Comprehensive Security Validation Tests', function () {
             RateLimiter::clear($key);
         });
 
-        it('enforces email-based rate limiting', function () {
+        it('enforces email-based rate limiting', function (): void {
             $email = 'test@example.com';
 
             // Simulate rate limit key
@@ -258,8 +258,8 @@ describe('Comprehensive Security Validation Tests', function () {
         });
     });
 
-    describe('Token Service Integration', function () {
-        it('can generate secure tokens', function () {
+    describe('Token Service Integration', function (): void {
+        it('can generate secure tokens', function (): void {
             $tokenService = new SecureTokenService;
 
             // Test token generation (basic functionality test)
@@ -267,8 +267,8 @@ describe('Comprehensive Security Validation Tests', function () {
         });
     });
 
-    describe('Input Sanitization Integration', function () {
-        it('can sanitize email input', function () {
+    describe('Input Sanitization Integration', function (): void {
+        it('can sanitize email input', function (): void {
             $sanitizer = new InputSanitizationService;
 
             // Test sanitization service exists and can be instantiated
@@ -276,8 +276,8 @@ describe('Comprehensive Security Validation Tests', function () {
         });
     });
 
-    describe('Audit Logging Integration', function () {
-        it('can create audit log service', function () {
+    describe('Audit Logging Integration', function (): void {
+        it('can create audit log service', function (): void {
             $auditLogger = new AuditLogService;
 
             // Test audit service exists and can be instantiated

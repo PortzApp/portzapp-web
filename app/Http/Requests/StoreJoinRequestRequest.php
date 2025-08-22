@@ -27,7 +27,7 @@ class StoreJoinRequestRequest extends FormRequest
                 'required',
                 'string',
                 'exists:organizations,id',
-                function ($attribute, $value, $fail) {
+                function ($attribute, $value, $fail): void {
                     $user = auth()->user();
 
                     // Check if user is already a member
