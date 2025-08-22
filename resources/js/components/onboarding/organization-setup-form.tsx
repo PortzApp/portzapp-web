@@ -21,7 +21,7 @@ interface Props {
     onCancel: () => void;
 }
 
-interface OrganizationFormData extends Record<string, any> {
+export interface OrganizationFormData {
     id?: string;
     name: string;
     slug: string;

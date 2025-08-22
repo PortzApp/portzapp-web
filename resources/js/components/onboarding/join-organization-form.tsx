@@ -15,14 +15,6 @@ interface Props {
     onCancel: () => void;
 }
 
-interface InvitationFormData extends Record<string, any> {
-    invitation_code: string;
-}
-
-interface JoinRequestFormData extends Record<string, any> {
-    organization_slug: string;
-    message?: string;
-}
 
 export default function JoinOrganizationForm({ onCancel }: Props) {
     const invitationForm = useForm({

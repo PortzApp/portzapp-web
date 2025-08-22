@@ -16,7 +16,6 @@ import InputError from '@/components/input-error';
 interface MemberInvite {
     email: string;
     role: string;
-    [key: string]: any;
 }
 
 interface Props {
@@ -29,10 +28,6 @@ interface Props {
     }>;
 }
 
-interface MemberInviteFormData extends Record<string, any> {
-    organization_id: string;
-    invites: MemberInvite[];
-}
 
 export default function MemberInviteForm({ organizationId, onSuccess, onSkip, availableRoles }: Props) {
     const [invites, setInvites] = useState<MemberInvite[]>([{ email: '', role: '' }]);

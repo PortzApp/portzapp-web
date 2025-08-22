@@ -12,7 +12,7 @@ import { CompletionCelebration, InvitationSuccessCelebration, SuccessCelebration
 import JoinOrganizationForm from './join-organization-form';
 import MemberInviteForm from './member-invite-form';
 import OnboardingStepper from './onboarding-stepper';
-import OrganizationSetupForm from './organization-setup-form';
+import OrganizationSetupForm, { OrganizationFormData } from './organization-setup-form';
 
 interface Props {
     businessTypes: Array<{
@@ -39,7 +39,7 @@ export default function EnhancedOrganizationWizard({ businessTypes }: Props) {
         }
     };
 
-    const handleOrganizationCreated = (data: any) => {
+    const handleOrganizationCreated = (data: OrganizationFormData) => {
         console.log('Organization created data received:', data);
         const orgData = data as { id?: string; name?: string };
 
