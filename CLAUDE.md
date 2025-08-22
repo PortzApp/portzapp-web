@@ -37,6 +37,8 @@ composer run test:spellcheck        # Run Peck spellchecker
 
 **IMPORTANT:** Use **Pest PHP** exclusively for all testing. Do not write PHPUnit tests. All tests should use Pest syntax with `it()`, `expect()`, and `describe()` functions.
 
+**CRITICAL:** When writing tests, ALWAYS use Pest - never PHPUnit. This is a strict requirement for all new tests and test modifications.
+
 **Linting and formatting:**
 
 ```bash
