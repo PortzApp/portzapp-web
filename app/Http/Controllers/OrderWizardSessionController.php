@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\OrderGroupStatus;
 use App\Enums\OrderStatus;
 use App\Enums\WizardStep;
+use App\Http\Requests\SetServicesRequest;
 use App\Models\Order;
 use App\Models\OrderGroup;
 use App\Models\OrderWizardSession;
@@ -201,14 +202,9 @@ class OrderWizardSessionController extends Controller
     /**
      * Set selected services for the session.
      */
-    public function setServices(Request $request, OrderWizardSession $session)
+    public function setServices(SetServicesRequest $request, OrderWizardSession $session)
     {
-        Gate::authorize('update', $session);
-
-        $validated = $request->validate([
-            'selected_services' => 'required|array|min:1',
-            'selected_services.*' => 'exists:services,id',
-        ]);
+        $validated = $request->validated();
 
         // Clear existing service selections
         $session->serviceSelections()->delete();
@@ -235,9 +231,7 @@ class OrderWizardSessionController extends Controller
 
         $session->load(['vessel', 'port', 'categorySelections.serviceCategory', 'serviceSelections.service']);
 
-        return back()->with([
-            'session' => $session,
-        ]);
+        return to_route('order-wizard.step.review', ['session' => $session->id]);
     }
 
     /**

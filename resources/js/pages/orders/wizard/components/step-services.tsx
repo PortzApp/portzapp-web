@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 
 import { router } from '@inertiajs/react';
-import { AlertCircle, ArrowLeft, Building2, Check, Search, Users } from 'lucide-react';
+import { AlertCircle, ArrowLeft, Building2, Search, Users } from 'lucide-react';
 
 import type { Service } from '@/types/models';
 import type { OrderWizardCategorySelection, OrderWizardSession } from '@/types/wizard';
@@ -9,9 +9,9 @@ import type { OrderWizardCategorySelection, OrderWizardSession } from '@/types/w
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 interface StepServicesProps {
     services: Service[];
@@ -26,11 +26,26 @@ export function StepServices({ services, session }: StepServicesProps) {
         ? services.filter((service) => session.service_selections?.some((selection) => selection.service_id === service.id))
         : [];
 
-    const [tempSelectedServices, setTempSelectedServices] = useState<Service[]>(initiallySelectedServices);
+    // Store selected services as a map of subCategoryId -> serviceId for radio group management
+    const [selectedServicesBySubCategory, setSelectedServicesBySubCategory] = useState<Record<string, string>>(() => {
+        const initialMap: Record<string, string> = {};
+        initiallySelectedServices.forEach((service) => {
+            if (service.sub_category?.id) {
+                initialMap[service.sub_category.id] = service.id;
+            }
+        });
+        return initialMap;
+    });
     const [search, setSearch] = useState('');
 
     // Get selected categories from session for display
     const selectedCategories = useMemo(() => session?.category_selections || [], [session?.category_selections]);
+
+    // Computed property to get currently selected services
+    const tempSelectedServices = useMemo(() => {
+        const selectedServiceIds = Object.values(selectedServicesBySubCategory);
+        return services.filter((service) => selectedServiceIds.includes(service.id));
+    }, [selectedServicesBySubCategory, services]);
 
     // Filter services by search only (they're already filtered by port and category from backend)
     const filteredServices = services.filter((service) => {
@@ -87,12 +102,19 @@ export function StepServices({ services, session }: StepServicesProps) {
         >,
     );
 
-    const handleServiceToggle = (service: Service, checked: boolean) => {
-        if (checked) {
-            setTempSelectedServices((prev) => [...prev, service]);
-        } else {
-            setTempSelectedServices((prev) => prev.filter((s) => s.id !== service.id));
-        }
+    const handleServiceSelection = (subCategoryId: string, serviceId: string) => {
+        setSelectedServicesBySubCategory((prev) => ({
+            ...prev,
+            [subCategoryId]: serviceId,
+        }));
+    };
+
+    const handleSubCategoryDeselection = (subCategoryId: string) => {
+        setSelectedServicesBySubCategory((prev) => {
+            const updated = { ...prev };
+            delete updated[subCategoryId];
+            return updated;
+        });
     };
 
     const handleContinue = () => {
@@ -105,11 +127,11 @@ export function StepServices({ services, session }: StepServicesProps) {
                     selected_services: tempSelectedServices.map((service) => service.id),
                 },
                 {
-                    onSuccess: () => {
-                        // Navigate to review step
-                        router.visit(route('order-wizard.step.review', { session: session.id }));
-                    },
                     onFinish: () => setIsSaving(false),
+                    onError: (errors) => {
+                        console.error('Service selection errors:', errors);
+                        setIsSaving(false);
+                    },
                 },
             );
         }
@@ -128,7 +150,7 @@ export function StepServices({ services, session }: StepServicesProps) {
                         Select Services
                     </h3>
                     <p className="mt-1 text-muted-foreground">
-                        Choose services from the selected categories. Services are grouped by category, then by provider.
+                        Choose one service provider per category. Services are grouped by category, and you can select only one provider per category.
                     </p>
                 </div>
 
@@ -170,52 +192,58 @@ export function StepServices({ services, session }: StepServicesProps) {
                             </CardHeader>
 
                             <CardContent className="space-y-4">
-                                <div className="grid gap-4 sm:grid-cols-2">
+                                <RadioGroup
+                                    value={selectedServicesBySubCategory[subCategory.id] || ''}
+                                    onValueChange={(value) => {
+                                        if (value) {
+                                            handleServiceSelection(subCategory.id, value);
+                                        } else {
+                                            handleSubCategoryDeselection(subCategory.id);
+                                        }
+                                    }}
+                                    className="gap-2"
+                                >
                                     {Object.values(organizationGroups).map(({ organization, services: orgServices }) => {
                                         // Since each organization only offers one service per sub-category,
                                         // we can simplify this to show one card per organization-service combination
                                         const service = orgServices[0]; // Take the first (and only) service
-                                        const isSelected = tempSelectedServices.some((s) => s.id === service.id);
+                                        const isSelected = selectedServicesBySubCategory[subCategory.id] === service.id;
 
                                         return (
                                             <div
                                                 key={`${organization.id}-${service.id}`}
-                                                className={`relative cursor-pointer rounded-lg border p-4 transition-colors ${
-                                                    isSelected ? 'border-primary bg-primary/5' : 'border-border hover:border-muted-foreground/50'
+                                                className={`relative flex w-full items-start gap-2 rounded-md border border-input p-4 shadow-xs outline-none transition-colors ${
+                                                    isSelected ? 'border-primary/50 bg-primary/5' : 'hover:border-muted-foreground/50'
                                                 }`}
-                                                onClick={() => handleServiceToggle(service, !isSelected)}
                                             >
-                                                <div className="flex items-start space-x-3">
-                                                    <Checkbox
-                                                        id={service.id}
-                                                        checked={isSelected}
-                                                        onCheckedChange={(checked) => handleServiceToggle(service, checked as boolean)}
-                                                        onClick={(e) => e.stopPropagation()}
-                                                    />
-
+                                                <RadioGroupItem
+                                                    value={service.id}
+                                                    id={`${subCategory.id}-${service.id}`}
+                                                    className="order-1 after:absolute after:inset-0"
+                                                />
+                                                <div className="flex grow items-center gap-3">
                                                     {/* Agency Logo Placeholder */}
                                                     <div className="h-12 w-12 flex-shrink-0 rounded-md bg-muted" />
 
-                                                    <div className="min-w-0 flex-1">
-                                                        <div className="mb-1 flex items-center gap-2">
-                                                            <Label htmlFor={service.id} className="cursor-pointer text-base font-semibold">
-                                                                {service.organization?.name || 'Agency'}
-                                                            </Label>
-                                                            <Building2 className="h-4 w-4 text-muted-foreground" />
-                                                        </div>
+                                                    <div className="grid grow gap-2">
+                                                        <Label htmlFor={`${subCategory.id}-${service.id}`} className="cursor-pointer">
+                                                            {service.organization?.name || 'Agency'}{' '}
+                                                            <span className="text-xs leading-[inherit] font-normal text-muted-foreground">
+                                                                ({subCategory.name})
+                                                            </span>
+                                                        </Label>
                                                         {service.description && (
-                                                            <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{service.description}</p>
+                                                            <p className="text-xs text-muted-foreground line-clamp-2">{service.description}</p>
                                                         )}
                                                         {service.price && (
-                                                            <p className="mt-2 text-sm font-semibold text-green-600">${service.price}</p>
+                                                            <p className="text-sm font-semibold text-green-600">${service.price}</p>
                                                         )}
                                                     </div>
-                                                    {isSelected && <Check className="h-5 w-5 text-primary" />}
                                                 </div>
                                             </div>
                                         );
                                     })}
-                                </div>
+                                </RadioGroup>
                             </CardContent>
                         </Card>
                     ))}
@@ -280,7 +308,7 @@ export function StepServices({ services, session }: StepServicesProps) {
                         <p className="text-sm text-muted-foreground">
                             {tempSelectedServices.length > 0
                                 ? 'These services will be included in your order'
-                                : 'Select services to see them here. Services from different providers will create separate order groups.'}
+                                : 'Select one service provider per category to see them here. Each provider will create a separate order group.'}
                         </p>
 
                         {/* Selected Services List */}
