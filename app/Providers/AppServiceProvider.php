@@ -10,6 +10,7 @@ use App\Models\OrganizationJoinRequest;
 use App\Models\Port;
 use App\Models\Service;
 use App\Models\User;
+use App\Observers\OrderGroupObserver;
 use App\Policies\InvitationPolicy;
 use App\Policies\OrderGroupPolicy;
 use App\Policies\OrderPolicy;
@@ -46,5 +47,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Invitation::class, InvitationPolicy::class);
         Gate::policy(User::class, UserPolicy::class);
 
+        // Register model observers
+        OrderGroup::observe(OrderGroupObserver::class);
     }
 }
