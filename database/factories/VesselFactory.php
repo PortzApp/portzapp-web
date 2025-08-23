@@ -13,6 +13,32 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class VesselFactory extends Factory
 {
     /**
+     * Realistic vessel names commonly used in shipping industry.
+     */
+    private const VESSEL_NAMES = [
+        'MV Ocean Pioneer',
+        'MSC Mediterranean',
+        'Ever Given',
+        'COSCO Fortune',
+        'Maersk Alabama',
+        'CMA CGM Marco Polo',
+        'OOCL Hong Kong',
+        'NYK Delphinus',
+        'Evergreen Marine',
+        'Hamburg Express',
+        'APL Merlion',
+        'MOL Triumph',
+        'Yang Ming Utmost',
+        'Hanjin Harmony',
+        'Pacific Voyager',
+        'Atlantic Star',
+        'Nordic Spirit',
+        'Global Trader',
+        'Sea Eagle',
+        'Blue Marlin',
+    ];
+
+    /**
      * Define the model's default state.
      *
      * @return array<string, mixed>
@@ -20,7 +46,7 @@ class VesselFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->words(2, true).' '.fake()->randomElement(['Vessel', 'Ship', 'Carrier', 'Express']),
+            'name' => fake()->randomElement(self::VESSEL_NAMES),
             'organization_id' => Organization::factory(),
             'imo_number' => fake()->unique()->randomNumber(7, true),
             'vessel_type' => fake()->randomElement(VesselType::cases()),
