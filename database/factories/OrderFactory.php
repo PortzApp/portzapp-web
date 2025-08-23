@@ -38,8 +38,8 @@ class OrderFactory extends Factory
                 OrderStatus::PENDING_AGENCY_CONFIRMATION,  // 30%
                 OrderStatus::PENDING_AGENCY_CONFIRMATION,
                 OrderStatus::PENDING_AGENCY_CONFIRMATION,
-                OrderStatus::PARTIALLY_CONFIRMED,          // 20%
-                OrderStatus::PARTIALLY_CONFIRMED,
+                OrderStatus::PARTIALLY_ACCEPTED,          // 20%
+                OrderStatus::PARTIALLY_ACCEPTED,
                 OrderStatus::CONFIRMED,                     // 30%
                 OrderStatus::CONFIRMED,
                 OrderStatus::CONFIRMED,
@@ -70,12 +70,52 @@ class OrderFactory extends Factory
     }
 
     /**
-     * Indicate that the order is partially confirmed.
+     * Indicate that the order is partially accepted.
      */
-    public function partiallyConfirmed(): static
+    public function partiallyAccepted(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => OrderStatus::PARTIALLY_CONFIRMED,
+            'status' => OrderStatus::PARTIALLY_ACCEPTED,
+        ]);
+    }
+
+    /**
+     * Indicate that the order is partially rejected.
+     */
+    public function partiallyRejected(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => OrderStatus::PARTIALLY_REJECTED,
+        ]);
+    }
+
+    /**
+     * Indicate that the order is in progress.
+     */
+    public function inProgress(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => OrderStatus::IN_PROGRESS,
+        ]);
+    }
+
+    /**
+     * Indicate that the order is partially completed.
+     */
+    public function partiallyCompleted(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => OrderStatus::PARTIALLY_COMPLETED,
+        ]);
+    }
+
+    /**
+     * Indicate that the order is completed.
+     */
+    public function completed(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => OrderStatus::COMPLETED,
         ]);
     }
 
