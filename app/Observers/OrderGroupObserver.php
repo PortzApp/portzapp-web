@@ -94,27 +94,46 @@ class OrderGroupObserver
     {
         $statusCounts = $orderGroupStatuses->countBy(fn ($status) => $status->value);
 
+        // Check for each status type
         $allCompleted = $orderGroupStatuses->every(fn ($status) => $status === OrderGroupStatus::COMPLETED);
         $allAccepted = $orderGroupStatuses->every(fn ($status) => $status === OrderGroupStatus::ACCEPTED);
+        $allPending = $orderGroupStatuses->every(fn ($status) => $status === OrderGroupStatus::PENDING);
+
         $anyRejected = $orderGroupStatuses->contains(OrderGroupStatus::REJECTED);
         $anyAccepted = $orderGroupStatuses->contains(OrderGroupStatus::ACCEPTED);
+        $anyInProgress = $orderGroupStatuses->contains(OrderGroupStatus::IN_PROGRESS);
         $anyCompleted = $orderGroupStatuses->contains(OrderGroupStatus::COMPLETED);
 
-        // Business logic for Order status aggregation
-        if ($allCompleted) {
-            return OrderStatus::CONFIRMED;
+        // Business logic for Order status aggregation (in priority order)
+
+        // Terminal state: any rejection means partial rejection
+        if ($anyRejected) {
+            return OrderStatus::PARTIALLY_REJECTED;
         }
 
+        // All completed - final success state
+        if ($allCompleted) {
+            return OrderStatus::COMPLETED;
+        }
+
+        // Some completed, others in progress or accepted - partial completion
+        if ($anyCompleted && ($anyInProgress || ($anyAccepted && ! $allAccepted))) {
+            return OrderStatus::PARTIALLY_COMPLETED;
+        }
+
+        // At least one in progress
+        if ($anyInProgress) {
+            return OrderStatus::IN_PROGRESS;
+        }
+
+        // All accepted and none in progress/completed - confirmed and ready
         if ($allAccepted) {
             return OrderStatus::CONFIRMED;
         }
 
-        if ($anyRejected) {
-            return OrderStatus::CANCELLED;
-        }
-
-        if ($anyAccepted || $anyCompleted) {
-            return OrderStatus::PARTIALLY_CONFIRMED;
+        // Some accepted, some pending - partial acceptance
+        if ($anyAccepted && ! $allAccepted) {
+            return OrderStatus::PARTIALLY_ACCEPTED;
         }
 
         // Default: all OrderGroups are still pending

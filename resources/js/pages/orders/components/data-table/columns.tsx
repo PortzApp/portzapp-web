@@ -28,8 +28,12 @@ export const columns: ColumnDef<OrderWithRelations>[] = [
                         order.status === 'draft' && 'bg-gray-200 text-gray-950 uppercase dark:bg-gray-900 dark:text-gray-50',
                         order.status === 'pending_agency_confirmation' &&
                             'bg-yellow-200 text-yellow-950 uppercase dark:bg-yellow-900 dark:text-yellow-50',
-                        order.status === 'partially_confirmed' && 'bg-orange-200 text-orange-950 uppercase dark:bg-orange-900 dark:text-orange-50',
+                        order.status === 'partially_accepted' && 'bg-orange-200 text-orange-950 uppercase dark:bg-orange-900 dark:text-orange-50',
+                        order.status === 'partially_rejected' && 'bg-red-200 text-red-950 uppercase dark:bg-red-900 dark:text-red-50',
                         order.status === 'confirmed' && 'bg-green-200 text-green-950 uppercase dark:bg-green-900 dark:text-green-50',
+                        order.status === 'in_progress' && 'bg-blue-200 text-blue-950 uppercase dark:bg-blue-900 dark:text-blue-50',
+                        order.status === 'partially_completed' && 'bg-blue-200 text-blue-950 uppercase dark:bg-blue-900 dark:text-blue-50',
+                        order.status === 'completed' && 'bg-green-200 text-green-950 uppercase dark:bg-green-900 dark:text-green-50',
                         order.status === 'cancelled' && 'bg-red-200 text-red-950 uppercase dark:bg-red-900 dark:text-red-50',
                     )}
                 >
