@@ -2,8 +2,8 @@ import { Link } from '@inertiajs/react';
 
 import { OrderGroup, OrderGroupService } from '@/types/models';
 
-import { cn } from '@/lib/utils';
-
+import { OrderGroupServiceStatusBadge } from '@/components/badges/order-group-service-status-badge';
+import { OrderGroupStatusBadge } from '@/components/badges/order-group-status-badge';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,19 +14,6 @@ interface OrderGroupsTabProps {
 }
 
 export default function OrderGroupsTab({ orderGroups }: OrderGroupsTabProps) {
-    const getStatusBadge = (status: string) => (
-        <Badge
-            className={cn(
-                status === 'pending' && 'bg-yellow-200 text-yellow-950 dark:bg-yellow-900 dark:text-yellow-50',
-                status === 'accepted' && 'bg-blue-200 text-blue-950 dark:bg-blue-900 dark:text-blue-50',
-                status === 'rejected' && 'bg-red-200 text-red-950 dark:bg-red-900 dark:text-red-50',
-                status === 'in_progress' && 'bg-purple-200 text-purple-950 dark:bg-purple-900 dark:text-purple-50',
-                status === 'completed' && 'bg-green-200 text-green-950 dark:bg-green-900 dark:text-green-50',
-            )}
-        >
-            {status.replace(/_/g, ' ')}
-        </Badge>
-    );
 
     // Helper to get services from either new or old structure
     const getGroupServices = (group: OrderGroup) => {
@@ -86,7 +73,7 @@ export default function OrderGroupsTab({ orderGroups }: OrderGroupsTabProps) {
                                     <CardTitle className="font-mono text-base">{group.group_number}</CardTitle>
                                     <CardDescription className="mt-1 flex items-center gap-2">
                                         <span>Assigned to {group.fulfilling_organization.name}</span>
-                                        {getStatusBadge(group.status)}
+                                        <OrderGroupStatusBadge status={group.status} />
                                     </CardDescription>
                                 </div>
                                 <Link href={route('order-groups.show', group.id)}>
@@ -128,7 +115,9 @@ export default function OrderGroupsTab({ orderGroups }: OrderGroupsTabProps) {
                                                             <span>
                                                                 {service.sub_category?.name || 'Service'} - {service.organization?.name || 'Unknown'}
                                                             </span>
-                                                            {orderGroupService.status && getStatusBadge(orderGroupService.status)}
+                                                            {orderGroupService.status && (
+                                                                <OrderGroupServiceStatusBadge status={orderGroupService.status} />
+                                                            )}
                                                         </div>
                                                         <span className="font-mono">
                                                             ${parseFloat(orderGroupService.price_snapshot || service.price || '0').toFixed(2)}
