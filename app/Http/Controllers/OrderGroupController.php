@@ -23,7 +23,7 @@ class OrderGroupController extends Controller
             'order.placedByUser',
             'order.placedByOrganization',
             'fulfillingOrganization',
-            'orderGroupServices.service',
+            'orderGroupServices.service.subCategory',
         ]);
 
         // PORTZAPP_TEAM can see all order groups
@@ -59,13 +59,13 @@ class OrderGroupController extends Controller
             'order.placedByUser',
             'order.placedByOrganization',
             'fulfillingOrganization',
-            'orderGroupServices.service',
+            'orderGroupServices.service.subCategory',
         ]);
 
         // Load sibling order groups for context (excluding current one)
         $siblingOrderGroups = OrderGroup::where('order_id', $orderGroup->order_id)
             ->where('id', '!=', $orderGroup->id)
-            ->with(['fulfillingOrganization', 'orderGroupServices.service'])
+            ->with(['fulfillingOrganization', 'orderGroupServices.service.subCategory'])
             ->get();
 
         return Inertia::render('order-groups/show-order-group-page', [
