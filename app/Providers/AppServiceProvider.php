@@ -5,12 +5,14 @@ namespace App\Providers;
 use App\Models\Invitation;
 use App\Models\Order;
 use App\Models\OrderGroup;
+use App\Models\OrderGroupService;
 use App\Models\OrderWizardSession;
 use App\Models\OrganizationJoinRequest;
 use App\Models\Port;
 use App\Models\Service;
 use App\Models\User;
 use App\Observers\OrderGroupObserver;
+use App\Observers\OrderGroupServiceObserver;
 use App\Policies\InvitationPolicy;
 use App\Policies\OrderGroupPolicy;
 use App\Policies\OrderPolicy;
@@ -49,5 +51,6 @@ class AppServiceProvider extends ServiceProvider
 
         // Register model observers
         OrderGroup::observe(OrderGroupObserver::class);
+        OrderGroupService::observe(OrderGroupServiceObserver::class);
     }
 }
