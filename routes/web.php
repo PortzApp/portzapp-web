@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\OrderGroupController;
+use App\Http\Controllers\OrderGroupServiceController;
 use App\Http\Controllers\OrderWizardSessionController;
 use App\Http\Controllers\OrganizationController;
 use App\Http\Controllers\PortController;
@@ -49,6 +50,9 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::post('order-groups/{orderGroup}/reject', [OrderGroupController::class, 'reject'])->name('order-groups.reject');
     Route::post('order-groups/{orderGroup}/start', [OrderGroupController::class, 'start'])->name('order-groups.start');
     Route::post('order-groups/{orderGroup}/complete', [OrderGroupController::class, 'complete'])->name('order-groups.complete');
+
+    // Order group service action routes
+    Route::patch('order-group-services/{orderGroupService}/status', [OrderGroupServiceController::class, 'updateStatus'])->name('order-group-services.status.update');
 
     // Order wizard routes
     Route::prefix('order-wizard')->group(function (): void {
