@@ -1,6 +1,6 @@
 import { Link } from '@inertiajs/react';
 
-import { OrderGroup } from '@/types/models';
+import { OrderGroup, OrderGroupService } from '@/types/models';
 
 import { cn } from '@/lib/utils';
 
@@ -27,6 +27,35 @@ export default function OrderGroupsTab({ orderGroups }: OrderGroupsTabProps) {
             {status.replace(/_/g, ' ')}
         </Badge>
     );
+
+    // Helper to get services from either new or old structure
+    const getGroupServices = (group: OrderGroup) => {
+        if (group.order_group_services && group.order_group_services.length > 0) {
+            return group.order_group_services;
+        }
+        // Fallback to old structure
+        return group.services?.map(service => ({
+            id: `${group.id}-${service.id}`, // temporary ID
+            service_id: service.id,
+            order_group_id: group.id,
+            status: 'pending' as const,
+            price_snapshot: parseFloat(service.price || '0'),
+            notes: null,
+            service,
+            created_at: service.created_at,
+            updated_at: service.updated_at,
+        })) || [];
+    };
+
+    // Helper to calculate total price from OrderGroupServices
+    const getGroupTotalPrice = (group: OrderGroup) => {
+        const groupServices = getGroupServices(group);
+        if (groupServices.length > 0 && 'price_snapshot' in groupServices[0]) {
+            return groupServices.reduce((sum, ogs) => sum + parseFloat(ogs.price_snapshot || '0'), 0);
+        }
+        // Fallback to old calculation
+        return group.total_price || group.services?.reduce((sum, service) => sum + parseFloat(service.price || '0'), 0) || 0;
+    };
 
     if (orderGroups.length === 0) {
         return (
@@ -71,17 +100,12 @@ export default function OrderGroupsTab({ orderGroups }: OrderGroupsTabProps) {
                             <div className="grid grid-cols-1 gap-4 text-sm md:grid-cols-3">
                                 <div>
                                     <span className="font-medium text-muted-foreground">Services:</span>
-                                    <p className="font-semibold">{group.services?.length || 0} services</p>
+                                    <p className="font-semibold">{getGroupServices(group).length} services</p>
                                 </div>
                                 <div>
                                     <span className="font-medium text-muted-foreground">Total Price:</span>
                                     <p className="font-semibold tabular-nums">
-                                        $
-                                        {(
-                                            group.total_price ||
-                                            group.services?.reduce((sum, service) => sum + parseFloat(service.price || '0'), 0) ||
-                                            0
-                                        ).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                        ${getGroupTotalPrice(group).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                     </p>
                                 </div>
                                 <div>
@@ -90,20 +114,28 @@ export default function OrderGroupsTab({ orderGroups }: OrderGroupsTabProps) {
                                 </div>
                             </div>
 
-                            {group.services && group.services.length > 0 && (
+                            {getGroupServices(group).length > 0 && (
                                 <>
                                     <Separator />
                                     <div>
                                         <h4 className="mb-2 text-sm font-medium text-muted-foreground">Services in this group:</h4>
                                         <div className="space-y-2">
-                                            {group.services.map((service) => (
-                                                <div key={service.id} className="flex items-center justify-between text-sm">
-                                                    <span>
-                                                        {service.sub_category?.name || 'Service'} - {service.organization?.name || 'Unknown'}
-                                                    </span>
-                                                    <span className="font-mono">${parseFloat(service.price).toFixed(2)}</span>
-                                                </div>
-                                            ))}
+                                            {getGroupServices(group).map((orderGroupService) => {
+                                                const service = orderGroupService.service || orderGroupService;
+                                                return (
+                                                    <div key={orderGroupService.id} className="flex items-center justify-between text-sm">
+                                                        <div className="flex items-center gap-2">
+                                                            <span>
+                                                                {service.sub_category?.name || 'Service'} - {service.organization?.name || 'Unknown'}
+                                                            </span>
+                                                            {orderGroupService.status && getStatusBadge(orderGroupService.status)}
+                                                        </div>
+                                                        <span className="font-mono">
+                                                            ${parseFloat(orderGroupService.price_snapshot || service.price || '0').toFixed(2)}
+                                                        </span>
+                                                    </div>
+                                                );
+                                            })}
                                         </div>
                                     </div>
                                 </>

@@ -126,12 +126,21 @@ class Service extends Model
     }
 
     /**
-     * Get the order groups for the current service.
+     * Get the order groups for the current service through OrderGroupService.
      */
     public function orderGroups(): BelongsToMany
     {
-        return $this->belongsToMany(OrderGroup::class, 'order_group_service')
+        return $this->belongsToMany(OrderGroup::class, 'order_group_services')
+            ->withPivot(['status', 'notes', 'price_snapshot'])
             ->withTimestamps();
+    }
+
+    /**
+     * Get the OrderGroupService records for this service.
+     */
+    public function orderGroupServices(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(OrderGroupService::class);
     }
 
     /**
