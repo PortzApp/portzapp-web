@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
 /**
@@ -24,8 +24,9 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $updated_at
  * @property-read Order $order
  * @property-read Organization $fulfillingOrganization
+ * @property-read Collection<int, OrderGroupService> $orderGroupServices
+ * @property-read int|null $order_group_services_count
  * @property-read Collection<int, Service> $services
- * @property-read int|null $services_count
  * @property-read float $total_price
  *
  * @method static \Database\Factories\OrderGroupFactory factory($count = null, $state = [])
@@ -58,19 +59,36 @@ class OrderGroup extends Model
         return $this->belongsTo(Organization::class, 'fulfilling_organization_id');
     }
 
-    public function services(): BelongsToMany
+    public function orderGroupServices(): HasMany
     {
-        return $this->belongsToMany(Service::class, 'order_group_service')
-            ->as('orderGroupService')
+        return $this->hasMany(OrderGroupService::class);
+    }
+
+    /**
+     * Get services through OrderGroupService relationship (backward compatibility).
+     * This provides a BelongsToMany relationship for the existing tests.
+     */
+    public function services()
+    {
+        return $this->belongsToMany(\App\Models\Service::class, 'order_group_services')
+            ->withPivot(['status', 'notes', 'price_snapshot'])
             ->withTimestamps();
     }
 
     /**
-     * Calculate the total price for this order group from all associated services.
+     * Helper method to get services collection for backward compatibility.
+     */
+    public function getServicesAttribute(): Collection
+    {
+        return $this->orderGroupServices->pluck('service');
+    }
+
+    /**
+     * Calculate the total price for this order group from all OrderGroupServices.
      */
     public function getTotalPriceAttribute(): float
     {
-        return (float) $this->services()->sum('price');
+        return (float) $this->orderGroupServices()->sum('price_snapshot');
     }
 
     protected function casts(): array
