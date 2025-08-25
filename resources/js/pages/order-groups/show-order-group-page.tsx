@@ -10,7 +10,6 @@ import type { BreadcrumbItem } from '@/types';
 import { OrderBase, OrderGroup, OrderGroupService, OrderWithRelations } from '@/types/models';
 import { OrderGroupServiceStatus, OrderGroupStatus } from '@/types/enums';
 
-import { cn } from '@/lib/utils';
 
 import AppLayout from '@/layouts/app-layout';
 
