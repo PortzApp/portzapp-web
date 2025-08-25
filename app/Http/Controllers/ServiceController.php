@@ -173,7 +173,7 @@ class ServiceController extends Controller
         ]);
 
         // Refresh the service with relationships to get the latest data
-        $service->refresh()->load(['organization:id,name', 'port:id,name', 'subCategory.category:id,name', 'orders']);
+        $service->refresh()->load(['organization:id,name', 'port:id,name', 'subCategory.category:id,name']);
 
         ServiceUpdated::dispatch($request->user(), $service);
 
