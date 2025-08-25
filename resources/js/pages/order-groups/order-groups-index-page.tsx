@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 
-import { Head, router } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import { useEcho } from '@laravel/echo-react';
 import { toast } from 'sonner';
 
-import type { BreadcrumbItem } from '@/types';
+import type { BreadcrumbItem, SharedData } from '@/types';
 import { OrderGroup } from '@/types/models';
 
 import AppLayout from '@/layouts/app-layout';
@@ -34,6 +34,7 @@ interface OrderGroupUpdatedEvent extends OrderGroupEvent {
 }
 
 export default function OrderGroupsIndexPage({ orderGroups: initialOrderGroups }: { orderGroups: Array<OrderGroup> }) {
+    const { auth } = usePage<SharedData>().props;
     const [orderGroups, setOrderGroups] = useState(initialOrderGroups);
 
     // Sync new props back to local state after server refetch
@@ -41,8 +42,8 @@ export default function OrderGroupsIndexPage({ orderGroups: initialOrderGroups }
         setOrderGroups(initialOrderGroups);
     }, [initialOrderGroups]);
 
-    // Listen for order group updated events
-    useEcho<OrderGroupUpdatedEvent>('order-groups', 'OrderGroupUpdated', ({ orderGroup: updatedOrderGroup }) => {
+    // Listen for order group updated events on organization-scoped channel
+    useEcho<OrderGroupUpdatedEvent>(`order-groups.organization.${auth.user.current_organization?.id}`, 'OrderGroupUpdated', ({ orderGroup: updatedOrderGroup }) => {
         setOrderGroups((prevOrderGroups) =>
             prevOrderGroups.map((prevOrderGroup) =>
                 prevOrderGroup.id === updatedOrderGroup.id ? {

@@ -44,8 +44,8 @@ export default function OrdersIndexPage({ orders: initialOrders }: { orders: Arr
         setOrders(initialOrders);
     }, [initialOrders]);
 
-    // Listen for order updated events
-    useEcho<OrderUpdatedEvent>('orders', 'OrderUpdated', ({ order: updatedOrder }) => {
+    // Listen for order updated events on organization-scoped channel
+    useEcho<OrderUpdatedEvent>(`orders.organization.${auth.user.current_organization?.id}`, 'OrderUpdated', ({ order: updatedOrder }) => {
         setOrders((prevOrders) =>
             prevOrders.map((prevOrder) => (prevOrder.id === updatedOrder.id ? {
                 ...prevOrder,

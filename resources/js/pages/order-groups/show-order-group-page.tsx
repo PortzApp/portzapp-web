@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 
-import { Head, router } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import { useEcho } from '@laravel/echo-react';
 import { toast } from 'sonner';
 
 import { MoreVertical } from 'lucide-react';
 
-import type { BreadcrumbItem } from '@/types';
+import type { BreadcrumbItem, SharedData } from '@/types';
 import { OrderBase, OrderGroup, OrderGroupService, OrderWithRelations } from '@/types/models';
 import { OrderGroupServiceStatus, OrderGroupStatus } from '@/types/enums';
 
@@ -74,6 +74,7 @@ export default function ShowOrderGroupPage({
     parentOrder: OrderBase;
     siblingOrderGroups: OrderGroup[];
 }) {
+    const { auth } = usePage<SharedData>().props;
     const [orderGroup, setOrderGroup] = useState(initialOrderGroup);
     const [parentOrder, setParentOrder] = useState(initialParentOrder);
     const [siblingOrderGroups, setSiblingOrderGroups] = useState(initialSiblingOrderGroups);
@@ -87,8 +88,8 @@ export default function ShowOrderGroupPage({
 
     const breadcrumbs = getBreadcrumbs(orderGroup);
 
-    // Listen for order group updated events
-    useEcho<OrderGroupUpdatedEvent>('order-groups', 'OrderGroupUpdated', ({ orderGroup: updatedOrderGroup }) => {
+    // Listen for order group updated events on resource-specific channel
+    useEcho<OrderGroupUpdatedEvent>(`order-groups.${orderGroup.id}`, 'OrderGroupUpdated', ({ orderGroup: updatedOrderGroup }) => {
         // Update main order group if it's the current one
         if (updatedOrderGroup.id === orderGroup.id) {
             setOrderGroup(prevOrderGroup => ({
@@ -131,8 +132,8 @@ export default function ShowOrderGroupPage({
         }
     });
 
-    // Listen for order group service updated events
-    useEcho<OrderGroupServiceUpdatedEvent>('order-group-services', 'OrderGroupServiceUpdated', ({ orderGroupService: updatedOrderGroupService }) => {
+    // Listen for order group service updated events on organization-scoped channel
+    useEcho<OrderGroupServiceUpdatedEvent>(`order-group-services.organization.${auth.user.current_organization?.id}`, 'OrderGroupServiceUpdated', ({ orderGroupService: updatedOrderGroupService }) => {
         // Check if this service belongs to the current order group
         const belongsToCurrentOrderGroup = orderGroup.order_group_services?.some(ogs => ogs.id === updatedOrderGroupService.id);
         
@@ -156,8 +157,8 @@ export default function ShowOrderGroupPage({
         }
     });
 
-    // Listen for parent order updated events
-    useEcho<OrderUpdatedEvent>('orders', 'OrderUpdated', ({ order: updatedOrder }) => {
+    // Listen for parent order updated events on resource-specific channel
+    useEcho<OrderUpdatedEvent>(`orders.${parentOrder.id}`, 'OrderUpdated', ({ order: updatedOrder }) => {
         if (updatedOrder.id === parentOrder.id) {
             setParentOrder(prevParentOrder => ({
                 ...prevParentOrder,
