@@ -52,6 +52,8 @@ export default function OrdersIndexPage({ orders: initialOrders }: { orders: Arr
 
         toast('Order updated', {
             description: `Order #${updatedOrder.id} status changed to ${updatedOrder.status?.replace(/_/g, ' ')}`,
+            className: 'bg-background border-border',
+            descriptionClassName: 'text-muted-foreground',
             action: {
                 label: 'View Order',
                 onClick: () => {

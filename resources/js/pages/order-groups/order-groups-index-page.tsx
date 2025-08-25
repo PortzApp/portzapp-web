@@ -51,6 +51,8 @@ export default function OrderGroupsIndexPage({ orderGroups: initialOrderGroups }
 
         toast('Order group updated', {
             description: `Order group #${updatedOrderGroup.group_number} status changed to ${updatedOrderGroup.status?.replace(/_/g, ' ')}`,
+            className: 'bg-background border-border',
+            descriptionClassName: 'text-muted-foreground',
             action: {
                 label: 'View Order Group',
                 onClick: () => {
