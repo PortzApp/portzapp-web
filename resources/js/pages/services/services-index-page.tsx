@@ -257,24 +257,16 @@ export default function ServicesIndexPage({ services: initialServices, ports, se
                                         </div>
 
                                         <div className="flex flex-wrap gap-2">
-                                            {service.sub_category?.category && (
-                                                <Badge variant="secondary">
-                                                    <Box className="mr-1 h-3 w-3" />
-                                                    {service.sub_category.category.name}
-                                                </Badge>
-                                            )}
-                                            {service.sub_category && (
-                                                <Badge variant="outline">
-                                                    <Box className="mr-1 h-3 w-3" />
-                                                    {service.sub_category.name}
-                                                </Badge>
-                                            )}
-                                            {!service.sub_category && (
-                                                <Badge variant="secondary">
-                                                    <Box className="mr-1 h-3 w-3" />
-                                                    No Category
-                                                </Badge>
-                                            )}
+                                            <Badge variant="secondary">
+                                                <Box className="mr-1 h-3 w-3" />
+                                                {service.sub_category?.category && service.sub_category
+                                                    ? `${service.sub_category.category.name} → ${service.sub_category.name}`
+                                                    : service.sub_category?.category
+                                                    ? service.sub_category.category.name
+                                                    : service.sub_category
+                                                    ? service.sub_category.name
+                                                    : 'No Category'}
+                                            </Badge>
                                             <Badge variant="secondary">
                                                 <MapPin className="mr-1 h-3 w-3" />
                                                 {service.port.name} ({service.port.country}, {service.port.city})
