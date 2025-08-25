@@ -1,11 +1,11 @@
 import { useState } from 'react';
 
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { useEcho } from '@laravel/echo-react';
 import { Dot, Edit, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
-import type { BreadcrumbItem } from '@/types';
+import type { BreadcrumbItem, SharedData } from '@/types';
 import { Service } from '@/types/models';
 
 import { cn } from '@/lib/utils';
@@ -49,11 +49,12 @@ interface ServiceDeletedEvent extends ServiceEvent {
 }
 
 export default function ShowServicePage({ service: initialService }: { service: Service }) {
+    const { auth } = usePage<SharedData>().props;
     const [service, setService] = useState(initialService);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
-    // Listen for service updated events
-    useEcho<ServiceCreatedEvent>('services', 'ServiceCreated', ({ service: newService }) => {
+    // Listen for service created events on organization-scoped channel
+    useEcho<ServiceCreatedEvent>(`services.organization.${auth.user.current_organization?.id}`, 'ServiceCreated', ({ service: newService }) => {
         toast('Service created', {
             description: `Service #${newService.id} created`,
             action: {
@@ -65,7 +66,7 @@ export default function ShowServicePage({ service: initialService }: { service: 
         });
     });
 
-    useEcho<ServiceUpdatedEvent>('services', 'ServiceUpdated', ({ service: updatedService }) => {
+    useEcho<ServiceUpdatedEvent>(`services.${service.id}`, 'ServiceUpdated', ({ service: updatedService }) => {
         if (updatedService.id === service.id) {
             setService({ ...service, ...updatedService });
         }
@@ -81,8 +82,8 @@ export default function ShowServicePage({ service: initialService }: { service: 
         });
     });
 
-    // Listen for service deleted events
-    useEcho<ServiceDeletedEvent>('services', 'ServiceDeleted', ({ serviceId }) => {
+    // Listen for service deleted events on resource-specific channel
+    useEcho<ServiceDeletedEvent>(`services.${service.id}`, 'ServiceDeleted', ({ serviceId }) => {
         if (serviceId === service.id) {
             toast('Service deleted', {
                 description: `Service #${serviceId} deleted`,
