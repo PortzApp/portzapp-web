@@ -1,10 +1,13 @@
 <?php
 
+use App\Enums\OrderGroupServiceStatus;
 use App\Enums\OrderGroupStatus;
 use App\Enums\OrderStatus;
 use App\Models\Order;
 use App\Models\OrderGroup;
+use App\Models\OrderGroupService;
 use App\Models\Organization;
+use App\Models\Service;
 use App\Models\User;
 
 describe('OrderGroupObserver', function () {
@@ -234,5 +237,167 @@ describe('OrderGroupObserver', function () {
 
         // Order should now be COMPLETED (since all OrderGroups are COMPLETED)
         expect($this->order->status)->toBe(OrderStatus::COMPLETED);
+    });
+
+    describe('cascade status updates to OrderGroupServices', function () {
+        beforeEach(function () {
+            $this->orderGroup = OrderGroup::factory()->create([
+                'order_id' => $this->order->id,
+                'status' => OrderGroupStatus::PENDING,
+                'fulfilling_organization_id' => $this->organization->id,
+            ]);
+
+            // Create services for this OrderGroup
+            $this->service1 = Service::factory()->create(['organization_id' => $this->organization->id]);
+            $this->service2 = Service::factory()->create(['organization_id' => $this->organization->id]);
+            $this->service3 = Service::factory()->create(['organization_id' => $this->organization->id]);
+
+            $this->orderGroupService1 = OrderGroupService::factory()->create([
+                'order_group_id' => $this->orderGroup->id,
+                'service_id' => $this->service1->id,
+                'status' => OrderGroupServiceStatus::PENDING,
+            ]);
+
+            $this->orderGroupService2 = OrderGroupService::factory()->create([
+                'order_group_id' => $this->orderGroup->id,
+                'service_id' => $this->service2->id,
+                'status' => OrderGroupServiceStatus::PENDING,
+            ]);
+
+            $this->orderGroupService3 = OrderGroupService::factory()->create([
+                'order_group_id' => $this->orderGroup->id,
+                'service_id' => $this->service3->id,
+                'status' => OrderGroupServiceStatus::ACCEPTED,
+            ]);
+        });
+
+        it('cascades COMPLETED status to all OrderGroupServices', function () {
+            // Update OrderGroup to COMPLETED
+            $this->orderGroup->update(['status' => OrderGroupStatus::COMPLETED]);
+
+            // Refresh all services from database
+            $this->orderGroupService1->refresh();
+            $this->orderGroupService2->refresh();
+            $this->orderGroupService3->refresh();
+
+            // All services should be COMPLETED
+            expect($this->orderGroupService1->status)->toBe(OrderGroupServiceStatus::COMPLETED);
+            expect($this->orderGroupService2->status)->toBe(OrderGroupServiceStatus::COMPLETED);
+            expect($this->orderGroupService3->status)->toBe(OrderGroupServiceStatus::COMPLETED);
+        });
+
+        it('cascades REJECTED status to all OrderGroupServices', function () {
+            // Update OrderGroup to REJECTED
+            $this->orderGroup->update(['status' => OrderGroupStatus::REJECTED]);
+
+            // Refresh all services from database
+            $this->orderGroupService1->refresh();
+            $this->orderGroupService2->refresh();
+            $this->orderGroupService3->refresh();
+
+            // All services should be REJECTED
+            expect($this->orderGroupService1->status)->toBe(OrderGroupServiceStatus::REJECTED);
+            expect($this->orderGroupService2->status)->toBe(OrderGroupServiceStatus::REJECTED);
+            expect($this->orderGroupService3->status)->toBe(OrderGroupServiceStatus::REJECTED);
+        });
+
+        it('cascades IN_PROGRESS status only to PENDING and ACCEPTED services', function () {
+            // Update OrderGroup to IN_PROGRESS
+            $this->orderGroup->update(['status' => OrderGroupStatus::IN_PROGRESS]);
+
+            // Refresh all services from database
+            $this->orderGroupService1->refresh();
+            $this->orderGroupService2->refresh();
+            $this->orderGroupService3->refresh();
+
+            // PENDING services should become IN_PROGRESS
+            expect($this->orderGroupService1->status)->toBe(OrderGroupServiceStatus::IN_PROGRESS);
+            expect($this->orderGroupService2->status)->toBe(OrderGroupServiceStatus::IN_PROGRESS);
+            // ACCEPTED service should become IN_PROGRESS
+            expect($this->orderGroupService3->status)->toBe(OrderGroupServiceStatus::IN_PROGRESS);
+        });
+
+        it('cascades ACCEPTED status only to PENDING services', function () {
+            // Update OrderGroup to ACCEPTED
+            $this->orderGroup->update(['status' => OrderGroupStatus::ACCEPTED]);
+
+            // Refresh all services from database
+            $this->orderGroupService1->refresh();
+            $this->orderGroupService2->refresh();
+            $this->orderGroupService3->refresh();
+
+            // PENDING services should become ACCEPTED
+            expect($this->orderGroupService1->status)->toBe(OrderGroupServiceStatus::ACCEPTED);
+            expect($this->orderGroupService2->status)->toBe(OrderGroupServiceStatus::ACCEPTED);
+            // Already ACCEPTED service should stay ACCEPTED
+            expect($this->orderGroupService3->status)->toBe(OrderGroupServiceStatus::ACCEPTED);
+        });
+
+        it('does not cascade when OrderGroup status is set to PENDING', function () {
+            // Create a new OrderGroup with specific services to avoid observer conflicts
+            $newOrderGroup = OrderGroup::factory()->create([
+                'order_id' => $this->order->id,
+                'status' => OrderGroupStatus::ACCEPTED, // Start with ACCEPTED
+                'fulfilling_organization_id' => $this->organization->id,
+            ]);
+
+            $service1 = OrderGroupService::factory()->create([
+                'order_group_id' => $newOrderGroup->id,
+                'service_id' => $this->service1->id,
+                'status' => OrderGroupServiceStatus::ACCEPTED,
+            ]);
+
+            $service2 = OrderGroupService::factory()->create([
+                'order_group_id' => $newOrderGroup->id,
+                'service_id' => $this->service2->id,
+                'status' => OrderGroupServiceStatus::COMPLETED,
+            ]);
+
+            // Update OrderGroup to PENDING (should not cascade to children)
+            // Disable observers to prevent the OrderGroupServiceObserver from changing it back
+            $newOrderGroup->withoutEvents(function () use ($newOrderGroup) {
+                $newOrderGroup->update(['status' => OrderGroupStatus::PENDING]);
+            });
+
+            // Manually trigger our cascade method to test it directly
+            $observer = new App\Observers\OrderGroupObserver;
+            $reflection = new ReflectionClass($observer);
+            $method = $reflection->getMethod('updateChildOrderGroupServices');
+            $method->setAccessible(true);
+
+            // Call the cascade method directly
+            $method->invoke($observer, $newOrderGroup->fresh());
+
+            // Refresh services from database
+            $service1->refresh();
+            $service2->refresh();
+
+            // Services should maintain their original statuses (PENDING doesn't cascade)
+            expect($service1->status)->toBe(OrderGroupServiceStatus::ACCEPTED);
+            expect($service2->status)->toBe(OrderGroupServiceStatus::COMPLETED);
+        });
+
+        it('prevents infinite observer loops during cascade', function () {
+            // This test ensures that cascading doesn't trigger OrderGroupServiceObserver
+            // which would try to update the OrderGroup status again
+
+            // Update OrderGroup to COMPLETED
+            $this->orderGroup->update(['status' => OrderGroupStatus::COMPLETED]);
+
+            // Refresh OrderGroup from database
+            $this->orderGroup->refresh();
+
+            // OrderGroup should still be COMPLETED (not changed by child observer)
+            expect($this->orderGroup->status)->toBe(OrderGroupStatus::COMPLETED);
+
+            // And all services should be COMPLETED
+            $this->orderGroupService1->refresh();
+            $this->orderGroupService2->refresh();
+            $this->orderGroupService3->refresh();
+
+            expect($this->orderGroupService1->status)->toBe(OrderGroupServiceStatus::COMPLETED);
+            expect($this->orderGroupService2->status)->toBe(OrderGroupServiceStatus::COMPLETED);
+            expect($this->orderGroupService3->status)->toBe(OrderGroupServiceStatus::COMPLETED);
+        });
     });
 });

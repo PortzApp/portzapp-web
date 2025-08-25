@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Enums\OrderGroupServiceStatus;
 use App\Enums\OrderGroupStatus;
 use App\Enums\OrderStatus;
 use App\Events\OrderGroupUpdated;
@@ -25,6 +26,7 @@ class OrderGroupObserver
         // Only update parent Order if the status field was changed
         if ($orderGroup->wasChanged('status')) {
             $this->updateParentOrderStatus($orderGroup);
+            $this->updateChildOrderGroupServices($orderGroup);
 
             // Dispatch broadcasting event for real-time updates
             $user = auth()->user();
@@ -148,5 +150,55 @@ class OrderGroupObserver
 
         // Default: all OrderGroups are still pending
         return OrderStatus::PENDING_AGENCY_CONFIRMATION;
+    }
+
+    /**
+     * Update child OrderGroupServices status when OrderGroup status changes.
+     */
+    private function updateChildOrderGroupServices(OrderGroup $orderGroup): void
+    {
+        // Define cascade rules based on OrderGroup status
+        $newServiceStatus = $this->getCascadeServiceStatus($orderGroup->status);
+
+        if ($newServiceStatus === null) {
+            // No cascade needed for this status
+            return;
+        }
+
+        // Get services that should be updated based on cascade rules
+        $servicesToUpdate = $orderGroup->orderGroupServices()
+            ->when($newServiceStatus === OrderGroupServiceStatus::IN_PROGRESS, function ($query) {
+                // For IN_PROGRESS: only update pending and accepted services
+                return $query->whereIn('status', [
+                    OrderGroupServiceStatus::PENDING,
+                    OrderGroupServiceStatus::ACCEPTED,
+                ]);
+            })
+            ->when($newServiceStatus === OrderGroupServiceStatus::ACCEPTED, function ($query) {
+                // For ACCEPTED: only update pending services
+                return $query->where('status', OrderGroupServiceStatus::PENDING);
+            })
+            ->get();
+
+        // Update services without triggering their observers to prevent infinite loops
+        $servicesToUpdate->each(function ($service) use ($newServiceStatus) {
+            $service->withoutEvents(function () use ($service, $newServiceStatus) {
+                $service->update(['status' => $newServiceStatus]);
+            });
+        });
+    }
+
+    /**
+     * Get the target service status for cascade based on OrderGroup status.
+     */
+    private function getCascadeServiceStatus(OrderGroupStatus $orderGroupStatus): ?OrderGroupServiceStatus
+    {
+        return match ($orderGroupStatus) {
+            OrderGroupStatus::COMPLETED => OrderGroupServiceStatus::COMPLETED,
+            OrderGroupStatus::REJECTED => OrderGroupServiceStatus::REJECTED,
+            OrderGroupStatus::IN_PROGRESS => OrderGroupServiceStatus::IN_PROGRESS,
+            OrderGroupStatus::ACCEPTED => OrderGroupServiceStatus::ACCEPTED,
+            OrderGroupStatus::PENDING => null, // No cascade for PENDING
+        };
     }
 }
