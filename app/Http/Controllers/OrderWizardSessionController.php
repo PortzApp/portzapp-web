@@ -8,6 +8,7 @@ use App\Enums\WizardStep;
 use App\Http\Requests\SetServicesRequest;
 use App\Models\Order;
 use App\Models\OrderGroup;
+use App\Models\OrderGroupService;
 use App\Models\OrderWizardSession;
 use App\Models\Port;
 use App\Models\Service;
@@ -304,9 +305,17 @@ class OrderWizardSessionController extends Controller
                     'notes' => null,
                 ]);
 
-                // Attach services to this order group
-                $serviceIds = $selections->pluck('service_id');
-                $orderGroup->services()->attach($serviceIds);
+                // Create OrderGroupService records for each service
+                foreach ($selections as $selection) {
+                    $service = $selection->service;
+                    OrderGroupService::create([
+                        'order_group_id' => $orderGroup->id,
+                        'service_id' => $service->id,
+                        'status' => 'pending',
+                        'price_snapshot' => $service->price,
+                        'notes' => null,
+                    ]);
+                }
             }
 
             // Mark session as completed

@@ -85,11 +85,11 @@ export const columns: ColumnDef<OrderGroup>[] = [
         },
     },
     {
-        accessorKey: 'services',
+        accessorKey: 'order_group_services',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Services" />,
         cell: ({ row }) => {
             const orderGroup = row.original;
-            const serviceCount = orderGroup.services?.length || 0;
+            const serviceCount = orderGroup.order_group_services?.length || 0;
 
             return (
                 <div className="flex flex-col">
@@ -104,8 +104,7 @@ export const columns: ColumnDef<OrderGroup>[] = [
         header: ({ column }) => <DataTableColumnHeader column={column} title="Total Price" />,
         cell: ({ row }) => {
             const orderGroup = row.original;
-            // Calculate total price from services
-            const totalPrice = orderGroup.services?.reduce((sum, service) => sum + parseFloat(service.price), 0) || 0;
+            const totalPrice = orderGroup.total_price || 0;
 
             return <p className="font-medium tabular-nums">${totalPrice.toFixed(2)}</p>;
         },

@@ -37,7 +37,7 @@ class OrderController extends Controller
             'placedByUser',
             'placedByOrganization',
             'orderGroups.fulfillingOrganization',
-            'orderGroups.services',
+            'orderGroups.orderGroupServices.service',
         ]);
 
         // PORTZAPP_TEAM can see all orders
@@ -160,7 +160,7 @@ class OrderController extends Controller
             'placedByUser',
             'placedByOrganization',
             'orderGroups.fulfillingOrganization',
-            'orderGroups.services.organization',
+            'orderGroups.orderGroupServices.service.organization',
         ]);
 
         // Get all services through order groups with sub-categories and categories

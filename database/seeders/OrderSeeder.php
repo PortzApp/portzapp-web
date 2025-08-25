@@ -118,8 +118,16 @@ class OrderSeeder extends Seeder
                 'notes' => fake()->optional(0.3)->sentence(),
             ]);
 
-            // Attach services to this order group
-            $orderGroup->services()->attach($chosenServices->pluck('id')->toArray());
+            // Create OrderGroupService records for this order group
+            foreach ($chosenServices as $service) {
+                \App\Models\OrderGroupService::create([
+                    'order_group_id' => $orderGroup->id,
+                    'service_id' => $service->id,
+                    'status' => 'pending',
+                    'price_snapshot' => $service->price,
+                    'notes' => null,
+                ]);
+            }
 
             $totalOrderGroups++;
 
@@ -225,8 +233,16 @@ class OrderSeeder extends Seeder
                 'notes' => "Test order group for {$notes}",
             ]);
 
-            // Attach services to this order group
-            $orderGroup->services()->attach($chosenServices->pluck('id')->toArray());
+            // Create OrderGroupService records for this order group
+            foreach ($chosenServices as $service) {
+                \App\Models\OrderGroupService::create([
+                    'order_group_id' => $orderGroup->id,
+                    'service_id' => $service->id,
+                    'status' => 'pending',
+                    'price_snapshot' => $service->price,
+                    'notes' => null,
+                ]);
+            }
 
             if ($this->command) {
                 $agency = Organization::find($agencyId);

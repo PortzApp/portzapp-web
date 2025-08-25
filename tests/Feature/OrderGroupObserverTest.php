@@ -17,7 +17,7 @@ describe('OrderGroupObserver', function () {
         ]);
     });
 
-    it('updates Order status to PARTIALLY_CONFIRMED when at least one OrderGroup is COMPLETED', function () {
+    it('remains PENDING_AGENCY_CONFIRMATION when some OrderGroups are COMPLETED but others are still PENDING', function () {
         // Create three OrderGroups with different statuses
         $orderGroup1 = OrderGroup::factory()->create([
             'order_id' => $this->order->id,
@@ -43,11 +43,11 @@ describe('OrderGroupObserver', function () {
         // Refresh the Order from database
         $this->order->refresh();
 
-        // Order should now be PARTIALLY_CONFIRMED
-        expect($this->order->status)->toBe(OrderStatus::PARTIALLY_CONFIRMED);
+        // Order should still be PENDING_AGENCY_CONFIRMATION (waiting for other groups to be accepted)
+        expect($this->order->status)->toBe(OrderStatus::PENDING_AGENCY_CONFIRMATION);
     });
 
-    it('updates Order status to CONFIRMED when all OrderGroups are COMPLETED', function () {
+    it('updates Order status to COMPLETED when all OrderGroups are COMPLETED', function () {
         // Create three OrderGroups
         $orderGroup1 = OrderGroup::factory()->create([
             'order_id' => $this->order->id,
@@ -75,8 +75,8 @@ describe('OrderGroupObserver', function () {
         // Refresh the Order from database
         $this->order->refresh();
 
-        // Order should now be CONFIRMED
-        expect($this->order->status)->toBe(OrderStatus::CONFIRMED);
+        // Order should now be COMPLETED
+        expect($this->order->status)->toBe(OrderStatus::COMPLETED);
     });
 
     it('updates Order status to CONFIRMED when all OrderGroups are ACCEPTED', function () {
@@ -104,7 +104,7 @@ describe('OrderGroupObserver', function () {
         expect($this->order->status)->toBe(OrderStatus::CONFIRMED);
     });
 
-    it('updates Order status to CANCELLED when any OrderGroup is REJECTED', function () {
+    it('updates Order status to PARTIALLY_REJECTED when any OrderGroup is REJECTED', function () {
         // Create three OrderGroups
         $orderGroup1 = OrderGroup::factory()->create([
             'order_id' => $this->order->id,
@@ -130,11 +130,11 @@ describe('OrderGroupObserver', function () {
         // Refresh the Order from database
         $this->order->refresh();
 
-        // Order should now be CANCELLED
-        expect($this->order->status)->toBe(OrderStatus::CANCELLED);
+        // Order should now be PARTIALLY_REJECTED
+        expect($this->order->status)->toBe(OrderStatus::PARTIALLY_REJECTED);
     });
 
-    it('updates Order status to PARTIALLY_CONFIRMED when some OrderGroups are ACCEPTED', function () {
+    it('updates Order status to PARTIALLY_ACCEPTED when some OrderGroups are ACCEPTED', function () {
         // Create three OrderGroups
         $orderGroup1 = OrderGroup::factory()->create([
             'order_id' => $this->order->id,
@@ -154,8 +154,8 @@ describe('OrderGroupObserver', function () {
         // Refresh the Order from database
         $this->order->refresh();
 
-        // Order should now be PARTIALLY_CONFIRMED
-        expect($this->order->status)->toBe(OrderStatus::PARTIALLY_CONFIRMED);
+        // Order should now be PARTIALLY_ACCEPTED
+        expect($this->order->status)->toBe(OrderStatus::PARTIALLY_ACCEPTED);
     });
 
     it('keeps Order status as PENDING_AGENCY_CONFIRMATION when all OrderGroups are PENDING', function () {
@@ -232,7 +232,7 @@ describe('OrderGroupObserver', function () {
         // Refresh the Order from database
         $this->order->refresh();
 
-        // Order should now be CONFIRMED (since all OrderGroups are COMPLETED)
-        expect($this->order->status)->toBe(OrderStatus::CONFIRMED);
+        // Order should now be COMPLETED (since all OrderGroups are COMPLETED)
+        expect($this->order->status)->toBe(OrderStatus::COMPLETED);
     });
 });

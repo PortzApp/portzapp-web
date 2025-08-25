@@ -1,5 +1,6 @@
 import {
     JoinRequestStatus,
+    OrderGroupServiceStatus,
     OrderGroupStatus,
     OrderStatus,
     OrganizationBusinessType,
@@ -123,10 +124,21 @@ export interface OrderGroupBase extends BaseModel {
     notes: string | null;
 }
 
+export interface OrderGroupService extends BaseModel {
+    order_group_id: string;
+    service_id: string;
+    status: OrderGroupServiceStatus;
+    notes: string | null;
+    price_snapshot: number;
+    order_group?: OrderGroup;
+    service?: Service;
+}
+
 export interface OrderGroup extends OrderGroupBase {
     order: OrderWithRelations;
     fulfilling_organization: Organization;
-    services: Service[];
+    order_group_services: OrderGroupService[];
+    services: Service[]; // Kept for backward compatibility during transition
     total_price: number;
 }
 

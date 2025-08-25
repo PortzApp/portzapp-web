@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Carbon;
 
 /**
@@ -96,11 +97,19 @@ class Order extends Model
     }
 
     /**
+     * Get all OrderGroupServices through OrderGroups.
+     */
+    public function orderGroupServices(): HasManyThrough
+    {
+        return $this->hasManyThrough(OrderGroupService::class, OrderGroup::class);
+    }
+
+    /**
      * Get all services through order groups using a proper relationship.
      */
     public function allServices()
     {
-        return Service::whereHas('orderGroups', function ($query): void {
+        return Service::whereHas('orderGroupServices.orderGroup', function ($query): void {
             $query->where('order_id', $this->id);
         })->with('organization');
     }
@@ -119,7 +128,7 @@ class Order extends Model
     public function getAllServicesAttribute(): \Illuminate\Support\Collection
     {
         return $this->orderGroups->flatMap(function ($orderGroup) {
-            return $orderGroup->services;
+            return $orderGroup->orderGroupServices->pluck('service');
         });
     }
 

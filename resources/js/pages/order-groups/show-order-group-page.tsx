@@ -1,7 +1,10 @@
 import { Head, router } from '@inertiajs/react';
 
+import { MoreVertical } from 'lucide-react';
+
 import type { BreadcrumbItem } from '@/types';
 import { OrderBase, OrderGroup } from '@/types/models';
+import { OrderGroupServiceStatus, OrderGroupStatus } from '@/types/enums';
 
 import { cn } from '@/lib/utils';
 
@@ -10,9 +13,21 @@ import AppLayout from '@/layouts/app-layout';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSub,
+    DropdownMenuSubContent,
+    DropdownMenuSubTrigger,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Separator } from '@/components/ui/separator';
 
 import { VesselTypeBadge } from '@/components/badges';
+import { OrderGroupServiceStatusBadge } from '@/components/badges/order-group-service-status-badge';
+import { OrderGroupStatusBadge } from '@/components/badges/order-group-status-badge';
+import { OrderStatusBadge } from '@/components/badges/order-status-badge';
 
 const getBreadcrumbs = (orderGroup: OrderGroup): BreadcrumbItem[] => [
     {
@@ -36,13 +51,13 @@ export default function ShowOrderGroupPage({
 }) {
     const breadcrumbs = getBreadcrumbs(orderGroup);
 
-    // Calculate total price from services
-    const totalPrice = orderGroup.services?.reduce((sum, service) => sum + parseFloat(service.price), 0) || 0;
+    // Calculate total price from order_group_services
+    const totalPrice = orderGroup.order_group_services?.reduce((sum, ogs) => sum + parseFloat(ogs.price_snapshot.toString()), 0) || 0;
 
-    const canAccept = orderGroup.status === 'pending';
-    const canReject = orderGroup.status === 'pending';
-    const canStart = orderGroup.status === 'accepted';
-    const canComplete = orderGroup.status === 'in_progress';
+    const canAccept = orderGroup.status === OrderGroupStatus.PENDING;
+    const canReject = orderGroup.status === OrderGroupStatus.PENDING;
+    const canStart = orderGroup.status === OrderGroupStatus.ACCEPTED;
+    const canComplete = orderGroup.status === OrderGroupStatus.IN_PROGRESS;
 
     const handleAccept = () => {
         router.post(route('order-groups.accept', orderGroup.id));
@@ -60,19 +75,73 @@ export default function ShowOrderGroupPage({
         router.post(route('order-groups.complete', orderGroup.id));
     };
 
-    const getStatusBadge = (status: string) => (
-        <Badge
-            className={cn(
-                status === 'pending' && 'bg-yellow-200 text-yellow-950 dark:bg-yellow-900 dark:text-yellow-50',
-                status === 'accepted' && 'bg-blue-200 text-blue-950 dark:bg-blue-900 dark:text-blue-50',
-                status === 'rejected' && 'bg-red-200 text-red-950 dark:bg-red-900 dark:text-red-50',
-                status === 'in_progress' && 'bg-purple-200 text-purple-950 dark:bg-purple-900 dark:text-purple-50',
-                status === 'completed' && 'bg-green-200 text-green-950 dark:bg-green-900 dark:text-green-50',
-            )}
-        >
-            {status.replace(/_/g, ' ')}
-        </Badge>
-    );
+    const handleOrderGroupStatusChange = (status: OrderGroupStatus) => {
+        const routes: Record<OrderGroupStatus, string> = {
+            [OrderGroupStatus.PENDING]: '', // Not used, but needed for type completeness
+            [OrderGroupStatus.ACCEPTED]: route('order-groups.accept', orderGroup.id),
+            [OrderGroupStatus.REJECTED]: route('order-groups.reject', orderGroup.id),
+            [OrderGroupStatus.IN_PROGRESS]: route('order-groups.start', orderGroup.id),
+            [OrderGroupStatus.COMPLETED]: route('order-groups.complete', orderGroup.id),
+        };
+
+        const targetRoute = routes[status];
+        if (targetRoute) {
+            router.post(targetRoute);
+        }
+    };
+
+    const handleOrderGroupServiceStatusChange = (orderGroupServiceId: string, status: OrderGroupServiceStatus) => {
+        router.patch(route('order-group-services.status.update', orderGroupServiceId), {
+            status: status,
+        });
+    };
+
+    const getValidOrderGroupStatusTransitions = (currentStatus: OrderGroupStatus): OrderGroupStatus[] => {
+        switch (currentStatus) {
+            case OrderGroupStatus.PENDING:
+                return [OrderGroupStatus.ACCEPTED, OrderGroupStatus.REJECTED];
+            case OrderGroupStatus.ACCEPTED:
+                return [OrderGroupStatus.IN_PROGRESS];
+            case OrderGroupStatus.IN_PROGRESS:
+                return [OrderGroupStatus.COMPLETED];
+            default:
+                return [];
+        }
+    };
+
+    const getOrderGroupStatusLabel = (status: OrderGroupStatus): string => {
+        switch (status) {
+            case OrderGroupStatus.PENDING:
+                return 'Pending';
+            case OrderGroupStatus.ACCEPTED:
+                return 'Accepted';
+            case OrderGroupStatus.REJECTED:
+                return 'Rejected';
+            case OrderGroupStatus.IN_PROGRESS:
+                return 'In Progress';
+            case OrderGroupStatus.COMPLETED:
+                return 'Completed';
+            default:
+                return status;
+        }
+    };
+
+    const getOrderGroupServiceStatusLabel = (status: OrderGroupServiceStatus): string => {
+        switch (status) {
+            case OrderGroupServiceStatus.PENDING:
+                return 'Pending';
+            case OrderGroupServiceStatus.ACCEPTED:
+                return 'Accepted';
+            case OrderGroupServiceStatus.REJECTED:
+                return 'Rejected';
+            case OrderGroupServiceStatus.IN_PROGRESS:
+                return 'In Progress';
+            case OrderGroupServiceStatus.COMPLETED:
+                return 'Completed';
+            default:
+                return status;
+        }
+    };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -84,7 +153,26 @@ export default function ShowOrderGroupPage({
                         <h1 className="text-2xl font-bold">{orderGroup.group_number}</h1>
                         <p className="text-muted-foreground">Order group assigned to your agency</p>
                     </div>
-                    <div className="flex items-center gap-2">{getStatusBadge(orderGroup.status)}</div>
+                    <div className="flex items-center gap-2">
+                        <OrderGroupStatusBadge status={orderGroup.status} />
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="outline" size="sm">
+                                    <MoreVertical className="size-4" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                {getValidOrderGroupStatusTransitions(orderGroup.status).map((status) => (
+                                    <DropdownMenuItem
+                                        key={status}
+                                        onClick={() => handleOrderGroupStatusChange(status)}
+                                    >
+                                        Mark as {getOrderGroupStatusLabel(status)}
+                                    </DropdownMenuItem>
+                                ))}
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
                 </div>
 
                 {/* Action Buttons */}
@@ -125,7 +213,7 @@ export default function ShowOrderGroupPage({
                             </div>
                             <div className="flex justify-between">
                                 <span className="font-medium">Status:</span>
-                                {getStatusBadge(parentOrder.status)}
+                                <OrderStatusBadge status={parentOrder.status} />
                             </div>
                             <Separator />
                             <div className="space-y-2">
@@ -179,22 +267,61 @@ export default function ShowOrderGroupPage({
                         </CardContent>
                     </Card>
 
-                    {/* Services */}
+                    {/* OrderGroupServices */}
                     <Card className="md:col-span-2">
                         <CardHeader>
-                            <CardTitle>Services ({orderGroup.services?.length || 0})</CardTitle>
+                            <CardTitle>Services ({orderGroup.order_group_services?.length || 0})</CardTitle>
                             <CardDescription>Services assigned to your agency for this order</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-4">
-                                {orderGroup.services?.map((service) => (
-                                    <div key={service.id} className="flex items-center justify-between rounded-lg bg-muted/50 p-3">
-                                        <div>
-                                            <h4 className="font-medium">{service?.sub_category?.name}</h4>
-                                            {service.description && <p className="text-sm text-muted-foreground">{service.description}</p>}
+                                {orderGroup.order_group_services?.map((orderGroupService) => (
+                                    <div key={orderGroupService.id} className="flex items-center justify-between rounded-lg bg-muted/50 p-3">
+                                        <div className="flex-1">
+                                            <div className="flex items-center gap-2">
+                                                <h4 className="font-medium">
+                                                    {orderGroupService.service?.sub_category?.name || 
+                                                     orderGroupService.service?.name || 
+                                                     'Service'}
+                                                </h4>
+                                                <OrderGroupServiceStatusBadge status={orderGroupService.status} />
+                                            </div>
+                                            {orderGroupService.service?.description && (
+                                                <p className="text-sm text-muted-foreground">{orderGroupService.service.description}</p>
+                                            )}
+                                            {orderGroupService.notes && (
+                                                <p className="text-sm text-muted-foreground italic">Notes: {orderGroupService.notes}</p>
+                                            )}
                                         </div>
-                                        <div className="text-right">
-                                            <p className="font-bold tabular-nums">${parseFloat(service.price).toFixed(2)}</p>
+                                        <div className="flex items-center gap-2">
+                                            <div className="text-right">
+                                                <p className="font-bold tabular-nums">${parseFloat(orderGroupService.price_snapshot.toString()).toFixed(2)}</p>
+                                            </div>
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button variant="ghost" size="sm">
+                                                        <MoreVertical className="size-4" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end">
+                                                    <DropdownMenuSub>
+                                                        <DropdownMenuSubTrigger>
+                                                            Update Status
+                                                        </DropdownMenuSubTrigger>
+                                                        <DropdownMenuSubContent>
+                                                            {Object.values(OrderGroupServiceStatus).map((status) => (
+                                                                <DropdownMenuItem
+                                                                    key={status}
+                                                                    onClick={() => handleOrderGroupServiceStatusChange(orderGroupService.id, status)}
+                                                                    disabled={status === orderGroupService.status}
+                                                                >
+                                                                    {getOrderGroupServiceStatusLabel(status)}
+                                                                </DropdownMenuItem>
+                                                            ))}
+                                                        </DropdownMenuSubContent>
+                                                    </DropdownMenuSub>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
                                         </div>
                                     </div>
                                 ))}
@@ -225,8 +352,8 @@ export default function ShowOrderGroupPage({
                                                 <p className="text-sm text-muted-foreground">{group.fulfilling_organization.name}</p>
                                             </div>
                                             <div className="text-right">
-                                                {getStatusBadge(group.status)}
-                                                <p className="mt-1 text-sm text-muted-foreground">{group.services?.length || 0} services</p>
+                                                <OrderGroupStatusBadge status={group.status} />
+                                                <p className="mt-1 text-sm text-muted-foreground">{group.order_group_services?.length || 0} services</p>
                                             </div>
                                         </div>
                                     ))}

@@ -20,6 +20,15 @@ export const OrderGroupStatus = {
 } as const;
 export type OrderGroupStatus = (typeof OrderGroupStatus)[keyof typeof OrderGroupStatus];
 
+export const OrderGroupServiceStatus = {
+    PENDING: 'pending',
+    ACCEPTED: 'accepted',
+    REJECTED: 'rejected',
+    IN_PROGRESS: 'in_progress',
+    COMPLETED: 'completed',
+} as const;
+export type OrderGroupServiceStatus = (typeof OrderGroupServiceStatus)[keyof typeof OrderGroupServiceStatus];
+
 export const OrganizationBusinessType = {
     VESSEL_OWNER: 'vessel_owner',
     SHIPPING_AGENCY: 'shipping_agency',
