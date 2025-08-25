@@ -45,7 +45,11 @@ export default function OrderGroupsIndexPage({ orderGroups: initialOrderGroups }
     useEcho<OrderGroupUpdatedEvent>('order-groups', 'OrderGroupUpdated', ({ orderGroup: updatedOrderGroup }) => {
         setOrderGroups((prevOrderGroups) =>
             prevOrderGroups.map((prevOrderGroup) =>
-                prevOrderGroup.id === updatedOrderGroup.id ? { ...prevOrderGroup, ...updatedOrderGroup } : prevOrderGroup,
+                prevOrderGroup.id === updatedOrderGroup.id ? {
+                    ...prevOrderGroup,
+                    status: updatedOrderGroup.status,
+                    updated_at: updatedOrderGroup.updated_at
+                } : prevOrderGroup,
             ),
         );
 

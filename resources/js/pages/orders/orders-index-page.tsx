@@ -47,7 +47,11 @@ export default function OrdersIndexPage({ orders: initialOrders }: { orders: Arr
     // Listen for order updated events
     useEcho<OrderUpdatedEvent>('orders', 'OrderUpdated', ({ order: updatedOrder }) => {
         setOrders((prevOrders) =>
-            prevOrders.map((prevOrder) => (prevOrder.id === updatedOrder.id ? { ...prevOrder, ...updatedOrder } : prevOrder)),
+            prevOrders.map((prevOrder) => (prevOrder.id === updatedOrder.id ? {
+                ...prevOrder,
+                status: updatedOrder.status,
+                updated_at: updatedOrder.updated_at
+            } : prevOrder)),
         );
 
         toast('Order updated', {
