@@ -4,12 +4,10 @@ import { ColumnDef } from '@tanstack/react-table';
 import { VesselType } from '@/types/enums';
 import { OrderGroup } from '@/types/models';
 
-import { cn } from '@/lib/utils';
-
-import { Badge } from '@/components/ui/badge';
 import { DataTableColumnHeader } from '@/components/ui/data-table/data-table-column-header';
 
 import { VesselTypeBadge } from '@/components/badges';
+import { OrderGroupStatusBadge } from '@/components/badges/order-group-status-badge';
 
 export const columns: ColumnDef<OrderGroup>[] = [
     {
@@ -22,19 +20,7 @@ export const columns: ColumnDef<OrderGroup>[] = [
         cell: ({ row }) => {
             const orderGroup = row.original;
 
-            return (
-                <Badge
-                    className={cn(
-                        orderGroup.status === 'pending' && 'bg-yellow-200 text-yellow-950 uppercase dark:bg-yellow-900 dark:text-yellow-50',
-                        orderGroup.status === 'accepted' && 'bg-blue-200 text-blue-950 uppercase dark:bg-blue-900 dark:text-blue-50',
-                        orderGroup.status === 'rejected' && 'bg-red-200 text-red-950 uppercase dark:bg-red-900 dark:text-red-50',
-                        orderGroup.status === 'in_progress' && 'bg-purple-200 text-purple-950 uppercase dark:bg-purple-900 dark:text-purple-50',
-                        orderGroup.status === 'completed' && 'bg-green-200 text-green-950 uppercase dark:bg-green-900 dark:text-green-50',
-                    )}
-                >
-                    {orderGroup.status.replace(/_/g, ' ')}
-                </Badge>
-            );
+            return <OrderGroupStatusBadge status={orderGroup.status} />;
         },
     },
     {
