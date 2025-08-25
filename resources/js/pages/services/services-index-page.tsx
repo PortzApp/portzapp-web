@@ -257,6 +257,10 @@ export default function ServicesIndexPage({ services: initialServices, ports, se
                                         </div>
 
                                         <div className="flex flex-wrap gap-2">
+                                            <Badge variant={service.status === 'active' ? 'default' : 'secondary'}>
+                                                <div className={`mr-1 h-2 w-2 rounded-full ${service.status === 'active' ? 'bg-green-500' : 'bg-gray-500'}`} />
+                                                {service.status === 'active' ? 'ACTIVE' : 'INACTIVE'}
+                                            </Badge>
                                             <Badge variant="secondary">
                                                 <Box className="mr-1 h-3 w-3" />
                                                 {service.sub_category?.category && service.sub_category
