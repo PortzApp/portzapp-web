@@ -1,4 +1,8 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
+
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import { useEcho } from '@laravel/echo-react';
+import { toast } from 'sonner';
 
 import type { BreadcrumbItem, SharedData } from '@/types';
 import { OrderWithRelations } from '@/types/models';
@@ -17,8 +21,45 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function OrdersIndexPage({ orders }: { orders: Array<OrderWithRelations> }) {
+interface OrderEvent {
+    message: string;
+    user: {
+        id: string;
+        name: string;
+        email: string;
+    };
+    timestamp: string;
+}
+
+interface OrderUpdatedEvent extends OrderEvent {
+    order: OrderWithRelations;
+}
+
+export default function OrdersIndexPage({ orders: initialOrders }: { orders: Array<OrderWithRelations> }) {
     const { auth } = usePage<SharedData>().props;
+    const [orders, setOrders] = useState(initialOrders);
+
+    // Sync new props back to local state after server refetch
+    useEffect(() => {
+        setOrders(initialOrders);
+    }, [initialOrders]);
+
+    // Listen for order updated events
+    useEcho<OrderUpdatedEvent>('orders', 'OrderUpdated', ({ order: updatedOrder }) => {
+        setOrders((prevOrders) =>
+            prevOrders.map((prevOrder) => (prevOrder.id === updatedOrder.id ? { ...prevOrder, ...updatedOrder } : prevOrder)),
+        );
+
+        toast('Order updated', {
+            description: `Order #${updatedOrder.id} status changed to ${updatedOrder.status?.replace(/_/g, ' ')}`,
+            action: {
+                label: 'View Order',
+                onClick: () => {
+                    router.visit(route('orders.show', updatedOrder.id));
+                },
+            },
+        });
+    });
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>

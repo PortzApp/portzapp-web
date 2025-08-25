@@ -1,4 +1,8 @@
-import { Head } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
+
+import { Head, router } from '@inertiajs/react';
+import { useEcho } from '@laravel/echo-react';
+import { toast } from 'sonner';
 
 import type { BreadcrumbItem } from '@/types';
 import { OrderGroup } from '@/types/models';
@@ -15,7 +19,46 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function OrderGroupsIndexPage({ orderGroups }: { orderGroups: Array<OrderGroup> }) {
+interface OrderGroupEvent {
+    message: string;
+    user: {
+        id: string;
+        name: string;
+        email: string;
+    };
+    timestamp: string;
+}
+
+interface OrderGroupUpdatedEvent extends OrderGroupEvent {
+    orderGroup: OrderGroup;
+}
+
+export default function OrderGroupsIndexPage({ orderGroups: initialOrderGroups }: { orderGroups: Array<OrderGroup> }) {
+    const [orderGroups, setOrderGroups] = useState(initialOrderGroups);
+
+    // Sync new props back to local state after server refetch
+    useEffect(() => {
+        setOrderGroups(initialOrderGroups);
+    }, [initialOrderGroups]);
+
+    // Listen for order group updated events
+    useEcho<OrderGroupUpdatedEvent>('order-groups', 'OrderGroupUpdated', ({ orderGroup: updatedOrderGroup }) => {
+        setOrderGroups((prevOrderGroups) =>
+            prevOrderGroups.map((prevOrderGroup) =>
+                prevOrderGroup.id === updatedOrderGroup.id ? { ...prevOrderGroup, ...updatedOrderGroup } : prevOrderGroup,
+            ),
+        );
+
+        toast('Order group updated', {
+            description: `Order group #${updatedOrderGroup.group_number} status changed to ${updatedOrderGroup.status?.replace(/_/g, ' ')}`,
+            action: {
+                label: 'View Order Group',
+                onClick: () => {
+                    router.visit(route('order-groups.show', updatedOrderGroup.id));
+                },
+            },
+        });
+    });
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Order Groups" />
