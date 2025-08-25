@@ -89,12 +89,16 @@ class Order extends Model
         return $this->hasMany(OrderGroup::class);
     }
 
-    public function services(): BelongsToMany
-    {
-        return $this->belongsToMany(Service::class, 'order_service')
-            ->as('orderService')
-            ->withTimestamps();
-    }
+    /**
+     * Get services for the current order.
+     * Note: This relationship is deprecated. Use orderGroupServices() or allServices() instead.
+     */
+    // public function services(): BelongsToMany
+    // {
+    //     return $this->belongsToMany(Service::class, 'order_service')
+    //         ->as('orderService')
+    //         ->withTimestamps();
+    // }
 
     /**
      * Get all OrderGroupServices through OrderGroups.
