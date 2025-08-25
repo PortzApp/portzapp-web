@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Enums\OrderGroupStatus;
 use App\Enums\OrderStatus;
+use App\Events\OrderGroupUpdated;
 use App\Models\OrderGroup;
 
 class OrderGroupObserver
@@ -24,6 +25,15 @@ class OrderGroupObserver
         // Only update parent Order if the status field was changed
         if ($orderGroup->wasChanged('status')) {
             $this->updateParentOrderStatus($orderGroup);
+
+            // Dispatch broadcasting event for real-time updates
+            $user = auth()->user();
+            if (! $user && $orderGroup->order) {
+                $user = $orderGroup->order->placedByUser;
+            }
+            if ($user) {
+                OrderGroupUpdated::dispatch($user, $orderGroup);
+            }
         }
     }
 

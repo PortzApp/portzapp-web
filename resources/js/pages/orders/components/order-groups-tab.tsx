@@ -1,10 +1,9 @@
 import { Link } from '@inertiajs/react';
 
-import { OrderGroup, OrderGroupService } from '@/types/models';
+import { OrderGroup } from '@/types/models';
 
 import { OrderGroupServiceStatusBadge } from '@/components/badges/order-group-service-status-badge';
 import { OrderGroupStatusBadge } from '@/components/badges/order-group-status-badge';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';

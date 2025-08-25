@@ -6,7 +6,6 @@ use App\Enums\ServiceStatus;
 use Eloquent;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -27,8 +26,6 @@ use Illuminate\Support\Carbon;
  * @property string|null $service_sub_category_id
  * @property-read ServiceSubCategory|null $subCategory
  * @property-read ServiceCategory|null $category
- * @property-read Collection<int, Order> $orders
- * @property-read int|null $orders_count
  * @property-read Organization $organization
  * @property-read Port $port
  *
@@ -117,13 +114,14 @@ class Service extends Model
 
     /**
      * Get the orders for the current service.
+     * Note: This relationship is deprecated. Use orderGroups() or orderGroupServices() instead.
      */
-    public function orders(): BelongsToMany
-    {
-        return $this->belongsToMany(Order::class, 'order_service')
-            ->as('orderService')
-            ->withTimestamps();
-    }
+    // public function orders(): BelongsToMany
+    // {
+    //     return $this->belongsToMany(Order::class, 'order_service')
+    //         ->as('orderService')
+    //         ->withTimestamps();
+    // }
 
     /**
      * Get the order groups for the current service through OrderGroupService.

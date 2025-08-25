@@ -2,7 +2,7 @@
 
 namespace App\Events;
 
-use App\Models\Service;
+use App\Models\Order;
 use App\Models\User;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
@@ -10,7 +10,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class ServiceUpdated implements ShouldBroadcastNow
+class OrderUpdated implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -19,7 +19,7 @@ class ServiceUpdated implements ShouldBroadcastNow
      */
     public function __construct(
         public User $user,
-        public Service $service,
+        public Order $order,
     ) {}
 
     /**
@@ -29,9 +29,9 @@ class ServiceUpdated implements ShouldBroadcastNow
     {
         return [
             // Organization-scoped channel for index pages
-            new PrivateChannel('services.organization.'.$this->service->organization_id),
+            new PrivateChannel('orders.organization.'.$this->order->placed_by_organization_id),
             // Resource-specific channel for detail pages
-            new PrivateChannel('services.'.$this->service->id),
+            new PrivateChannel('orders.'.$this->order->id),
         ];
     }
 
@@ -43,13 +43,13 @@ class ServiceUpdated implements ShouldBroadcastNow
     public function broadcastWith(): array
     {
         return [
-            'message' => 'Service updated successfully',
+            'message' => 'Order updated successfully',
             'user' => [
                 'id' => $this->user->id,
                 'name' => $this->user->first_name.' '.$this->user->last_name,
                 'email' => $this->user->email,
             ],
-            'service' => $this->service->toArray(),
+            'order' => $this->order->toArray(),
             'timestamp' => now()->toISOString(),
         ];
     }

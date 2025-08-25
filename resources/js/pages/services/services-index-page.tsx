@@ -99,8 +99,8 @@ export default function ServicesIndexPage({ services: initialServices, ports, se
         setServices(initialServices);
     }, [initialServices]);
 
-    // Listen for service created events
-    useEcho<ServiceCreatedEvent>('services', 'ServiceCreated', ({ service: newService }) => {
+    // Listen for service created events on organization-scoped channel
+    useEcho<ServiceCreatedEvent>(`services.organization.${auth.user.current_organization?.id}`, 'ServiceCreated', ({ service: newService }) => {
         setServices((prevServices) => [newService, ...prevServices]);
 
         toast('Service created', {
@@ -114,8 +114,8 @@ export default function ServicesIndexPage({ services: initialServices, ports, se
         });
     });
 
-    // Listen for service updated events
-    useEcho<ServiceUpdatedEvent>('services', 'ServiceUpdated', ({ service: updatedService }) => {
+    // Listen for service updated events on organization-scoped channel
+    useEcho<ServiceUpdatedEvent>(`services.organization.${auth.user.current_organization?.id}`, 'ServiceUpdated', ({ service: updatedService }) => {
         setServices((prevServices) =>
             prevServices.map((prevService) => (prevService.id === updatedService.id ? { ...prevService, ...updatedService } : prevService)),
         );
@@ -131,8 +131,8 @@ export default function ServicesIndexPage({ services: initialServices, ports, se
         });
     });
 
-    // Listen for service deleted events
-    useEcho<ServiceDeletedEvent>('services', 'ServiceDeleted', ({ serviceId }) => {
+    // Listen for service deleted events on organization-scoped channel
+    useEcho<ServiceDeletedEvent>(`services.organization.${auth.user.current_organization?.id}`, 'ServiceDeleted', ({ serviceId }) => {
         setServices((prevServices) => prevServices.filter((service) => service.id !== serviceId));
 
         toast('Service deleted', {

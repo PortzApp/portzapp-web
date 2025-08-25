@@ -26,7 +26,7 @@ class ServiceController extends Controller
         Gate::authorize('viewAny', Service::class);
 
         $user = request()->user();
-        $query = Service::query()->with(['organization', 'port', 'subCategory.category', 'orders']);
+        $query = Service::query()->with(['organization', 'port', 'subCategory.category']);
 
         // Apply organization-based filtering
         if ($user->isInOrganizationWithBusinessType(OrganizationBusinessType::SHIPPING_AGENCY)) {

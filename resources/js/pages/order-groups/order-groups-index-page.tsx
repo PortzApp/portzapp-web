@@ -1,6 +1,10 @@
-import { Head } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
 
-import type { BreadcrumbItem } from '@/types';
+import { Head, router, usePage } from '@inertiajs/react';
+import { useEcho } from '@laravel/echo-react';
+import { toast } from 'sonner';
+
+import type { BreadcrumbItem, SharedData } from '@/types';
 import { OrderGroup } from '@/types/models';
 
 import AppLayout from '@/layouts/app-layout';
@@ -15,7 +19,54 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function OrderGroupsIndexPage({ orderGroups }: { orderGroups: Array<OrderGroup> }) {
+interface OrderGroupEvent {
+    message: string;
+    user: {
+        id: string;
+        name: string;
+        email: string;
+    };
+    timestamp: string;
+}
+
+interface OrderGroupUpdatedEvent extends OrderGroupEvent {
+    orderGroup: OrderGroup;
+}
+
+export default function OrderGroupsIndexPage({ orderGroups: initialOrderGroups }: { orderGroups: Array<OrderGroup> }) {
+    const { auth } = usePage<SharedData>().props;
+    const [orderGroups, setOrderGroups] = useState(initialOrderGroups);
+
+    // Sync new props back to local state after server refetch
+    useEffect(() => {
+        setOrderGroups(initialOrderGroups);
+    }, [initialOrderGroups]);
+
+    // Listen for order group updated events on organization-scoped channel
+    useEcho<OrderGroupUpdatedEvent>(`order-groups.organization.${auth.user.current_organization?.id}`, 'OrderGroupUpdated', ({ orderGroup: updatedOrderGroup }) => {
+        setOrderGroups((prevOrderGroups) =>
+            prevOrderGroups.map((prevOrderGroup) =>
+                prevOrderGroup.id === updatedOrderGroup.id ? {
+                    ...prevOrderGroup,
+                    status: updatedOrderGroup.status,
+                    updated_at: updatedOrderGroup.updated_at
+                } : prevOrderGroup,
+            ),
+        );
+
+        toast('Order group updated', {
+            description: `Order group #${updatedOrderGroup.group_number} status changed to ${updatedOrderGroup.status?.replace(/_/g, ' ')}`,
+            classNames: {
+                description: '!text-muted-foreground',
+            },
+            action: {
+                label: 'View Order Group',
+                onClick: () => {
+                    router.visit(route('order-groups.show', updatedOrderGroup.id));
+                },
+            },
+        });
+    });
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Order Groups" />

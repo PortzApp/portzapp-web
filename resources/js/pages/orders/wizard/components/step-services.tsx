@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 
 import { router } from '@inertiajs/react';
-import { AlertCircle, ArrowLeft, Building2, Search, Users } from 'lucide-react';
+import { AlertCircle, ArrowLeft, Search, Users } from 'lucide-react';
 
 import type { Service } from '@/types/models';
 import type { OrderWizardCategorySelection, OrderWizardSession } from '@/types/wizard';

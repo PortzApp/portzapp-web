@@ -12,6 +12,8 @@ composer run dev
 
 This runs the Laravel app, queue worker, Vite dev server, log viewer, and WebSocket server concurrently.
 
+**IMPORTANT:** The development server is typically running in the background during development sessions. Do NOT attempt to start/restart `composer run dev` or `npm run dev` unless explicitly requested, as these are usually already running. Other npm/composer scripts (lint, test, format, etc.) can be run safely.
+
 **Build frontend:**
 
 ```bash
