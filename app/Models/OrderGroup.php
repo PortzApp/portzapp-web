@@ -49,6 +49,10 @@ class OrderGroup extends Model
         'notes',
     ];
 
+    protected $appends = [
+        'total_price',
+    ];
+
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
