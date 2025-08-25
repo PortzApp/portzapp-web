@@ -27,8 +27,6 @@ use Illuminate\Support\Carbon;
  * @property string|null $service_sub_category_id
  * @property-read ServiceSubCategory|null $subCategory
  * @property-read ServiceCategory|null $category
- * @property-read Collection<int, Order> $orders
- * @property-read int|null $orders_count
  * @property-read Organization $organization
  * @property-read Port $port
  *
