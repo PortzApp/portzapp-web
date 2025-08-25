@@ -25,9 +25,14 @@ class ServiceUpdated implements ShouldBroadcastNow
     /**
      * Get the channels the event should broadcast on.
      */
-    public function broadcastOn(): PrivateChannel
+    public function broadcastOn(): array
     {
-        return new PrivateChannel('services');
+        return [
+            // Organization-scoped channel for index pages
+            new PrivateChannel('services.organization.'.$this->service->organization_id),
+            // Resource-specific channel for detail pages
+            new PrivateChannel('services.'.$this->service->id),
+        ];
     }
 
     /**
