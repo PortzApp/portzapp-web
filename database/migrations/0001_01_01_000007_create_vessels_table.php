@@ -19,6 +19,12 @@ return new class extends Migration
             $table->string('vessel_type', 50);
             $table->string('status', 50);
             $table->timestamps();
+
+            // Indices for performance
+            $table->index('organization_id');
+            $table->index('status');
+            $table->index('vessel_type');
+            $table->index(['organization_id', 'status']);
         });
     }
 

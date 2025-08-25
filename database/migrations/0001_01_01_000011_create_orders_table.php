@@ -20,8 +20,17 @@ return new class extends Migration
             $table->foreignUlid('placed_by_user_id')->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignUlid('placed_by_organization_id')->constrained('organizations')->cascadeOnUpdate()->cascadeOnDelete();
             $table->text('notes')->nullable();
-            $table->string('status')->default(OrderStatus::DRAFT->value)->index();
+            $table->string('status')->default(OrderStatus::DRAFT->value);
             $table->timestamps();
+
+            // Indices for performance
+            $table->index('status');
+            $table->index('vessel_id');
+            $table->index('port_id');
+            $table->index('placed_by_user_id');
+            $table->index('placed_by_organization_id');
+            $table->index(['placed_by_organization_id', 'status']);
+            $table->index('created_at');
         });
     }
 

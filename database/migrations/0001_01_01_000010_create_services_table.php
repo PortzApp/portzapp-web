@@ -15,12 +15,19 @@ return new class extends Migration
             $table->ulid('id')->primary();
             $table->foreignUlid('organization_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignUlid('port_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignUlid('service_category_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
-            $table->string('name');
+            $table->foreignUlid('service_sub_category_id')->nullable()->constrained()->nullOnDelete();
             $table->text('description')->nullable();
             $table->decimal('price', total: 10, places: 2);
             $table->string('status');
             $table->timestamps();
+
+            // Indices for performance
+            $table->index('organization_id');
+            $table->index('port_id');
+            $table->index('service_sub_category_id');
+            $table->index('status');
+            $table->index(['organization_id', 'status']);
+            $table->index(['port_id', 'service_sub_category_id', 'status']);
         });
     }
 

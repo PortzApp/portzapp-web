@@ -11,10 +11,6 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Drop the old pivot table
-        Schema::dropIfExists('order_group_service');
-
-        // Create the new OrderGroupService table
         Schema::create('order_group_services', function (Blueprint $table) {
             $table->ulid('id')->primary();
             $table->ulid('order_group_id');
@@ -28,7 +24,8 @@ return new class extends Migration
             $table->foreign('order_group_id')->references('id')->on('order_groups')->onDelete('cascade');
             $table->foreign('service_id')->references('id')->on('services')->onDelete('cascade');
 
-            // Indexes for performance
+            // Unique constraint and indices for performance
+            $table->unique(['order_group_id', 'service_id']);
             $table->index(['order_group_id', 'status']);
             $table->index('service_id');
             $table->index('status');
@@ -41,17 +38,5 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('order_group_services');
-
-        // Recreate the old pivot table for rollback
-        Schema::create('order_group_service', function (Blueprint $table) {
-            $table->ulid('order_group_id');
-            $table->ulid('service_id');
-            $table->timestamps();
-
-            $table->foreign('order_group_id')->references('id')->on('order_groups')->onDelete('cascade');
-            $table->foreign('service_id')->references('id')->on('services')->onDelete('cascade');
-
-            $table->unique(['order_group_id', 'service_id']);
-        });
     }
 };

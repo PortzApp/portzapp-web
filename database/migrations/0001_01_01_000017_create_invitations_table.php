@@ -24,9 +24,14 @@ return new class extends Migration
             $table->json('metadata')->nullable(); // For additional context like invitation message
             $table->timestamps();
 
+            // Indices for performance
+            $table->index('type');
+            $table->index('expires_at');
+            $table->index('invited_by_user_id');
+            $table->index('organization_id');
             $table->index(['email', 'organization_id']);
-            $table->index(['token']);
-            $table->index(['status']);
+            $table->index('token');
+            $table->index('status');
         });
     }
 

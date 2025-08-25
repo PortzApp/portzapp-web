@@ -22,6 +22,12 @@ return new class extends Migration
             $table->decimal('longitude', 10, 8)->nullable();
             $table->string('timezone');
             $table->timestamps();
+
+            // Indices for performance
+            $table->index('status');
+            $table->index('country');
+            $table->index('name');
+            $table->index(['country', 'city']);
         });
     }
 

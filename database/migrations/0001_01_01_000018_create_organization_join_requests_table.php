@@ -22,9 +22,13 @@ return new class extends Migration
             $table->timestamp('reviewed_at')->nullable();
             $table->timestamps();
 
+            // Unique constraint and indices for performance
             $table->unique(['user_id', 'organization_id']);
+            $table->index('user_id');
+            $table->index('reviewed_by_user_id');
+            $table->index('created_at');
             $table->index(['organization_id', 'status']);
-            $table->index(['status']);
+            $table->index('status');
         });
     }
 

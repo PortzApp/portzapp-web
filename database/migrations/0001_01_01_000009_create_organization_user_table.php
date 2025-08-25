@@ -17,7 +17,10 @@ return new class extends Migration
             $table->string('role');
             $table->timestamps();
 
+            // Unique constraint and indices for performance
             $table->unique(['organization_id', 'user_id']);
+            $table->index('role');
+            $table->index('user_id');
         });
     }
 

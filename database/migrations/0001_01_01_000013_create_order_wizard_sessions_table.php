@@ -18,15 +18,19 @@ return new class extends Migration
             $table->string('session_name');
             $table->foreignUlid('vessel_id')->nullable()->constrained()->cascadeOnUpdate()->nullOnDelete();
             $table->foreignUlid('port_id')->nullable()->constrained()->cascadeOnUpdate()->nullOnDelete();
-            $table->json('selected_categories')->nullable(); // Array of category IDs
-            $table->json('selected_services')->nullable(); // Array of service objects with agency info
             $table->string('current_step')->default('vessel_port'); // vessel_port, categories, services, review
+            $table->integer('current_category_index')->default(0); // For tracking which category we're selecting services for in step 3
             $table->string('status')->default('draft'); // draft, completed, abandoned
             $table->timestamp('completed_at')->nullable();
             $table->timestamp('expires_at')->nullable();
             $table->timestamps();
 
             // Indexes for common queries
+            $table->index('session_name');
+            $table->index('vessel_id');
+            $table->index('port_id');
+            $table->index('current_step');
+            $table->index('completed_at');
             $table->index(['user_id', 'status']);
             $table->index(['organization_id', 'status']);
             $table->index('expires_at');

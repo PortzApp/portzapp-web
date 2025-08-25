@@ -15,14 +15,18 @@ return new class extends Migration
             $table->ulid('id')->primary();
             $table->foreignUlid('session_id')->constrained('order_wizard_sessions')->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignUlid('service_category_id')->constrained('service_categories')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignUlid('service_sub_category_id')->nullable()->after('service_category_id')
+                ->constrained('service_sub_categories')->cascadeOnUpdate()->cascadeOnDelete();
             $table->integer('order_index')->default(0); // For ordering categories in step 3
             $table->timestamps();
 
-            // Prevent duplicate category selections per session
-            $table->unique(['session_id', 'service_category_id']);
+            // Prevent duplicate sub-category selections per session (updated constraint)
+            $table->unique(['session_id', 'service_sub_category_id']);
 
             // Index for efficient queries
-            $table->index(['session_id', 'order_index']);
+            $table->index('service_category_id');
+            $table->index(['session_id', 'order_index'], 'owcs_session_order_idx');
+            $table->index(['session_id', 'service_sub_category_id'], 'owcs_session_subcategory_idx');
         });
     }
 

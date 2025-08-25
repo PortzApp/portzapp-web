@@ -11,13 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('service_sub_categories', function (Blueprint $table) {
+        Schema::create('organizations', function (Blueprint $table) {
             $table->ulid('id')->primary();
-            $table->foreignUlid('service_category_id')->constrained()->cascadeOnDelete();
             $table->string('name');
+            $table->string('slug')->unique();
+            $table->string('registration_code')->unique();
+            $table->string('business_type');
             $table->text('description')->nullable();
-            $table->integer('sort_order')->default(0);
             $table->timestamps();
+
+            // Indices for performance
+            $table->index('business_type');
+            $table->index('name');
         });
     }
 
@@ -26,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('service_sub_categories');
+        Schema::dropIfExists('organizations');
     }
 };

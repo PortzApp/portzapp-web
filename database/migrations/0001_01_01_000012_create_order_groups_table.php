@@ -17,11 +17,14 @@ return new class extends Migration
             $table->string('group_number')->unique();
             $table->foreignUlid('order_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignUlid('fulfilling_organization_id')->constrained('organizations')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->string('status')->default(OrderGroupStatus::PENDING->value)->index();
+            $table->string('status')->default(OrderGroupStatus::PENDING->value);
             $table->text('notes')->nullable();
             $table->timestamps();
 
-            // Index for common queries
+            // Indices for common queries
+            $table->index('status');
+            $table->index('order_id');
+            $table->index('fulfilling_organization_id');
             $table->index(['order_id', 'fulfilling_organization_id']);
             $table->index(['fulfilling_organization_id', 'status']);
         });

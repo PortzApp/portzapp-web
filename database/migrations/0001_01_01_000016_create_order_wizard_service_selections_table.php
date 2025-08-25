@@ -25,8 +25,10 @@ return new class extends Migration
             $table->unique(['session_id', 'service_category_id', 'service_id'], 'unique_session_category_service');
 
             // Indexes for efficient queries
+            $table->index('organization_id');
+            $table->index('service_id');
             $table->index(['session_id', 'service_category_id']);
-            $table->index(['session_id']);
+            $table->index('session_id');
         });
     }
 

@@ -19,8 +19,16 @@ return new class extends Migration
             $table->string('phone_number', length: 25);
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->foreignUlid('current_organization_id')->nullable()->constrained('organizations')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->string('onboarding_status')->default('pending');
             $table->rememberToken();
             $table->timestamps();
+
+            // Indices for performance
+            $table->index('onboarding_status');
+            $table->index('current_organization_id');
+            $table->index('email_verified_at');
+            $table->index(['email', 'password']);
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
