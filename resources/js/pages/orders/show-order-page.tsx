@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import OrderGroupsTab from '@/pages/orders/components/order-groups-tab';
 import OrderOverviewTab from '@/pages/orders/components/order-overview-tab';
@@ -6,11 +6,12 @@ import OrderServicesTab from '@/pages/orders/components/order-services-tab';
 import OrderSystemTab from '@/pages/orders/components/order-system-tab';
 import OrderVesselTab from '@/pages/orders/components/order-vessel-tab';
 import { Head, Link, router } from '@inertiajs/react';
+import { useEcho } from '@laravel/echo-react';
 import { Database, Edit, LayoutGrid, MapPin, Package, Ship, Trash2, Users } from 'lucide-react';
 import { toast } from 'sonner';
 
 import type { BreadcrumbItem } from '@/types';
-import { OrderWithRelations, Service } from '@/types/models';
+import { OrderWithRelations, Service, OrderGroup, OrderGroupService } from '@/types/models';
 
 import AppLayout from '@/layouts/app-layout';
 
@@ -28,8 +29,36 @@ import {
 } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-export default function ShowOrderPage({ order }: { order: OrderWithRelations }) {
+interface OrderEvent {
+    message: string;
+    user: {
+        id: string;
+        name: string;
+        email: string;
+    };
+    timestamp: string;
+}
+
+interface OrderUpdatedEvent extends OrderEvent {
+    order: OrderWithRelations;
+}
+
+interface OrderGroupUpdatedEvent extends OrderEvent {
+    orderGroup: OrderGroup;
+}
+
+interface OrderGroupServiceUpdatedEvent extends OrderEvent {
+    orderGroupService: OrderGroupService;
+}
+
+export default function ShowOrderPage({ order: initialOrder }: { order: OrderWithRelations }) {
+    const [order, setOrder] = useState(initialOrder);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+
+    // Sync new props back to local state after server refetch
+    useEffect(() => {
+        setOrder(initialOrder);
+    }, [initialOrder]);
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -41,6 +70,84 @@ export default function ShowOrderPage({ order }: { order: OrderWithRelations }) 
             href: `/orders/${order.id}`,
         },
     ];
+
+    // Listen for order updated events
+    useEcho<OrderUpdatedEvent>('orders', 'OrderUpdated', ({ order: updatedOrder }) => {
+        if (updatedOrder.id === order.id) {
+            setOrder(prevOrder => ({
+                ...prevOrder,
+                status: updatedOrder.status,
+                updated_at: updatedOrder.updated_at
+            }));
+            
+            toast('Order updated', {
+                description: `Order #${updatedOrder.order_number} status changed to ${updatedOrder.status?.replace(/_/g, ' ')}`,
+                className: 'bg-background border-border',
+                descriptionClassName: 'text-muted-foreground',
+            });
+        }
+    });
+
+    // Listen for order group updated events
+    useEcho<OrderGroupUpdatedEvent>('order-groups', 'OrderGroupUpdated', ({ orderGroup: updatedOrderGroup }) => {
+        // Check if this order group belongs to the current order
+        const belongsToCurrentOrder = order.order_groups?.some(og => og.id === updatedOrderGroup.id);
+        
+        if (belongsToCurrentOrder) {
+            setOrder(prevOrder => ({
+                ...prevOrder,
+                order_groups: prevOrder.order_groups?.map(orderGroup =>
+                    orderGroup.id === updatedOrderGroup.id ? {
+                        ...orderGroup,
+                        status: updatedOrderGroup.status,
+                        updated_at: updatedOrderGroup.updated_at
+                    } : orderGroup
+                )
+            }));
+
+            toast('Order group updated', {
+                description: `Order group #${updatedOrderGroup.group_number} status changed to ${updatedOrderGroup.status?.replace(/_/g, ' ')}`,
+                className: 'bg-background border-border',
+                descriptionClassName: 'text-muted-foreground',
+                action: {
+                    label: 'View Order Group',
+                    onClick: () => {
+                        router.visit(route('order-groups.show', updatedOrderGroup.id));
+                    },
+                },
+            });
+        }
+    });
+
+    // Listen for order group service updated events
+    useEcho<OrderGroupServiceUpdatedEvent>('order-group-services', 'OrderGroupServiceUpdated', ({ orderGroupService: updatedOrderGroupService }) => {
+        // Check if this service belongs to any order group in the current order
+        const belongsToCurrentOrder = order.order_groups?.some(og => 
+            og.order_group_services?.some(ogs => ogs.id === updatedOrderGroupService.id)
+        );
+        
+        if (belongsToCurrentOrder) {
+            setOrder(prevOrder => ({
+                ...prevOrder,
+                order_groups: prevOrder.order_groups?.map(orderGroup => ({
+                    ...orderGroup,
+                    order_group_services: orderGroup.order_group_services?.map(service =>
+                        service.id === updatedOrderGroupService.id ? {
+                            ...service,
+                            status: updatedOrderGroupService.status,
+                            updated_at: updatedOrderGroupService.updated_at
+                        } : service
+                    )
+                }))
+            }));
+
+            toast('Service updated', {
+                description: `Service status changed to ${updatedOrderGroupService.status?.replace(/_/g, ' ')}`,
+                className: 'bg-background border-border',
+                descriptionClassName: 'text-muted-foreground',
+            });
+        }
+    });
 
     function handleDeleteOrder() {
         setOpenDeleteDialog(false);
