@@ -105,7 +105,7 @@ class ServiceController extends Controller
         ]);
 
         // Load relationships for the created service
-        $service->load(['organization:id,name', 'port:id,name', 'subCategory.category:id,name', 'orders']);
+        $service->load(['organization:id,name', 'port:id,name', 'subCategory.category:id,name']);
 
         ServiceCreated::dispatch($request->user(), $service);
 
@@ -132,7 +132,7 @@ class ServiceController extends Controller
     {
         Gate::authorize('view', $service);
 
-        $service->load(['organization:id,name', 'port:id,name', 'subCategory.category:id,name', 'orders']);
+        $service->load(['organization:id,name', 'port:id,name', 'subCategory.category:id,name']);
 
         return Inertia::render('services/show-service-page', [
             'service' => $service,
@@ -146,7 +146,7 @@ class ServiceController extends Controller
     {
         Gate::authorize('update', $service);
 
-        $service->load(['organization:id,name', 'port:id,name', 'subCategory.category:id,name', 'orders']);
+        $service->load(['organization:id,name', 'port:id,name', 'subCategory.category:id,name']);
 
         return Inertia::render('services/edit-service-page', [
             'service' => $service,
