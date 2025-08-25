@@ -83,8 +83,9 @@ export default function ShowOrderPage({ order: initialOrder }: { order: OrderWit
             
             toast('Order updated', {
                 description: `Order #${updatedOrder.order_number} status changed to ${updatedOrder.status?.replace(/_/g, ' ')}`,
-                className: 'bg-background border-border',
-                descriptionClassName: 'text-muted-foreground',
+                classNames: {
+                    description: '!text-muted-foreground',
+                },
             });
         }
     });
@@ -108,8 +109,9 @@ export default function ShowOrderPage({ order: initialOrder }: { order: OrderWit
 
             toast('Order group updated', {
                 description: `Order group #${updatedOrderGroup.group_number} status changed to ${updatedOrderGroup.status?.replace(/_/g, ' ')}`,
-                className: 'bg-background border-border',
-                descriptionClassName: 'text-muted-foreground',
+                classNames: {
+                    description: '!text-muted-foreground',
+                },
                 action: {
                     label: 'View Order Group',
                     onClick: () => {
@@ -144,8 +146,9 @@ export default function ShowOrderPage({ order: initialOrder }: { order: OrderWit
 
             toast('Service updated', {
                 description: `Service status changed to ${updatedOrderGroupService.status?.replace(/_/g, ' ')}`,
-                className: 'bg-background border-border',
-                descriptionClassName: 'text-muted-foreground',
+                classNames: {
+                    description: '!text-muted-foreground',
+                },
             });
         }
     });

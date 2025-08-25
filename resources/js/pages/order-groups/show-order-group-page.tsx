@@ -99,8 +99,9 @@ export default function ShowOrderGroupPage({
             
             toast('Order group updated', {
                 description: `Order group #${updatedOrderGroup.group_number} status changed to ${updatedOrderGroup.status?.replace(/_/g, ' ')}`,
-                className: 'bg-background border-border',
-                descriptionClassName: 'text-muted-foreground',
+                classNames: {
+                    description: '!text-muted-foreground',
+                },
             });
         }
         
@@ -119,8 +120,9 @@ export default function ShowOrderGroupPage({
             
             toast('Related order group updated', {
                 description: `Order group #${updatedOrderGroup.group_number} status changed to ${updatedOrderGroup.status?.replace(/_/g, ' ')}`,
-                className: 'bg-background border-border',
-                descriptionClassName: 'text-muted-foreground',
+                classNames: {
+                    description: '!text-muted-foreground',
+                },
                 action: {
                     label: 'View Order Group',
                     onClick: () => {
@@ -150,8 +152,9 @@ export default function ShowOrderGroupPage({
 
             toast('Service updated', {
                 description: `Service status changed to ${updatedOrderGroupService.status?.replace(/_/g, ' ')}`,
-                className: 'bg-background border-border',
-                descriptionClassName: 'text-muted-foreground',
+                classNames: {
+                    description: '!text-muted-foreground',
+                },
             });
         }
     });
@@ -167,8 +170,9 @@ export default function ShowOrderGroupPage({
             
             toast('Parent order updated', {
                 description: `Order #${updatedOrder.order_number} status changed to ${updatedOrder.status?.replace(/_/g, ' ')}`,
-                className: 'bg-background border-border',
-                descriptionClassName: 'text-muted-foreground',
+                classNames: {
+                    description: '!text-muted-foreground',
+                },
                 action: {
                     label: 'View Order',
                     onClick: () => {
