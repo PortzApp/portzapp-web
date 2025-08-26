@@ -24,9 +24,20 @@ class UpdateVesselRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'imo_number' => ['required', 'string', 'size:7'],
-            'vessel_type' => ['required', 'in:cargo,tanker,container'],
-            'status' => ['required', 'in:active,inactive,maintenance'],
+            'imo_number' => ['nullable', 'string', 'size:7', 'unique:vessels,imo_number,'.$this->route('vessel')->id],
+            'vessel_type' => ['required', 'string', 'in:bulk_carrier,car_carrier,container_ship,dry_bulk,gas_carrier,naval_ships,passenger_ships,tanker_ship,yacht'],
+            'status' => ['required', 'string', 'in:active,inactive,maintenance'],
+            'grt' => ['nullable', 'numeric', 'min:0'],
+            'nrt' => ['nullable', 'numeric', 'min:0'],
+            'dwt' => ['nullable', 'integer', 'min:0'],
+            'loa' => ['nullable', 'numeric', 'min:0'],
+            'beam' => ['nullable', 'numeric', 'min:0'],
+            'draft' => ['nullable', 'numeric', 'min:0'],
+            'build_year' => ['nullable', 'integer', 'min:1900', 'max:'.(date('Y') + 1)],
+            'mmsi' => ['nullable', 'string', 'size:9', 'regex:/^\d{9}$/', 'unique:vessels,mmsi,'.$this->route('vessel')->id],
+            'call_sign' => ['nullable', 'string', 'max:10'],
+            'flag_state' => ['nullable', 'string', 'max:255'],
+            'remarks' => ['nullable', 'string', 'max:1000'],
         ];
     }
 }
