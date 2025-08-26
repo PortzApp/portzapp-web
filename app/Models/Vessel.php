@@ -17,17 +17,32 @@ use Illuminate\Support\Carbon;
 /**
  * @method static create(string[] $array)
  *
- * @property int $id
- * @property int $organization_id
+ * @property string $id
+ * @property string $organization_id
  * @property string $name
  * @property string $imo_number
  * @property VesselType $vessel_type
  * @property VesselStatus $status
+ * @property float|null $grt
+ * @property float|null $nrt
+ * @property int|null $dwt
+ * @property int|null $loa
+ * @property int|null $beam
+ * @property int|null $draft
+ * @property int|null $build_year
+ * @property string|null $mmsi
+ * @property string|null $call_sign
+ * @property string|null $flag_state
+ * @property string|null $remarks
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read Collection<int, Order> $orders
  * @property-read int|null $orders_count
  * @property-read Organization $organization
+ * @property-read float|null $dwt_in_tons
+ * @property-read float|null $loa_in_meters
+ * @property-read float|null $beam_in_meters
+ * @property-read float|null $draft_in_meters
  *
  * @method static \Database\Factories\VesselFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Vessel newModelQuery()
@@ -55,6 +70,17 @@ class Vessel extends Model
         'imo_number',
         'status',
         'vessel_type',
+        'grt',
+        'nrt',
+        'dwt',
+        'loa',
+        'beam',
+        'draft',
+        'build_year',
+        'mmsi',
+        'call_sign',
+        'flag_state',
+        'remarks',
     ];
 
     /**
@@ -84,5 +110,37 @@ class Vessel extends Model
             'vessel_type' => VesselType::class,
             'status' => VesselStatus::class,
         ];
+    }
+
+    /**
+     * Get the DWT in metric tons (for display purposes).
+     */
+    public function getDwtInTonsAttribute(): ?float
+    {
+        return $this->dwt ? round($this->dwt / 1000, 2) : null;
+    }
+
+    /**
+     * Get the LOA in meters (for display purposes).
+     */
+    public function getLoaInMetersAttribute(): ?float
+    {
+        return $this->loa ? round($this->loa / 1000, 2) : null;
+    }
+
+    /**
+     * Get the Beam in meters (for display purposes).
+     */
+    public function getBeamInMetersAttribute(): ?float
+    {
+        return $this->beam ? round($this->beam / 1000, 2) : null;
+    }
+
+    /**
+     * Get the Draft in meters (for display purposes).
+     */
+    public function getDraftInMetersAttribute(): ?float
+    {
+        return $this->draft ? round($this->draft / 1000, 2) : null;
     }
 }
