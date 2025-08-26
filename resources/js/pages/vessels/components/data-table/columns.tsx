@@ -1,10 +1,12 @@
 import { VesselsPageColumnActions } from '@/pages/vessels/components/data-table/column-actions';
 import { ColumnDef } from '@tanstack/react-table';
+import { Info } from 'lucide-react';
 
 import { Vessel } from '@/types/models';
 
 import { Checkbox } from '@/components/ui/checkbox';
 import { DataTableColumnHeader } from '@/components/ui/data-table/data-table-column-header';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 import { VesselStatusBadge, VesselTypeBadge } from '@/components/badges';
 
@@ -47,6 +49,116 @@ export const columns: ColumnDef<Vessel>[] = [
         cell: ({ row }) => {
             const vessel = row.original;
             return <VesselTypeBadge type={vessel.vessel_type} iconOnly />;
+        },
+    },
+    {
+        accessorKey: 'grt',
+        header: ({ column }) => (
+            <div className="flex items-center gap-1">
+                <DataTableColumnHeader column={column} title="GRT" />
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Info className="h-3 w-3 text-muted-foreground" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>Gross Register Tonnage - Total internal volume</p>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
+            </div>
+        ),
+        cell: ({ row }) => {
+            const vessel = row.original;
+            return vessel.grt ? (
+                <p className="tabular-nums">{new Intl.NumberFormat().format(vessel.grt)}</p>
+            ) : (
+                <span className="text-muted-foreground">—</span>
+            );
+        },
+    },
+    {
+        accessorKey: 'nrt',
+        header: ({ column }) => (
+            <div className="flex items-center gap-1">
+                <DataTableColumnHeader column={column} title="NRT" />
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Info className="h-3 w-3 text-muted-foreground" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>Net Register Tonnage - Cargo carrying capacity</p>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
+            </div>
+        ),
+        cell: ({ row }) => {
+            const vessel = row.original;
+            return vessel.nrt ? (
+                <p className="tabular-nums">{new Intl.NumberFormat().format(vessel.nrt)}</p>
+            ) : (
+                <span className="text-muted-foreground">—</span>
+            );
+        },
+    },
+    {
+        accessorKey: 'dwt',
+        header: ({ column }) => (
+            <div className="flex items-center gap-1">
+                <DataTableColumnHeader column={column} title="DWT" />
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Info className="h-3 w-3 text-muted-foreground" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>Deadweight Tonnage - Maximum cargo weight capacity</p>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
+            </div>
+        ),
+        cell: ({ row }) => {
+            const vessel = row.original;
+            const dwtInTons = vessel.dwt ? vessel.dwt / 1000 : null;
+            return dwtInTons ? (
+                <p className="tabular-nums">{new Intl.NumberFormat().format(Math.round(dwtInTons))} t</p>
+            ) : (
+                <span className="text-muted-foreground">—</span>
+            );
+        },
+    },
+    {
+        accessorKey: 'loa',
+        header: ({ column }) => (
+            <div className="flex items-center gap-1">
+                <DataTableColumnHeader column={column} title="LOA" />
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Info className="h-3 w-3 text-muted-foreground" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>Length Overall - Total length of vessel</p>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
+            </div>
+        ),
+        cell: ({ row }) => {
+            const vessel = row.original;
+            const loaInMeters = vessel.loa ? vessel.loa / 1000 : null;
+            return loaInMeters ? <p className="tabular-nums">{loaInMeters} m</p> : <span className="text-muted-foreground">—</span>;
+        },
+    },
+    {
+        accessorKey: 'flag_state',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Flag" />,
+        cell: ({ row }) => {
+            const vessel = row.original;
+            return vessel.flag_state ? <p className="text-sm">{vessel.flag_state}</p> : <span className="text-muted-foreground">—</span>;
         },
     },
     {
