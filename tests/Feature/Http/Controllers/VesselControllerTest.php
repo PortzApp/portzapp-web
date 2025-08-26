@@ -54,7 +54,7 @@ beforeEach(function (): void {
         'organization_id' => $this->vesselOwnerOrg->id,
         'name' => 'Test Vessel',
         'imo_number' => '1234567',
-        'vessel_type' => VesselType::CARGO,
+        'vessel_type' => VesselType::CONTAINER_SHIP,
         'status' => VesselStatus::ACTIVE,
     ]);
 
@@ -190,7 +190,7 @@ describe('VesselController store', function (): void {
         $vesselData = [
             'name' => 'New Vessel',
             'imo_number' => '9876543',
-            'vessel_type' => VesselType::TANKER->value,
+            'vessel_type' => VesselType::TANKER_SHIP->value,
             'status' => VesselStatus::ACTIVE->value,
         ];
 
@@ -203,7 +203,7 @@ describe('VesselController store', function (): void {
         $this->assertDatabaseHas('vessels', [
             'name' => 'New Vessel',
             'imo_number' => '9876543',
-            'vessel_type' => VesselType::TANKER->value,
+            'vessel_type' => VesselType::TANKER_SHIP->value,
             'status' => VesselStatus::ACTIVE->value,
             'organization_id' => $this->vesselOwnerOrg->id,
         ]);
@@ -213,7 +213,7 @@ describe('VesselController store', function (): void {
         $vesselData = [
             'name' => 'Admin Created Vessel',
             'imo_number' => '1111111',
-            'vessel_type' => VesselType::CARGO->value,
+            'vessel_type' => VesselType::BULK_CARRIER->value,
             'status' => VesselStatus::ACTIVE->value,
         ];
 
@@ -233,7 +233,7 @@ describe('VesselController store', function (): void {
         $vesselData = [
             'name' => 'Organization Test Vessel',
             'imo_number' => '2222222',
-            'vessel_type' => VesselType::CARGO->value,
+            'vessel_type' => VesselType::BULK_CARRIER->value,
             'status' => VesselStatus::ACTIVE->value,
         ];
 
@@ -250,7 +250,7 @@ describe('VesselController store', function (): void {
         $vesselData = [
             'name' => 'Unauthorized Vessel',
             'imo_number' => '9999999',
-            'vessel_type' => VesselType::CARGO->value,
+            'vessel_type' => VesselType::BULK_CARRIER->value,
             'status' => VesselStatus::ACTIVE->value,
         ];
 
@@ -264,7 +264,7 @@ describe('VesselController store', function (): void {
         $vesselData = [
             'name' => 'Unauthorized Vessel',
             'imo_number' => '9999998',
-            'vessel_type' => VesselType::CARGO->value,
+            'vessel_type' => VesselType::BULK_CARRIER->value,
             'status' => VesselStatus::ACTIVE->value,
         ];
 
@@ -357,7 +357,7 @@ describe('VesselController update', function (): void {
         $updateData = [
             'name' => 'Updated Vessel Name',
             'imo_number' => '7777777',
-            'vessel_type' => VesselType::TANKER->value,
+            'vessel_type' => VesselType::TANKER_SHIP->value,
             'status' => VesselStatus::INACTIVE->value,
         ];
 
@@ -370,7 +370,7 @@ describe('VesselController update', function (): void {
         $this->vessel->refresh();
         expect($this->vessel->name)->toBe('Updated Vessel Name');
         expect($this->vessel->imo_number)->toBe('7777777');
-        expect($this->vessel->vessel_type)->toBe(VesselType::TANKER);
+        expect($this->vessel->vessel_type)->toBe(VesselType::TANKER_SHIP);
         expect($this->vessel->status)->toBe(VesselStatus::INACTIVE);
     });
 
@@ -378,7 +378,7 @@ describe('VesselController update', function (): void {
         $updateData = [
             'name' => 'Admin Updated Vessel',
             'imo_number' => '8888888',
-            'vessel_type' => VesselType::CARGO->value,
+            'vessel_type' => VesselType::BULK_CARRIER->value,
             'status' => VesselStatus::ACTIVE->value,
         ];
 
@@ -396,7 +396,7 @@ describe('VesselController update', function (): void {
         $updateData = [
             'name' => 'Unauthorized Update',
             'imo_number' => '9999997',
-            'vessel_type' => VesselType::CARGO->value,
+            'vessel_type' => VesselType::BULK_CARRIER->value,
             'status' => VesselStatus::ACTIVE->value,
         ];
 
@@ -410,7 +410,7 @@ describe('VesselController update', function (): void {
         $updateData = [
             'name' => 'Unauthorized Update',
             'imo_number' => '9999996',
-            'vessel_type' => VesselType::CARGO->value,
+            'vessel_type' => VesselType::BULK_CARRIER->value,
             'status' => VesselStatus::ACTIVE->value,
         ];
 
@@ -518,7 +518,7 @@ describe('VesselController authorization edge cases', function (): void {
         $vesselData = [
             'name' => 'Test Vessel',
             'imo_number' => '1234568',
-            'vessel_type' => VesselType::CARGO->value,
+            'vessel_type' => VesselType::BULK_CARRIER->value,
             'status' => VesselStatus::ACTIVE->value,
         ];
 
