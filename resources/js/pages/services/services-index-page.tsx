@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { useEcho } from '@laravel/echo-react';
-import { Box, MapPin, Plus, RotateCcw, Star } from 'lucide-react';
+import { Box, ClipboardList, MapPin, Plus, RotateCcw, Star } from 'lucide-react';
 import { parseAsInteger, parseAsString, useQueryState, useQueryStates } from 'nuqs';
 import { toast } from 'sonner';
 
@@ -62,9 +62,13 @@ interface ServicesPageProps {
     services: PaginatedResponse<ServiceWithRelations>;
     ports: Port[];
     categories_with_subcategories: ServiceCategoryWithSubCategories[];
+    status_counts: {
+        active: number;
+        inactive: number;
+    };
 }
 
-export default function ServicesIndexPage({ services: initialServices, ports, categories_with_subcategories }: ServicesPageProps) {
+export default function ServicesIndexPage({ services: initialServices, ports, categories_with_subcategories, status_counts }: ServicesPageProps) {
     const { auth } = usePage<SharedData>().props;
 
     const [services, setServices] = useState(initialServices.data);
@@ -85,6 +89,14 @@ export default function ServicesIndexPage({ services: initialServices, ports, ca
         }),
     );
 
+    const [statusFilter, setStatusFilter] = useQueryState(
+        'status',
+        parseAsString.withDefault('').withOptions({
+            shallow: false,
+            history: 'push',
+        }),
+    );
+
     const [, setCurrentPage] = useQueryState(
         'page',
         parseAsInteger.withDefault(1).withOptions({
@@ -98,6 +110,7 @@ export default function ServicesIndexPage({ services: initialServices, ports, ca
         {
             port: parseAsString.withDefault(''),
             sub_category: parseAsString.withDefault(''),
+            status: parseAsString.withDefault(''),
             page: parseAsInteger.withDefault(1),
         },
         {
@@ -171,12 +184,19 @@ export default function ServicesIndexPage({ services: initialServices, ports, ca
                 <div className="flex items-center justify-between">
                     <h1 className="text-2xl font-bold">Services</h1>
 
-                    {auth.user.current_organization?.business_type === 'shipping_agency' && (
-                        <Link href={route('services.create')} className={buttonVariants({ variant: 'default' })}>
-                            <Plus className="mr-2 h-4 w-4" />
-                            Add Service
+                    <div className="flex items-center gap-3">
+                        <Link href={route('order-wizard.dashboard')} className={buttonVariants({ variant: 'default' })}>
+                            <ClipboardList className="mr-2 h-4 w-4" />
+                            New Order
                         </Link>
-                    )}
+                        
+                        {auth.user.current_organization?.business_type === 'shipping_agency' && (
+                            <Link href={route('services.create')} className={buttonVariants({ variant: 'outline' })}>
+                                <Plus className="mr-2 h-4 w-4" />
+                                Add Service
+                            </Link>
+                        )}
+                    </div>
                 </div>
                 {/*<ServicesPageDataTable columns={servicesPageColumns} data={services} />*/}
                 {/*<pre>{JSON.stringify(services, null, 2)}</pre>*/}
@@ -191,7 +211,38 @@ export default function ServicesIndexPage({ services: initialServices, ports, ca
                             </Button>
                         </div>
 
-                        <Accordion type="multiple" defaultValue={['filter_ports', 'filter_categories']} className="w-full">
+                        <Accordion type="multiple" defaultValue={['filter_status', 'filter_ports', 'filter_categories']} className="w-full">
+                            <AccordionItem value="filter_status" className="py-2">
+                                <AccordionTrigger className="py-4 text-[15px] leading-6 hover:no-underline">
+                                    <span className="text-sm font-semibold uppercase">Status</span>
+                                </AccordionTrigger>
+                                <AccordionContent className="pb-2 text-muted-foreground">
+                                    <RadioGroup
+                                        value={statusFilter}
+                                        onValueChange={async (value) => {
+                                            await setStatusFilter(value);
+                                            await setCurrentPage(1);
+                                            router.reload({ only: ['services'] });
+                                        }}
+                                    >
+                                        <div className="flex items-center gap-2">
+                                            <RadioGroupItem value="active" id="active" />
+                                            <Label htmlFor="active">
+                                                Active
+                                                <span className="ml-1 text-muted-foreground">({status_counts.active})</span>
+                                            </Label>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <RadioGroupItem value="inactive" id="inactive" />
+                                            <Label htmlFor="inactive">
+                                                Inactive
+                                                <span className="ml-1 text-muted-foreground">({status_counts.inactive})</span>
+                                            </Label>
+                                        </div>
+                                    </RadioGroup>
+                                </AccordionContent>
+                            </AccordionItem>
+
                             <AccordionItem value="filter_ports" className="py-2">
                                 <AccordionTrigger className="py-4 text-[15px] leading-6 hover:no-underline">
                                     <span className="text-sm font-semibold uppercase">Ports</span>
@@ -261,28 +312,25 @@ export default function ServicesIndexPage({ services: initialServices, ports, ca
                         {services.map((service) => (
                             <div
                                 key={service.id}
-                                className="flex h-fit flex-col gap-2 rounded-xl border bg-card p-6 text-card-foreground shadow-md transition-shadow hover:shadow-lg"
+                                className="flex h-fit flex-col gap-4 rounded-xl border bg-card p-6 text-card-foreground shadow-md transition-shadow hover:shadow-lg"
                             >
-                                <div className="flex items-start gap-6">
-                                    <div className="size-12 rounded-md bg-neutral-200" />
-                                    <div className="flex flex-1 flex-col gap-4">
-                                        <div className="flex justify-between">
-                                            <div className="flex flex-col gap-2">
-                                                <h3 className="inline-flex items-center gap-2 text-lg font-semibold">
-                                                    <div className="size-4 rounded-full bg-neutral-200" />
-                                                    <span>{service.organization.name}</span>
-                                                </h3>
+                                <div className="flex items-start justify-between">
+                                    <div className="flex flex-1 flex-col gap-3">
+                                        {/* Primary: Service Sub-Category (main title) */}
+                                        <Link
+                                            href={route('services.show', service.id)}
+                                            className="text-xl font-bold text-foreground hover:underline hover:underline-offset-4"
+                                        >
+                                            {service.sub_category?.name || 'Service'}
+                                        </Link>
 
-                                                <Link
-                                                    href={route('services.show', service.id)}
-                                                    className="text-base font-medium hover:underline hover:underline-offset-4"
-                                                >
-                                                    {service.sub_category?.name || 'Service'} - Service #{service.id}
-                                                </Link>
-                                            </div>
-                                            <ServicesPageColumnActions service={service} />
+                                        {/* Secondary: Organization providing the service */}
+                                        <div className="inline-flex items-center gap-2 text-base text-muted-foreground">
+                                            <div className="size-4 rounded-full bg-neutral-200" />
+                                            <span>Provided by {service.organization.name}</span>
                                         </div>
 
+                                        {/* Supporting info: Badges */}
                                         <div className="flex flex-wrap gap-2">
                                             <Badge variant={service.status === 'active' ? 'default' : 'secondary'}>
                                                 <div
@@ -306,35 +354,34 @@ export default function ServicesIndexPage({ services: initialServices, ports, ca
                                             </Badge>
                                         </div>
 
+                                        {/* Rating */}
                                         <div className="flex items-center gap-2">
-                                            <div className="flex gap-1">
-                                                <Star fill="#eab308" className="size-4 text-yellow-500" />
-                                                <Star fill="#eab308" className="size-4 text-yellow-500" />
-                                                <Star fill="#eab308" className="size-4 text-yellow-500" />
-                                                <Star fill="#eab308" className="size-4 text-yellow-500" />
-                                                <Star className="size-4 text-yellow-500" />
+                                            <div className="flex gap-0.5">
+                                                <Star fill="#eab308" className="size-3 text-yellow-500" />
+                                                <Star fill="#eab308" className="size-3 text-yellow-500" />
+                                                <Star fill="#eab308" className="size-3 text-yellow-500" />
+                                                <Star fill="#eab308" className="size-3 text-yellow-500" />
+                                                <Star className="size-3 text-yellow-500" />
                                             </div>
-                                            <span className="text-sm font-normal">(4.0)</span>
+                                            <span className="text-xs text-muted-foreground">(4.0)</span>
                                         </div>
 
-                                        <p className="line-clamp-2 text-sm text-muted-foreground">{service.description || 'No description.'}</p>
+                                        {/* Description */}
+                                        <p className="line-clamp-2 text-sm text-muted-foreground">{service.description || 'No description available.'}</p>
 
-                                        <div className="flex justify-between">
-                                            <div className="flex items-center gap-2">
-                                                <span className="text-xl font-medium text-primary">
-                                                    {new Intl.NumberFormat('en-US', {
-                                                        style: 'currency',
-                                                        currency: 'USD',
-                                                    }).format(Number(service.price))}
-                                                </span>
-                                            </div>
-
-                                            <Button variant="outline" size="sm">
-                                                <Plus className="size-4" />
-                                                Add
-                                            </Button>
+                                        {/* Price */}
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-2xl font-bold text-primary">
+                                                {new Intl.NumberFormat('en-US', {
+                                                    style: 'currency',
+                                                    currency: 'USD',
+                                                }).format(Number(service.price))}
+                                            </span>
                                         </div>
                                     </div>
+                                    
+                                    {/* Actions */}
+                                    <ServicesPageColumnActions service={service} />
                                 </div>
                             </div>
                         ))}

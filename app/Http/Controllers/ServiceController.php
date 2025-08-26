@@ -53,6 +53,12 @@ class ServiceController extends Controller
             $query->where('service_sub_category_id', $subCategoryFilter);
         }
 
+        // Filter by status if provided
+        if (request()->has('status') && request()->get('status') !== '') {
+            $statusFilter = request()->get('status');
+            $query->where('status', $statusFilter);
+        }
+
         $services = $query->latest()->paginate(10);
 
         // Build base query for counts (same organization filtering as main query)
@@ -79,10 +85,17 @@ class ServiceController extends Controller
             ->orderBy('name')
             ->get();
 
+        // Get status counts
+        $statusCounts = [
+            'active' => (clone $countQuery)->where('status', 'active')->count(),
+            'inactive' => (clone $countQuery)->where('status', 'inactive')->count(),
+        ];
+
         return Inertia::render('services/services-index-page', [
             'services' => Inertia::always($services),
             'ports' => $portsWithCounts,
             'categories_with_subcategories' => $categoriesWithSubCategories,
+            'status_counts' => $statusCounts,
         ]);
     }
 
