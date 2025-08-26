@@ -3,10 +3,10 @@ import { useEffect, useState } from 'react';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { useEcho } from '@laravel/echo-react';
 import { Box, MapPin, Plus, RotateCcw, Star } from 'lucide-react';
-import { parseAsString, useQueryState, useQueryStates } from 'nuqs';
+import { parseAsInteger, parseAsString, useQueryState, useQueryStates } from 'nuqs';
 import { toast } from 'sonner';
 
-import type { BreadcrumbItem, SharedData } from '@/types';
+import type { BreadcrumbItem, PaginatedResponse, SharedData } from '@/types';
 import { ServiceWithRelations } from '@/types/core';
 import { Port, ServiceCategoryWithSubCategories } from '@/types/models';
 
@@ -16,6 +16,15 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import {
+    Pagination,
+    PaginationContent,
+    PaginationEllipsis,
+    PaginationItem,
+    PaginationLink,
+    PaginationNext,
+    PaginationPrevious,
+} from '@/components/ui/pagination';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 import { ServicesPageColumnActions } from './components/data-table/column-actions';
@@ -50,7 +59,7 @@ interface ServiceDeletedEvent extends ServiceEvent {
 }
 
 interface ServicesPageProps {
-    services: ServiceWithRelations[];
+    services: PaginatedResponse<ServiceWithRelations>;
     ports: Port[];
     categories_with_subcategories: ServiceCategoryWithSubCategories[];
 }
@@ -58,7 +67,7 @@ interface ServicesPageProps {
 export default function ServicesIndexPage({ services: initialServices, ports, categories_with_subcategories }: ServicesPageProps) {
     const { auth } = usePage<SharedData>().props;
 
-    const [services, setServices] = useState(initialServices);
+    const [services, setServices] = useState(initialServices.data);
 
     const [portFilter, setPortFilter] = useQueryState(
         'port',
@@ -76,11 +85,20 @@ export default function ServicesIndexPage({ services: initialServices, ports, ca
         }),
     );
 
+    const [, setCurrentPage] = useQueryState(
+        'page',
+        parseAsInteger.withDefault(1).withOptions({
+            shallow: false,
+            history: 'push',
+        }),
+    );
+
     // Alternative approach using useQueryStates for batch operations
     const [, setFilters] = useQueryStates(
         {
             port: parseAsString.withDefault(''),
             sub_category: parseAsString.withDefault(''),
+            page: parseAsInteger.withDefault(1),
         },
         {
             shallow: false,
@@ -96,7 +114,7 @@ export default function ServicesIndexPage({ services: initialServices, ports, ca
 
     // Sync new props back to local state after server refetch
     useEffect(() => {
-        setServices(initialServices);
+        setServices(initialServices.data);
     }, [initialServices]);
 
     // Listen for service created events on organization-scoped channel
@@ -183,6 +201,7 @@ export default function ServicesIndexPage({ services: initialServices, ports, ca
                                         value={portFilter}
                                         onValueChange={async (value) => {
                                             await setPortFilter(value);
+                                            await setCurrentPage(1);
                                             router.reload({ only: ['services'] });
                                         }}
                                     >
@@ -210,30 +229,35 @@ export default function ServicesIndexPage({ services: initialServices, ports, ca
                                         value={subCategoryFilter}
                                         onValueChange={async (value) => {
                                             await setSubCategoryFilter(value);
+                                            await setCurrentPage(1);
                                             router.reload({ only: ['services'] });
                                         }}
                                     >
-                                        {categories_with_subcategories.map((category) => (
-                                            <div key={category.id} className="mb-4">
-                                                <div className="mb-2 text-sm font-medium text-foreground">{category.name}</div>
-                                                {category.sub_categories.map((subCategory) => (
-                                                    <div className="ml-4 flex items-center gap-2" key={subCategory.id}>
-                                                        <RadioGroupItem value={subCategory.id} id={subCategory.id} />
-                                                        <Label htmlFor={subCategory.id}>
-                                                            {subCategory.name}
-                                                            <span className="ml-1 text-muted-foreground">({subCategory.services_count})</span>
-                                                        </Label>
+                                        <div className="flex flex-col gap-4">
+                                            {categories_with_subcategories.map((category) => (
+                                                <div key={category.id} className="flex flex-col gap-2">
+                                                    <div className="text-sm font-medium text-foreground">{category.name}</div>
+                                                    <div className="flex flex-col gap-2">
+                                                        {category.sub_categories.map((subCategory) => (
+                                                            <div className="flex items-center gap-1" key={subCategory.id}>
+                                                                <RadioGroupItem value={subCategory.id} id={subCategory.id} />
+                                                                <Label htmlFor={subCategory.id}>
+                                                                    {subCategory.name}
+                                                                    <span className="ml-1 text-muted-foreground">({subCategory.services_count})</span>
+                                                                </Label>
+                                                            </div>
+                                                        ))}
                                                     </div>
-                                                ))}
-                                            </div>
-                                        ))}
+                                                </div>
+                                            ))}
+                                        </div>
                                     </RadioGroup>
                                 </AccordionContent>
                             </AccordionItem>
                         </Accordion>
                     </div>
 
-                    <div className="col-span-9 grid grid-cols-1 gap-4">
+                    <div className="col-span-9 flex min-h-[600px] flex-col gap-4">
                         {services.map((service) => (
                             <div
                                 key={service.id}
@@ -261,7 +285,9 @@ export default function ServicesIndexPage({ services: initialServices, ports, ca
 
                                         <div className="flex flex-wrap gap-2">
                                             <Badge variant={service.status === 'active' ? 'default' : 'secondary'}>
-                                                <div className={`mr-1 h-2 w-2 rounded-full ${service.status === 'active' ? 'bg-green-500' : 'bg-gray-500'}`} />
+                                                <div
+                                                    className={`mr-1 h-2 w-2 rounded-full ${service.status === 'active' ? 'bg-green-500' : 'bg-gray-500'}`}
+                                                />
                                                 {service.status === 'active' ? 'ACTIVE' : 'INACTIVE'}
                                             </Badge>
                                             <Badge variant="secondary">
@@ -269,10 +295,10 @@ export default function ServicesIndexPage({ services: initialServices, ports, ca
                                                 {service.sub_category?.category && service.sub_category
                                                     ? `${service.sub_category.category.name} → ${service.sub_category.name}`
                                                     : service.sub_category?.category
-                                                    ? service.sub_category.category.name
-                                                    : service.sub_category
-                                                    ? service.sub_category.name
-                                                    : 'No Category'}
+                                                      ? service.sub_category.category.name
+                                                      : service.sub_category
+                                                        ? service.sub_category.name
+                                                        : 'No Category'}
                                             </Badge>
                                             <Badge variant="secondary">
                                                 <MapPin className="mr-1 h-3 w-3" />
@@ -312,8 +338,82 @@ export default function ServicesIndexPage({ services: initialServices, ports, ca
                                 </div>
                             </div>
                         ))}
+
+                        {/* Spacer to maintain consistent layout when fewer than 10 services */}
+                        {services.length < 10 && <div className="flex-1" />}
                     </div>
                 </div>
+
+                {/* Pagination */}
+                {initialServices.total > 0 && (
+                    <div className="flex justify-center">
+                        <Pagination>
+                            <PaginationContent>
+                                {/* Previous button */}
+                                {initialServices.prev_page_url && (
+                                    <PaginationItem>
+                                        <PaginationPrevious
+                                            onClick={async () => {
+                                                await setCurrentPage(initialServices.current_page - 1);
+                                                router.reload({ only: ['services'] });
+                                            }}
+                                        />
+                                    </PaginationItem>
+                                )}
+
+                                {/* Page numbers */}
+                                {Array.from({ length: initialServices.last_page }, (_, i) => i + 1).map((page) => {
+                                    // Show first page, last page, current page, and pages around current
+                                    const showPage =
+                                        page === 1 || page === initialServices.last_page || Math.abs(page - initialServices.current_page) <= 1;
+
+                                    const showEllipsis =
+                                        (page === 2 && initialServices.current_page > 4) ||
+                                        (page === initialServices.last_page - 1 && initialServices.current_page < initialServices.last_page - 3);
+
+                                    if (showEllipsis) {
+                                        return (
+                                            <PaginationItem key={`ellipsis-${page}`}>
+                                                <PaginationEllipsis />
+                                            </PaginationItem>
+                                        );
+                                    }
+
+                                    if (!showPage) {
+                                        return null;
+                                    }
+
+                                    return (
+                                        <PaginationItem key={page}>
+                                            <PaginationLink
+                                                isActive={page === initialServices.current_page}
+                                                onClick={async () => {
+                                                    await setCurrentPage(page);
+                                                    router.reload({ only: ['services'] });
+                                                }}
+                                            >
+                                                {page}
+                                            </PaginationLink>
+                                        </PaginationItem>
+                                    );
+                                })}
+
+                                {/* Next button */}
+                                {initialServices.next_page_url && (
+                                    <PaginationItem>
+                                        <PaginationNext
+                                            onClick={async () => {
+                                                await setCurrentPage(initialServices.current_page + 1);
+                                                router.reload({ only: ['services'] });
+                                            }}
+                                        />
+                                    </PaginationItem>
+                                )}
+                            </PaginationContent>
+                        </Pagination>
+                    </div>
+                )}
+
                 {services.length === 0 && (
                     <div className="py-8 text-center">
                         <p className="text-muted-foreground">No services found. Create your first service!</p>
