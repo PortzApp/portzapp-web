@@ -58,6 +58,22 @@ export interface Vessel extends BaseModel {
     imo_number: string;
     vessel_type: VesselType;
     status: VesselStatus;
+    grt: number | null;
+    nrt: number | null;
+    dwt: number | null; // stored in kg
+    loa: number | null; // stored in mm
+    beam: number | null; // stored in mm
+    draft: number | null; // stored in mm
+    build_year: number | null;
+    mmsi: string | null;
+    call_sign: string | null;
+    flag_state: string | null;
+    remarks: string | null;
+    // Computed accessors for display
+    dwt_in_tons?: number | null;
+    loa_in_meters?: number | null;
+    beam_in_meters?: number | null;
+    draft_in_meters?: number | null;
 }
 
 export interface Port extends BaseModel {

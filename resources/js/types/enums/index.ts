@@ -60,9 +60,15 @@ export const VesselStatus = {
 export type VesselStatus = (typeof VesselStatus)[keyof typeof VesselStatus];
 
 export const VesselType = {
-    CARGO: 'cargo',
-    TANKER: 'tanker',
-    CONTAINER: 'container',
+    BULK_CARRIER: 'bulk_carrier',
+    CAR_CARRIER: 'car_carrier',
+    CONTAINER_SHIP: 'container_ship',
+    DRY_BULK: 'dry_bulk',
+    GAS_CARRIER: 'gas_carrier',
+    NAVAL_SHIPS: 'naval_ships',
+    PASSENGER_SHIPS: 'passenger_ships',
+    TANKER_SHIP: 'tanker_ship',
+    YACHT: 'yacht',
 } as const;
 export type VesselType = (typeof VesselType)[keyof typeof VesselType];
 
