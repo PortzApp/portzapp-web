@@ -53,7 +53,7 @@ class ServiceController extends Controller
             $query->where('service_sub_category_id', $subCategoryFilter);
         }
 
-        $services = $query->latest()->get();
+        $services = $query->latest()->paginate(10);
 
         // Build base query for counts (same organization filtering as main query)
         $countQuery = Service::query();
