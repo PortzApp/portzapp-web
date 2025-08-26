@@ -34,14 +34,48 @@ class VesselController extends Controller
 
         $validated = $request->validated();
 
-        Vessel::create([
+        // Convert units for storage (frontend sends user-friendly units, we store in base SI units)
+        $vesselData = [
             'organization_id' => $request->user()->organizations->first()?->id,
             'name' => $validated['name'],
             'imo_number' => $validated['imo_number'],
             'vessel_type' => $validated['vessel_type'],
             'status' => $validated['status'],
-        ]);
+            'grt' => $validated['grt'] ?? null,
+            'nrt' => $validated['nrt'] ?? null,
+            'build_year' => $validated['build_year'] ?? null,
+            'mmsi' => $validated['mmsi'] ?? null,
+            'call_sign' => $validated['call_sign'] ?? null,
+            'flag_state' => $validated['flag_state'] ?? null,
+            'remarks' => $validated['remarks'] ?? null,
+        ];
 
+        // Convert DWT from tons to kilograms for storage
+        if (isset($validated['dwt']) && $validated['dwt'] !== null) {
+            $vesselData['dwt'] = $validated['dwt'] * 1000;
+        }
+
+        // Convert length measurements from meters to millimeters for storage
+        if (isset($validated['loa']) && $validated['loa'] !== null) {
+            $vesselData['loa'] = $validated['loa'] * 1000;
+        }
+        if (isset($validated['beam']) && $validated['beam'] !== null) {
+            $vesselData['beam'] = $validated['beam'] * 1000;
+        }
+        if (isset($validated['draft']) && $validated['draft'] !== null) {
+            $vesselData['draft'] = $validated['draft'] * 1000;
+        }
+
+        $vessel = Vessel::create($vesselData);
+
+        // Check if we should redirect to the show page or stay on form
+        if ($request->get('action') === 'view') {
+            return to_route('vessels.show', $vessel)->with('message', 'Vessel created successfully!');
+        } elseif ($request->get('action') === 'another') {
+            return to_route('vessels.create')->with('message', 'Vessel created successfully!');
+        }
+
+        // Default behavior for existing functionality/tests
         return to_route('vessels.index')->with('message', 'Vessel created successfully!');
     }
 
@@ -88,12 +122,38 @@ class VesselController extends Controller
 
         $validated = $request->validated();
 
-        $vessel->update([
+        // Convert units for storage (frontend sends user-friendly units, we store in base SI units)
+        $vesselData = [
             'name' => $validated['name'],
             'imo_number' => $validated['imo_number'],
             'vessel_type' => $validated['vessel_type'],
             'status' => $validated['status'],
-        ]);
+            'grt' => $validated['grt'] ?? null,
+            'nrt' => $validated['nrt'] ?? null,
+            'build_year' => $validated['build_year'] ?? null,
+            'mmsi' => $validated['mmsi'] ?? null,
+            'call_sign' => $validated['call_sign'] ?? null,
+            'flag_state' => $validated['flag_state'] ?? null,
+            'remarks' => $validated['remarks'] ?? null,
+        ];
+
+        // Convert DWT from tons to kilograms for storage
+        if (isset($validated['dwt'])) {
+            $vesselData['dwt'] = $validated['dwt'] !== null ? $validated['dwt'] * 1000 : null;
+        }
+
+        // Convert length measurements from meters to millimeters for storage
+        if (isset($validated['loa'])) {
+            $vesselData['loa'] = $validated['loa'] !== null ? $validated['loa'] * 1000 : null;
+        }
+        if (isset($validated['beam'])) {
+            $vesselData['beam'] = $validated['beam'] !== null ? $validated['beam'] * 1000 : null;
+        }
+        if (isset($validated['draft'])) {
+            $vesselData['draft'] = $validated['draft'] !== null ? $validated['draft'] * 1000 : null;
+        }
+
+        $vessel->update($vesselData);
 
         return to_route('vessels.index')->with('message', 'Vessel updated successfully!');
     }
