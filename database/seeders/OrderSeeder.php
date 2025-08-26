@@ -23,6 +23,9 @@ class OrderSeeder extends Seeder
      */
     public function run(): void
     {
+        // Disable events during seeding to prevent broadcasting errors
+        \Illuminate\Support\Facades\Event::fake();
+
         // Get vessel owner organizations (requesting services)
         $vesselOwnerOrganizations = Organization::where('business_type', OrganizationBusinessType::VESSEL_OWNER)->get();
 
@@ -45,6 +48,9 @@ class OrderSeeder extends Seeder
 
         // Create specific test orders for admin@vessels1.com
         $this->createTestOrdersForVessels1($servicesByOrg);
+
+        // Create historical orders for shipping agencies to populate revenue charts
+        $this->createHistoricalOrdersForShippingAgencies($servicesByOrg);
 
         // Each vessel owner organization places additional orders
         $MAX_ORDER_COUNT_PER_ORGANIZATION = 3; // Reduced to make testing easier
@@ -290,5 +296,138 @@ class OrderSeeder extends Seeder
             OrderGroupStatus::COMPLETED,
             OrderGroupStatus::REJECTED,     // 5%
         ]);
+    }
+
+    /**
+     * Create historical orders for shipping agencies to populate revenue charts.
+     * These orders will be spread across the last 6 months with completed status.
+     */
+    private function createHistoricalOrdersForShippingAgencies(Collection $servicesByOrg): void
+    {
+        // Get the shipping agency organization for admin@shipping1.com
+        $shipping1User = User::where('email', 'admin@shipping1.com')->first();
+        if (! $shipping1User) {
+            if ($this->command) {
+                $this->command->warn('admin@shipping1.com user not found. Skipping historical orders.');
+            }
+
+            return;
+        }
+
+        // Get shipping1 organization
+        $shipping1Org = Organization::whereHas('users', function ($q) use ($shipping1User) {
+            $q->where('user_id', $shipping1User->id);
+        })->where('business_type', OrganizationBusinessType::SHIPPING_AGENCY)->first();
+
+        if (! $shipping1Org || ! $servicesByOrg->has($shipping1Org->id)) {
+            if ($this->command) {
+                $this->command->warn('Shipping1 organization or services not found. Skipping historical orders.');
+            }
+
+            return;
+        }
+
+        // Get all vessel owner organizations
+        $vesselOwnerOrgs = Organization::where('business_type', OrganizationBusinessType::VESSEL_OWNER)->get();
+
+        if ($vesselOwnerOrgs->isEmpty()) {
+            if ($this->command) {
+                $this->command->warn('No vessel owner organizations found. Skipping historical orders.');
+            }
+
+            return;
+        }
+
+        // Get services from shipping1 organization
+        $shipping1Services = $servicesByOrg[$shipping1Org->id];
+
+        // Create orders for each month in the last 6 months
+        for ($monthsAgo = 5; $monthsAgo >= 0; $monthsAgo--) {
+            $startOfMonth = now()->subMonths($monthsAgo)->startOfMonth();
+            $endOfMonth = now()->subMonths($monthsAgo)->endOfMonth();
+
+            // Create 3-8 orders per month with varying completion rates
+            $ordersPerMonth = rand(3, 8);
+
+            for ($i = 0; $i < $ordersPerMonth; $i++) {
+                // Pick a random vessel owner organization
+                $vesselOwnerOrg = $vesselOwnerOrgs->random();
+
+                // Get a vessel from this organization
+                $vessel = Vessel::where('organization_id', $vesselOwnerOrg->id)->first();
+                if (! $vessel) {
+                    continue;
+                }
+
+                // Get a random port
+                $port = Port::inRandomOrder()->first() ?? Port::factory()->create();
+
+                // Generate a random date within the month
+                $orderDate = fake()->dateTimeBetween($startOfMonth, $endOfMonth);
+
+                // Create the order
+                $order = Order::create([
+                    'order_number' => 'HIST-'.$orderDate->format('ymdHis').'-'.fake()->unique()->numberBetween(100, 999),
+                    'vessel_id' => $vessel->id,
+                    'port_id' => $port->id,
+                    'placed_by_user_id' => $vesselOwnerOrg->users->random()->id,
+                    'placed_by_organization_id' => $vesselOwnerOrg->id,
+                    'status' => fake()->randomElement([
+                        OrderStatus::CONFIRMED,
+                        OrderStatus::COMPLETED,
+                        OrderStatus::COMPLETED, // More completed orders for revenue
+                        OrderStatus::COMPLETED,
+                        OrderStatus::IN_PROGRESS,
+                        OrderStatus::PARTIALLY_COMPLETED,
+                    ]),
+                    'notes' => 'Historical order for '.$startOfMonth->format('F Y'),
+                    'created_at' => $orderDate,
+                    'updated_at' => $orderDate,
+                ]);
+
+                // Pick 2-5 services for this order
+                $chosenServices = $shipping1Services->random(rand(2, min(5, $shipping1Services->count())));
+                if (! $chosenServices instanceof Collection) {
+                    $chosenServices = collect([$chosenServices]);
+                }
+
+                // Create order group with completed status (for revenue tracking)
+                $orderGroupStatus = fake()->randomElement([
+                    OrderGroupStatus::COMPLETED,
+                    OrderGroupStatus::COMPLETED,
+                    OrderGroupStatus::COMPLETED, // 60% completed
+                    OrderGroupStatus::IN_PROGRESS,
+                    OrderGroupStatus::IN_PROGRESS, // 40% in progress
+                ]);
+
+                $orderGroup = OrderGroup::create([
+                    'group_number' => 'HIST-GRP-'.strtoupper(uniqid()),
+                    'order_id' => $order->id,
+                    'fulfilling_organization_id' => $shipping1Org->id,
+                    'status' => $orderGroupStatus,
+                    'notes' => 'Historical order group for revenue tracking',
+                    'created_at' => $orderDate,
+                    'updated_at' => $orderDate,
+                ]);
+
+                // Create OrderGroupService records
+                foreach ($chosenServices as $service) {
+                    $servicePrice = fake()->randomFloat(2, 500, 5000);
+                    \App\Models\OrderGroupService::create([
+                        'order_group_id' => $orderGroup->id,
+                        'service_id' => $service->id,
+                        'status' => $orderGroupStatus === OrderGroupStatus::COMPLETED ? 'completed' : 'in_progress',
+                        'price_snapshot' => $servicePrice,
+                        'notes' => null,
+                        'created_at' => $orderDate,
+                        'updated_at' => $orderDate,
+                    ]);
+                }
+            }
+        }
+
+        if ($this->command) {
+            $this->command->info('Created historical orders for shipping agency revenue charts (last 6 months)');
+        }
     }
 }
