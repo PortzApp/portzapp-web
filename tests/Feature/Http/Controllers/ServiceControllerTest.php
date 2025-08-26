@@ -119,7 +119,9 @@ test('shipping agency admin can view only own org services', function (): void {
 
     $response->assertStatus(200);
     $response->assertInertia(fn ($page) => $page->component('services/services-index-page')
-        ->has('services', 1) // Should see only their own org's service
+        ->has('services.data', 1) // Should see only their own org's service
+        ->has('services.total')
+        ->has('services.current_page')
     );
 });
 
@@ -129,7 +131,9 @@ test('shipping agency viewer can view only own org services', function (): void 
 
     $response->assertStatus(200);
     $response->assertInertia(fn ($page) => $page->component('services/services-index-page')
-        ->has('services', 1) // Should see only their own org's service
+        ->has('services.data', 1) // Should see only their own org's service
+        ->has('services.total')
+        ->has('services.current_page')
     );
 });
 
@@ -140,7 +144,9 @@ test('vessel owner can view all services', function (): void {
     $response->assertStatus(200);
     // Vessel owners should see all services, not filtered by organization
     $response->assertInertia(fn ($page) => $page->component('services/services-index-page')
-        ->has('services', 2) // Should see both services
+        ->has('services.data', 2) // Should see both services
+        ->has('services.total')
+        ->has('services.current_page')
     );
 });
 
@@ -150,7 +156,9 @@ test('portzapp team can view all services across organizations', function (): vo
 
     $response->assertStatus(200);
     $response->assertInertia(fn ($page) => $page->component('services/services-index-page')
-        ->has('services', 2) // Should see all services
+        ->has('services.data', 2) // Should see all services
+        ->has('services.total')
+        ->has('services.current_page')
     );
 });
 
@@ -362,7 +370,9 @@ test('shipping agency users only see services from their current organization', 
 
     // Should see only services from their organization (1 service from shippingAgencyOrg2)
     $response->assertInertia(fn ($page) => $page->component('services/services-index-page')
-        ->has('services', 1) // Should see only their org's service
+        ->has('services.data', 1) // Should see only their org's service
+        ->has('services.total')
+        ->has('services.current_page')
     );
 });
 
@@ -461,7 +471,9 @@ test('services index handles empty port filter', function (): void {
 
     $response->assertStatus(200);
     $response->assertInertia(fn ($page) => $page->component('services/services-index-page')
-        ->has('services', 2) // Should see all services (no filtering)
+        ->has('services.data', 2) // Should see all services (no filtering)
+        ->has('services.total')
+        ->has('services.current_page')
     );
 });
 
@@ -471,7 +483,9 @@ test('services index handles empty category filter', function (): void {
 
     $response->assertStatus(200);
     $response->assertInertia(fn ($page) => $page->component('services/services-index-page')
-        ->has('services', 2) // Should see all services (no filtering)
+        ->has('services.data', 2) // Should see all services (no filtering)
+        ->has('services.total')
+        ->has('services.current_page')
     );
 });
 
@@ -482,7 +496,7 @@ test('services index includes ports with service counts', function (): void {
     $response->assertStatus(200);
     $response->assertInertia(fn ($page) => $page->component('services/services-index-page')
         ->has('ports')
-        ->has('service_categories')
+        ->has('categories_with_subcategories')
     );
 });
 
@@ -493,8 +507,10 @@ test('services index counts are filtered by organization for shipping agency', f
     $response->assertStatus(200);
     $response->assertInertia(fn ($page) => $page->component('services/services-index-page')
         ->has('ports')
-        ->has('service_categories')
-        ->has('services', 1) // Only see services from their org
+        ->has('categories_with_subcategories')
+        ->has('services.data', 1) // Only see services from their org
+        ->has('services.total')
+        ->has('services.current_page')
     );
 });
 
