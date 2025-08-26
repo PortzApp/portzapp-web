@@ -106,6 +106,15 @@ export interface ServiceSubCategory extends BaseModel {
     services_count?: number;
 }
 
+// Type for category with sub-categories and counts for filtering UI
+export interface ServiceCategoryWithSubCategories extends ServiceCategory {
+    sub_categories: ServiceSubCategoryWithCount[];
+}
+
+export interface ServiceSubCategoryWithCount extends ServiceSubCategory {
+    services_count: number;
+}
+
 export interface OrderBase extends BaseModel {
     order_number: string;
     vessel_id: string;

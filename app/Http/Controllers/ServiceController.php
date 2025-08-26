@@ -45,14 +45,12 @@ class ServiceController extends Controller
             });
         }
 
-        // Filter by category if provided
-        if (request()->has('category') && request()->get('category') !== '') {
-            $categoryFilter = request()->get('category');
+        // Filter by sub-category if provided
+        if (request()->has('sub_category') && request()->get('sub_category') !== '') {
+            $subCategoryFilter = request()->get('sub_category');
 
-            // Filter by category name
-            $query->whereHas('subCategory.category', function ($q) use ($categoryFilter): void {
-                $q->where('name', 'like', '%'.$categoryFilter.'%');
-            });
+            // Filter by sub-category ID
+            $query->where('service_sub_category_id', $subCategoryFilter);
         }
 
         $services = $query->latest()->get();
@@ -71,18 +69,20 @@ class ServiceController extends Controller
             ->orderBy('name')
             ->get();
 
-        // Get service categories with service counts
-        $categoriesWithCounts = ServiceCategory::query()
-            ->withCount(['services' => function ($query) use ($countQuery): void {
-                $query->whereIn('services.id', $countQuery->pluck('id'));
+        // Get categories with sub-categories and service counts
+        $categoriesWithSubCategories = ServiceCategory::query()
+            ->with(['subCategories' => function ($q) use ($countQuery): void {
+                $q->withCount(['services' => function ($sq) use ($countQuery): void {
+                    $sq->whereIn('services.id', $countQuery->pluck('id'));
+                }])->orderBy('sort_order');
             }])
-            ->orderBy('service_categories.name')
+            ->orderBy('name')
             ->get();
 
         return Inertia::render('services/services-index-page', [
             'services' => Inertia::always($services),
             'ports' => $portsWithCounts,
-            'service_categories' => $categoriesWithCounts,
+            'categories_with_subcategories' => $categoriesWithSubCategories,
         ]);
     }
 

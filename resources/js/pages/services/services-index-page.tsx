@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 
 import type { BreadcrumbItem, SharedData } from '@/types';
 import { ServiceWithRelations } from '@/types/core';
-import { Port, ServiceCategory } from '@/types/models';
+import { Port, ServiceCategoryWithSubCategories } from '@/types/models';
 
 import AppLayout from '@/layouts/app-layout';
 
@@ -52,10 +52,10 @@ interface ServiceDeletedEvent extends ServiceEvent {
 interface ServicesPageProps {
     services: ServiceWithRelations[];
     ports: Port[];
-    service_categories: ServiceCategory[];
+    categories_with_subcategories: ServiceCategoryWithSubCategories[];
 }
 
-export default function ServicesIndexPage({ services: initialServices, ports, service_categories }: ServicesPageProps) {
+export default function ServicesIndexPage({ services: initialServices, ports, categories_with_subcategories }: ServicesPageProps) {
     const { auth } = usePage<SharedData>().props;
 
     const [services, setServices] = useState(initialServices);
@@ -68,8 +68,8 @@ export default function ServicesIndexPage({ services: initialServices, ports, se
         }),
     );
 
-    const [categoryFilter, setCategoryFilter] = useQueryState(
-        'category',
+    const [subCategoryFilter, setSubCategoryFilter] = useQueryState(
+        'sub_category',
         parseAsString.withDefault('').withOptions({
             shallow: false,
             history: 'push',
@@ -80,7 +80,7 @@ export default function ServicesIndexPage({ services: initialServices, ports, se
     const [, setFilters] = useQueryStates(
         {
             port: parseAsString.withDefault(''),
-            category: parseAsString.withDefault(''),
+            sub_category: parseAsString.withDefault(''),
         },
         {
             shallow: false,
@@ -207,21 +207,24 @@ export default function ServicesIndexPage({ services: initialServices, ports, se
                                 </AccordionTrigger>
                                 <AccordionContent className="pb-2 text-muted-foreground">
                                     <RadioGroup
-                                        value={categoryFilter}
+                                        value={subCategoryFilter}
                                         onValueChange={async (value) => {
-                                            await setCategoryFilter(value);
+                                            await setSubCategoryFilter(value);
                                             router.reload({ only: ['services'] });
                                         }}
                                     >
-                                        {service_categories.map((category) => (
-                                            <div className="flex items-center gap-2" key={category.id}>
-                                                <RadioGroupItem value={category.name} id={category.id} />
-                                                <Label htmlFor={category.id}>
-                                                    {category.name}
-                                                    {typeof category.services_count === 'number' && (
-                                                        <span className="ml-1 text-muted-foreground">({category.services_count})</span>
-                                                    )}
-                                                </Label>
+                                        {categories_with_subcategories.map((category) => (
+                                            <div key={category.id} className="mb-4">
+                                                <div className="mb-2 text-sm font-medium text-foreground">{category.name}</div>
+                                                {category.sub_categories.map((subCategory) => (
+                                                    <div className="ml-4 flex items-center gap-2" key={subCategory.id}>
+                                                        <RadioGroupItem value={subCategory.id} id={subCategory.id} />
+                                                        <Label htmlFor={subCategory.id}>
+                                                            {subCategory.name}
+                                                            <span className="ml-1 text-muted-foreground">({subCategory.services_count})</span>
+                                                        </Label>
+                                                    </div>
+                                                ))}
                                             </div>
                                         ))}
                                     </RadioGroup>
