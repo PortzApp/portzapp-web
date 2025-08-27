@@ -72,8 +72,8 @@ export default function ShowOrderPage({ order: initialOrder }: { order: OrderWit
         },
     ];
 
-    // Listen for order updated events on resource-specific channel
-    useEcho<OrderUpdatedEvent>(`orders.${order.id}`, 'OrderUpdated', ({ order: updatedOrder }) => {
+    // Listen for order updated events on static channel
+    useEcho<OrderUpdatedEvent>('orders.updated', 'OrderUpdated', ({ order: updatedOrder }) => {
         if (updatedOrder.id === order.id) {
             setOrder((prevOrder) => ({
                 ...prevOrder,
@@ -90,9 +90,9 @@ export default function ShowOrderPage({ order: initialOrder }: { order: OrderWit
         }
     });
 
-    // Listen for order group updated events on organization-scoped channel
+    // Listen for order group updated events on static channel
     useEcho<OrderGroupUpdatedEvent>(
-        `order-groups.organization.${auth.user.current_organization?.id}`,
+        'order-groups.updated',
         'OrderGroupUpdated',
         ({ orderGroup: updatedOrderGroup }) => {
             // Check if this order group belongs to the current order
@@ -128,9 +128,9 @@ export default function ShowOrderPage({ order: initialOrder }: { order: OrderWit
         },
     );
 
-    // Listen for order group service updated events on organization-scoped channel
+    // Listen for order group service updated events on static channel
     useEcho<OrderGroupServiceUpdatedEvent>(
-        `order-group-services.organization.${auth.user.current_organization?.id}`,
+        'order-group-services.updated',
         'OrderGroupServiceUpdated',
         ({ orderGroupService: updatedOrderGroupService }) => {
             // Check if this service belongs to any order group in the current order
