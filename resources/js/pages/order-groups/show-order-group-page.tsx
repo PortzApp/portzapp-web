@@ -2,14 +2,12 @@ import { useEffect, useState } from 'react';
 
 import { Head, router, usePage } from '@inertiajs/react';
 import { useEcho } from '@laravel/echo-react';
+import { MoreVertical } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { MoreVertical } from 'lucide-react';
-
 import type { BreadcrumbItem, SharedData } from '@/types';
-import { OrderBase, OrderGroup, OrderGroupService, OrderWithRelations } from '@/types/models';
 import { OrderGroupServiceStatus, OrderGroupStatus } from '@/types/enums';
-
+import { OrderBase, OrderGroup, OrderGroupService, OrderWithRelations } from '@/types/models';
 
 import AppLayout from '@/layouts/app-layout';
 
@@ -91,12 +89,12 @@ export default function ShowOrderGroupPage({
     useEcho<OrderGroupUpdatedEvent>(`order-groups.${orderGroup.id}`, 'OrderGroupUpdated', ({ orderGroup: updatedOrderGroup }) => {
         // Update main order group if it's the current one
         if (updatedOrderGroup.id === orderGroup.id) {
-            setOrderGroup(prevOrderGroup => ({
+            setOrderGroup((prevOrderGroup) => ({
                 ...prevOrderGroup,
                 status: updatedOrderGroup.status,
-                updated_at: updatedOrderGroup.updated_at
+                updated_at: updatedOrderGroup.updated_at,
             }));
-            
+
             toast('Order group updated', {
                 description: `Order group #${updatedOrderGroup.group_number} status changed to ${updatedOrderGroup.status?.replace(/_/g, ' ')}`,
                 classNames: {
@@ -104,20 +102,22 @@ export default function ShowOrderGroupPage({
                 },
             });
         }
-        
+
         // Update sibling order groups if one of them updated
-        const isSibling = siblingOrderGroups.some(og => og.id === updatedOrderGroup.id);
+        const isSibling = siblingOrderGroups.some((og) => og.id === updatedOrderGroup.id);
         if (isSibling) {
-            setSiblingOrderGroups(prevSiblings =>
-                prevSiblings.map(sibling =>
-                    sibling.id === updatedOrderGroup.id ? {
-                        ...sibling,
-                        status: updatedOrderGroup.status,
-                        updated_at: updatedOrderGroup.updated_at
-                    } : sibling
-                )
+            setSiblingOrderGroups((prevSiblings) =>
+                prevSiblings.map((sibling) =>
+                    sibling.id === updatedOrderGroup.id
+                        ? {
+                              ...sibling,
+                              status: updatedOrderGroup.status,
+                              updated_at: updatedOrderGroup.updated_at,
+                          }
+                        : sibling,
+                ),
             );
-            
+
             toast('Related order group updated', {
                 description: `Order group #${updatedOrderGroup.group_number} status changed to ${updatedOrderGroup.status?.replace(/_/g, ' ')}`,
                 classNames: {
@@ -134,40 +134,46 @@ export default function ShowOrderGroupPage({
     });
 
     // Listen for order group service updated events on organization-scoped channel
-    useEcho<OrderGroupServiceUpdatedEvent>(`order-group-services.organization.${auth.user.current_organization?.id}`, 'OrderGroupServiceUpdated', ({ orderGroupService: updatedOrderGroupService }) => {
-        // Check if this service belongs to the current order group
-        const belongsToCurrentOrderGroup = orderGroup.order_group_services?.some(ogs => ogs.id === updatedOrderGroupService.id);
-        
-        if (belongsToCurrentOrderGroup) {
-            setOrderGroup(prevOrderGroup => ({
-                ...prevOrderGroup,
-                order_group_services: prevOrderGroup.order_group_services?.map(service =>
-                    service.id === updatedOrderGroupService.id ? {
-                        ...service,
-                        status: updatedOrderGroupService.status,
-                        updated_at: updatedOrderGroupService.updated_at
-                    } : service
-                )
-            }));
+    useEcho<OrderGroupServiceUpdatedEvent>(
+        `order-group-services.organization.${auth.user.current_organization?.id}`,
+        'OrderGroupServiceUpdated',
+        ({ orderGroupService: updatedOrderGroupService }) => {
+            // Check if this service belongs to the current order group
+            const belongsToCurrentOrderGroup = orderGroup.order_group_services?.some((ogs) => ogs.id === updatedOrderGroupService.id);
 
-            toast('Service updated', {
-                description: `Service status changed to ${updatedOrderGroupService.status?.replace(/_/g, ' ')}`,
-                classNames: {
-                    description: '!text-muted-foreground',
-                },
-            });
-        }
-    });
+            if (belongsToCurrentOrderGroup) {
+                setOrderGroup((prevOrderGroup) => ({
+                    ...prevOrderGroup,
+                    order_group_services: prevOrderGroup.order_group_services?.map((service) =>
+                        service.id === updatedOrderGroupService.id
+                            ? {
+                                  ...service,
+                                  status: updatedOrderGroupService.status,
+                                  updated_at: updatedOrderGroupService.updated_at,
+                              }
+                            : service,
+                    ),
+                }));
+
+                toast('Service updated', {
+                    description: `Service status changed to ${updatedOrderGroupService.status?.replace(/_/g, ' ')}`,
+                    classNames: {
+                        description: '!text-muted-foreground',
+                    },
+                });
+            }
+        },
+    );
 
     // Listen for parent order updated events on resource-specific channel
     useEcho<OrderUpdatedEvent>(`orders.${parentOrder.id}`, 'OrderUpdated', ({ order: updatedOrder }) => {
         if (updatedOrder.id === parentOrder.id) {
-            setParentOrder(prevParentOrder => ({
+            setParentOrder((prevParentOrder) => ({
                 ...prevParentOrder,
                 status: updatedOrder.status,
-                updated_at: updatedOrder.updated_at
+                updated_at: updatedOrder.updated_at,
             }));
-            
+
             toast('Parent order updated', {
                 description: `Order #${updatedOrder.order_number} status changed to ${updatedOrder.status?.replace(/_/g, ' ')}`,
                 classNames: {
@@ -295,10 +301,7 @@ export default function ShowOrderGroupPage({
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                                 {getValidOrderGroupStatusTransitions(orderGroup.status).map((status) => (
-                                    <DropdownMenuItem
-                                        key={status}
-                                        onClick={() => handleOrderGroupStatusChange(status)}
-                                    >
+                                    <DropdownMenuItem key={status} onClick={() => handleOrderGroupStatusChange(status)}>
                                         Mark as {getOrderGroupStatusLabel(status)}
                                     </DropdownMenuItem>
                                 ))}
@@ -412,9 +415,7 @@ export default function ShowOrderGroupPage({
                                         <div className="flex-1">
                                             <div className="flex items-center gap-2">
                                                 <h4 className="font-medium">
-                                                    {orderGroupService.service?.sub_category?.name || 
-                                                     orderGroupService.service?.name || 
-                                                     'Service'}
+                                                    {orderGroupService.service?.sub_category?.name || orderGroupService.service?.name || 'Service'}
                                                 </h4>
                                                 <OrderGroupServiceStatusBadge status={orderGroupService.status} />
                                             </div>
@@ -427,7 +428,9 @@ export default function ShowOrderGroupPage({
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <div className="text-right">
-                                                <p className="font-bold tabular-nums">${parseFloat(orderGroupService.price_snapshot.toString()).toFixed(2)}</p>
+                                                <p className="font-bold tabular-nums">
+                                                    ${parseFloat(orderGroupService.price_snapshot.toString()).toFixed(2)}
+                                                </p>
                                             </div>
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
@@ -437,9 +440,7 @@ export default function ShowOrderGroupPage({
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end">
                                                     <DropdownMenuSub>
-                                                        <DropdownMenuSubTrigger>
-                                                            Update Status
-                                                        </DropdownMenuSubTrigger>
+                                                        <DropdownMenuSubTrigger>Update Status</DropdownMenuSubTrigger>
                                                         <DropdownMenuSubContent>
                                                             {Object.values(OrderGroupServiceStatus).map((status) => (
                                                                 <DropdownMenuItem
@@ -485,7 +486,9 @@ export default function ShowOrderGroupPage({
                                             </div>
                                             <div className="text-right">
                                                 <OrderGroupStatusBadge status={group.status} />
-                                                <p className="mt-1 text-sm text-muted-foreground">{group.order_group_services?.length || 0} services</p>
+                                                <p className="mt-1 text-sm text-muted-foreground">
+                                                    {group.order_group_services?.length || 0} services
+                                                </p>
                                             </div>
                                         </div>
                                     ))}

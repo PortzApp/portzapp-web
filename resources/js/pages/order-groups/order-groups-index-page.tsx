@@ -43,30 +43,36 @@ export default function OrderGroupsIndexPage({ orderGroups: initialOrderGroups }
     }, [initialOrderGroups]);
 
     // Listen for order group updated events on organization-scoped channel
-    useEcho<OrderGroupUpdatedEvent>(`order-groups.organization.${auth.user.current_organization?.id}`, 'OrderGroupUpdated', ({ orderGroup: updatedOrderGroup }) => {
-        setOrderGroups((prevOrderGroups) =>
-            prevOrderGroups.map((prevOrderGroup) =>
-                prevOrderGroup.id === updatedOrderGroup.id ? {
-                    ...prevOrderGroup,
-                    status: updatedOrderGroup.status,
-                    updated_at: updatedOrderGroup.updated_at
-                } : prevOrderGroup,
-            ),
-        );
+    useEcho<OrderGroupUpdatedEvent>(
+        `order-groups.organization.${auth.user.current_organization?.id}`,
+        'OrderGroupUpdated',
+        ({ orderGroup: updatedOrderGroup }) => {
+            setOrderGroups((prevOrderGroups) =>
+                prevOrderGroups.map((prevOrderGroup) =>
+                    prevOrderGroup.id === updatedOrderGroup.id
+                        ? {
+                              ...prevOrderGroup,
+                              status: updatedOrderGroup.status,
+                              updated_at: updatedOrderGroup.updated_at,
+                          }
+                        : prevOrderGroup,
+                ),
+            );
 
-        toast('Order group updated', {
-            description: `Order group #${updatedOrderGroup.group_number} status changed to ${updatedOrderGroup.status?.replace(/_/g, ' ')}`,
-            classNames: {
-                description: '!text-muted-foreground',
-            },
-            action: {
-                label: 'View Order Group',
-                onClick: () => {
-                    router.visit(route('order-groups.show', updatedOrderGroup.id));
+            toast('Order group updated', {
+                description: `Order group #${updatedOrderGroup.group_number} status changed to ${updatedOrderGroup.status?.replace(/_/g, ' ')}`,
+                classNames: {
+                    description: '!text-muted-foreground',
                 },
-            },
-        });
-    });
+                action: {
+                    label: 'View Order Group',
+                    onClick: () => {
+                        router.visit(route('order-groups.show', updatedOrderGroup.id));
+                    },
+                },
+            });
+        },
+    );
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Order Groups" />

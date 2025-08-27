@@ -189,7 +189,7 @@ export default function ServicesIndexPage({ services: initialServices, ports, ca
                             <ClipboardList className="mr-2 h-4 w-4" />
                             New Order
                         </Link>
-                        
+
                         {auth.user.current_organization?.business_type === 'shipping_agency' && (
                             <Link href={route('services.create')} className={buttonVariants({ variant: 'outline' })}>
                                 <Plus className="mr-2 h-4 w-4" />
@@ -367,7 +367,9 @@ export default function ServicesIndexPage({ services: initialServices, ports, ca
                                         </div>
 
                                         {/* Description */}
-                                        <p className="line-clamp-2 text-sm text-muted-foreground">{service.description || 'No description available.'}</p>
+                                        <p className="line-clamp-2 text-sm text-muted-foreground">
+                                            {service.description || 'No description available.'}
+                                        </p>
 
                                         {/* Price */}
                                         <div className="flex items-center gap-2">
@@ -379,7 +381,7 @@ export default function ServicesIndexPage({ services: initialServices, ports, ca
                                             </span>
                                         </div>
                                     </div>
-                                    
+
                                     {/* Actions */}
                                     <ServicesPageColumnActions service={service} />
                                 </div>
