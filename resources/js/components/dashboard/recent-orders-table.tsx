@@ -1,16 +1,12 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { router } from '@inertiajs/react';
-import { OrderStatusBadge } from '@/components/badges/order-status-badge';
+
 import { OrderStatus } from '@/types/enums';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
+
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+
+import { OrderStatusBadge } from '@/components/badges/order-status-badge';
 
 interface Order {
     id: string;
@@ -32,15 +28,14 @@ interface RecentOrdersTableProps {
     onRowClick?: (order: Order) => void;
 }
 
-
-export function RecentOrdersTable({ 
-    orders, 
-    title = 'Recent Orders', 
+export function RecentOrdersTable({
+    orders,
+    title = 'Recent Orders',
     description = 'Latest order activity',
     showClientName = false,
     showViewAllLink = false,
     viewAllRoute,
-    onRowClick
+    onRowClick,
 }: RecentOrdersTableProps) {
     return (
         <Card className="bg-card">
@@ -51,11 +46,7 @@ export function RecentOrdersTable({
                         <CardDescription>{description}</CardDescription>
                     </div>
                     {showViewAllLink && viewAllRoute && (
-                        <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => router.visit(viewAllRoute)}
-                        >
+                        <Button variant="outline" size="sm" onClick={() => router.visit(viewAllRoute)}>
                             View All
                         </Button>
                     )}
@@ -77,39 +68,28 @@ export function RecentOrdersTable({
                     <TableBody>
                         {orders.length === 0 ? (
                             <TableRow>
-                                <TableCell 
-                                    colSpan={showClientName ? 7 : 6} 
-                                    className="text-center text-muted-foreground"
-                                >
+                                <TableCell colSpan={showClientName ? 7 : 6} className="text-center text-muted-foreground">
                                     No recent orders
                                 </TableCell>
                             </TableRow>
                         ) : (
                             orders.map((order) => (
-                                <TableRow 
+                                <TableRow
                                     key={order.id}
-                                    className={onRowClick ? "cursor-pointer hover:bg-muted/50" : ""}
+                                    className={onRowClick ? 'cursor-pointer hover:bg-muted/50' : ''}
                                     onClick={() => onRowClick && onRowClick(order)}
                                 >
                                     <TableCell className="font-mono text-sm">
-                                        <span className={onRowClick ? "hover:underline" : ""}>
-                                            {order.id.slice(0, 8)}...
-                                        </span>
+                                        <span className={onRowClick ? 'hover:underline' : ''}>{order.id.slice(0, 8)}...</span>
                                     </TableCell>
                                     <TableCell>{order.vessel_name || '-'}</TableCell>
                                     <TableCell>{order.port_name || '-'}</TableCell>
-                                    {showClientName && (
-                                        <TableCell>{order.client_name || '-'}</TableCell>
-                                    )}
+                                    {showClientName && <TableCell>{order.client_name || '-'}</TableCell>}
                                     <TableCell>
                                         <OrderStatusBadge status={order.status as OrderStatus} />
                                     </TableCell>
-                                    <TableCell className="text-right">
-                                        ${order.total_price.toLocaleString()}
-                                    </TableCell>
-                                    <TableCell className="text-right text-muted-foreground">
-                                        {order.created_at}
-                                    </TableCell>
+                                    <TableCell className="text-right tabular-nums">${order.total_price.toLocaleString()}</TableCell>
+                                    <TableCell className="text-right text-muted-foreground">{order.created_at}</TableCell>
                                 </TableRow>
                             ))
                         )}
