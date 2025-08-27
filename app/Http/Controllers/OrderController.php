@@ -161,6 +161,7 @@ class OrderController extends Controller
             'placedByOrganization',
             'orderGroups.fulfillingOrganization',
             'orderGroups.orderGroupServices.service.organization',
+            'orderGroups.orderGroupServices.service.subCategory.category',
         ]);
 
         // Get all services through order groups with sub-categories and categories

@@ -8,6 +8,7 @@ import { Separator } from '@/components/ui/separator';
 
 import { OrderGroupServiceStatusBadge } from '@/components/badges/order-group-service-status-badge';
 import { OrderGroupStatusBadge } from '@/components/badges/order-group-status-badge';
+import { ServiceCategoryBadge } from '@/components/badges/service-category-badge';
 
 interface OrderGroupsTabProps {
     orderGroups: OrderGroup[];
@@ -39,7 +40,7 @@ export default function OrderGroupsTab({ orderGroups }: OrderGroupsTabProps) {
     const getGroupTotalPrice = (group: OrderGroup) => {
         const groupServices = getGroupServices(group);
         if (groupServices.length > 0 && 'price_snapshot' in groupServices[0]) {
-            return groupServices.reduce((sum, ogs) => sum + parseFloat(ogs.price_snapshot || '0'), 0);
+            return groupServices.reduce((sum, ogs) => sum + parseFloat(ogs.price_snapshot?.toString() || '0'), 0);
         }
         // Fallback to old calculation
         return group.total_price || group.services?.reduce((sum, service) => sum + parseFloat(service.price || '0'), 0) || 0;
@@ -109,19 +110,30 @@ export default function OrderGroupsTab({ orderGroups }: OrderGroupsTabProps) {
                                         <h4 className="mb-2 text-sm font-medium text-muted-foreground">Services in this group:</h4>
                                         <div className="space-y-2">
                                             {getGroupServices(group).map((orderGroupService) => {
-                                                const service = orderGroupService.service || orderGroupService;
+                                                const service = 'service' in orderGroupService && orderGroupService.service 
+                                                    ? orderGroupService.service 
+                                                    : orderGroupService;
                                                 return (
                                                     <div key={orderGroupService.id} className="flex items-center justify-between text-sm">
                                                         <div className="flex items-center gap-2">
-                                                            <span>
-                                                                {service.sub_category?.name || 'Service'} - {service.organization?.name || 'Unknown'}
-                                                            </span>
+                                                            <div className="flex items-center gap-2">
+                                                                <span className="font-medium">
+                                                                    {'sub_category' in service ? service.sub_category?.name || 'Service' : 'Service'}
+                                                                </span>
+                                                                {'sub_category' in service && service.sub_category?.category?.name && (
+                                                                    <ServiceCategoryBadge categoryName={service.sub_category.category.name} />
+                                                                )}
+                                                            </div>
                                                             {orderGroupService.status && (
                                                                 <OrderGroupServiceStatusBadge status={orderGroupService.status} />
                                                             )}
                                                         </div>
                                                         <span className="font-mono">
-                                                            ${parseFloat(orderGroupService.price_snapshot || service.price || '0').toFixed(2)}
+                                                            ${parseFloat(
+                                                                'price_snapshot' in orderGroupService 
+                                                                    ? orderGroupService.price_snapshot?.toString() || '0'
+                                                                    : ('price' in service ? service.price || '0' : '0')
+                                                            ).toFixed(2)}
                                                         </span>
                                                     </div>
                                                 );

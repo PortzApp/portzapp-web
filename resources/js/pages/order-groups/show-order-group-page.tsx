@@ -28,6 +28,7 @@ import { VesselTypeBadge } from '@/components/badges';
 import { OrderGroupServiceStatusBadge } from '@/components/badges/order-group-service-status-badge';
 import { OrderGroupStatusBadge } from '@/components/badges/order-group-status-badge';
 import { OrderStatusBadge } from '@/components/badges/order-status-badge';
+import { ServiceCategoryBadge } from '@/components/badges/service-category-badge';
 
 interface OrderGroupEvent {
     message: string;
@@ -420,8 +421,11 @@ export default function ShowOrderGroupPage({
                                         <div className="flex-1">
                                             <div className="flex items-center gap-2">
                                                 <h4 className="font-medium">
-                                                    {orderGroupService.service?.sub_category?.name || orderGroupService.service?.name || 'Service'}
+                                                    {orderGroupService.service?.sub_category?.name || 'Service'}
                                                 </h4>
+                                                {orderGroupService.service?.sub_category?.category?.name && (
+                                                    <ServiceCategoryBadge categoryName={orderGroupService.service.sub_category.category.name} />
+                                                )}
                                                 <OrderGroupServiceStatusBadge status={orderGroupService.status} />
                                             </div>
                                             {orderGroupService.service?.description && (
