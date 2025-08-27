@@ -42,9 +42,9 @@ export default function OrderGroupsIndexPage({ orderGroups: initialOrderGroups }
         setOrderGroups(initialOrderGroups);
     }, [initialOrderGroups]);
 
-    // Listen for order group updated events on organization-scoped channel
+    // Listen for order group updated events on static channel
     useEcho<OrderGroupUpdatedEvent>(
-        `order-groups.organization.${auth.user.current_organization?.id}`,
+        'order-groups',
         'OrderGroupUpdated',
         ({ orderGroup: updatedOrderGroup }) => {
             setOrderGroups((prevOrderGroups) =>
