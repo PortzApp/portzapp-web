@@ -1,17 +1,15 @@
 import { Head } from '@inertiajs/react';
 
 import type { BreadcrumbItem } from '@/types';
-import type { 
-    VesselOwnerDashboardData, 
-    ShippingAgencyDashboardData, 
-    PortzAppTeamDashboardData 
-} from '@/types/dashboard';
+import type { PortzAppTeamDashboardData, ShippingAgencyDashboardData, VesselOwnerDashboardData } from '@/types/dashboard';
 
 import AppLayout from '@/layouts/app-layout';
-import { VesselOwnerDashboard } from '@/components/dashboard/vessel-owner-dashboard';
-import { ShippingAgencyDashboard } from '@/components/dashboard/shipping-agency-dashboard';
-import { PortzAppTeamDashboard } from '@/components/dashboard/portzapp-team-dashboard';
+
 import { Card, CardContent } from '@/components/ui/card';
+
+import { PortzAppTeamDashboard } from '@/components/dashboard/portzapp-team-dashboard';
+import { ShippingAgencyDashboard } from '@/components/dashboard/shipping-agency-dashboard';
+import { VesselOwnerDashboard } from '@/components/dashboard/vessel-owner-dashboard';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -31,9 +29,7 @@ export default function Dashboard({ dashboardData, organizationType }: Dashboard
             return (
                 <Card>
                     <CardContent className="p-8 text-center">
-                        <p className="text-muted-foreground">
-                            Please select an organization to view your dashboard.
-                        </p>
+                        <p className="text-muted-foreground">Please select an organization to view your dashboard.</p>
                     </CardContent>
                 </Card>
             );
@@ -50,9 +46,7 @@ export default function Dashboard({ dashboardData, organizationType }: Dashboard
                 return (
                     <Card>
                         <CardContent className="p-8 text-center">
-                            <p className="text-muted-foreground">
-                                Unknown organization type: {organizationType}
-                            </p>
+                            <p className="text-muted-foreground">Unknown organization type: {organizationType}</p>
                         </CardContent>
                     </Card>
                 );
@@ -63,9 +57,7 @@ export default function Dashboard({ dashboardData, organizationType }: Dashboard
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-                <div className="max-w-7xl mx-auto w-full">
-                    {renderDashboard()}
-                </div>
+                <div className="mx-auto w-full max-w-7xl">{renderDashboard()}</div>
             </div>
         </AppLayout>
     );
