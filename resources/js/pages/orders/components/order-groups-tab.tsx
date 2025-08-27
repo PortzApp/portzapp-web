@@ -110,9 +110,10 @@ export default function OrderGroupsTab({ orderGroups }: OrderGroupsTabProps) {
                                         <h4 className="mb-2 text-sm font-medium text-muted-foreground">Services in this group:</h4>
                                         <div className="space-y-2">
                                             {getGroupServices(group).map((orderGroupService) => {
-                                                const service = 'service' in orderGroupService && orderGroupService.service 
-                                                    ? orderGroupService.service 
-                                                    : orderGroupService;
+                                                const service =
+                                                    'service' in orderGroupService && orderGroupService.service
+                                                        ? orderGroupService.service
+                                                        : orderGroupService;
                                                 return (
                                                     <div key={orderGroupService.id} className="flex items-center justify-between text-sm">
                                                         <div className="flex items-center gap-2">
@@ -129,10 +130,13 @@ export default function OrderGroupsTab({ orderGroups }: OrderGroupsTabProps) {
                                                             )}
                                                         </div>
                                                         <span className="font-mono">
-                                                            ${parseFloat(
-                                                                'price_snapshot' in orderGroupService 
+                                                            $
+                                                            {parseFloat(
+                                                                'price_snapshot' in orderGroupService
                                                                     ? orderGroupService.price_snapshot?.toString() || '0'
-                                                                    : ('price' in service ? service.price || '0' : '0')
+                                                                    : 'price' in service
+                                                                      ? service.price || '0'
+                                                                      : '0',
                                                             ).toFixed(2)}
                                                         </span>
                                                     </div>

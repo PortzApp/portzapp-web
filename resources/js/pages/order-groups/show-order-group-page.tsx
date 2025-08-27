@@ -420,9 +420,7 @@ export default function ShowOrderGroupPage({
                                     <div key={orderGroupService.id} className="flex items-center justify-between rounded-lg bg-muted/50 p-3">
                                         <div className="flex-1">
                                             <div className="flex items-center gap-2">
-                                                <h4 className="font-medium">
-                                                    {orderGroupService.service?.sub_category?.name || 'Service'}
-                                                </h4>
+                                                <h4 className="font-medium">{orderGroupService.service?.sub_category?.name || 'Service'}</h4>
                                                 {orderGroupService.service?.sub_category?.category?.name && (
                                                     <ServiceCategoryBadge categoryName={orderGroupService.service.sub_category.category.name} />
                                                 )}
