@@ -99,7 +99,7 @@ class OrderGroupServiceObserver
         // Only update if the status actually needs to change
         if ($orderGroup->status !== $newOrderGroupStatus) {
             // Use withoutEvents to prevent triggering cascade logic during automatic aggregation
-            $orderGroup->withoutEvents(function () use ($orderGroup, $newOrderGroupStatus) {
+            $orderGroup->withoutEvents(function () use ($orderGroup, $newOrderGroupStatus): void {
                 $orderGroup->update(['status' => $newOrderGroupStatus]);
             });
 

@@ -65,7 +65,7 @@ class SetServicesRequest extends FormRequest
         $servicesBySubCategory = $services->groupBy('service_sub_category_id');
 
         // Check if any sub-category has more than one service selected
-        foreach ($servicesBySubCategory as $subCategoryId => $servicesInSubCategory) {
+        foreach ($servicesBySubCategory as $servicesInSubCategory) {
             if ($servicesInSubCategory->count() > 1) {
                 $subCategoryName = $servicesInSubCategory->first()->subCategory->name ?? 'Unknown';
                 $validator->errors()->add(

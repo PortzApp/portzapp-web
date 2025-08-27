@@ -10,8 +10,8 @@ use App\Models\Organization;
 use App\Models\Service;
 use App\Models\User;
 
-describe('OrderGroupObserver', function () {
-    beforeEach(function () {
+describe('OrderGroupObserver', function (): void {
+    beforeEach(function (): void {
         $this->user = User::factory()->create();
         $this->organization = Organization::factory()->create();
 
@@ -20,7 +20,7 @@ describe('OrderGroupObserver', function () {
         ]);
     });
 
-    it('remains PENDING_AGENCY_CONFIRMATION when some OrderGroups are COMPLETED but others are still PENDING', function () {
+    it('remains PENDING_AGENCY_CONFIRMATION when some OrderGroups are COMPLETED but others are still PENDING', function (): void {
         // Create three OrderGroups with different statuses
         $orderGroup1 = OrderGroup::factory()->create([
             'order_id' => $this->order->id,
@@ -50,7 +50,7 @@ describe('OrderGroupObserver', function () {
         expect($this->order->status)->toBe(OrderStatus::PENDING_AGENCY_CONFIRMATION);
     });
 
-    it('updates Order status to COMPLETED when all OrderGroups are COMPLETED', function () {
+    it('updates Order status to COMPLETED when all OrderGroups are COMPLETED', function (): void {
         // Create three OrderGroups
         $orderGroup1 = OrderGroup::factory()->create([
             'order_id' => $this->order->id,
@@ -82,7 +82,7 @@ describe('OrderGroupObserver', function () {
         expect($this->order->status)->toBe(OrderStatus::COMPLETED);
     });
 
-    it('updates Order status to CONFIRMED when all OrderGroups are ACCEPTED', function () {
+    it('updates Order status to CONFIRMED when all OrderGroups are ACCEPTED', function (): void {
         // Create three OrderGroups
         $orderGroup1 = OrderGroup::factory()->create([
             'order_id' => $this->order->id,
@@ -107,7 +107,7 @@ describe('OrderGroupObserver', function () {
         expect($this->order->status)->toBe(OrderStatus::CONFIRMED);
     });
 
-    it('updates Order status to PARTIALLY_REJECTED when any OrderGroup is REJECTED', function () {
+    it('updates Order status to PARTIALLY_REJECTED when any OrderGroup is REJECTED', function (): void {
         // Create three OrderGroups
         $orderGroup1 = OrderGroup::factory()->create([
             'order_id' => $this->order->id,
@@ -137,7 +137,7 @@ describe('OrderGroupObserver', function () {
         expect($this->order->status)->toBe(OrderStatus::PARTIALLY_REJECTED);
     });
 
-    it('updates Order status to PARTIALLY_ACCEPTED when some OrderGroups are ACCEPTED', function () {
+    it('updates Order status to PARTIALLY_ACCEPTED when some OrderGroups are ACCEPTED', function (): void {
         // Create three OrderGroups
         $orderGroup1 = OrderGroup::factory()->create([
             'order_id' => $this->order->id,
@@ -161,7 +161,7 @@ describe('OrderGroupObserver', function () {
         expect($this->order->status)->toBe(OrderStatus::PARTIALLY_ACCEPTED);
     });
 
-    it('keeps Order status as PENDING_AGENCY_CONFIRMATION when all OrderGroups are PENDING', function () {
+    it('keeps Order status as PENDING_AGENCY_CONFIRMATION when all OrderGroups are PENDING', function (): void {
         // Create OrderGroups with PENDING status
         $orderGroup1 = OrderGroup::factory()->create([
             'order_id' => $this->order->id,
@@ -182,7 +182,7 @@ describe('OrderGroupObserver', function () {
         expect($this->order->status)->toBe(OrderStatus::PENDING_AGENCY_CONFIRMATION);
     });
 
-    it('updates Order status to DRAFT when all OrderGroups are deleted', function () {
+    it('updates Order status to DRAFT when all OrderGroups are deleted', function (): void {
         // Create an OrderGroup
         $orderGroup = OrderGroup::factory()->create([
             'order_id' => $this->order->id,
@@ -200,7 +200,7 @@ describe('OrderGroupObserver', function () {
         expect($this->order->status)->toBe(OrderStatus::DRAFT);
     });
 
-    it('only updates Order when OrderGroup status field changes', function () {
+    it('only updates Order when OrderGroup status field changes', function (): void {
         // Create an OrderGroup
         $orderGroup = OrderGroup::factory()->create([
             'order_id' => $this->order->id,
@@ -221,7 +221,7 @@ describe('OrderGroupObserver', function () {
         expect($this->order->status)->toBe(OrderStatus::CONFIRMED);
     });
 
-    it('triggers on OrderGroup creation', function () {
+    it('triggers on OrderGroup creation', function (): void {
         // Order starts with PENDING_AGENCY_CONFIRMATION
         expect($this->order->status)->toBe(OrderStatus::PENDING_AGENCY_CONFIRMATION);
 
@@ -239,8 +239,8 @@ describe('OrderGroupObserver', function () {
         expect($this->order->status)->toBe(OrderStatus::COMPLETED);
     });
 
-    describe('cascade status updates to OrderGroupServices', function () {
-        beforeEach(function () {
+    describe('cascade status updates to OrderGroupServices', function (): void {
+        beforeEach(function (): void {
             $this->orderGroup = OrderGroup::factory()->create([
                 'order_id' => $this->order->id,
                 'status' => OrderGroupStatus::PENDING,
@@ -271,7 +271,7 @@ describe('OrderGroupObserver', function () {
             ]);
         });
 
-        it('cascades COMPLETED status to all OrderGroupServices', function () {
+        it('cascades COMPLETED status to all OrderGroupServices', function (): void {
             // Update OrderGroup to COMPLETED
             $this->orderGroup->update(['status' => OrderGroupStatus::COMPLETED]);
 
@@ -286,7 +286,7 @@ describe('OrderGroupObserver', function () {
             expect($this->orderGroupService3->status)->toBe(OrderGroupServiceStatus::COMPLETED);
         });
 
-        it('cascades REJECTED status to all OrderGroupServices', function () {
+        it('cascades REJECTED status to all OrderGroupServices', function (): void {
             // Update OrderGroup to REJECTED
             $this->orderGroup->update(['status' => OrderGroupStatus::REJECTED]);
 
@@ -301,7 +301,7 @@ describe('OrderGroupObserver', function () {
             expect($this->orderGroupService3->status)->toBe(OrderGroupServiceStatus::REJECTED);
         });
 
-        it('cascades IN_PROGRESS status only to PENDING and ACCEPTED services', function () {
+        it('cascades IN_PROGRESS status only to PENDING and ACCEPTED services', function (): void {
             // Update OrderGroup to IN_PROGRESS
             $this->orderGroup->update(['status' => OrderGroupStatus::IN_PROGRESS]);
 
@@ -317,7 +317,7 @@ describe('OrderGroupObserver', function () {
             expect($this->orderGroupService3->status)->toBe(OrderGroupServiceStatus::IN_PROGRESS);
         });
 
-        it('cascades ACCEPTED status only to PENDING services', function () {
+        it('cascades ACCEPTED status only to PENDING services', function (): void {
             // Update OrderGroup to ACCEPTED
             $this->orderGroup->update(['status' => OrderGroupStatus::ACCEPTED]);
 
@@ -333,7 +333,7 @@ describe('OrderGroupObserver', function () {
             expect($this->orderGroupService3->status)->toBe(OrderGroupServiceStatus::ACCEPTED);
         });
 
-        it('does not cascade when OrderGroup status is set to PENDING', function () {
+        it('does not cascade when OrderGroup status is set to PENDING', function (): void {
             // Create a new OrderGroup with specific services to avoid observer conflicts
             $newOrderGroup = OrderGroup::factory()->create([
                 'order_id' => $this->order->id,
@@ -355,7 +355,7 @@ describe('OrderGroupObserver', function () {
 
             // Update OrderGroup to PENDING (should not cascade to children)
             // Disable observers to prevent the OrderGroupServiceObserver from changing it back
-            $newOrderGroup->withoutEvents(function () use ($newOrderGroup) {
+            $newOrderGroup->withoutEvents(function () use ($newOrderGroup): void {
                 $newOrderGroup->update(['status' => OrderGroupStatus::PENDING]);
             });
 
@@ -377,7 +377,7 @@ describe('OrderGroupObserver', function () {
             expect($service2->status)->toBe(OrderGroupServiceStatus::COMPLETED);
         });
 
-        it('prevents infinite observer loops during cascade', function () {
+        it('prevents infinite observer loops during cascade', function (): void {
             // This test ensures that cascading doesn't trigger OrderGroupServiceObserver
             // which would try to update the OrderGroup status again
 

@@ -6,8 +6,8 @@ use App\Models\OrderGroup;
 use App\Models\OrderGroupService;
 use App\Models\Service;
 
-describe('OrderGroupServiceObserver', function () {
-    beforeEach(function () {
+describe('OrderGroupServiceObserver', function (): void {
+    beforeEach(function (): void {
         $this->orderGroup = OrderGroup::factory()->create([
             'status' => OrderGroupStatus::PENDING,
         ]);
@@ -17,7 +17,7 @@ describe('OrderGroupServiceObserver', function () {
         $this->service3 = Service::factory()->create();
     });
 
-    it('updates OrderGroup status to ACCEPTED when all OrderGroupServices are ACCEPTED', function () {
+    it('updates OrderGroup status to ACCEPTED when all OrderGroupServices are ACCEPTED', function (): void {
         // Create OrderGroupServices with PENDING status
         $orderGroupService1 = OrderGroupService::factory()->create([
             'order_group_id' => $this->orderGroup->id,
@@ -42,7 +42,7 @@ describe('OrderGroupServiceObserver', function () {
         expect($this->orderGroup->status)->toBe(OrderGroupStatus::ACCEPTED);
     });
 
-    it('updates OrderGroup status to COMPLETED when all OrderGroupServices are COMPLETED', function () {
+    it('updates OrderGroup status to COMPLETED when all OrderGroupServices are COMPLETED', function (): void {
         // Create OrderGroupServices
         $orderGroupService1 = OrderGroupService::factory()->create([
             'order_group_id' => $this->orderGroup->id,
@@ -67,7 +67,7 @@ describe('OrderGroupServiceObserver', function () {
         expect($this->orderGroup->status)->toBe(OrderGroupStatus::COMPLETED);
     });
 
-    it('updates OrderGroup status to REJECTED when any OrderGroupService is REJECTED', function () {
+    it('updates OrderGroup status to REJECTED when any OrderGroupService is REJECTED', function (): void {
         // Create OrderGroupServices
         $orderGroupService1 = OrderGroupService::factory()->create([
             'order_group_id' => $this->orderGroup->id,
@@ -97,7 +97,7 @@ describe('OrderGroupServiceObserver', function () {
         expect($this->orderGroup->status)->toBe(OrderGroupStatus::REJECTED);
     });
 
-    it('updates OrderGroup status to IN_PROGRESS when any OrderGroupService is IN_PROGRESS', function () {
+    it('updates OrderGroup status to IN_PROGRESS when any OrderGroupService is IN_PROGRESS', function (): void {
         // Create OrderGroupServices
         $orderGroupService1 = OrderGroupService::factory()->create([
             'order_group_id' => $this->orderGroup->id,
@@ -121,7 +121,7 @@ describe('OrderGroupServiceObserver', function () {
         expect($this->orderGroup->status)->toBe(OrderGroupStatus::IN_PROGRESS);
     });
 
-    it('keeps OrderGroup status as PENDING when all OrderGroupServices are PENDING', function () {
+    it('keeps OrderGroup status as PENDING when all OrderGroupServices are PENDING', function (): void {
         // Create OrderGroupServices with PENDING status
         OrderGroupService::factory()->create([
             'order_group_id' => $this->orderGroup->id,
@@ -142,7 +142,7 @@ describe('OrderGroupServiceObserver', function () {
         expect($this->orderGroup->status)->toBe(OrderGroupStatus::PENDING);
     });
 
-    it('only updates OrderGroup when OrderGroupService status field changes', function () {
+    it('only updates OrderGroup when OrderGroupService status field changes', function (): void {
         // Create an OrderGroupService
         $orderGroupService = OrderGroupService::factory()->create([
             'order_group_id' => $this->orderGroup->id,
@@ -163,7 +163,7 @@ describe('OrderGroupServiceObserver', function () {
         expect($this->orderGroup->status)->toBe(OrderGroupStatus::ACCEPTED);
     });
 
-    it('triggers on OrderGroupService creation', function () {
+    it('triggers on OrderGroupService creation', function (): void {
         // OrderGroup starts with PENDING
         expect($this->orderGroup->status)->toBe(OrderGroupStatus::PENDING);
 
@@ -181,7 +181,7 @@ describe('OrderGroupServiceObserver', function () {
         expect($this->orderGroup->status)->toBe(OrderGroupStatus::ACCEPTED);
     });
 
-    it('triggers on OrderGroupService deletion', function () {
+    it('triggers on OrderGroupService deletion', function (): void {
         // Create two OrderGroupServices
         $orderGroupService1 = OrderGroupService::factory()->create([
             'order_group_id' => $this->orderGroup->id,
@@ -209,7 +209,7 @@ describe('OrderGroupServiceObserver', function () {
         expect($this->orderGroup->status)->toBe(OrderGroupStatus::ACCEPTED);
     });
 
-    it('handles mixed statuses correctly with priority order', function () {
+    it('handles mixed statuses correctly with priority order', function (): void {
         // Create OrderGroupServices with mixed statuses
         OrderGroupService::factory()->create([
             'order_group_id' => $this->orderGroup->id,

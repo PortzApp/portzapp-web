@@ -185,9 +185,9 @@ class OrderGroupObserver
             ->get();
 
         // Update services without triggering their observers to prevent infinite loops
-        $servicesToUpdate->each(function ($service) use ($newServiceStatus) {
+        $servicesToUpdate->each(function ($service) use ($newServiceStatus): void {
             /** @var \App\Models\OrderGroupService $service */
-            $service->withoutEvents(function () use ($service, $newServiceStatus) {
+            $service->withoutEvents(function () use ($service, $newServiceStatus): void {
                 $service->update(['status' => $newServiceStatus]);
             });
 

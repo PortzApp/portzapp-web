@@ -106,19 +106,19 @@ class DashboardController extends Controller
             ->where('status', 'active')
             ->count();
 
-        $pendingOrders = Order::whereHas('orderGroups', function ($query) use ($organization) {
+        $pendingOrders = Order::whereHas('orderGroups', function ($query) use ($organization): void {
             $query->where('fulfilling_organization_id', $organization->id)
                 ->where('status', 'pending');
         })->count();
 
-        $completedOrdersThisMonth = Order::whereHas('orderGroups', function ($query) use ($organization) {
+        $completedOrdersThisMonth = Order::whereHas('orderGroups', function ($query) use ($organization): void {
             $query->where('fulfilling_organization_id', $organization->id)
                 ->where('status', 'completed');
         })
             ->whereMonth('created_at', Carbon::now()->month)
             ->count();
 
-        $monthlyRevenue = Order::whereHas('orderGroups', function ($query) use ($organization) {
+        $monthlyRevenue = Order::whereHas('orderGroups', function ($query) use ($organization): void {
             $query->where('fulfilling_organization_id', $organization->id)
                 ->where('status', 'completed');
         })
@@ -127,7 +127,7 @@ class DashboardController extends Controller
             ->sum('total_price');
 
         // Recent order requests
-        $recentOrderRequests = Order::whereHas('orderGroups', function ($query) use ($organization) {
+        $recentOrderRequests = Order::whereHas('orderGroups', function ($query) use ($organization): void {
             $query->where('fulfilling_organization_id', $organization->id);
         })
             ->with(['vessel', 'port', 'placedByOrganization'])
@@ -148,7 +148,7 @@ class DashboardController extends Controller
             });
 
         // Revenue trends (last 6 months)
-        $revenueTrends = Order::whereHas('orderGroups', function ($query) use ($organization) {
+        $revenueTrends = Order::whereHas('orderGroups', function ($query) use ($organization): void {
             $query->where('fulfilling_organization_id', $organization->id)
                 ->where('status', 'completed');
         })
