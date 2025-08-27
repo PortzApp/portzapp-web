@@ -1,17 +1,17 @@
-import { 
-    Ship, 
-    Package, 
-    Clock, 
-    CheckCircle, 
-    Settings, 
-    DollarSign, 
-    Building, 
-    Users, 
-    Anchor, 
+import {
+    Anchor,
+    BarChart3,
+    Building,
+    CheckCircle,
+    Clock,
+    DollarSign,
+    Package,
     Plus,
-    TrendingUp,
+    Settings,
+    Ship,
     TrendingDown,
-    BarChart3
+    TrendingUp,
+    Users,
 } from 'lucide-react';
 
 export const iconMap = {

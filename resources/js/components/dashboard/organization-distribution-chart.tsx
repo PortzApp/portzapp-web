@@ -1,6 +1,7 @@
 import { Cell, Pie, PieChart } from 'recharts';
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart';
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { ChartConfig, ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 
 interface OrganizationDistributionChartProps {
     data: Array<{
@@ -17,7 +18,7 @@ const chartConfig = {
         color: 'var(--chart-1)',
     },
     'Shipping Agency': {
-        label: 'Shipping Agencies', 
+        label: 'Shipping Agencies',
         color: 'var(--chart-2)',
     },
     'PortzApp Team': {
@@ -26,10 +27,10 @@ const chartConfig = {
     },
 } satisfies ChartConfig;
 
-export function OrganizationDistributionChart({ 
-    data, 
-    title = 'Organization Distribution', 
-    description = 'Breakdown of organizations by type' 
+export function OrganizationDistributionChart({
+    data,
+    title = 'Organization Distribution',
+    description = 'Breakdown of organizations by type',
 }: OrganizationDistributionChartProps) {
     const chartData = data.map((item) => ({
         ...item,
@@ -47,14 +48,7 @@ export function OrganizationDistributionChart({
                     <PieChart>
                         <ChartTooltip content={<ChartTooltipContent nameKey="type" />} />
                         <ChartLegend content={<ChartLegendContent nameKey="type" />} />
-                        <Pie
-                            data={chartData}
-                            cx="50%"
-                            cy="50%"
-                            outerRadius={80}
-                            dataKey="count"
-                            nameKey="type"
-                        >
+                        <Pie data={chartData} cx="50%" cy="50%" outerRadius={80} dataKey="count" nameKey="type">
                             {chartData.map((entry, index) => (
                                 <Cell key={`cell-${index}`} fill={entry.fill} />
                             ))}
