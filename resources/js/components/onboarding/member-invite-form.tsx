@@ -16,6 +16,7 @@ import InputError from '@/components/input-error';
 interface MemberInvite {
     email: string;
     role: string;
+    [key: string]: string; // Make it compatible with FormDataConvertible
 }
 
 interface Props {
@@ -31,7 +32,10 @@ interface Props {
 export default function MemberInviteForm({ organizationId, onSuccess, onSkip, availableRoles }: Props) {
     const [invites, setInvites] = useState<MemberInvite[]>([{ email: '', role: '' }]);
 
-    const { setData, post, processing, errors } = useForm({
+    const { setData, post, processing, errors } = useForm<{
+        organization_id: string;
+        invites: MemberInvite[];
+    }>({
         organization_id: organizationId,
         invites: invites,
     });

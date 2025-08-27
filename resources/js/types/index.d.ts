@@ -26,7 +26,7 @@ interface Auth {
 }
 
 export interface User {
-    id: number;
+    id: string;
     first_name: string;
     last_name: string;
     email: string;
@@ -43,7 +43,7 @@ export interface User {
 }
 
 interface Organization {
-    id: number;
+    id: string;
     name: string;
     business_type: OrganizationBusinessType;
     registration_code: string;
