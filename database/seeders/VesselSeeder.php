@@ -11,18 +11,29 @@ use Illuminate\Database\Seeder;
 class VesselSeeder extends Seeder
 {
     /**
-     * Specific vessel names for each vessel type to make seeded data more realistic.
+     * Pool of realistic vessel names to randomly select from.
      */
-    private const VESSEL_NAMES_BY_TYPE = [
-        'bulk_carrier' => 'MV Iron Duke',
-        'car_carrier' => 'MS Auto Express',
-        'container_ship' => 'Ever Given',
-        'dry_bulk' => 'Coal Pioneer',
-        'gas_carrier' => 'LNG Horizon',
-        'naval_ships' => 'HMS Defender',
-        'passenger_ships' => 'Ocean Majesty',
-        'tanker_ship' => 'Crude Navigator',
-        'yacht' => 'Lady Serenity',
+    private const VESSEL_NAMES = [
+        'MV Iron Duke',
+        'MS Auto Express',
+        'Ever Given',
+        'Coal Pioneer',
+        'LNG Horizon',
+        'HMS Defender',
+        'Ocean Majesty',
+        'Crude Navigator',
+        'Lady Serenity',
+        'Pacific Guardian',
+        'Atlantic Pioneer',
+        'Sea Voyager',
+        'Nordic Star',
+        'Golden Eagle',
+        'Blue Horizon',
+        'Silver Wave',
+        'Ocean Explorer',
+        'Maritime Spirit',
+        'Coastal Breeze',
+        'Deep Waters',
     ];
 
     /**
@@ -41,7 +52,7 @@ class VesselSeeder extends Seeder
                 Vessel::factory()->create([
                     'organization_id' => $organization->id,
                     'vessel_type' => $vesselType,
-                    'name' => self::VESSEL_NAMES_BY_TYPE[$vesselType->value].' '.$organization->id,
+                    'name' => self::VESSEL_NAMES[array_rand(self::VESSEL_NAMES)],
                 ]);
                 $totalVessels++;
             }
