@@ -175,7 +175,7 @@ class Order extends Model
         }
 
         if ($anyAccepted) {
-            return OrderStatus::PARTIALLY_CONFIRMED;
+            return OrderStatus::PARTIALLY_ACCEPTED;
         }
 
         return OrderStatus::PENDING_AGENCY_CONFIRMATION;
