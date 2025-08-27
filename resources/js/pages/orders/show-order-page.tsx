@@ -8,6 +8,7 @@ import OrderVesselTab from '@/pages/orders/components/order-vessel-tab';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { useEcho } from '@laravel/echo-react';
 import { Database, Edit, LayoutGrid, MapPin, Package, Ship, Trash2, Users } from 'lucide-react';
+import { parseAsStringLiteral, useQueryState } from 'nuqs';
 import { toast } from 'sonner';
 
 import type { BreadcrumbItem, SharedData } from '@/types';
@@ -56,10 +57,20 @@ interface OrderGroupServiceUpdatedEvent extends OrderEvent {
     };
 }
 
+const tabValues = ['overview', 'groups', 'services', 'vessel', 'system'] as const;
+
 export default function ShowOrderPage({ order: initialOrder }: { order: OrderWithRelations }) {
     const { auth } = usePage<SharedData>().props;
     const [order, setOrder] = useState(initialOrder);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+
+    const [activeTab, setActiveTab] = useQueryState(
+        'tab',
+        parseAsStringLiteral(tabValues).withDefault('overview').withOptions({
+            history: 'replace',
+            shallow: false,
+        }),
+    );
 
     // Sync new props back to local state after server refetch
     useEffect(() => {
@@ -96,44 +107,38 @@ export default function ShowOrderPage({ order: initialOrder }: { order: OrderWit
     });
 
     // Listen for order group updated events on static channel
-    useEcho<OrderGroupUpdatedEvent>(
-        'order-groups.updated',
-        'OrderGroupUpdated',
-        ({ orderGroup: updatedOrderGroup }) => {
-            // Check if this order group belongs to the current order by checking both order_id and group ID
-            const belongsToCurrentOrder =
-                (updatedOrderGroup.order_id === order.id) ||
-                order.order_groups?.some((og) => og.id === updatedOrderGroup.id);
+    useEcho<OrderGroupUpdatedEvent>('order-groups.updated', 'OrderGroupUpdated', ({ orderGroup: updatedOrderGroup }) => {
+        // Check if this order group belongs to the current order by checking both order_id and group ID
+        const belongsToCurrentOrder = updatedOrderGroup.order_id === order.id || order.order_groups?.some((og) => og.id === updatedOrderGroup.id);
 
-            if (belongsToCurrentOrder) {
-                setOrder((prevOrder) => ({
-                    ...prevOrder,
-                    order_groups: prevOrder.order_groups?.map((orderGroup) =>
-                        orderGroup.id === updatedOrderGroup.id
-                            ? {
-                                  ...orderGroup,
-                                  status: updatedOrderGroup.status,
-                                  updated_at: updatedOrderGroup.updated_at,
-                              }
-                            : orderGroup,
-                    ),
-                }));
+        if (belongsToCurrentOrder) {
+            setOrder((prevOrder) => ({
+                ...prevOrder,
+                order_groups: prevOrder.order_groups?.map((orderGroup) =>
+                    orderGroup.id === updatedOrderGroup.id
+                        ? {
+                              ...orderGroup,
+                              status: updatedOrderGroup.status,
+                              updated_at: updatedOrderGroup.updated_at,
+                          }
+                        : orderGroup,
+                ),
+            }));
 
-                toast('Order group updated', {
-                    description: `Order group #${updatedOrderGroup.group_number} status changed to ${updatedOrderGroup.status?.replace(/_/g, ' ')}`,
-                    classNames: {
-                        description: '!text-muted-foreground',
+            toast('Order group updated', {
+                description: `Order group #${updatedOrderGroup.group_number} status changed to ${updatedOrderGroup.status?.replace(/_/g, ' ')}`,
+                classNames: {
+                    description: '!text-muted-foreground',
+                },
+                action: {
+                    label: 'View Order Group',
+                    onClick: () => {
+                        router.visit(route('order-groups.show', updatedOrderGroup.id));
                     },
-                    action: {
-                        label: 'View Order Group',
-                        onClick: () => {
-                            router.visit(route('order-groups.show', updatedOrderGroup.id));
-                        },
-                    },
-                });
-            }
-        },
-    );
+                },
+            });
+        }
+    });
 
     // Listen for order group service updated events on static channel
     useEcho<OrderGroupServiceUpdatedEvent>(
@@ -142,10 +147,8 @@ export default function ShowOrderPage({ order: initialOrder }: { order: OrderWit
         ({ orderGroupService: updatedOrderGroupService }) => {
             // Check if this service belongs to the current order by checking both order_id and service ID
             const belongsToCurrentOrder =
-                (updatedOrderGroupService.order_id === order.id) ||
-                order.order_groups?.some((og) =>
-                    og.order_group_services?.some((ogs) => ogs.id === updatedOrderGroupService.id),
-                );
+                updatedOrderGroupService.order_id === order.id ||
+                order.order_groups?.some((og) => og.order_group_services?.some((ogs) => ogs.id === updatedOrderGroupService.id));
 
             if (belongsToCurrentOrder) {
                 setOrder((prevOrder) => ({
@@ -229,7 +232,15 @@ export default function ShowOrderPage({ order: initialOrder }: { order: OrderWit
                     </div>
                 </div>
 
-                <Tabs defaultValue="overview" className="w-full">
+                <Tabs
+                    value={activeTab}
+                    onValueChange={(value) => {
+                        if (tabValues.includes(value as (typeof tabValues)[number])) {
+                            setActiveTab(value as (typeof tabValues)[number]);
+                        }
+                    }}
+                    className="w-full"
+                >
                     <TabsList className="grid w-full grid-cols-5">
                         <TabsTrigger value="overview" className="flex items-center gap-2">
                             <LayoutGrid className="h-4 w-4" />
