@@ -25,11 +25,9 @@ class OrderUpdated implements ShouldBroadcastNow
     /**
      * Get the channels the event should broadcast on.
      */
-    public function broadcastOn(): array
+    public function broadcastOn(): PrivateChannel
     {
-        return [
-            new PrivateChannel('orders'),
-        ];
+        return new PrivateChannel('orders.updated');
     }
 
     /**
@@ -46,7 +44,10 @@ class OrderUpdated implements ShouldBroadcastNow
                 'name' => $this->user->first_name.' '.$this->user->last_name,
                 'email' => $this->user->email,
             ],
-            'order' => $this->order->toArray(),
+            'order' => array_merge($this->order->toArray(), [
+                'id' => $this->order->id,
+                'order_number' => $this->order->order_number,
+            ]),
             'timestamp' => now()->toISOString(),
         ];
     }

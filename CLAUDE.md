@@ -49,6 +49,10 @@ npm run format:fix                  # Fix Prettier formatting
 composer lint:backend               # Run Laravel Pint
 ```
 
+**Git operations:**
+
+**IMPORTANT:** Always use Git CLI commands exclusively for all git operations. Use `git` commands via Bash tool for commits, branching, pushing, etc. Do not use any other git tools or interfaces.
+
 ## Architecture Overview
 
 **Laravel Conventions:**

@@ -40,11 +40,16 @@ interface OrderGroupEvent {
 }
 
 interface OrderGroupUpdatedEvent extends OrderGroupEvent {
-    orderGroup: OrderGroup;
+    orderGroup: OrderGroup & {
+        order_id: string;
+    };
 }
 
 interface OrderGroupServiceUpdatedEvent extends OrderGroupEvent {
-    orderGroupService: OrderGroupService;
+    orderGroupService: OrderGroupService & {
+        order_id?: string;
+        order_group_id: string;
+    };
 }
 
 interface OrderUpdatedEvent extends OrderGroupEvent {
@@ -86,7 +91,7 @@ export default function ShowOrderGroupPage({
     const breadcrumbs = getBreadcrumbs(orderGroup);
 
     // Listen for order group updated events on static channel
-    useEcho<OrderGroupUpdatedEvent>('order-groups', 'OrderGroupUpdated', ({ orderGroup: updatedOrderGroup }) => {
+    useEcho<OrderGroupUpdatedEvent>('order-groups.updated', 'OrderGroupUpdated', ({ orderGroup: updatedOrderGroup }) => {
         // Update main order group if it's the current one
         if (updatedOrderGroup.id === orderGroup.id) {
             setOrderGroup((prevOrderGroup) => ({
@@ -135,7 +140,7 @@ export default function ShowOrderGroupPage({
 
     // Listen for order group service updated events on static channel
     useEcho<OrderGroupServiceUpdatedEvent>(
-        'order-group-services',
+        'order-group-services.updated',
         'OrderGroupServiceUpdated',
         ({ orderGroupService: updatedOrderGroupService }) => {
             // Check if this service belongs to the current order group
@@ -166,7 +171,7 @@ export default function ShowOrderGroupPage({
     );
 
     // Listen for parent order updated events on static channel
-    useEcho<OrderUpdatedEvent>('orders', 'OrderUpdated', ({ order: updatedOrder }) => {
+    useEcho<OrderUpdatedEvent>('orders.updated', 'OrderUpdated', ({ order: updatedOrder }) => {
         if (updatedOrder.id === parentOrder.id) {
             setParentOrder((prevParentOrder) => ({
                 ...prevParentOrder,
