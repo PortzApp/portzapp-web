@@ -8,6 +8,22 @@ use App\Models\Service;
 use App\Models\User;
 use Illuminate\Support\Facades\Broadcast;
 
+// Static channels for simplified broadcasting
+Broadcast::channel('orders', function (User $user) {
+    // Users can listen to orders if they are in an organization that can place or fulfill orders
+    return $user->current_organization_id !== null;
+});
+
+Broadcast::channel('order-groups', function (User $user) {
+    // Users can listen to order groups if they are in an organization
+    return $user->current_organization_id !== null;
+});
+
+Broadcast::channel('order-group-services', function (User $user) {
+    // Users can listen to order group services if they are in an organization
+    return $user->current_organization_id !== null;
+});
+
 // Organization-scoped channels for index pages
 Broadcast::channel('services.organization.{organizationId}', function (User $user, string $organizationId) {
     return $user->current_organization_id === $organizationId;
