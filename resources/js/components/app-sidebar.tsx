@@ -61,11 +61,6 @@ const mainNavItemsAsVesselOwner: NavItem[] = [
         icon: LayoutGrid,
     },
     {
-        title: 'Services',
-        href: route('services.index'),
-        icon: Package,
-    },
-    {
         title: 'Orders',
         href: route('orders.index'),
         icon: ClipboardCheck,
