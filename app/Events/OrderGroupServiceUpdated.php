@@ -49,7 +49,7 @@ class OrderGroupServiceUpdated implements ShouldBroadcastNow
             ],
             'orderGroupService' => array_merge($this->orderGroupService->toArray(), [
                 'order_group_id' => $this->orderGroupService->order_group_id,
-                'order_id' => $this->orderGroupService->orderGroup?->order?->id,
+                'order_id' => $this->orderGroupService->orderGroup->order->id,
             ]),
             'timestamp' => now()->toISOString(),
         ];

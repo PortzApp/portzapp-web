@@ -18,6 +18,7 @@ class DashboardController extends Controller
 {
     public function index(Request $request)
     {
+        /** @var \App\Models\User $user */
         $user = $request->user();
         $currentOrg = $user->currentOrganization;
 
@@ -40,7 +41,7 @@ class DashboardController extends Controller
         ]);
     }
 
-    private function getVesselOwnerData($user, $organization)
+    private function getVesselOwnerData(User $user, Organization $organization): array
     {
         $totalVessels = Vessel::where('organization_id', $organization->id)->count();
         $totalOrders = Order::where('placed_by_organization_id', $organization->id)->count();
@@ -57,11 +58,12 @@ class DashboardController extends Controller
             ->latest()
             ->limit(5)
             ->get()
-            ->map(function ($order) {
+            ->map(function ($order): array {
+                /** @var Order $order */
                 return [
                     'id' => $order->id,
-                    'vessel_name' => $order->vessel?->name,
-                    'port_name' => $order->port?->name,
+                    'vessel_name' => $order->vessel->name,
+                    'port_name' => $order->port->name,
                     'status' => $order->status->value,
                     'total_price' => $order->total_price,
                     'created_at' => $order->created_at->diffForHumans(),
@@ -98,7 +100,7 @@ class DashboardController extends Controller
         ];
     }
 
-    private function getShippingAgencyData($user, $organization)
+    private function getShippingAgencyData(User $user, Organization $organization): array
     {
         $activeServices = Service::where('organization_id', $organization->id)
             ->where('status', 'active')
@@ -132,12 +134,13 @@ class DashboardController extends Controller
             ->latest()
             ->limit(5)
             ->get()
-            ->map(function ($order) {
+            ->map(function ($order): array {
+                /** @var Order $order */
                 return [
                     'id' => $order->id,
-                    'vessel_name' => $order->vessel?->name,
-                    'port_name' => $order->port?->name,
-                    'client_name' => $order->placedByOrganization?->name,
+                    'vessel_name' => $order->vessel->name,
+                    'port_name' => $order->port->name,
+                    'client_name' => $order->placedByOrganization->name,
                     'status' => $order->aggregated_status->value,
                     'total_price' => $order->total_price,
                     'created_at' => $order->created_at->diffForHumans(),
@@ -177,7 +180,7 @@ class DashboardController extends Controller
         ];
     }
 
-    private function getPortzAppTeamData($user)
+    private function getPortzAppTeamData(User $user): array
     {
         $totalOrganizations = Organization::count();
         $totalUsers = User::count();

@@ -307,7 +307,9 @@ class OrderWizardSessionController extends Controller
 
                 // Create OrderGroupService records for each service
                 foreach ($selections as $selection) {
+                    /** @var \App\Models\OrderWizardServiceSelection $selection */
                     $service = $selection->service;
+                    /** @var \App\Models\Service $service */
                     OrderGroupService::create([
                         'order_group_id' => $orderGroup->id,
                         'service_id' => $service->id,

@@ -82,7 +82,7 @@ class OrderGroup extends Model
     /**
      * Helper method to get services collection for backward compatibility.
      */
-    public function getServicesAttribute(): Collection
+    public function getServicesAttribute(): \Illuminate\Support\Collection
     {
         return $this->orderGroupServices->pluck('service');
     }

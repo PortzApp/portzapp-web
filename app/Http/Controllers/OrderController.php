@@ -229,8 +229,9 @@ class OrderController extends Controller
         }
 
         // Handle service updates
+        // Note: Service sync is deprecated - services are now managed through OrderGroupServices
         if (isset($validated['service_ids'])) {
-            $order->services()->sync($validated['service_ids']);
+            // TODO: Implement service updates through OrderGroupService if needed
             unset($validated['service_ids']);
         }
 

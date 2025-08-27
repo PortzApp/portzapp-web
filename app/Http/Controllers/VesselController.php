@@ -51,18 +51,18 @@ class VesselController extends Controller
         ];
 
         // Convert DWT from tons to kilograms for storage
-        if (isset($validated['dwt']) && $validated['dwt'] !== null) {
+        if (isset($validated['dwt'])) {
             $vesselData['dwt'] = $validated['dwt'] * 1000;
         }
 
         // Convert length measurements from meters to millimeters for storage
-        if (isset($validated['loa']) && $validated['loa'] !== null) {
+        if (isset($validated['loa'])) {
             $vesselData['loa'] = $validated['loa'] * 1000;
         }
-        if (isset($validated['beam']) && $validated['beam'] !== null) {
+        if (isset($validated['beam'])) {
             $vesselData['beam'] = $validated['beam'] * 1000;
         }
-        if (isset($validated['draft']) && $validated['draft'] !== null) {
+        if (isset($validated['draft'])) {
             $vesselData['draft'] = $validated['draft'] * 1000;
         }
 
@@ -139,18 +139,18 @@ class VesselController extends Controller
 
         // Convert DWT from tons to kilograms for storage
         if (isset($validated['dwt'])) {
-            $vesselData['dwt'] = $validated['dwt'] !== null ? $validated['dwt'] * 1000 : null;
+            $vesselData['dwt'] = $validated['dwt'] * 1000;
         }
 
         // Convert length measurements from meters to millimeters for storage
         if (isset($validated['loa'])) {
-            $vesselData['loa'] = $validated['loa'] !== null ? $validated['loa'] * 1000 : null;
+            $vesselData['loa'] = $validated['loa'] * 1000;
         }
         if (isset($validated['beam'])) {
-            $vesselData['beam'] = $validated['beam'] !== null ? $validated['beam'] * 1000 : null;
+            $vesselData['beam'] = $validated['beam'] * 1000;
         }
         if (isset($validated['draft'])) {
-            $vesselData['draft'] = $validated['draft'] !== null ? $validated['draft'] * 1000 : null;
+            $vesselData['draft'] = $validated['draft'] * 1000;
         }
 
         $vessel->update($vesselData);

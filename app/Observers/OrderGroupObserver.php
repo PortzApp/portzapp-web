@@ -145,7 +145,7 @@ class OrderGroupObserver
         }
 
         // Some accepted, some pending - partial acceptance
-        if ($anyAccepted && ! $allAccepted) {
+        if ($anyAccepted) {
             return OrderStatus::PARTIALLY_ACCEPTED;
         }
 
@@ -159,7 +159,10 @@ class OrderGroupObserver
     private function updateChildOrderGroupServices(OrderGroup $orderGroup): void
     {
         // Define cascade rules based on OrderGroup status
-        $newServiceStatus = $this->getCascadeServiceStatus($orderGroup->status);
+        $status = $orderGroup->status instanceof OrderGroupStatus 
+            ? $orderGroup->status 
+            : OrderGroupStatus::from($orderGroup->status);
+        $newServiceStatus = $this->getCascadeServiceStatus($status);
 
         if ($newServiceStatus === null) {
             // No cascade needed for this status
@@ -183,14 +186,18 @@ class OrderGroupObserver
 
         // Update services without triggering their observers to prevent infinite loops
         $servicesToUpdate->each(function ($service) use ($newServiceStatus) {
+            /** @var \App\Models\OrderGroupService $service */
             $service->withoutEvents(function () use ($service, $newServiceStatus) {
                 $service->update(['status' => $newServiceStatus]);
             });
 
             // Manually dispatch OrderGroupServiceUpdated event since withoutEvents() prevents it
             $user = auth()->user();
-            if (! $user && $service->orderGroup && $service->orderGroup->order) {
-                $user = $service->orderGroup->order->placedByUser;
+            if (! $user) {
+                $service->load('orderGroup.order.placedByUser');
+                if ($service->orderGroup && $service->orderGroup->order) {
+                    $user = $service->orderGroup->order->placedByUser;
+                }
             }
             if ($user) {
                 \App\Events\OrderGroupServiceUpdated::dispatch($user, $service->fresh());

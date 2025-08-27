@@ -23,10 +23,11 @@ use Illuminate\Support\Carbon;
  * @property string $vessel_id
  * @property string $placed_by_organization_id
  * @property string|null $notes
- * @property string $status
+ * @property OrderStatus $status
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read Vessel $vessel
+ * @property-read Port $port
  * @property-read Organization $placedByOrganization
  * @property-read User $placedByUser
  * @property-read Collection<int, OrderGroup> $orderGroups
@@ -34,6 +35,7 @@ use Illuminate\Support\Carbon;
  * @property-read Collection<int, Service> $services
  * @property-read int|null $services_count
  * @property-read float $total_price
+ * @property-read OrderStatus $aggregated_status
  * @property-read Collection<int, Organization> $providing_organizations
  *
  * @method static \Database\Factories\OrderFactory factory($count = null, $state = [])
@@ -154,7 +156,7 @@ class Order extends Model
         $groupStatuses = $this->orderGroups->pluck('status');
 
         if ($groupStatuses->isEmpty()) {
-            return OrderStatus::from($this->status);
+            return $this->status;
         }
 
         $allAccepted = $groupStatuses->every(fn ($status) => $status === OrderGroupStatus::ACCEPTED);

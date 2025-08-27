@@ -8,6 +8,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property string $id
+ * @property string $order_group_id
+ * @property string $service_id
+ * @property OrderGroupServiceStatus $status
+ * @property string|null $notes
+ * @property float $price_snapshot
+ * @property-read OrderGroup $orderGroup
+ * @property-read Service $service
+ */
 class OrderGroupService extends Model
 {
     use HasFactory, HasUlids;

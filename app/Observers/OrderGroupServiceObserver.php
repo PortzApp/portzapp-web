@@ -29,6 +29,7 @@ class OrderGroupServiceObserver
             // Dispatch broadcasting event for real-time updates
             $user = auth()->user();
             if (! $user) {
+                $orderGroupService->load('orderGroup.order.placedByUser');
                 $orderGroup = $orderGroupService->orderGroup;
                 if ($orderGroup && $orderGroup->order) {
                     $user = $orderGroup->order->placedByUser;
@@ -69,6 +70,7 @@ class OrderGroupServiceObserver
      */
     private function updateParentOrderGroupStatus(OrderGroupService $orderGroupService): void
     {
+        /** @var \App\Models\OrderGroup|null $orderGroup */
         $orderGroup = $orderGroupService->orderGroup;
 
         if (! $orderGroup) {
@@ -103,8 +105,11 @@ class OrderGroupServiceObserver
 
             // Manually dispatch OrderGroupUpdated event since withoutEvents() prevents it
             $user = auth()->user();
-            if (! $user && $orderGroup->order) {
-                $user = $orderGroup->order->placedByUser;
+            if (! $user) {
+                $orderGroup->load('order.placedByUser');
+                if ($orderGroup->order) {
+                    $user = $orderGroup->order->placedByUser;
+                }
             }
             if ($user) {
                 \App\Events\OrderGroupUpdated::dispatch($user, $orderGroup->fresh());
@@ -150,7 +155,7 @@ class OrderGroupServiceObserver
         }
 
         // Some accepted, some pending - partial acceptance (still counts as accepted)
-        if ($anyAccepted && ! $allAccepted) {
+        if ($anyAccepted) {
             return OrderGroupStatus::ACCEPTED;
         }
 

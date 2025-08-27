@@ -37,6 +37,7 @@ use Illuminate\Support\Carbon;
  * @property-read int|null $organizations_count
  * @property-read Collection<int, Service> $services
  * @property-read int|null $services_count
+ * @property-read Organization|null $currentOrganization
  *
  * @method static \Database\Factories\UserFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User newModelQuery()
