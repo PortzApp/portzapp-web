@@ -212,7 +212,7 @@ export function StepServices({ services, session }: StepServicesProps) {
                                         return (
                                             <div
                                                 key={`${organization.id}-${service.id}`}
-                                                className={`relative flex w-full items-start gap-2 rounded-md border border-input p-4 shadow-xs outline-none transition-colors ${
+                                                className={`relative flex w-full items-start gap-2 rounded-md border border-input p-4 shadow-xs transition-colors outline-none ${
                                                     isSelected ? 'border-primary/50 bg-primary/5' : 'hover:border-muted-foreground/50'
                                                 }`}
                                             >
@@ -233,11 +233,9 @@ export function StepServices({ services, session }: StepServicesProps) {
                                                             </span>
                                                         </Label>
                                                         {service.description && (
-                                                            <p className="text-xs text-muted-foreground line-clamp-2">{service.description}</p>
+                                                            <p className="line-clamp-2 text-xs text-muted-foreground">{service.description}</p>
                                                         )}
-                                                        {service.price && (
-                                                            <p className="text-sm font-semibold text-green-600">${service.price}</p>
-                                                        )}
+                                                        {service.price && <p className="text-sm font-semibold text-green-600">${service.price}</p>}
                                                     </div>
                                                 </div>
                                             </div>

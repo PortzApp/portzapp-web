@@ -2,35 +2,37 @@ import { Link } from '@inertiajs/react';
 
 import { OrderGroup } from '@/types/models';
 
-import { OrderGroupServiceStatusBadge } from '@/components/badges/order-group-service-status-badge';
-import { OrderGroupStatusBadge } from '@/components/badges/order-group-status-badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+
+import { OrderGroupServiceStatusBadge } from '@/components/badges/order-group-service-status-badge';
+import { OrderGroupStatusBadge } from '@/components/badges/order-group-status-badge';
 
 interface OrderGroupsTabProps {
     orderGroups: OrderGroup[];
 }
 
 export default function OrderGroupsTab({ orderGroups }: OrderGroupsTabProps) {
-
     // Helper to get services from either new or old structure
     const getGroupServices = (group: OrderGroup) => {
         if (group.order_group_services && group.order_group_services.length > 0) {
             return group.order_group_services;
         }
         // Fallback to old structure
-        return group.services?.map(service => ({
-            id: `${group.id}-${service.id}`, // temporary ID
-            service_id: service.id,
-            order_group_id: group.id,
-            status: 'pending' as const,
-            price_snapshot: parseFloat(service.price || '0'),
-            notes: null,
-            service,
-            created_at: service.created_at,
-            updated_at: service.updated_at,
-        })) || [];
+        return (
+            group.services?.map((service) => ({
+                id: `${group.id}-${service.id}`, // temporary ID
+                service_id: service.id,
+                order_group_id: group.id,
+                status: 'pending' as const,
+                price_snapshot: parseFloat(service.price || '0'),
+                notes: null,
+                service,
+                created_at: service.created_at,
+                updated_at: service.updated_at,
+            })) || []
+        );
     };
 
     // Helper to calculate total price from OrderGroupServices

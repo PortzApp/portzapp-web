@@ -2,9 +2,10 @@ import { MapPin, Package, Ship, User } from 'lucide-react';
 
 import { OrderWithRelations } from '@/types/models';
 
-import { OrderStatusBadge } from '@/components/badges/order-status-badge';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+
+import { OrderStatusBadge } from '@/components/badges/order-status-badge';
 
 interface OrderOverviewTabProps {
     order: OrderWithRelations;
