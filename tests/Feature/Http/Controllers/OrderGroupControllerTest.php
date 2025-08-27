@@ -5,6 +5,7 @@ use App\Enums\OrganizationBusinessType;
 use App\Enums\UserRoles;
 use App\Models\Order;
 use App\Models\OrderGroup;
+use App\Models\OrderGroupService;
 use App\Models\Organization;
 use App\Models\Port;
 use App\Models\Service;
@@ -80,7 +81,13 @@ beforeEach(function (): void {
         'port_id' => $this->port->id,
     ]);
 
-    $this->orderGroup->services()->attach($this->service);
+    OrderGroupService::create([
+        'order_group_id' => $this->orderGroup->id,
+        'service_id' => $this->service->id,
+        'status' => 'pending',
+        'price_snapshot' => $this->service->price,
+        'notes' => null,
+    ]);
 });
 
 describe('OrderGroupController index', function (): void {
@@ -140,7 +147,8 @@ describe('OrderGroupController index', function (): void {
             ->has('orderGroups.0.order.vessel')
             ->has('orderGroups.0.order.port')
             ->has('orderGroups.0.fulfilling_organization')
-            ->has('orderGroups.0.services')
+            ->has('orderGroups.0.order_group_services')
+            ->has('orderGroups.0.order_group_services.0.service')
         );
     });
 });

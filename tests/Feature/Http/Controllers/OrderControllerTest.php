@@ -6,6 +6,7 @@ use App\Enums\ServiceStatus;
 use App\Enums\UserRoles;
 use App\Models\Order;
 use App\Models\OrderGroup;
+use App\Models\OrderGroupService;
 use App\Models\Organization;
 use App\Models\Port;
 use App\Models\Service;
@@ -111,7 +112,13 @@ beforeEach(function (): void {
         'fulfilling_organization_id' => $this->shippingAgencyOrg->id,
         'status' => OrderGroupStatus::PENDING,
     ]);
-    $this->orderGroup->services()->attach($this->service->id);
+    OrderGroupService::create([
+        'order_group_id' => $this->orderGroup->id,
+        'service_id' => $this->service->id,
+        'status' => 'pending',
+        'price_snapshot' => $this->service->price,
+        'notes' => null,
+    ]);
 
     $this->orderFromOtherOrgs = Order::factory()->create([
         'vessel_id' => $this->vessel2->id,
@@ -119,8 +126,19 @@ beforeEach(function (): void {
         'placed_by_organization_id' => $this->vesselOwnerOrg2->id,
         'notes' => 'Another test order',
     ]);
-    // Attach the service via pivot table
-    $this->orderFromOtherOrgs->services()->attach($this->serviceFromOtherOrg->id);
+    // Create order group for the second order
+    $this->orderGroup2 = OrderGroup::factory()->create([
+        'order_id' => $this->orderFromOtherOrgs->id,
+        'fulfilling_organization_id' => $this->shippingAgencyOrg2->id,
+        'status' => OrderGroupStatus::PENDING,
+    ]);
+    OrderGroupService::create([
+        'order_group_id' => $this->orderGroup2->id,
+        'service_id' => $this->serviceFromOtherOrg->id,
+        'status' => 'pending',
+        'price_snapshot' => $this->serviceFromOtherOrg->price,
+        'notes' => null,
+    ]);
 });
 
 test('vessel owner admin can view orders index', function (): void {
@@ -570,7 +588,7 @@ test('order update with vessel_id updates vessel', function (): void {
     expect($this->order->notes)->toBe('Updated with new vessel');
 });
 
-test('order update with service_ids syncs services', function (): void {
+test('order update ignores service_ids since service sync is deprecated', function (): void {
     $newService = Service::factory()->create([
         'organization_id' => $this->shippingAgencyOrg->id,
         'status' => ServiceStatus::ACTIVE,
@@ -588,9 +606,13 @@ test('order update with service_ids syncs services', function (): void {
     $response->assertSessionHas('message', 'Order updated successfully!');
 
     $this->order->refresh();
-    $this->order->load('services');
-    expect($this->order->services)->toHaveCount(1);
-    expect($this->order->services->first()->id)->toBe($newService->id);
+    expect($this->order->notes)->toBe('Updated with new services');
+
+    // Service IDs should be ignored - services are managed through OrderGroupServices
+    // Original service should still be attached via OrderGroupService
+    $originalServices = $this->order->allServices()->get();
+    expect($originalServices)->toHaveCount(1);
+    expect($originalServices->first()->id)->toBe($this->service->id); // Original service, not new one
 });
 
 test('show order loads all_services relationship correctly', function (): void {
@@ -642,13 +664,15 @@ test('create form shows only active services', function (): void {
     );
 });
 
-test('edit form loads order with services and vessel relationships', function (): void {
+test('edit form loads order with order groups and vessel relationships', function (): void {
     $response = $this->actingAs($this->vesselOwnerAdmin)
         ->get(route('orders.edit', $this->order));
 
     $response->assertStatus(200);
     $response->assertInertia(fn ($page) => $page
-        ->has('order.services')
+        ->has('order.order_groups')
+        ->has('order.order_groups.0.order_group_services')
+        ->has('order.order_groups.0.order_group_services.0.service')
         ->has('order.vessel')
         ->where('order.id', $this->order->id)
     );

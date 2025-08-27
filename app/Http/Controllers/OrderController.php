@@ -10,6 +10,7 @@ use App\Http\Requests\StoreOrderRequest;
 use App\Http\Requests\UpdateOrderRequest;
 use App\Models\Order;
 use App\Models\OrderGroup;
+use App\Models\OrderGroupService;
 use App\Models\Organization;
 use App\Models\Port;
 use App\Models\Service;
@@ -104,8 +105,16 @@ class OrderController extends Controller
                 'status' => OrderGroupStatus::PENDING,
             ]);
 
-            // Attach services to this order group
-            $orderGroup->services()->attach($orgServices->pluck('id')->toArray());
+            // Create OrderGroupService records for each service
+            foreach ($orgServices as $service) {
+                OrderGroupService::create([
+                    'order_group_id' => $orderGroup->id,
+                    'service_id' => $service->id,
+                    'status' => 'pending',
+                    'price_snapshot' => $service->price,
+                    'notes' => null,
+                ]);
+            }
         }
 
         return to_route('orders.index')->with('message', 'Order created successfully!');
@@ -205,7 +214,7 @@ class OrderController extends Controller
             ->with('organization:id,name')
             ->get();
 
-        $order->load(['services', 'vessel']);
+        $order->load(['orderGroups.orderGroupServices.service', 'vessel']);
 
         return Inertia::render('orders/edit-order-page', [
             'order' => $order,

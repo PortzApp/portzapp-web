@@ -356,6 +356,19 @@ describe('OrderWizardSessionController setCategories', function (): void {
 
 describe('OrderWizardSessionController setServices', function (): void {
     it('sets selected services and moves to review step', function (): void {
+        // Set up required session data for validation
+        $this->wizardSession->update([
+            'vessel_id' => $this->vessel->id,
+            'port_id' => $this->port->id,
+        ]);
+
+        // Add required category selections for validation
+        $this->wizardSession->categorySelections()->create([
+            'service_category_id' => $this->serviceCategory->id,
+            'service_sub_category_id' => $this->serviceSubCategory->id,
+            'order_index' => 0,
+        ]);
+
         $data = [
             'selected_services' => [$this->service->id],
         ];
@@ -376,6 +389,19 @@ describe('OrderWizardSessionController setServices', function (): void {
     });
 
     it('clears existing service selections before adding new ones', function (): void {
+        // Set up required session data for validation
+        $this->wizardSession->update([
+            'vessel_id' => $this->vessel->id,
+            'port_id' => $this->port->id,
+        ]);
+
+        // Add required category selections for validation
+        $this->wizardSession->categorySelections()->create([
+            'service_category_id' => $this->serviceCategory->id,
+            'service_sub_category_id' => $this->serviceSubCategory->id,
+            'order_index' => 0,
+        ]);
+
         // Add existing selection
         $this->wizardSession->serviceSelections()->create([
             'service_category_id' => $this->serviceCategory->id,

@@ -28,7 +28,7 @@ test('email can be verified', function (): void {
 
     Event::assertDispatched(Verified::class);
     expect($user->fresh()->hasVerifiedEmail())->toBeTrue();
-    $response->assertRedirect(route('onboarding.index'));
+    $response->assertRedirect(route('dashboard'));
     $response->assertSessionHas('status', 'email-verified');
 });
 
@@ -48,7 +48,7 @@ test('email can be verified when user is not authenticated', function (): void {
 
     Event::assertDispatched(Verified::class);
     expect($user->fresh()->hasVerifiedEmail())->toBeTrue();
-    $response->assertRedirect(route('onboarding.index'));
+    $response->assertRedirect(route('dashboard'));
     $response->assertSessionHas('status', 'email-verified');
 
     // Check that user is now authenticated after verification

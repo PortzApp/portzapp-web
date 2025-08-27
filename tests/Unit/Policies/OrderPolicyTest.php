@@ -5,6 +5,7 @@ use App\Enums\OrganizationBusinessType;
 use App\Enums\UserRoles;
 use App\Models\Order;
 use App\Models\OrderGroup;
+use App\Models\OrderGroupService;
 use App\Models\Organization;
 use App\Models\Port;
 use App\Models\Service;
@@ -81,7 +82,13 @@ beforeEach(function (): void {
         'fulfilling_organization_id' => $this->shippingAgencyOrg->id,
         'status' => OrderGroupStatus::PENDING,
     ]);
-    $this->orderGroup1->services()->attach($this->service);
+    OrderGroupService::create([
+        'order_group_id' => $this->orderGroup1->id,
+        'service_id' => $this->service->id,
+        'status' => 'pending',
+        'price_snapshot' => $this->service->price,
+        'notes' => null,
+    ]);
 
     $this->orderFromVesselOwner2 = Order::factory()->create([
         'vessel_id' => $this->vessel2->id,
@@ -95,7 +102,13 @@ beforeEach(function (): void {
         'fulfilling_organization_id' => $this->shippingAgencyOrg2->id,
         'status' => OrderGroupStatus::PENDING,
     ]);
-    $this->orderGroup2->services()->attach($this->service2);
+    OrderGroupService::create([
+        'order_group_id' => $this->orderGroup2->id,
+        'service_id' => $this->service2->id,
+        'status' => 'pending',
+        'price_snapshot' => $this->service2->price,
+        'notes' => null,
+    ]);
 });
 
 describe('OrderPolicy viewAny', function (): void {
