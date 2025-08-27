@@ -5,6 +5,7 @@ namespace App\Observers;
 use App\Enums\OrderGroupServiceStatus;
 use App\Enums\OrderGroupStatus;
 use App\Enums\OrderStatus;
+use App\Events\OrderGroupServiceUpdated;
 use App\Events\OrderGroupUpdated;
 use App\Models\OrderGroup;
 
@@ -185,6 +186,15 @@ class OrderGroupObserver
             $service->withoutEvents(function () use ($service, $newServiceStatus) {
                 $service->update(['status' => $newServiceStatus]);
             });
+
+            // Manually dispatch OrderGroupServiceUpdated event since withoutEvents() prevents it
+            $user = auth()->user();
+            if (! $user && $service->orderGroup && $service->orderGroup->order) {
+                $user = $service->orderGroup->order->placedByUser;
+            }
+            if ($user) {
+                \App\Events\OrderGroupServiceUpdated::dispatch($user, $service->fresh());
+            }
         });
     }
 
