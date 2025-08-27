@@ -1,18 +1,17 @@
 import { useEffect, useState } from 'react';
 
-import OrderGroupsTab from '@/pages/orders/components/order-groups-tab';
 import OrderOverviewTab from '@/pages/orders/components/order-overview-tab';
-import OrderServicesTab from '@/pages/orders/components/order-services-tab';
-import OrderSystemTab from '@/pages/orders/components/order-system-tab';
+import OrderServicesGroupedTab from '@/pages/orders/components/order-services-grouped-tab';
+// import OrderSystemTab from '@/pages/orders/components/order-system-tab';
 import OrderVesselTab from '@/pages/orders/components/order-vessel-tab';
-import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { useEcho } from '@laravel/echo-react';
-import { Database, Edit, LayoutGrid, MapPin, Package, Ship, Trash2, Users } from 'lucide-react';
+import { Edit, LayoutGrid, MapPin, Package, Ship, Trash2 } from 'lucide-react';
 import { parseAsStringLiteral, useQueryState } from 'nuqs';
 import { toast } from 'sonner';
 
-import type { BreadcrumbItem, SharedData } from '@/types';
-import { OrderGroup, OrderGroupService, OrderWithRelations, Service } from '@/types/models';
+import type { BreadcrumbItem } from '@/types';
+import { OrderGroup, OrderGroupService, OrderWithRelations } from '@/types/models';
 
 import AppLayout from '@/layouts/app-layout';
 
@@ -57,10 +56,9 @@ interface OrderGroupServiceUpdatedEvent extends OrderEvent {
     };
 }
 
-const tabValues = ['overview', 'groups', 'services', 'vessel', 'system'] as const;
+const tabValues = ['overview', 'services', 'vessel'] as const;
 
 export default function ShowOrderPage({ order: initialOrder }: { order: OrderWithRelations }) {
-    const { auth } = usePage<SharedData>().props;
     const [order, setOrder] = useState(initialOrder);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
@@ -241,23 +239,19 @@ export default function ShowOrderPage({ order: initialOrder }: { order: OrderWit
                     }}
                     className="w-full"
                 >
-                    <TabsList className="grid w-full grid-cols-5">
+                    <TabsList className="grid w-full grid-cols-3">
                         <TabsTrigger value="overview" className="flex items-center gap-2">
                             <LayoutGrid className="h-4 w-4" />
                             Overview
-                        </TabsTrigger>
-                        <TabsTrigger value="groups" className="flex items-center gap-2">
-                            <Users className="h-4 w-4" />
-                            Order Groups
-                            <Badge variant="secondary" className="ml-1">
-                                {order.order_groups?.length || 0}
-                            </Badge>
                         </TabsTrigger>
                         <TabsTrigger value="services" className="flex items-center gap-2">
                             <Package className="h-4 w-4" />
                             Services
                             <Badge variant="secondary" className="ml-1">
-                                {(order.all_services || order.services || []).length}
+                                {order.order_groups?.reduce(
+                                    (count, group) => count + (group.order_group_services?.length || group.services?.length || 0),
+                                    0,
+                                ) || 0}
                             </Badge>
                         </TabsTrigger>
                         <TabsTrigger value="vessel" className="flex items-center gap-2">
@@ -267,10 +261,10 @@ export default function ShowOrderPage({ order: initialOrder }: { order: OrderWit
                                 1
                             </Badge>
                         </TabsTrigger>
-                        <TabsTrigger value="system" className="flex items-center gap-2">
+                        {/* <TabsTrigger value="system" className="flex items-center gap-2">
                             <Database className="h-4 w-4" />
                             System Info
-                        </TabsTrigger>
+                        </TabsTrigger> */}
                     </TabsList>
 
                     <div className="mt-6">
@@ -278,12 +272,8 @@ export default function ShowOrderPage({ order: initialOrder }: { order: OrderWit
                             <OrderOverviewTab order={order} />
                         </TabsContent>
 
-                        <TabsContent value="groups" className="space-y-4">
-                            <OrderGroupsTab orderGroups={order.order_groups || []} />
-                        </TabsContent>
-
                         <TabsContent value="services" className="space-y-4">
-                            <OrderServicesTab services={(order.all_services || order.services || []) as Service[]} />
+                            <OrderServicesGroupedTab orderGroups={order.order_groups || []} />
                         </TabsContent>
 
                         <TabsContent value="vessel" className="space-y-4">
@@ -353,9 +343,9 @@ export default function ShowOrderPage({ order: initialOrder }: { order: OrderWit
                             </div>
                         </TabsContent>
 
-                        <TabsContent value="system" className="space-y-4">
+                        {/* <TabsContent value="system" className="space-y-4">
                             <OrderSystemTab order={order} />
-                        </TabsContent>
+                        </TabsContent> */}
                     </div>
                 </Tabs>
             </div>
