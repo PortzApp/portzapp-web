@@ -44,7 +44,9 @@ class OrderGroupUpdated implements ShouldBroadcastNow
                 'name' => $this->user->first_name.' '.$this->user->last_name,
                 'email' => $this->user->email,
             ],
-            'orderGroup' => $this->orderGroup->toArray(),
+            'orderGroup' => array_merge($this->orderGroup->toArray(), [
+                'order_id' => $this->orderGroup->order_id,
+            ]),
             'timestamp' => now()->toISOString(),
         ];
     }

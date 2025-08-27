@@ -44,7 +44,9 @@ interface OrderUpdatedEvent extends OrderEvent {
 }
 
 interface OrderGroupUpdatedEvent extends OrderEvent {
-    orderGroup: OrderGroup;
+    orderGroup: OrderGroup & {
+        order_id: string;
+    };
 }
 
 interface OrderGroupServiceUpdatedEvent extends OrderEvent {
@@ -98,8 +100,10 @@ export default function ShowOrderPage({ order: initialOrder }: { order: OrderWit
         'order-groups.updated',
         'OrderGroupUpdated',
         ({ orderGroup: updatedOrderGroup }) => {
-            // Check if this order group belongs to the current order
-            const belongsToCurrentOrder = order.order_groups?.some((og) => og.id === updatedOrderGroup.id);
+            // Check if this order group belongs to the current order by checking both order_id and group ID
+            const belongsToCurrentOrder = 
+                (updatedOrderGroup.order_id === order.id) ||
+                order.order_groups?.some((og) => og.id === updatedOrderGroup.id);
 
             if (belongsToCurrentOrder) {
                 setOrder((prevOrder) => ({
