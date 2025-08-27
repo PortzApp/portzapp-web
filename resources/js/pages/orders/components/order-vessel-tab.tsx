@@ -1,8 +1,8 @@
 import { Anchor, Building2, Calendar, Ship } from 'lucide-react';
 
-import { cn } from '@/lib/utils';
-
 import { VesselType } from '@/types/enums';
+
+import { cn } from '@/lib/utils';
 
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';

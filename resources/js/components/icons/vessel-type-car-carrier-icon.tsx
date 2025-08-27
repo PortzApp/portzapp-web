@@ -37,16 +37,8 @@ const CarCarrierIcon = (props: SVGProps<SVGSVGElement>) => (
             fill="#2563EB"
             transform="translate(71,75)"
         />
-        <path
-            d="M0 0 C4 2 8 4 12 6 C12 8 12 10 12 12 C8 10 4 8 0 6 C0 4 0 2 0 0 Z"
-            fill="#1E40AF"
-            transform="translate(150,45)"
-        />
-        <path
-            d="M0 0 C4 2 8 4 12 6 C12 8 12 10 12 12 C8 10 4 8 0 6 C0 4 0 2 0 0 Z"
-            fill="#1E40AF"
-            transform="translate(180,45)"
-        />
+        <path d="M0 0 C4 2 8 4 12 6 C12 8 12 10 12 12 C8 10 4 8 0 6 C0 4 0 2 0 0 Z" fill="#1E40AF" transform="translate(150,45)" />
+        <path d="M0 0 C4 2 8 4 12 6 C12 8 12 10 12 12 C8 10 4 8 0 6 C0 4 0 2 0 0 Z" fill="#1E40AF" transform="translate(180,45)" />
     </svg>
 );
 export default CarCarrierIcon;

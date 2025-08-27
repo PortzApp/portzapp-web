@@ -494,7 +494,9 @@ export default function ShowOrderGroupPage({
 
                                 <div className="flex items-center justify-between text-lg font-bold">
                                     <span>Total Price:</span>
-                                    <span className="tabular-nums">${totalPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                    <span className="tabular-nums">
+                                        ${totalPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                    </span>
                                 </div>
                             </div>
                         </CardContent>
