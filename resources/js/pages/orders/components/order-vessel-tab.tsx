@@ -2,15 +2,19 @@ import { Anchor, Building2, Calendar, Ship } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 
+import { VesselType } from '@/types/enums';
+
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+
+import { VesselTypeBadge } from '@/components/badges';
 
 type Vessel = {
     id: string;
     organization_id: string;
     name: string;
     imo_number: string;
-    vessel_type: string;
+    vessel_type: VesselType;
     status: string;
     created_at: string;
     updated_at: string;
@@ -21,17 +25,6 @@ interface OrderVesselTabProps {
 }
 
 export default function OrderVesselTab({ vessel }: OrderVesselTabProps) {
-    const vesselTypeIcons: Record<string, string> = {
-        container_ship: '🚢',
-        tanker: '🛢️',
-        bulk_carrier: '⚓',
-        passenger_ship: '🛳️',
-        gas_carrier: '⛽',
-        dry_bulk: '📦',
-        naval_ship: '⚔️',
-        yacht: '🛥️',
-    };
-
     return (
         <div className="space-y-6">
             {/* Vessel Overview */}
@@ -61,7 +54,9 @@ export default function OrderVesselTab({ vessel }: OrderVesselTabProps) {
                 <CardContent>
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
                         <div className="rounded-lg bg-muted/50 p-4 text-center">
-                            <div className="mb-2 text-2xl">{vesselTypeIcons[vessel.vessel_type] || '🚢'}</div>
+                            <div className="mb-2">
+                                <VesselTypeBadge type={vessel.vessel_type} iconOnly className="size-8" />
+                            </div>
                             <div className="text-sm font-medium">Vessel Type</div>
                             <div className="text-xs text-muted-foreground capitalize">{vessel.vessel_type.replace('_', ' ')}</div>
                         </div>
@@ -111,10 +106,8 @@ export default function OrderVesselTab({ vessel }: OrderVesselTabProps) {
                         <div className="flex items-center justify-between">
                             <span className="text-sm font-medium text-muted-foreground">Vessel Type:</span>
                             <div className="flex items-center gap-2">
-                                <span className="text-lg">{vesselTypeIcons[vessel.vessel_type] || '🚢'}</span>
-                                <Badge variant="outline" className="capitalize">
-                                    {vessel.vessel_type.replace('_', ' ')}
-                                </Badge>
+                                <VesselTypeBadge type={vessel.vessel_type} iconOnly className="size-4" />
+                                <VesselTypeBadge type={vessel.vessel_type} />
                             </div>
                         </div>
                         <div className="flex items-center justify-between">
@@ -199,22 +192,23 @@ export default function OrderVesselTab({ vessel }: OrderVesselTabProps) {
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                         <div>
                             <h4 className="mb-2 flex items-center gap-2 font-medium">
-                                <span className="text-2xl">{vesselTypeIcons[vessel.vessel_type] || '🚢'}</span>
+                                <VesselTypeBadge type={vessel.vessel_type} iconOnly className="size-8" />
                                 {vessel.vessel_type.replace('_', ' ').toUpperCase()}
                             </h4>
                             <div className="text-sm text-muted-foreground">
                                 {vessel.vessel_type === 'container_ship' &&
                                     'Designed to carry containerized cargo in truck-size intermodal containers.'}
-                                {vessel.vessel_type === 'tanker' &&
+                                {vessel.vessel_type === 'tanker_ship' &&
                                     'Specialized for transporting liquid bulk cargo such as crude oil, petroleum products, and chemicals.'}
                                 {vessel.vessel_type === 'bulk_carrier' &&
                                     'Designed to transport unpackaged bulk cargo such as grains, coal, ore, and cement.'}
-                                {vessel.vessel_type === 'passenger_ship' &&
+                                {vessel.vessel_type === 'passenger_ships' &&
                                     'Built to carry passengers on voyages, including cruise ships and ferries.'}
                                 {vessel.vessel_type === 'gas_carrier' && 'Specialized vessels for transporting liquefied gases such as LNG and LPG.'}
                                 {vessel.vessel_type === 'dry_bulk' && 'Carries dry bulk cargo such as coal, iron ore, grain, and other commodities.'}
-                                {vessel.vessel_type === 'naval_ship' && 'Military vessels designed for naval warfare and defense operations.'}
+                                {vessel.vessel_type === 'naval_ships' && 'Military vessels designed for naval warfare and defense operations.'}
                                 {vessel.vessel_type === 'yacht' && 'Recreational or luxury vessel used for pleasure cruising and entertainment.'}
+                                {vessel.vessel_type === 'car_carrier' && 'Specialized vessels designed to transport automobiles and other vehicles.'}
                             </div>
                         </div>
                         <div>
@@ -228,7 +222,7 @@ export default function OrderVesselTab({ vessel }: OrderVesselTabProps) {
                                         <li>• Regular scheduled routes</li>
                                     </>
                                 )}
-                                {vessel.vessel_type === 'tanker' && (
+                                {vessel.vessel_type === 'tanker_ship' && (
                                     <>
                                         <li>• Specialized tank compartments</li>
                                         <li>• Safety systems for liquid cargo</li>
@@ -244,7 +238,15 @@ export default function OrderVesselTab({ vessel }: OrderVesselTabProps) {
                                         <li>• Efficient cargo handling</li>
                                     </>
                                 )}
-                                {(vessel.vessel_type === 'passenger_ship' || vessel.vessel_type === 'yacht') && (
+                                {vessel.vessel_type === 'car_carrier' && (
+                                    <>
+                                        <li>• Multi-level vehicle decks</li>
+                                        <li>• Adjustable ramps and platforms</li>
+                                        <li>• Secure vehicle fastening systems</li>
+                                        <li>• Weather protection for cargo</li>
+                                    </>
+                                )}
+                                {(vessel.vessel_type === 'passenger_ships' || vessel.vessel_type === 'yacht') && (
                                     <>
                                         <li>• Passenger accommodations</li>
                                         <li>• Safety and comfort features</li>
@@ -254,7 +256,7 @@ export default function OrderVesselTab({ vessel }: OrderVesselTabProps) {
                                 )}
                                 {(vessel.vessel_type === 'gas_carrier' ||
                                     vessel.vessel_type === 'dry_bulk' ||
-                                    vessel.vessel_type === 'naval_ship') && (
+                                    vessel.vessel_type === 'naval_ships') && (
                                     <>
                                         <li>• Specialized equipment</li>
                                         <li>• Advanced safety systems</li>

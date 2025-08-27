@@ -9,7 +9,6 @@ import { Vessel } from '@/types/models';
 
 import AppLayout from '@/layouts/app-layout';
 
-import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -24,7 +23,7 @@ import {
 } from '@/components/ui/dialog';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
-import { VesselStatusBadge } from '@/components/badges';
+import { VesselStatusBadge, VesselTypeBadge } from '@/components/badges';
 
 export default function ShowVesselPage({ vessel }: { vessel: Vessel }) {
     const { auth } = usePage<SharedData>().props;
@@ -116,7 +115,7 @@ export default function ShowVesselPage({ vessel }: { vessel: Vessel }) {
                             </div>
                             <div className="flex justify-between">
                                 <span className="text-sm font-medium text-muted-foreground">Type:</span>
-                                <Badge className="bg-neutral-100 text-neutral-800 capitalize">{vessel.vessel_type.replace('_', ' ')}</Badge>
+                                <VesselTypeBadge type={vessel.vessel_type} />
                             </div>
                             <div className="flex justify-between">
                                 <span className="text-sm font-medium text-muted-foreground">Status:</span>
