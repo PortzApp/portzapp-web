@@ -28,10 +28,7 @@ class OrderGroupUpdated implements ShouldBroadcastNow
     public function broadcastOn(): array
     {
         return [
-            // Organization-scoped channel for index pages
-            new PrivateChannel('order-groups.organization.'.$this->orderGroup->fulfilling_organization_id),
-            // Resource-specific channel for detail pages
-            new PrivateChannel('order-groups.'.$this->orderGroup->id),
+            new PrivateChannel('order-groups'),
         ];
     }
 

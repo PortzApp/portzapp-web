@@ -27,24 +27,9 @@ class OrderGroupServiceUpdated implements ShouldBroadcastNow
      */
     public function broadcastOn(): array
     {
-        $channels = [];
-
-        // Load relationships if not already loaded
-        $this->orderGroupService->loadMissing(['orderGroup', 'service']);
-
-        // Organization-scoped channels for index pages
-        if ($this->orderGroupService->orderGroup) {
-            $channels[] = new PrivateChannel('order-group-services.organization.'.$this->orderGroupService->orderGroup->fulfilling_organization_id);
-        }
-
-        if ($this->orderGroupService->service) {
-            $channels[] = new PrivateChannel('order-group-services.organization.'.$this->orderGroupService->service->organization_id);
-        }
-
-        // Resource-specific channel for detail pages
-        $channels[] = new PrivateChannel('order-group-services.'.$this->orderGroupService->id);
-
-        return array_unique($channels, SORT_REGULAR);
+        return [
+            new PrivateChannel('order-group-services'),
+        ];
     }
 
     /**
