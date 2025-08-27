@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { Head, router, usePage } from '@inertiajs/react';
 import { useEcho } from '@laravel/echo-react';
-import { MoreVertical } from 'lucide-react';
+import { Copy, Eye, MapPin, MoreVertical, Package, Ship, Tag } from 'lucide-react';
 import { toast } from 'sonner';
 
 import type { BreadcrumbItem, SharedData } from '@/types';
@@ -91,6 +91,16 @@ export default function ShowOrderGroupPage({
 
     const breadcrumbs = getBreadcrumbs(orderGroup);
 
+    // Copy to clipboard function
+    const copyToClipboard = async (text: string, type: string) => {
+        try {
+            await navigator.clipboard.writeText(text);
+            toast.success(`${type} copied to clipboard!`);
+        } catch {
+            toast.error(`Failed to copy ${type.toLowerCase()}`);
+        }
+    };
+
     // Listen for order group updated events on static channel
     useEcho<OrderGroupUpdatedEvent>('order-groups.updated', 'OrderGroupUpdated', ({ orderGroup: updatedOrderGroup }) => {
         // Update main order group if it's the current one
@@ -101,8 +111,8 @@ export default function ShowOrderGroupPage({
                 updated_at: updatedOrderGroup.updated_at,
             }));
 
-            toast('Order group updated', {
-                description: `Order group #${updatedOrderGroup.group_number} status changed to ${updatedOrderGroup.status?.replace(/_/g, ' ')}`,
+            toast('Order updated', {
+                description: `Order #${updatedOrderGroup.group_number} status changed to ${updatedOrderGroup.status?.replace(/_/g, ' ')}`,
                 classNames: {
                     description: '!text-muted-foreground',
                 },
@@ -124,13 +134,13 @@ export default function ShowOrderGroupPage({
                 ),
             );
 
-            toast('Related order group updated', {
-                description: `Order group #${updatedOrderGroup.group_number} status changed to ${updatedOrderGroup.status?.replace(/_/g, ' ')}`,
+            toast('Related order updated', {
+                description: `Order #${updatedOrderGroup.group_number} status changed to ${updatedOrderGroup.status?.replace(/_/g, ' ')}`,
                 classNames: {
                     description: '!text-muted-foreground',
                 },
                 action: {
-                    label: 'View Order Group',
+                    label: 'View Order',
                     onClick: () => {
                         router.visit(route('order-groups.show', updatedOrderGroup.id));
                     },
@@ -289,13 +299,13 @@ export default function ShowOrderGroupPage({
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`Order Group ${orderGroup.group_number}`} />
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-4">
+            <Head title={`Order ${orderGroup.group_number}`} />
+            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-8">
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-2xl font-bold">{orderGroup.group_number}</h1>
-                        <p className="text-muted-foreground">Order group assigned to your agency</p>
+                        <p className="text-muted-foreground">Order assigned to your agency</p>
                     </div>
                     <div className="flex items-center gap-2">
                         <OrderGroupStatusBadge status={orderGroup.status} />
@@ -306,11 +316,20 @@ export default function ShowOrderGroupPage({
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                                {getValidOrderGroupStatusTransitions(orderGroup.status).map((status) => (
-                                    <DropdownMenuItem key={status} onClick={() => handleOrderGroupStatusChange(status)}>
-                                        Mark as {getOrderGroupStatusLabel(status)}
-                                    </DropdownMenuItem>
-                                ))}
+                                <DropdownMenuItem onClick={() => copyToClipboard(orderGroup.id, 'Order ID')}>
+                                    <Copy className="mr-2 h-4 w-4" />
+                                    Copy Order ID
+                                </DropdownMenuItem>
+                                {getValidOrderGroupStatusTransitions(orderGroup.status).length > 0 && (
+                                    <>
+                                        <Separator />
+                                        {getValidOrderGroupStatusTransitions(orderGroup.status).map((status) => (
+                                            <DropdownMenuItem key={status} onClick={() => handleOrderGroupStatusChange(status)}>
+                                                Mark as {getOrderGroupStatusLabel(status)}
+                                            </DropdownMenuItem>
+                                        ))}
+                                    </>
+                                )}
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
@@ -320,12 +339,12 @@ export default function ShowOrderGroupPage({
                 <div className="flex flex-wrap gap-2">
                     {canAccept && (
                         <Button onClick={handleAccept} variant="default" className="bg-green-600 hover:bg-green-700">
-                            Accept Order Group
+                            Accept Order
                         </Button>
                     )}
                     {canReject && (
                         <Button onClick={handleReject} variant="destructive">
-                            Reject Order Group
+                            Reject Order
                         </Button>
                     )}
                     {canStart && (
@@ -340,46 +359,20 @@ export default function ShowOrderGroupPage({
                     )}
                 </div>
 
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                    {/* Parent Order Information */}
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Parent Order Details</CardTitle>
-                            <CardDescription>Information about the main order this group belongs to</CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="flex justify-between">
-                                <span className="font-medium">Order Number:</span>
-                                <span>{parentOrder.order_number}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="font-medium">Status:</span>
-                                <OrderStatusBadge status={parentOrder.status} />
-                            </div>
-                            <Separator />
-                            <div className="space-y-2">
-                                <div className="flex justify-between">
-                                    <span className="font-medium">Placed by:</span>
-                                    <span>
-                                        {orderGroup.order.placed_by_user.first_name} {orderGroup.order.placed_by_user.last_name}
-                                    </span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span className="font-medium">Organization:</span>
-                                    <span>{orderGroup.order.placed_by_organization.name}</span>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    {/* Vessel & Port Information */}
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Vessel & Port</CardTitle>
-                            <CardDescription>Details about the vessel and destination port</CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="space-y-2">
+                {/* Vessel & Port Information */}
+                <div>
+                    <h2 className="mb-4 flex items-center gap-2 text-xl font-semibold">
+                        <Ship className="h-5 w-5" />
+                        Vessel & Port Information
+                    </h2>
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                        {/* Vessel Information */}
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Vessel Information</CardTitle>
+                                <CardDescription>Details about the vessel</CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
                                 <div className="flex items-center justify-between">
                                     <span className="font-medium">Vessel:</span>
                                     <div className="flex items-center gap-2">
@@ -391,9 +384,16 @@ export default function ShowOrderGroupPage({
                                     <span className="font-medium">IMO Number:</span>
                                     <span>{orderGroup.order.vessel.imo_number}</span>
                                 </div>
-                            </div>
-                            <Separator />
-                            <div className="space-y-2">
+                            </CardContent>
+                        </Card>
+
+                        {/* Port Information */}
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Port Information</CardTitle>
+                                <CardDescription>Details about the destination port</CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
                                 <div className="flex justify-between">
                                     <span className="font-medium">Port:</span>
                                     <span>{orderGroup.order.port.name}</span>
@@ -404,22 +404,29 @@ export default function ShowOrderGroupPage({
                                         {orderGroup.order.port.city}, {orderGroup.order.port.country}
                                     </span>
                                 </div>
-                            </div>
-                        </CardContent>
-                    </Card>
+                            </CardContent>
+                        </Card>
+                    </div>
+                </div>
 
-                    {/* OrderGroupServices */}
-                    <Card className="md:col-span-2">
+                {/* Service Details */}
+                <div>
+                    <h2 className="mb-4 flex items-center gap-2 text-xl font-semibold">
+                        <Package className="h-5 w-5" />
+                        Service Details
+                    </h2>
+                    <Card>
                         <CardHeader>
                             <CardTitle>Services ({orderGroup.order_group_services?.length || 0})</CardTitle>
                             <CardDescription>Services assigned to your agency for this order</CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <div className="space-y-4">
+                            <div className="space-y-3">
                                 {orderGroup.order_group_services?.map((orderGroupService) => (
-                                    <div key={orderGroupService.id} className="flex items-center justify-between rounded-lg bg-muted/50 p-3">
+                                    <div key={orderGroupService.id} className="flex items-start justify-between rounded-lg border p-4">
                                         <div className="flex-1">
-                                            <div className="flex items-center gap-2">
+                                            <div className="mb-2 flex items-center gap-2">
+                                                <Tag className="h-4 w-4" />
                                                 <h4 className="font-medium">{orderGroupService.service?.sub_category?.name || 'Service'}</h4>
                                                 {orderGroupService.service?.sub_category?.category?.name && (
                                                     <ServiceCategoryBadge categoryName={orderGroupService.service.sub_category.category.name} />
@@ -427,25 +434,44 @@ export default function ShowOrderGroupPage({
                                                 <OrderGroupServiceStatusBadge status={orderGroupService.status} />
                                             </div>
                                             {orderGroupService.service?.description && (
-                                                <p className="text-sm text-muted-foreground">{orderGroupService.service.description}</p>
+                                                <p className="mb-2 text-sm text-muted-foreground">{orderGroupService.service.description}</p>
                                             )}
                                             {orderGroupService.notes && (
-                                                <p className="text-sm text-muted-foreground italic">Notes: {orderGroupService.notes}</p>
+                                                <div className="mt-2">
+                                                    <p className="text-sm text-muted-foreground">
+                                                        <strong>Notes:</strong> {orderGroupService.notes}
+                                                    </p>
+                                                </div>
                                             )}
                                         </div>
-                                        <div className="flex items-center gap-2">
+                                        <div className="flex items-center gap-3">
                                             <div className="text-right">
-                                                <p className="font-bold tabular-nums">
-                                                    ${parseFloat(orderGroupService.price_snapshot.toString()).toFixed(2)}
-                                                </p>
+                                                <div className="text-lg font-semibold tabular-nums">
+                                                    $
+                                                    {parseFloat(orderGroupService.price_snapshot.toString()).toLocaleString('en-US', {
+                                                        minimumFractionDigits: 2,
+                                                        maximumFractionDigits: 2,
+                                                    })}
+                                                </div>
                                             </div>
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="sm">
-                                                        <MoreVertical className="size-4" />
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                                                        <MoreVertical className="h-4 w-4" />
+                                                        <span className="sr-only">Open menu</span>
                                                     </Button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end">
+                                                    <DropdownMenuItem
+                                                        onClick={() => router.visit(route('services.show', orderGroupService.service_id))}
+                                                    >
+                                                        <Eye className="mr-2 h-4 w-4" />
+                                                        View details
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => copyToClipboard(orderGroupService.service_id, 'Service ID')}>
+                                                        <Copy className="mr-2 h-4 w-4" />
+                                                        Copy service ID
+                                                    </DropdownMenuItem>
                                                     <DropdownMenuSub>
                                                         <DropdownMenuSubTrigger>Update Status</DropdownMenuSubTrigger>
                                                         <DropdownMenuSubContent>
@@ -470,52 +496,24 @@ export default function ShowOrderGroupPage({
 
                                 <div className="flex items-center justify-between text-lg font-bold">
                                     <span>Total Price:</span>
-                                    <span className="tabular-nums">${totalPrice.toFixed(2)}</span>
+                                    <span className="tabular-nums">${totalPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                 </div>
                             </div>
                         </CardContent>
                     </Card>
-
-                    {/* Other Order Groups (for context) */}
-                    {siblingOrderGroups.length > 0 && (
-                        <Card className="md:col-span-2">
-                            <CardHeader>
-                                <CardTitle>Other Groups in this Order</CardTitle>
-                                <CardDescription>Other agencies also working on this order (for your information only)</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="grid gap-3">
-                                    {siblingOrderGroups.map((group) => (
-                                        <div key={group.id} className="flex items-center justify-between rounded-lg bg-muted/30 p-3">
-                                            <div>
-                                                <p className="font-medium">{group.group_number}</p>
-                                                <p className="text-sm text-muted-foreground">{group.fulfilling_organization.name}</p>
-                                            </div>
-                                            <div className="text-right">
-                                                <OrderGroupStatusBadge status={group.status} />
-                                                <p className="mt-1 text-sm text-muted-foreground">
-                                                    {group.order_group_services?.length || 0} services
-                                                </p>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </CardContent>
-                        </Card>
-                    )}
-
-                    {/* Notes */}
-                    {orderGroup.notes && (
-                        <Card className="md:col-span-2">
-                            <CardHeader>
-                                <CardTitle>Notes</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <p>{orderGroup.notes}</p>
-                            </CardContent>
-                        </Card>
-                    )}
                 </div>
+
+                {/* Notes */}
+                {orderGroup.notes && (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Notes</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <p>{orderGroup.notes}</p>
+                        </CardContent>
+                    </Card>
+                )}
             </div>
         </AppLayout>
     );
