@@ -255,7 +255,7 @@ export default function OrderSystemTab({ order }: OrderSystemTabProps) {
                 </CardHeader>
                 <CardContent>
                     <div className="space-y-4">
-                        {order.services.map((service, index) => (
+                        {(order.services || []).map((service, index) => (
                             <div key={service.id} className="rounded-lg border p-4">
                                 <div className="mb-3 flex items-center justify-between">
                                     <div className="flex items-center gap-2">
