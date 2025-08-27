@@ -53,6 +53,8 @@ composer lint:backend               # Run Laravel Pint
 
 **IMPORTANT:** Always use Git CLI commands exclusively for all git operations. Use `git` commands via Bash tool for commits, branching, pushing, etc. Do not use any other git tools or interfaces.
 
+**CRITICAL:** NEVER DO `git add .` - always manually add relevant files to `git add` when staging changes. Be selective about which files to stage to avoid accidentally committing unwanted changes.
+
 ## Architecture Overview
 
 **Laravel Conventions:**
