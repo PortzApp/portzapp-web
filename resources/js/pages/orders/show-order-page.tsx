@@ -48,7 +48,10 @@ interface OrderGroupUpdatedEvent extends OrderEvent {
 }
 
 interface OrderGroupServiceUpdatedEvent extends OrderEvent {
-    orderGroupService: OrderGroupService;
+    orderGroupService: OrderGroupService & {
+        order_id?: string;
+        order_group_id: string;
+    };
 }
 
 export default function ShowOrderPage({ order: initialOrder }: { order: OrderWithRelations }) {
@@ -133,10 +136,12 @@ export default function ShowOrderPage({ order: initialOrder }: { order: OrderWit
         'order-group-services.updated',
         'OrderGroupServiceUpdated',
         ({ orderGroupService: updatedOrderGroupService }) => {
-            // Check if this service belongs to any order group in the current order
-            const belongsToCurrentOrder = order.order_groups?.some((og) =>
-                og.order_group_services?.some((ogs) => ogs.id === updatedOrderGroupService.id),
-            );
+            // Check if this service belongs to the current order by checking both order_id and service ID
+            const belongsToCurrentOrder = 
+                (updatedOrderGroupService.order_id === order.id) ||
+                order.order_groups?.some((og) =>
+                    og.order_group_services?.some((ogs) => ogs.id === updatedOrderGroupService.id),
+                );
 
             if (belongsToCurrentOrder) {
                 setOrder((prevOrder) => ({

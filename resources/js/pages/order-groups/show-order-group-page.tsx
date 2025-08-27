@@ -44,7 +44,10 @@ interface OrderGroupUpdatedEvent extends OrderGroupEvent {
 }
 
 interface OrderGroupServiceUpdatedEvent extends OrderGroupEvent {
-    orderGroupService: OrderGroupService;
+    orderGroupService: OrderGroupService & {
+        order_id?: string;
+        order_group_id: string;
+    };
 }
 
 interface OrderUpdatedEvent extends OrderGroupEvent {
