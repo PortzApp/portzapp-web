@@ -25,14 +25,9 @@ class OrderUpdated implements ShouldBroadcastNow
     /**
      * Get the channels the event should broadcast on.
      */
-    public function broadcastOn(): array
+    public function broadcastOn(): PrivateChannel
     {
-        return [
-            // Organization-scoped channel for index pages
-            new PrivateChannel('orders.organization.'.$this->order->placed_by_organization_id),
-            // Resource-specific channel for detail pages
-            new PrivateChannel('orders.'.$this->order->id),
-        ];
+        return new PrivateChannel('orders.updated');
     }
 
     /**
