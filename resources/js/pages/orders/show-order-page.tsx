@@ -44,11 +44,16 @@ interface OrderUpdatedEvent extends OrderEvent {
 }
 
 interface OrderGroupUpdatedEvent extends OrderEvent {
-    orderGroup: OrderGroup;
+    orderGroup: OrderGroup & {
+        order_id: string;
+    };
 }
 
 interface OrderGroupServiceUpdatedEvent extends OrderEvent {
-    orderGroupService: OrderGroupService;
+    orderGroupService: OrderGroupService & {
+        order_id?: string;
+        order_group_id: string;
+    };
 }
 
 export default function ShowOrderPage({ order: initialOrder }: { order: OrderWithRelations }) {
@@ -72,8 +77,8 @@ export default function ShowOrderPage({ order: initialOrder }: { order: OrderWit
         },
     ];
 
-    // Listen for order updated events on resource-specific channel
-    useEcho<OrderUpdatedEvent>(`orders.${order.id}`, 'OrderUpdated', ({ order: updatedOrder }) => {
+    // Listen for order updated events on static channel
+    useEcho<OrderUpdatedEvent>('orders.updated', 'OrderUpdated', ({ order: updatedOrder }) => {
         if (updatedOrder.id === order.id) {
             setOrder((prevOrder) => ({
                 ...prevOrder,
@@ -90,13 +95,15 @@ export default function ShowOrderPage({ order: initialOrder }: { order: OrderWit
         }
     });
 
-    // Listen for order group updated events on organization-scoped channel
+    // Listen for order group updated events on static channel
     useEcho<OrderGroupUpdatedEvent>(
-        `order-groups.organization.${auth.user.current_organization?.id}`,
+        'order-groups.updated',
         'OrderGroupUpdated',
         ({ orderGroup: updatedOrderGroup }) => {
-            // Check if this order group belongs to the current order
-            const belongsToCurrentOrder = order.order_groups?.some((og) => og.id === updatedOrderGroup.id);
+            // Check if this order group belongs to the current order by checking both order_id and group ID
+            const belongsToCurrentOrder = 
+                (updatedOrderGroup.order_id === order.id) ||
+                order.order_groups?.some((og) => og.id === updatedOrderGroup.id);
 
             if (belongsToCurrentOrder) {
                 setOrder((prevOrder) => ({
@@ -128,15 +135,17 @@ export default function ShowOrderPage({ order: initialOrder }: { order: OrderWit
         },
     );
 
-    // Listen for order group service updated events on organization-scoped channel
+    // Listen for order group service updated events on static channel
     useEcho<OrderGroupServiceUpdatedEvent>(
-        `order-group-services.organization.${auth.user.current_organization?.id}`,
+        'order-group-services.updated',
         'OrderGroupServiceUpdated',
         ({ orderGroupService: updatedOrderGroupService }) => {
-            // Check if this service belongs to any order group in the current order
-            const belongsToCurrentOrder = order.order_groups?.some((og) =>
-                og.order_group_services?.some((ogs) => ogs.id === updatedOrderGroupService.id),
-            );
+            // Check if this service belongs to the current order by checking both order_id and service ID
+            const belongsToCurrentOrder = 
+                (updatedOrderGroupService.order_id === order.id) ||
+                order.order_groups?.some((og) =>
+                    og.order_group_services?.some((ogs) => ogs.id === updatedOrderGroupService.id),
+                );
 
             if (belongsToCurrentOrder) {
                 setOrder((prevOrder) => ({

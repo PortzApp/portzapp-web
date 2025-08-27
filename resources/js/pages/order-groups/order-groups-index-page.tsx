@@ -42,11 +42,14 @@ export default function OrderGroupsIndexPage({ orderGroups: initialOrderGroups }
         setOrderGroups(initialOrderGroups);
     }, [initialOrderGroups]);
 
-    // Listen for order group updated events on organization-scoped channel
+    // Listen for order group updated events on static channel
     useEcho<OrderGroupUpdatedEvent>(
-        `order-groups.organization.${auth.user.current_organization?.id}`,
+        'order-groups.updated',
         'OrderGroupUpdated',
         ({ orderGroup: updatedOrderGroup }) => {
+            // Only update order groups that belong to the current organization
+            const belongsToCurrentOrganization = updatedOrderGroup.fulfilling_organization_id === auth.user.current_organization?.id;
+            if (!belongsToCurrentOrganization) return;
             setOrderGroups((prevOrderGroups) =>
                 prevOrderGroups.map((prevOrderGroup) =>
                     prevOrderGroup.id === updatedOrderGroup.id

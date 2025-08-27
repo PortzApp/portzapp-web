@@ -25,26 +25,9 @@ class OrderGroupServiceUpdated implements ShouldBroadcastNow
     /**
      * Get the channels the event should broadcast on.
      */
-    public function broadcastOn(): array
+    public function broadcastOn(): PrivateChannel
     {
-        $channels = [];
-
-        // Load relationships if not already loaded
-        $this->orderGroupService->loadMissing(['orderGroup', 'service']);
-
-        // Organization-scoped channels for index pages
-        if ($this->orderGroupService->orderGroup) {
-            $channels[] = new PrivateChannel('order-group-services.organization.'.$this->orderGroupService->orderGroup->fulfilling_organization_id);
-        }
-
-        if ($this->orderGroupService->service) {
-            $channels[] = new PrivateChannel('order-group-services.organization.'.$this->orderGroupService->service->organization_id);
-        }
-
-        // Resource-specific channel for detail pages
-        $channels[] = new PrivateChannel('order-group-services.'.$this->orderGroupService->id);
-
-        return array_unique($channels, SORT_REGULAR);
+        return new PrivateChannel('order-group-services.updated');
     }
 
     /**
@@ -54,6 +37,9 @@ class OrderGroupServiceUpdated implements ShouldBroadcastNow
      */
     public function broadcastWith(): array
     {
+        // Load the orderGroup relationship to get order information
+        $this->orderGroupService->load('orderGroup.order');
+
         return [
             'message' => 'Order group service updated successfully',
             'user' => [
@@ -61,7 +47,10 @@ class OrderGroupServiceUpdated implements ShouldBroadcastNow
                 'name' => $this->user->first_name.' '.$this->user->last_name,
                 'email' => $this->user->email,
             ],
-            'orderGroupService' => $this->orderGroupService->toArray(),
+            'orderGroupService' => array_merge($this->orderGroupService->toArray(), [
+                'order_group_id' => $this->orderGroupService->order_group_id,
+                'order_id' => $this->orderGroupService->orderGroup?->order?->id,
+            ]),
             'timestamp' => now()->toISOString(),
         ];
     }

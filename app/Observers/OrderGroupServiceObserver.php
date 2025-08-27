@@ -100,6 +100,15 @@ class OrderGroupServiceObserver
             $orderGroup->withoutEvents(function () use ($orderGroup, $newOrderGroupStatus) {
                 $orderGroup->update(['status' => $newOrderGroupStatus]);
             });
+
+            // Manually dispatch OrderGroupUpdated event since withoutEvents() prevents it
+            $user = auth()->user();
+            if (! $user && $orderGroup->order) {
+                $user = $orderGroup->order->placedByUser;
+            }
+            if ($user) {
+                \App\Events\OrderGroupUpdated::dispatch($user, $orderGroup->fresh());
+            }
         }
     }
 
