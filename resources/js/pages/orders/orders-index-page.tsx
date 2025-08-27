@@ -44,8 +44,11 @@ export default function OrdersIndexPage({ orders: initialOrders }: { orders: Arr
         setOrders(initialOrders);
     }, [initialOrders]);
 
-    // Listen for order updated events on organization-scoped channel
-    useEcho<OrderUpdatedEvent>(`orders.organization.${auth.user.current_organization?.id}`, 'OrderUpdated', ({ order: updatedOrder }) => {
+    // Listen for order updated events on static channel
+    useEcho<OrderUpdatedEvent>('orders.updated', 'OrderUpdated', ({ order: updatedOrder }) => {
+        // Only update orders that belong to the current organization
+        const belongsToCurrentOrganization = updatedOrder.placed_by_organization_id === auth.user.current_organization?.id;
+        if (!belongsToCurrentOrganization) return;
         setOrders((prevOrders) =>
             prevOrders.map((prevOrder) =>
                 prevOrder.id === updatedOrder.id
