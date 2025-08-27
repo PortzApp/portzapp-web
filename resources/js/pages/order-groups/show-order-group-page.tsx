@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 
-import { Head, router, usePage } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { useEcho } from '@laravel/echo-react';
-import { Copy, Eye, MapPin, MoreVertical, Package, Ship, Tag } from 'lucide-react';
+import { Copy, Eye, MoreVertical, Package, Ship, Tag } from 'lucide-react';
 import { toast } from 'sonner';
 
-import type { BreadcrumbItem, SharedData } from '@/types';
+import type { BreadcrumbItem } from '@/types';
 import { OrderGroupServiceStatus, OrderGroupStatus } from '@/types/enums';
 import { OrderBase, OrderGroup, OrderGroupService, OrderWithRelations } from '@/types/models';
 
@@ -27,7 +27,6 @@ import { Separator } from '@/components/ui/separator';
 import { VesselTypeBadge } from '@/components/badges';
 import { OrderGroupServiceStatusBadge } from '@/components/badges/order-group-service-status-badge';
 import { OrderGroupStatusBadge } from '@/components/badges/order-group-status-badge';
-import { OrderStatusBadge } from '@/components/badges/order-status-badge';
 import { ServiceCategoryBadge } from '@/components/badges/service-category-badge';
 
 interface OrderGroupEvent {
@@ -77,7 +76,6 @@ export default function ShowOrderGroupPage({
     parentOrder: OrderBase;
     siblingOrderGroups: OrderGroup[];
 }) {
-    const { auth } = usePage<SharedData>().props;
     const [orderGroup, setOrderGroup] = useState(initialOrderGroup);
     const [parentOrder, setParentOrder] = useState(initialParentOrder);
     const [siblingOrderGroups, setSiblingOrderGroups] = useState(initialSiblingOrderGroups);
