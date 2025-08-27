@@ -159,8 +159,8 @@ class OrderGroupObserver
     private function updateChildOrderGroupServices(OrderGroup $orderGroup): void
     {
         // Define cascade rules based on OrderGroup status
-        $status = $orderGroup->status instanceof OrderGroupStatus 
-            ? $orderGroup->status 
+        $status = $orderGroup->status instanceof OrderGroupStatus
+            ? $orderGroup->status
             : OrderGroupStatus::from($orderGroup->status);
         $newServiceStatus = $this->getCascadeServiceStatus($status);
 
