@@ -237,6 +237,10 @@ Co-Authored-By: Aryan Prince <aryan@portzapp.com>
 Co-Authored-By: Claude <noreply@anthropic.com>
 ```
 
+**Commit Message Style:**
+- Always capitalize the first letter of the commit message after the conventional commit prefix (e.g., `feat: Add`, `fix: Resolve`, `docs: Update`)
+- Use imperative mood for commit messages (Add, Fix, Update, not Added, Fixed, Updated)
+
 ## Linear Issue Management Workflow
 
 **Creating Linear Issues:**
