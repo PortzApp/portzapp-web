@@ -47,8 +47,9 @@ node_modules/
 .DS_Store
 tests/Browser/screenshots/
 .claude/settings.local.json
+.taskmaster/tasks/tasks.json
 test_output.xml
 
 # Task files
 # tasks.json
-# tasks/ 
+# tasks/
