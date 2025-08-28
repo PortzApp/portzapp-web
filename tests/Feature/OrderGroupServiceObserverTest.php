@@ -5,9 +5,20 @@ use App\Enums\OrderGroupStatus;
 use App\Models\OrderGroup;
 use App\Models\OrderGroupService;
 use App\Models\Service;
+use Illuminate\Support\Facades\Event;
 
 describe('OrderGroupServiceObserver', function (): void {
     beforeEach(function (): void {
+        // Fake only the broadcast events to prevent WebSocket connection issues
+        // but allow observers to run normally
+        Event::fake([
+            \App\Events\OrderUpdated::class,
+            \App\Events\OrderGroupUpdated::class,
+            \App\Events\OrderGroupServiceUpdated::class,
+            \App\Events\ServiceUpdated::class,
+            \App\Events\ServiceCreated::class,
+            \App\Events\ServiceDeleted::class,
+        ]);
         $this->orderGroup = OrderGroup::factory()->create([
             'status' => OrderGroupStatus::PENDING,
         ]);

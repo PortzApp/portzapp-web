@@ -14,8 +14,11 @@ use App\Models\ServiceCategory;
 use App\Models\ServiceSubCategory;
 use App\Models\User;
 use App\Models\Vessel;
+use Illuminate\Support\Facades\Event;
 
 beforeEach(function (): void {
+    // Fake broadcasting and events to prevent WebSocket connection issues
+    Event::fake();
     // Create organizations
     $this->vesselOwnerOrg = Organization::factory()->create([
         'business_type' => OrganizationBusinessType::VESSEL_OWNER,

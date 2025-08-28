@@ -9,9 +9,20 @@ use App\Models\OrderGroupService;
 use App\Models\Organization;
 use App\Models\Service;
 use App\Models\User;
+use Illuminate\Support\Facades\Event;
 
 describe('OrderGroupObserver', function (): void {
     beforeEach(function (): void {
+        // Fake only the broadcast events to prevent WebSocket connection issues
+        // but allow observers to run normally
+        Event::fake([
+            \App\Events\OrderUpdated::class,
+            \App\Events\OrderGroupUpdated::class,
+            \App\Events\OrderGroupServiceUpdated::class,
+            \App\Events\ServiceUpdated::class,
+            \App\Events\ServiceCreated::class,
+            \App\Events\ServiceDeleted::class,
+        ]);
         $this->user = User::factory()->create();
         $this->organization = Organization::factory()->create();
 
