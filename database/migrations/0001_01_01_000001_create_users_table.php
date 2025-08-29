@@ -21,11 +21,13 @@ return new class extends Migration
             $table->string('password');
             $table->foreignUlid('current_organization_id')->nullable()->constrained('organizations')->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('onboarding_status')->default('pending');
+            $table->string('onboarding_step')->nullable();
             $table->rememberToken();
             $table->timestamps();
 
             // Indices for performance
             $table->index('onboarding_status');
+            $table->index('onboarding_step');
             $table->index('current_organization_id');
             $table->index('email_verified_at');
             $table->index(['email', 'password']);

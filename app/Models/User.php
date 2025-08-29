@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\OnboardingStatus;
+use App\Enums\OnboardingStep;
 use App\Enums\OrganizationBusinessType;
 use App\Enums\UserRoles;
 use Database\Factories\UserFactory;
@@ -74,6 +75,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'current_organization_id',
         'onboarding_status',
+        'onboarding_step',
     ];
 
     /**
@@ -97,6 +99,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'onboarding_status' => OnboardingStatus::class,
+            'onboarding_step' => OnboardingStep::class,
         ];
     }
 

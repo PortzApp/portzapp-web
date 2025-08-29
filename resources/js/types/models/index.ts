@@ -1,4 +1,5 @@
 import {
+    InvitationStatus,
     JoinRequestStatus,
     OrderGroupServiceStatus,
     OrderGroupStatus,
@@ -226,4 +227,17 @@ export interface OrganizationJoinRequest extends BaseModel {
         email: string;
         phone_number: string | null;
     };
+}
+
+export interface Invitation extends BaseModel {
+    organization_id: string;
+    email: string;
+    role: UserRoles;
+    status: InvitationStatus;
+    token: string;
+    message: string | null;
+    invited_by: string;
+    expires_at: string;
+    accepted_at: string | null;
+    rejected_at: string | null;
 }

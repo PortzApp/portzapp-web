@@ -86,3 +86,11 @@ export const OnboardingStatus = {
     COMPLETED: 'completed',
 } as const;
 export type OnboardingStatus = (typeof OnboardingStatus)[keyof typeof OnboardingStatus];
+
+export const InvitationStatus = {
+    PENDING: 'pending',
+    ACCEPTED: 'accepted',
+    REJECTED: 'rejected',
+    EXPIRED: 'expired',
+} as const;
+export type InvitationStatus = (typeof InvitationStatus)[keyof typeof InvitationStatus];
