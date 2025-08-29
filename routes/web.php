@@ -121,6 +121,14 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
 
 });
 
+// Email preview routes (development only)
+if (app()->environment('local', 'testing')) {
+    Route::middleware(['auth', 'verified'])->group(function (): void {
+        Route::get('emails', [App\Http\Controllers\EmailPreviewController::class, 'index'])->name('emails.index');
+        Route::get('emails/{template}', [App\Http\Controllers\EmailPreviewController::class, 'show'])->name('emails.show');
+    });
+}
+
 // Public invitation routes (accessible without authentication)
 Route::get('api/invitations', [InvitationController::class, 'show'])->name('invitations.show');
 
