@@ -11,7 +11,6 @@ use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\SwitchOrganization;
 use App\Http\Controllers\VesselController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 // Security.txt route
 Route::get('/.well-known/security.txt', function () {
@@ -22,7 +21,7 @@ Route::get('/.well-known/security.txt', function () {
 });
 
 Route::get('/', function () {
-    return Inertia::render('welcome');
+    return redirect()->route('login');
 })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function (): void {
