@@ -3,16 +3,14 @@
 namespace App\Mail;
 
 use App\Models\Invitation;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class InvitationEmail extends Mailable implements ShouldQueue
+class InvitationEmail extends Mailable
 {
-    use Queueable, SerializesModels;
+    use SerializesModels;
 
     /**
      * Create a new message instance.
@@ -76,8 +74,8 @@ class InvitationEmail extends Mailable implements ShouldQueue
      */
     private function getAcceptUrl(): string
     {
-        return route('invitations.accept', [
-            'token' => $this->invitation->token,
+        return route('register', [
+            'invite' => $this->invitation->token,
         ]);
     }
 
@@ -86,9 +84,9 @@ class InvitationEmail extends Mailable implements ShouldQueue
      */
     private function getDeclineUrl(): string
     {
-        return route('invitations.decline', [
-            'token' => $this->invitation->token,
-        ]);
+        // For now, we'll just link to the home page for decline
+        // This could be enhanced later with a proper decline endpoint
+        return route('home');
     }
 
     /**
@@ -96,15 +94,6 @@ class InvitationEmail extends Mailable implements ShouldQueue
      */
     private function getRoleName(): string
     {
-        $roleLabels = [
-            'ADMIN' => 'Administrator',
-            'CEO' => 'Chief Executive Officer',
-            'MANAGER' => 'Manager',
-            'OPERATIONS' => 'Operations',
-            'FINANCE' => 'Finance',
-            'VIEWER' => 'Viewer',
-        ];
-
-        return $roleLabels[$this->invitation->role->value] ?? $this->invitation->role->value;
+        return $this->invitation->role->label();
     }
 }

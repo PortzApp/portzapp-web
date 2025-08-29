@@ -184,7 +184,7 @@
             <!-- Organization Information -->
             <div class="organization-info">
                 <div class="organization-name">{{ $organization->name }}</div>
-                <p>{{ ucfirst(str_replace('_', ' ', $organization->business_type)) }}</p>
+                <p>{{ $organization->business_type->label() }}</p>
                 <div class="role-badge">{{ $roleName }}</div>
             </div>
 
@@ -204,7 +204,7 @@
                 </div>
                 <div class="detail-row">
                     <span class="detail-label">Organization Type:</span>
-                    <span class="detail-value">{{ ucfirst(str_replace('_', ' ', $organization->business_type)) }}</span>
+                    <span class="detail-value">{{ $organization->business_type->label() }}</span>
                 </div>
                 <div class="detail-row">
                     <span class="detail-label">Invitation Expires:</span>
@@ -214,8 +214,8 @@
 
             <!-- Action Buttons -->
             <div class="actions">
-                <a href="{{ $acceptUrl }}" class="btn btn-primary">Accept Invitation</a>
-                <a href="{{ $declineUrl }}" class="btn btn-secondary">Decline</a>
+                <a href="{{ $acceptUrl }}" class="btn btn-primary">Create Account & Join</a>
+                <a href="{{ $declineUrl }}" class="btn btn-secondary">No Thanks</a>
             </div>
 
             <!-- Security Notice -->
@@ -226,9 +226,8 @@
             </div>
 
             <p>
-                By accepting this invitation, you'll gain access to PortzApp's platform and be able to 
-                collaborate with {{ $organization->name }} on managing shipping operations, vessels, 
-                and port services.
+                By creating your account, you'll join {{ $organization->name }} and gain access to PortzApp's 
+                platform to collaborate on managing shipping operations, vessels, and port services.
             </p>
 
             <p>
