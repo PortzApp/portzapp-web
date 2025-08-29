@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\InvitationStatus;
 use App\Enums\OrganizationBusinessType;
 use App\Enums\UserRoles;
 use App\Http\Requests\StoreOrganizationRequest;
+use App\Models\Invitation;
 use App\Models\Organization;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -114,9 +116,17 @@ class OrganizationController extends Controller
             // Fetch users with their pivot data (including roles) for the current organization
             $organizationUsers = $currentOrganization->users()->get();
 
+            // Fetch pending invitations for the current organization
+            $pendingInvitations = Invitation::where('organization_id', $currentOrganization->id)
+                ->where('status', InvitationStatus::PENDING)
+                ->where('expires_at', '>', now())
+                ->orderBy('created_at', 'desc')
+                ->get();
+
             return Inertia::render('settings/organization', [
                 'users' => $organizationUsers,
                 'organization' => $currentOrganization,
+                'pendingInvitations' => $pendingInvitations,
             ]);
         }
 
