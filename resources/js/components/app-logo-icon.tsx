@@ -1,6 +1,6 @@
 export default function AppLogoIcon() {
     return (
-        <svg width="120" height="148" viewBox="0 0 630 148" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg width="120" height="30" viewBox="0 0 630 148" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
                 d="M177.505 68.9117C177.505 100.291 134.413 89.7161 134.413 114.049V122.578H119.521V42.9885H151.355C168.98 42.9885 177.505 52.3102 177.505 68.9117ZM162.041 68.9117C162.041 57.77 155.106 57.2031 150.218 57.2031H134.413V90.743C144.762 81.0763 162.041 81.7583 162.041 68.9117Z"
                 fill="#D6A165"
