@@ -6,6 +6,7 @@ use App\Enums\OnboardingStatus;
 use App\Enums\OnboardingStep;
 use App\Enums\OrganizationBusinessType;
 use App\Enums\UserRoles;
+use App\Notifications\VerifyEmail;
 use Database\Factories\UserFactory;
 use Eloquent;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -197,5 +198,13 @@ class User extends Authenticatable implements MustVerifyEmail
     public function reviewedJoinRequests(): HasMany
     {
         return $this->hasMany(OrganizationJoinRequest::class, 'reviewed_by_user_id');
+    }
+
+    /**
+     * Send the email verification notification with custom PortzApp branding.
+     */
+    public function sendEmailVerificationNotification(): void
+    {
+        $this->notify(new VerifyEmail);
     }
 }
