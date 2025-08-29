@@ -31,8 +31,14 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     // Onboarding routes
     Route::prefix('onboarding')->name('onboarding.')->group(function (): void {
         Route::get('/', [\App\Http\Controllers\OnboardingController::class, 'index'])->name('index');
-        Route::get('/{step}', [\App\Http\Controllers\OnboardingController::class, 'show'])->name('show');
+        Route::get('/welcome', [\App\Http\Controllers\OnboardingController::class, 'welcome'])->name('welcome');
+        Route::get('/organization', [\App\Http\Controllers\OnboardingController::class, 'organization'])->name('organization');
+        Route::get('/invite', [\App\Http\Controllers\OnboardingController::class, 'invite'])->name('invite');
+        Route::get('/complete', [\App\Http\Controllers\OnboardingController::class, 'complete'])->name('complete');
+        Route::post('/update-step', [\App\Http\Controllers\OnboardingController::class, 'updateStep'])->name('update-step');
         Route::patch('/', [\App\Http\Controllers\OnboardingController::class, 'update'])->name('update');
+        // Legacy route for backward compatibility
+        Route::get('/{step}', [\App\Http\Controllers\OnboardingController::class, 'show'])->name('show');
     });
 
     Route::put('/user/current-organization', SwitchOrganization::class)->name('user.current-organization.update');
@@ -115,6 +121,9 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::post('api/organizations/create-from-onboarding', [\App\Http\Controllers\OrganizationController::class, 'storeFromOnboarding'])->name('organizations.store.onboarding');
 
 });
+
+// Public invitation routes (accessible without authentication)
+Route::get('api/invitations', [InvitationController::class, 'show'])->name('invitations.show');
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
