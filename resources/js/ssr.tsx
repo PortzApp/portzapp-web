@@ -6,7 +6,7 @@ import { route } from 'ziggy-js';
 
 import type { RouteName } from 'ziggy-js';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+const appName = import.meta.env.VITE_APP_NAME || 'PortzApp';
 
 createServer((page) =>
     createInertiaApp({

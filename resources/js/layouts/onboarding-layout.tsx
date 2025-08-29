@@ -13,9 +13,10 @@ interface OnboardingLayoutProps {
     children: ReactNode;
     user: User;
     title?: string;
+    hideNameText?: boolean;
 }
 
-export default function OnboardingLayout({ children, user, title = 'Complete Setup' }: OnboardingLayoutProps) {
+export default function OnboardingLayout({ children, user, title = 'Complete Setup', hideNameText = false }: OnboardingLayoutProps) {
     const { name } = usePage<SharedData>().props;
 
     const handleLogout = () => {
@@ -32,7 +33,7 @@ export default function OnboardingLayout({ children, user, title = 'Complete Set
                     {/* Centered Logo */}
                     <Link href={route('home')} className="flex items-center gap-3 text-xl font-medium">
                         <AppLogoIcon />
-                        {name}
+                        {!hideNameText && name}
                     </Link>
                 </div>
             </div>

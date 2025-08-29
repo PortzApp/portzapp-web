@@ -45,7 +45,7 @@ export default function Complete({ user, currentOrganization }: Props) {
     }, [isCompleting]);
 
     return (
-        <OnboardingLayout user={user} title="Welcome to PortzApp!">
+        <OnboardingLayout user={user} title="Welcome to PortzApp!" hideNameText={true}>
             <div className="w-full space-y-4 py-0">
                 <div className="mx-auto mt-24 flex max-w-5xl flex-col justify-center space-y-8">
                     <div className="space-y-8">
