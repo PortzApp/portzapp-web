@@ -7,217 +7,100 @@
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background-color: #f8fafc;
+            line-height: 1.5;
+            color: #000;
+            background-color: #fff;
             margin: 0;
             padding: 0;
         }
         .container {
             max-width: 600px;
             margin: 0 auto;
-            background-color: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
+            background-color: #fff;
+            border: 1px solid #e5e5e5;
         }
         .header {
-            background: linear-gradient(135deg, #f6ad55 0%, #ed8936 100%);
-            color: white;
-            padding: 40px 30px;
-            text-align: center;
+            background-color: #fff;
+            padding: 20px;
+            border-bottom: 1px solid #e5e5e5;
         }
         .header h1 {
-            margin: 0 0 10px 0;
-            font-size: 28px;
-            font-weight: 600;
-        }
-        .header p {
             margin: 0;
-            font-size: 16px;
-            opacity: 0.9;
-        }
-        .urgency-indicator {
-            background-color: rgba(255, 255, 255, 0.2);
-            border-radius: 20px;
-            padding: 8px 16px;
-            display: inline-block;
-            margin-top: 16px;
-            font-size: 14px;
-            font-weight: 600;
-        }
-        .content {
-            padding: 40px 30px;
-        }
-        .reminder-notice {
-            background-color: #fed7d7;
-            border-radius: 8px;
-            padding: 24px;
-            margin: 24px 0;
-            border-left: 4px solid #f56565;
-            text-align: center;
-        }
-        .reminder-notice h3 {
-            color: #c53030;
-            margin: 0 0 12px 0;
-            font-size: 18px;
-        }
-        .expiry-countdown {
-            font-size: 32px;
-            font-weight: bold;
-            color: #c53030;
-            margin: 8px 0;
-        }
-        .organization-info {
-            background-color: #f8fafc;
-            border-radius: 8px;
-            padding: 24px;
-            margin: 24px 0;
-            border-left: 4px solid #f6ad55;
-        }
-        .organization-name {
             font-size: 20px;
             font-weight: 600;
-            color: #1a202c;
-            margin-bottom: 8px;
+            color: #000;
         }
-        .role-badge {
-            display: inline-block;
-            background-color: #f6ad55;
-            color: white;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 500;
-            margin-top: 8px;
-        }
-        .actions {
-            text-align: center;
-            margin: 32px 0;
+        .content {
+            padding: 20px;
         }
         .btn {
             display: inline-block;
-            padding: 14px 36px;
-            margin: 8px;
+            padding: 12px 24px;
+            margin: 8px 8px 8px 0;
             text-decoration: none;
-            border-radius: 6px;
+            border: 1px solid #000;
             font-weight: 600;
-            font-size: 18px;
-            transition: all 0.2s ease;
+            text-align: center;
         }
         .btn-primary {
-            background-color: #48bb78;
-            color: white;
-            box-shadow: 0 4px 12px rgba(72, 187, 120, 0.3);
-        }
-        .btn-primary:hover {
-            background-color: #38a169;
-            transform: translateY(-1px);
+            background-color: #000;
+            color: #fff;
         }
         .btn-secondary {
-            background-color: #e2e8f0;
-            color: #4a5568;
+            background-color: #fff;
+            color: #000;
         }
-        .btn-secondary:hover {
-            background-color: #cbd5e0;
+        .info-section {
+            margin: 20px 0;
+            padding: 16px;
+            border: 1px solid #e5e5e5;
+            background-color: #f8f8f8;
         }
-        .timeline {
-            background-color: #f7fafc;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 24px 0;
-            border-left: 4px solid #4299e1;
-        }
-        .timeline-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
-        .timeline-label {
-            font-weight: 600;
-            color: #2d3748;
-        }
-        .timeline-value {
-            color: #4a5568;
+        .expiry-notice {
+            margin: 20px 0;
+            padding: 16px;
+            border: 2px solid #000;
+            background-color: #f8f8f8;
+            text-align: center;
         }
         .footer {
-            background-color: #f7fafc;
-            padding: 30px;
-            text-align: center;
+            background-color: #f8f8f8;
+            padding: 20px;
+            border-top: 1px solid #e5e5e5;
             font-size: 14px;
-            color: #718096;
-            border-top: 1px solid #e2e8f0;
+            color: #666;
         }
         .footer a {
-            color: #f6ad55;
+            color: #000;
             text-decoration: none;
-        }
-        .what-happens-next {
-            background-color: #e6fffa;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 24px 0;
-            border-left: 4px solid #38b2ac;
-        }
-        .what-happens-next h4 {
-            color: #234e52;
-            margin: 0 0 12px 0;
-        }
-        .what-happens-next ul {
-            margin: 0;
-            padding-left: 20px;
-        }
-        .what-happens-next li {
-            color: #285e61;
-            margin-bottom: 8px;
         }
         @media (max-width: 600px) {
             .container {
-                margin: 0;
-                border-radius: 0;
+                border: none;
             }
             .header, .content, .footer {
-                padding: 20px;
+                padding: 16px;
             }
             .btn {
                 display: block;
                 margin: 8px 0;
-            }
-            .expiry-countdown {
-                font-size: 24px;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
         <div class="header">
-            <h1>⏰ Invitation Reminder</h1>
-            <p>Your invitation to {{ $organization->name }} is expiring soon</p>
-            <div class="urgency-indicator">
-                @if($daysUntilExpiry <= 1)
-                    ⚠️ Expires {{ $daysUntilExpiry == 0 ? 'today' : 'tomorrow' }}
-                @else
-                    {{ $daysUntilExpiry }} days remaining
-                @endif
-            </div>
+            <h1>Invitation Expiring</h1>
         </div>
 
-        <!-- Content -->
         <div class="content">
-            <p>Hello!</p>
+            <p>Hello,</p>
             
-            <p>
-                This is a friendly reminder that your invitation to join 
-                <strong>{{ $organization->name }}</strong> on PortzApp is expiring soon.
-            </p>
+            <p>Your invitation to join <strong>{{ $organization->name }}</strong> on PortzApp is expiring soon.</p>
 
-            <!-- Reminder Notice -->
-            <div class="reminder-notice">
-                <h3>⚠️ Time is Running Out!</h3>
-                <div class="expiry-countdown">
+            <div class="expiry-notice">
+                <p style="margin: 0; font-size: 18px; font-weight: 600;">
                     @if($daysUntilExpiry == 0)
                         Expires Today
                     @elseif($daysUntilExpiry == 1)
@@ -225,65 +108,26 @@
                     @else
                         {{ $daysUntilExpiry }} Days Left
                     @endif
-                </div>
-                <p>Your invitation expires on {{ $expiresAt->format('F j, Y \a\t g:i A') }}</p>
+                </p>
+                <p style="margin: 8px 0 0 0; font-size: 14px;">Expires {{ $expiresAt->format('F j, Y \a\t g:i A') }}</p>
             </div>
 
-            <!-- Organization Information -->
-            <div class="organization-info">
-                <div class="organization-name">{{ $organization->name }}</div>
-                <p>{{ ucfirst(str_replace('_', ' ', $organization->business_type)) }}</p>
-                <div class="role-badge">{{ $roleName }}</div>
+            <div class="info-section">
+                <p><strong>Organization:</strong> {{ $organization->name }}</p>
+                <p><strong>Type:</strong> {{ $organization->business_type->label() }}</p>
+                <p><strong>Your Role:</strong> {{ $roleName }}</p>
+                <p><strong>Originally Invited:</strong> {{ $invitation->created_at->format('F j, Y') }}</p>
+                @if($invitedBy)
+                <p><strong>Invited By:</strong> {{ $invitedBy->first_name }} {{ $invitedBy->last_name }}</p>
+                @endif
             </div>
 
-            <!-- Timeline -->
-            <div class="timeline">
-                <div class="timeline-item">
-                    <span class="timeline-label">Originally Invited:</span>
-                    <span class="timeline-value">{{ $invitation->created_at->format('F j, Y') }}</span>
-                </div>
-                <div class="timeline-item">
-                    <span class="timeline-label">Invited By:</span>
-                    <span class="timeline-value">
-                        @if($invitedBy)
-                            {{ $invitedBy->first_name }} {{ $invitedBy->last_name }}
-                        @else
-                            PortzApp Team
-                        @endif
-                    </span>
-                </div>
-                <div class="timeline-item">
-                    <span class="timeline-label">Your Role:</span>
-                    <span class="timeline-value">{{ $roleName }}</span>
-                </div>
-                <div class="timeline-item">
-                    <span class="timeline-label">Expires:</span>
-                    <span class="timeline-value">{{ $expiresAt->format('F j, Y \a\t g:i A') }}</span>
-                </div>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="actions">
-                <a href="{{ $acceptUrl }}" class="btn btn-primary">✅ Accept Invitation Now</a>
-                <a href="{{ $declineUrl }}" class="btn btn-secondary">❌ Decline</a>
-            </div>
-
-            <!-- What Happens Next -->
-            <div class="what-happens-next">
-                <h4>🚀 What happens when you accept?</h4>
-                <ul>
-                    <li>Instant access to {{ $organization->name }}'s PortzApp workspace</li>
-                    <li>Collaborate on shipping operations and vessel management</li>
-                    <li>Access to port services and booking systems</li>
-                    <li>Real-time updates and notifications</li>
-                    <li>Professional networking with industry peers</li>
-                </ul>
-            </div>
+            <a href="{{ $acceptUrl }}" class="btn btn-primary">Accept Invitation Now</a>
+            <a href="{{ $declineUrl }}" class="btn btn-secondary">Decline</a>
 
             @if($daysUntilExpiry <= 2)
-            <p style="background-color: #fff5f5; padding: 16px; border-radius: 6px; border-left: 4px solid #f56565;">
-                <strong style="color: #c53030;">⚠️ Urgent Action Required:</strong>
-                This invitation will expire in 
+            <p style="margin-top: 24px; padding: 16px; border: 1px solid #000; background-color: #f8f8f8;">
+                <strong>Action Required:</strong> This invitation expires in 
                 @if($daysUntilExpiry == 0)
                     less than 24 hours
                 @elseif($daysUntilExpiry == 1)
@@ -291,35 +135,27 @@
                 @else
                     {{ $daysUntilExpiry }} days
                 @endif
-                . After that, you'll need to request a new invitation to join {{ $organization->name }}.
+                . After that, you'll need to request a new invitation.
             </p>
             @endif
 
-            <p>
-                If you have any questions about this invitation or need assistance, 
+            <p style="margin-top: 24px; font-size: 14px; color: #666;">
                 @if($invitedBy)
-                    you can reply to this email to contact {{ $invitedBy->first_name }} {{ $invitedBy->last_name }} directly.
+                    Questions? Reply to contact {{ $invitedBy->first_name }} {{ $invitedBy->last_name }} directly.
                 @else
-                    please contact our support team.
+                    Questions? Contact our support team.
                 @endif
-            </p>
-
-            <p>
-                Don't miss this opportunity to join {{ $organization->name }} and streamline your shipping operations with PortzApp!
             </p>
         </div>
 
-        <!-- Footer -->
         <div class="footer">
             <p>
-                This reminder was sent by PortzApp on behalf of {{ $organization->name }}.<br>
-                <a href="{{ config('app.url') }}">Visit PortzApp</a> | 
-                <a href="{{ config('app.url') }}/privacy">Privacy Policy</a> | 
-                <a href="{{ config('app.url') }}/terms">Terms of Service</a>
+                <a href="{{ config('app.url') }}">PortzApp</a> | 
+                <a href="{{ config('app.url') }}/privacy">Privacy</a> | 
+                <a href="{{ config('app.url') }}/terms">Terms</a>
             </p>
-            <p style="margin-top: 16px; font-size: 12px;">
-                If you're having trouble with the buttons above, copy and paste this URL into your browser:<br>
-                <span style="word-break: break-all;">{{ $acceptUrl }}</span>
+            <p style="margin-top: 12px; font-size: 12px; word-break: break-all;">
+                {{ $acceptUrl }}
             </p>
         </div>
     </div>
