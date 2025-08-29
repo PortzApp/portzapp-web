@@ -8,7 +8,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import LoadingSpinner, { LoadingOverlay } from '@/components/ui/loading-spinner';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Textarea } from '@/components/ui/textarea';
 
 import InputError from '@/components/input-error';
 
@@ -144,10 +143,10 @@ export default function OrganizationSetupForm({ businessTypes, onSuccess, onCanc
                         {/* Organization URL/Slug */}
                         <div className="grid gap-2">
                             <Label htmlFor="slug">Organization URL</Label>
-                            <div className="relative">
-                                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                    <span className="text-sm text-muted-foreground">portzapp.com/</span>
-                                </div>
+                            <div className="flex rounded-md shadow-xs">
+                                <span className="border-input bg-background text-muted-foreground -z-10 inline-flex items-center rounded-s-md border px-3 text-sm">
+                                    portzapp.com/
+                                </span>
                                 <Input
                                     id="slug"
                                     type="text"
@@ -155,7 +154,7 @@ export default function OrganizationSetupForm({ businessTypes, onSuccess, onCanc
                                     onChange={(e) => handleSlugChange(e.target.value)}
                                     disabled={processing}
                                     placeholder="acme-shipping-co"
-                                    className="pl-[120px]"
+                                    className="-ms-px rounded-s-none shadow-none"
                                     required
                                 />
                             </div>
@@ -218,19 +217,6 @@ export default function OrganizationSetupForm({ businessTypes, onSuccess, onCanc
                             <InputError message={errors.registration_code} />
                         </div>
 
-                        {/* Description (Optional) */}
-                        <div className="grid gap-2">
-                            <Label htmlFor="description">Description (Optional)</Label>
-                            <Textarea
-                                id="description"
-                                value={data.description || ''}
-                                onChange={(e) => setData('description', e.target.value)}
-                                disabled={processing}
-                                placeholder="Brief description of your organization..."
-                                rows={3}
-                            />
-                            <InputError message={errors.description} />
-                        </div>
                     </div>
 
                     {/* Form Actions */}
