@@ -32,7 +32,7 @@ export default function Welcome({ user }: Props) {
                             <p className="text-lg text-muted-foreground">Choose how you'd like to proceed with PortzApp</p>
                         </div>
 
-                        <div className="flex items-center gap-8">
+                        <div className="flex items-center justify-center gap-8">
                             <Card
                                 className="h-fit w-full max-w-lg cursor-pointer border px-4 py-4 transition-all duration-200 hover:border-blue-200 hover:bg-neutral-900/50 hover:shadow-lg"
                                 onClick={() => handleActionChoice('create')}

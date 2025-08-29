@@ -112,27 +112,18 @@ export default function JoinOrganizationForm({ onCancel }: Props) {
                     <form onSubmit={submitJoinRequest} className="space-y-4">
                         <div className="grid gap-2">
                             <Label htmlFor="organization_slug">
-                                Organization URL
+                                Organization Name
                                 <span className="ml-1 text-destructive">*</span>
                             </Label>
-                            <div className="relative">
-                                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                    <span className="text-sm text-muted-foreground">portzapp.com/</span>
-                                </div>
-                                <Input
-                                    id="organization_slug"
-                                    type="text"
-                                    required
-                                    value={joinRequestForm.data.organization_slug}
-                                    onChange={(e) => joinRequestForm.setData('organization_slug', e.target.value)}
-                                    disabled={joinRequestForm.processing}
-                                    placeholder="acme-shipping-co"
-                                    className="pl-[120px]"
-                                />
-                                <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                                    <ExternalLink className="h-4 w-4 text-muted-foreground" />
-                                </div>
-                            </div>
+                            <Input
+                                id="organization_slug"
+                                type="text"
+                                required
+                                value={joinRequestForm.data.organization_slug}
+                                onChange={(e) => joinRequestForm.setData('organization_slug', e.target.value)}
+                                disabled={joinRequestForm.processing}
+                                placeholder="Acme Shipping Co"
+                            />
                             <InputError message={joinRequestForm.errors.organization_slug} />
                         </div>
 
