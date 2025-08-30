@@ -1,4 +1,4 @@
-import React, { FormEventHandler, useState } from 'react';
+import React, { FormEventHandler } from 'react';
 
 import { useForm } from '@inertiajs/react';
 import { Plus, X } from 'lucide-react';
