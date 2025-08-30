@@ -427,8 +427,10 @@ describe('OrderWizardSessionController setServices', function (): void {
             ->patch(route('order-wizard-sessions.services', $this->wizardSession), $data);
 
         $response->assertRedirect();
+        $response->assertSessionHasNoErrors();
 
         $this->wizardSession->refresh();
+        $this->wizardSession->load('serviceSelections');
         expect($this->wizardSession->serviceSelections)->toHaveCount(1);
         expect($this->wizardSession->serviceSelections->first()->service_id)->toBe($newService->id);
     });
