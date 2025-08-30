@@ -1,6 +1,7 @@
+import React, { ReactNode } from 'react';
+
 import { User } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import React, { ReactNode } from 'react';
 
 import type { SharedData } from '@/types';
 
@@ -33,16 +34,13 @@ export default function OnboardingLayout({ children, user, title = 'Complete Set
                     {/* Centered Logo */}
                     <Link href={route('home')} className="flex items-center gap-3 text-xl font-medium">
                         <AppLogoIcon />
-                        {!hideNameText && name}
                     </Link>
                 </div>
             </div>
 
             {/* Main content area */}
             <div className="mt-0 px-6 md:px-12">
-                <div className="mx-auto w-full max-w-4xl">
-                    {children}
-                </div>
+                <div className="mx-auto w-full max-w-4xl">{children}</div>
             </div>
 
             {/* User email and logout at bottom-right */}
