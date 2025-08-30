@@ -1,23 +1,16 @@
 import React, { FormEventHandler, useState } from 'react';
 
 import { useForm } from '@inertiajs/react';
-import { AlertCircle, CheckCircle, Plus, X } from 'lucide-react';
-
-import { cn } from '@/lib/utils';
+import { Plus, X } from 'lucide-react';
+import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import LoadingSpinner, { LoadingOverlay } from '@/components/ui/loading-spinner';
+import { LoadingOverlay } from '@/components/ui/loading-spinner';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 import InputError from '@/components/input-error';
-
-interface MemberInvite {
-    email: string;
-    role: string;
-    [key: string]: string; // Make it compatible with FormDataConvertible
-}
 
 interface Props {
     organizationId: string;
@@ -30,97 +23,85 @@ interface Props {
 }
 
 export default function MemberInviteForm({ organizationId, onSuccess, onSkip, availableRoles }: Props) {
-    const [invites, setInvites] = useState<MemberInvite[]>([{ email: '', role: '' }]);
-
-    const { setData, post, processing, errors } = useForm<{
-        organization_id: string;
-        invites: MemberInvite[];
-    }>({
+    const { data, setData, post, processing, errors } = useForm({
         organization_id: organizationId,
-        invites: invites,
+        invites: [{ email: '', role: '' }],
     });
 
-    // Update form data when invites change
-    React.useEffect(() => {
-        setData('invites', invites);
-    }, [invites, setData]);
-
     const addInvite = () => {
-        setInvites([...invites, { email: '', role: '' }]);
+        setData('invites', [...data.invites, { email: '', role: '' }]);
     };
 
     const removeInvite = (index: number) => {
-        if (invites.length > 1) {
-            setInvites(invites.filter((_, i) => i !== index));
+        if (data.invites.length > 1) {
+            setData('invites', data.invites.filter((_, i) => i !== index));
         }
     };
 
-    const updateInvite = (index: number, field: keyof MemberInvite, value: string) => {
-        const updated = invites.map((invite, i) => (i === index ? { ...invite, [field]: value } : invite));
-        setInvites(updated);
-    };
-
-    const isValidEmail = (email: string): boolean => {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
-    };
-
-    const getValidInvites = (): MemberInvite[] => {
-        return invites.filter((invite) => invite.email.trim() !== '' && invite.role !== '' && isValidEmail(invite.email.trim()));
-    };
-
-    const hasDuplicateEmails = (): boolean => {
-        const emails = invites.map((invite) => invite.email.trim().toLowerCase()).filter((email) => email !== '');
-        return emails.length !== new Set(emails).size;
-    };
-
-    const canSubmit = (): boolean => {
-        const validInvites = getValidInvites();
-        return validInvites.length > 0 && !hasDuplicateEmails() && !processing;
+    const updateInvite = (index: number, field: string, value: string) => {
+        const updatedInvites = data.invites.map((invite, i) => 
+            i === index ? { ...invite, [field]: value } : invite
+        );
+        setData('invites', updatedInvites);
     };
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
+        
+        console.log('🚀 Form submission started');
+        console.log('📊 Current form data:', data);
 
-        if (!canSubmit()) {
+        // Filter out empty invites before sending
+        const validInvites = data.invites.filter(invite => invite.email.trim() && invite.role);
+        console.log('✅ Valid invites found:', validInvites);
+        
+        if (validInvites.length === 0) {
+            console.log('❌ No valid invites to send');
+            toast.error('Please fill in at least one invitation with email and role');
             return;
         }
 
-        const validInvites = getValidInvites();
-
-        // Update form data before submitting
+        // Update form data with only valid invites before submission
+        console.log('📝 Updating form data with valid invites');
         setData({
-            organization_id: organizationId,
+            organization_id: data.organization_id,
             invites: validInvites,
         });
 
+        console.log('🌐 Making request to:', route('invitations.bulk-create'));
         post(route('invitations.bulk-create'), {
-            onSuccess: () => {
+            onSuccess: (page) => {
+                console.log('✅ Form submission successful:', page);
                 onSuccess(validInvites.length);
             },
             onError: (errors: Record<string, string>) => {
-                console.log('Bulk invitation errors:', errors);
+                console.log('❌ Form submission errors:', errors);
+                if (errors.organization_id) {
+                    toast.error('Organization Error', {
+                        description: errors.organization_id,
+                    });
+                } else if (errors.bulk_invite) {
+                    toast.error('Invitation Error', {
+                        description: errors.bulk_invite,
+                    });
+                } else {
+                    const errorMessages = Object.values(errors);
+                    if (errorMessages.length > 0) {
+                        toast.error('Validation Error', {
+                            description: errorMessages[0],
+                        });
+                    } else {
+                        toast.error('Failed to send invitations. Please try again.');
+                    }
+                }
+            },
+            onStart: () => {
+                console.log('🔄 Request started');
+            },
+            onFinish: () => {
+                console.log('🏁 Request finished');
             },
         });
-    };
-
-    const getRoleDescription = (roleValue: string) => {
-        switch (roleValue) {
-            case 'admin':
-                return 'Full access to all organization settings and data';
-            case 'ceo':
-                return 'Executive level access with oversight capabilities';
-            case 'manager':
-                return 'Manage teams and oversee operations';
-            case 'operations':
-                return 'Handle day-to-day operations and service coordination';
-            case 'finance':
-                return 'Manage billing, payments, and financial reporting';
-            case 'viewer':
-                return 'View-only access to organization data';
-            default:
-                return '';
-        }
     };
 
     const getEmailError = (index: number): string | undefined => {
@@ -131,27 +112,16 @@ export default function MemberInviteForm({ organizationId, onSuccess, onSkip, av
         return errors[`invites.${index}.role` as keyof typeof errors] as string | undefined;
     };
 
-    // Validation feedback component
-    const ValidationIcon = ({ isValid, hasError }: { isValid: boolean; hasError: boolean }) => {
-        if (hasError) {
-            return <AlertCircle className="h-4 w-4 text-destructive" />;
-        }
-        if (isValid) {
-            return <CheckCircle className="h-4 w-4 text-green-600" />;
-        }
-        return null;
-    };
-
     return (
         <LoadingOverlay isLoading={processing} message="Sending invitations...">
             <div className="space-y-6">
                 <form onSubmit={submit} className="space-y-6">
                     <div className="space-y-4">
-                        {invites.map((invite, index) => (
+                        {data.invites.map((invite, index) => (
                             <div key={index} className="grid gap-4 rounded-lg border p-4">
                                 <div className="flex items-center justify-between">
                                     <Label className="font-medium">Invite #{index + 1}</Label>
-                                    {invites.length > 1 && (
+                                    {data.invites.length > 1 && (
                                         <Button type="button" variant="ghost" size="sm" onClick={() => removeInvite(index)} disabled={processing}>
                                             <X className="h-4 w-4" />
                                         </Button>
@@ -159,13 +129,7 @@ export default function MemberInviteForm({ organizationId, onSuccess, onSkip, av
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor={`email-${index}`} className="flex items-center gap-2">
-                                        Email Address
-                                        <ValidationIcon
-                                            isValid={isValidEmail(invite.email.trim()) && !getEmailError(index)}
-                                            hasError={!!getEmailError(index)}
-                                        />
-                                    </Label>
+                                    <Label htmlFor={`email-${index}`}>Email Address</Label>
                                     <Input
                                         id={`email-${index}`}
                                         type="email"
@@ -173,35 +137,20 @@ export default function MemberInviteForm({ organizationId, onSuccess, onSkip, av
                                         onChange={(e) => updateInvite(index, 'email', e.target.value)}
                                         disabled={processing}
                                         placeholder="colleague@company.com"
-                                        className={cn(
-                                            getEmailError(index) && 'border-destructive',
-                                            isValidEmail(invite.email.trim()) && !getEmailError(index) && invite.email.trim() && 'border-green-500',
-                                        )}
                                     />
                                     <InputError message={getEmailError(index)} />
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor={`role-${index}`} className="flex items-center gap-2">
-                                        Role
-                                        <ValidationIcon isValid={invite.role !== '' && !getRoleError(index)} hasError={!!getRoleError(index)} />
-                                    </Label>
+                                    <Label htmlFor={`role-${index}`}>Role</Label>
                                     <Select value={invite.role} onValueChange={(value) => updateInvite(index, 'role', value)} disabled={processing}>
-                                        <SelectTrigger
-                                            className={cn(
-                                                getRoleError(index) && 'border-destructive',
-                                                invite.role && !getRoleError(index) && 'border-green-500',
-                                            )}
-                                        >
+                                        <SelectTrigger>
                                             <SelectValue placeholder="Select a role" />
                                         </SelectTrigger>
                                         <SelectContent>
                                             {availableRoles.map((role) => (
                                                 <SelectItem key={role.value} value={role.value}>
-                                                    <div>
-                                                        <div className="font-medium">{role.label}</div>
-                                                        <div className="text-xs text-muted-foreground">{getRoleDescription(role.value)}</div>
-                                                    </div>
+                                                    {role.label}
                                                 </SelectItem>
                                             ))}
                                         </SelectContent>
@@ -212,21 +161,11 @@ export default function MemberInviteForm({ organizationId, onSuccess, onSkip, av
                         ))}
                     </div>
 
-                    <Button type="button" variant="outline" onClick={addInvite} disabled={processing || invites.length >= 10} className="w-full">
+                    <Button type="button" variant="outline" onClick={addInvite} disabled={processing || data.invites.length >= 10} className="w-full">
                         <Plus className="mr-2 h-4 w-4" />
                         Add Another Invite
-                        {invites.length >= 10 && ' (Maximum reached)'}
+                        {data.invites.length >= 10 && ' (Maximum reached)'}
                     </Button>
-
-                    {/* Validation Status */}
-                    <div className="space-y-2 text-sm">
-                        {hasDuplicateEmails() && <p className="text-destructive">⚠️ Duplicate email addresses found</p>}
-                        {getValidInvites().length > 0 && (
-                            <p className="text-muted-foreground">
-                                ✓ {getValidInvites().length} valid invitation{getValidInvites().length !== 1 ? 's' : ''} ready to send
-                            </p>
-                        )}
-                    </div>
 
                     {/* General Errors */}
                     <InputError message={errors.organization_id} />
@@ -237,9 +176,8 @@ export default function MemberInviteForm({ organizationId, onSuccess, onSkip, av
                         <Button type="button" variant="outline" onClick={onSkip} disabled={processing} className="flex-1 py-3">
                             Skip for Now
                         </Button>
-                        <Button type="submit" disabled={!canSubmit() || processing} className="flex-1 py-3">
-                            {processing && <LoadingSpinner size="sm" className="mr-2" />}
-                            {processing ? 'Sending...' : `Send ${getValidInvites().length} Invitation${getValidInvites().length !== 1 ? 's' : ''}`}
+                        <Button type="submit" disabled={processing} className="flex-1 py-3">
+                            {processing ? 'Sending...' : 'Send Invitations'}
                         </Button>
                     </div>
 
