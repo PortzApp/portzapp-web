@@ -22,6 +22,7 @@ class OnboardingController extends Controller
      */
     private function checkStepAccess(OnboardingStep $requestedStep): ?RedirectResponse
     {
+        /** @var \App\Models\User $user */
         $user = Auth::user();
 
         // If user has completed onboarding, redirect to dashboard
@@ -30,7 +31,7 @@ class OnboardingController extends Controller
         }
 
         // Check if user can access this step
-        if (! $requestedStep->canAccessFrom($user->onboarding_step)) {
+        if (! $requestedStep->canAccessFrom($user->getAttribute('onboarding_step'))) {
             // Redirect to current step or welcome if no step set
             $currentStep = $user->onboarding_step ?? OnboardingStep::WELCOME;
 

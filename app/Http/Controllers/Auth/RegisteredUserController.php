@@ -38,8 +38,8 @@ class RegisteredUserController extends Controller
             'inviteToken' => $inviteToken,
             'invitation' => $invitation ? [
                 'organization' => [
-                    'name' => $invitation->organization->name,
-                    'business_type' => $invitation->organization->business_type->label(),
+                    'name' => $invitation->organization->getAttribute('name'),
+                    'business_type' => $invitation->organization->getAttribute('business_type')?->label(),
                 ],
                 'role' => $invitation->role->label(),
                 'email' => $invitation->email,

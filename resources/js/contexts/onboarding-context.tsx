@@ -23,7 +23,7 @@ interface MemberInvite {
     role: string;
 }
 
-type OnboardingStep = 'create-organization' | 'invite-members' | 'complete';
+type OnboardingStep = 'choose-action' | 'create-organization' | 'join-organization' | 'invite-members' | 'complete';
 
 interface OnboardingState {
     currentStep: OnboardingStep;
@@ -115,7 +115,7 @@ const getStorageKey = (userId: string | number | null): string | null => {
 };
 
 // Step order for navigation
-const stepOrder: OnboardingStep[] = ['create-organization', 'invite-members', 'complete'];
+const stepOrder: OnboardingStep[] = ['choose-action', 'create-organization', 'join-organization', 'invite-members', 'complete'];
 
 interface OnboardingProviderProps {
     children: ReactNode;

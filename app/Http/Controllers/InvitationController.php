@@ -411,13 +411,13 @@ class InvitationController extends Controller
                 'role' => $invitation->role->value,
                 'role_label' => $invitation->role->label(),
                 'organization' => [
-                    'id' => $invitation->organization->id,
-                    'name' => $invitation->organization->name,
-                    'business_type' => $invitation->organization->business_type->value,
-                    'business_type_label' => $invitation->organization->business_type->label(),
+                    'id' => $invitation->organization->getAttribute('id'),
+                    'name' => $invitation->organization->getAttribute('name'),
+                    'business_type' => $invitation->organization->getAttribute('business_type')?->value,
+                    'business_type_label' => $invitation->organization->getAttribute('business_type')?->label(),
                 ],
                 'invited_by' => $invitation->invitedByUser ? [
-                    'name' => $invitation->invitedByUser->first_name.' '.$invitation->invitedByUser->last_name,
+                    'name' => $invitation->invitedByUser->getAttribute('first_name').' '.$invitation->invitedByUser->getAttribute('last_name'),
                 ] : null,
                 'expires_at' => $invitation->expires_at->toISOString(),
             ],
