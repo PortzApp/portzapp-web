@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\OrderGroupController;
 use App\Http\Controllers\OrderGroupServiceController;
@@ -118,6 +119,9 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
 
     // Organization creation from onboarding flow
     Route::post('api/organizations/create-from-onboarding', [\App\Http\Controllers\OrganizationController::class, 'storeFromOnboarding'])->name('organizations.store.onboarding');
+
+    // Bulk invitation route for onboarding
+    Route::post('invitations/bulk-create', [InvitationController::class, 'bulkCreate'])->name('invitations.bulk-create');
 
 });
 
