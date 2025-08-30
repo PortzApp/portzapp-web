@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use App\Notifications\VerifyEmail;
 use Illuminate\Support\Facades\Notification;
 
 beforeEach(function (): void {
@@ -28,7 +29,7 @@ describe('EmailVerificationNotificationController store', function (): void {
 
         Notification::assertSentTo(
             $this->unverifiedUser,
-            \Illuminate\Auth\Notifications\VerifyEmail::class
+            VerifyEmail::class
         );
     });
 
@@ -69,12 +70,12 @@ describe('EmailVerificationNotificationController store', function (): void {
         // Both should have sent emails (throttling is handled elsewhere)
         Notification::assertSentTo(
             $this->unverifiedUser,
-            \Illuminate\Auth\Notifications\VerifyEmail::class
+            VerifyEmail::class
         );
 
         Notification::assertSentToTimes(
             $this->unverifiedUser,
-            \Illuminate\Auth\Notifications\VerifyEmail::class,
+            VerifyEmail::class,
             2
         );
     });
@@ -106,7 +107,7 @@ describe('EmailVerificationNotificationController store', function (): void {
 
         Notification::assertSentTo(
             $userWithProfile,
-            \Illuminate\Auth\Notifications\VerifyEmail::class
+            VerifyEmail::class
         );
     });
 
