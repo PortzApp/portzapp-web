@@ -1,10 +1,12 @@
+import React from 'react';
+
 import { User } from '@/types';
 import { router } from '@inertiajs/react';
-import React from 'react';
+
+import OnboardingLayout from '@/layouts/onboarding-layout';
 
 import JoinOrganizationForm from '@/components/onboarding/join-organization-form';
 import OrganizationSetupForm from '@/components/onboarding/organization-setup-form';
-import OnboardingLayout from '@/layouts/onboarding-layout';
 
 interface Props {
     user: User;
@@ -38,11 +40,7 @@ export default function Organization({ user, action, businessTypes }: Props) {
                                 <p className="text-lg text-muted-foreground">Set up your organization details and get started</p>
                             </div>
 
-                            <OrganizationSetupForm 
-                                businessTypes={businessTypes} 
-                                onSuccess={handleOrganizationCreated} 
-                                onCancel={handleGoBack}
-                            />
+                            <OrganizationSetupForm businessTypes={businessTypes} onSuccess={handleOrganizationCreated} onCancel={handleGoBack} />
                         </div>
                     </div>
                 </div>
@@ -60,9 +58,7 @@ export default function Organization({ user, action, businessTypes }: Props) {
                             <p className="text-lg text-muted-foreground">Enter your invitation details or request to join an organization</p>
                         </div>
 
-                        <JoinOrganizationForm 
-                            onCancel={handleGoBack}
-                        />
+                        <JoinOrganizationForm onCancel={handleGoBack} />
                     </div>
                 </div>
             </div>

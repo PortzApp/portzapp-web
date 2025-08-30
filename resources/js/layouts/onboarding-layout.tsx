@@ -15,7 +15,6 @@ interface OnboardingLayoutProps {
 }
 
 export default function OnboardingLayout({ children, user, title = 'Complete Setup' }: OnboardingLayoutProps) {
-
     const handleLogout = () => {
         router.post(route('logout'));
     };

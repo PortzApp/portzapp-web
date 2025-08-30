@@ -144,7 +144,7 @@ export default function OrganizationSetupForm({ businessTypes, onSuccess, onCanc
                         <div className="grid gap-2">
                             <Label htmlFor="slug">Organization URL</Label>
                             <div className="flex rounded-md shadow-xs">
-                                <span className="border-input bg-background text-muted-foreground -z-10 inline-flex items-center rounded-s-md border px-3 text-sm">
+                                <span className="-z-10 inline-flex items-center rounded-s-md border border-input bg-background px-3 text-sm text-muted-foreground">
                                     portzapp.com/
                                 </span>
                                 <Input
@@ -216,7 +216,6 @@ export default function OrganizationSetupForm({ businessTypes, onSuccess, onCanc
                             <p className="text-xs text-muted-foreground">Your official business registration code or license number</p>
                             <InputError message={errors.registration_code} />
                         </div>
-
                     </div>
 
                     {/* Form Actions */}

@@ -1,12 +1,12 @@
 import { useState } from 'react';
 
 import { Head, router } from '@inertiajs/react';
-import { Plus, Mail, Clock } from 'lucide-react';
+import { Clock, Mail, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { UserWithPivot } from '@/types/core';
-import { Invitation } from '@/types/models';
 import { UserRoles } from '@/types/enums';
+import { Invitation } from '@/types/models';
 
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
@@ -83,7 +83,7 @@ export default function OrganizationSettingsPage({ users, pendingInvitations }: 
                 onFinish: () => {
                     setIsSubmitting(false);
                 },
-            }
+            },
         );
     };
 
@@ -95,11 +95,11 @@ export default function OrganizationSettingsPage({ users, pendingInvitations }: 
                 <div className="space-y-6">
                     <div className="flex items-center justify-between">
                         <HeadingSmall title="Organization settings" description="Manage your organization's members" />
-                        
+
                         <Dialog open={isInviteDialogOpen} onOpenChange={setIsInviteDialogOpen}>
                             <DialogTrigger asChild>
                                 <Button>
-                                    <Plus className="h-4 w-4 mr-2" />
+                                    <Plus className="mr-2 h-4 w-4" />
                                     Invite Member
                                 </Button>
                             </DialogTrigger>
@@ -107,7 +107,8 @@ export default function OrganizationSettingsPage({ users, pendingInvitations }: 
                                 <DialogHeader>
                                     <DialogTitle>Invite Team Member</DialogTitle>
                                     <DialogDescription>
-                                        Send an invitation to join your organization. They'll receive an email with instructions to create their account.
+                                        Send an invitation to join your organization. They'll receive an email with instructions to create their
+                                        account.
                                     </DialogDescription>
                                 </DialogHeader>
                                 <div className="grid gap-4 py-4">
@@ -152,27 +153,18 @@ export default function OrganizationSettingsPage({ users, pendingInvitations }: 
                                     </div>
                                 </div>
                                 <DialogFooter>
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        onClick={() => setIsInviteDialogOpen(false)}
-                                        disabled={isSubmitting}
-                                    >
+                                    <Button type="button" variant="outline" onClick={() => setIsInviteDialogOpen(false)} disabled={isSubmitting}>
                                         Cancel
                                     </Button>
-                                    <Button
-                                        type="button"
-                                        onClick={handleInviteSubmit}
-                                        disabled={isSubmitting}
-                                    >
+                                    <Button type="button" onClick={handleInviteSubmit} disabled={isSubmitting}>
                                         {isSubmitting ? (
                                             <>
-                                                <Mail className="h-4 w-4 mr-2 animate-spin" />
+                                                <Mail className="mr-2 h-4 w-4 animate-spin" />
                                                 Sending...
                                             </>
                                         ) : (
                                             <>
-                                                <Mail className="h-4 w-4 mr-2" />
+                                                <Mail className="mr-2 h-4 w-4" />
                                                 Send Invitation
                                             </>
                                         )}
@@ -187,12 +179,18 @@ export default function OrganizationSettingsPage({ users, pendingInvitations }: 
                             <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-600">
                                 <thead className="bg-gray-50 dark:bg-gray-800">
                                     <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 dark:text-gray-400 uppercase">Name</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 dark:text-gray-400 uppercase">Email</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 dark:text-gray-400 uppercase">Role</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400">
+                                            Name
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400">
+                                            Email
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400">
+                                            Role
+                                        </th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-gray-200 dark:divide-gray-600 bg-white dark:bg-gray-900">
+                                <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-600 dark:bg-gray-900">
                                     {users.map((user) => (
                                         <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
                                             <td className="px-6 py-4 whitespace-nowrap">
@@ -224,7 +222,7 @@ export default function OrganizationSettingsPage({ users, pendingInvitations }: 
                                                 <div className="text-sm text-gray-900 dark:text-gray-100">{user.email}</div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                <span className="inline-flex rounded-full bg-blue-100 dark:bg-blue-900 px-2 py-1 text-xs font-semibold text-blue-800 dark:text-blue-200">
+                                                <span className="inline-flex rounded-full bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-800 dark:bg-blue-900 dark:text-blue-200">
                                                     {getRoleLabel(user.pivot.role)}
                                                 </span>
                                             </td>
@@ -245,39 +243,47 @@ export default function OrganizationSettingsPage({ users, pendingInvitations }: 
                     {pendingInvitations.length > 0 && (
                         <div className="mt-8 space-y-4">
                             <HeadingSmall title="Pending Invitations" description="Invitations awaiting acceptance" />
-                            
+
                             <div className="bg-white dark:bg-gray-900">
                                 <div className="overflow-x-auto rounded-md border border-gray-200 dark:border-gray-700">
                                     <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-600">
                                         <thead className="bg-gray-50 dark:bg-gray-800">
                                             <tr>
-                                                <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 dark:text-gray-400 uppercase">Email</th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 dark:text-gray-400 uppercase">Role</th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 dark:text-gray-400 uppercase">Status</th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 dark:text-gray-400 uppercase">Sent</th>
+                                                <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400">
+                                                    Email
+                                                </th>
+                                                <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400">
+                                                    Role
+                                                </th>
+                                                <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400">
+                                                    Status
+                                                </th>
+                                                <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400">
+                                                    Sent
+                                                </th>
                                             </tr>
                                         </thead>
-                                        <tbody className="divide-y divide-gray-200 dark:divide-gray-600 bg-white dark:bg-gray-900">
+                                        <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-600 dark:bg-gray-900">
                                             {pendingInvitations.map((invitation) => (
                                                 <tr key={invitation.id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <div className="flex items-center">
-                                                            <Mail className="h-4 w-4 text-gray-400 mr-3" />
+                                                            <Mail className="mr-3 h-4 w-4 text-gray-400" />
                                                             <div className="text-sm text-gray-900 dark:text-gray-100">{invitation.email}</div>
                                                         </div>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
-                                                        <span className="inline-flex rounded-full bg-blue-100 dark:bg-blue-900 px-2 py-1 text-xs font-semibold text-blue-800 dark:text-blue-200">
+                                                        <span className="inline-flex rounded-full bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-800 dark:bg-blue-900 dark:text-blue-200">
                                                             {getRoleLabel(invitation.role)}
                                                         </span>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
-                                                        <span className="inline-flex items-center rounded-full bg-yellow-100 dark:bg-yellow-900 px-2 py-1 text-xs font-medium text-yellow-800 dark:text-yellow-200">
-                                                            <Clock className="h-3 w-3 mr-1" />
+                                                        <span className="inline-flex items-center rounded-full bg-yellow-100 px-2 py-1 text-xs font-medium text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                                                            <Clock className="mr-1 h-3 w-3" />
                                                             Pending
                                                         </span>
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                                    <td className="px-6 py-4 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">
                                                         {new Date(invitation.created_at).toLocaleDateString()}
                                                     </td>
                                                 </tr>

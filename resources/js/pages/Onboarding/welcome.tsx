@@ -2,9 +2,9 @@ import { User } from '@/types';
 import { router } from '@inertiajs/react';
 import { Building2, Users } from 'lucide-react';
 
-import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-
 import OnboardingLayout from '@/layouts/onboarding-layout';
+
+import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface Props {
     user: User;

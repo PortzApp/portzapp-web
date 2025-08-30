@@ -34,27 +34,28 @@ export default function MemberInviteForm({ organizationId, onSuccess, onSkip, av
 
     const removeInvite = (index: number) => {
         if (data.invites.length > 1) {
-            setData('invites', data.invites.filter((_, i) => i !== index));
+            setData(
+                'invites',
+                data.invites.filter((_, i) => i !== index),
+            );
         }
     };
 
     const updateInvite = (index: number, field: string, value: string) => {
-        const updatedInvites = data.invites.map((invite, i) => 
-            i === index ? { ...invite, [field]: value } : invite
-        );
+        const updatedInvites = data.invites.map((invite, i) => (i === index ? { ...invite, [field]: value } : invite));
         setData('invites', updatedInvites);
     };
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-        
+
         console.log('🚀 Form submission started');
         console.log('📊 Current form data:', data);
 
         // Filter out empty invites before sending
-        const validInvites = data.invites.filter(invite => invite.email.trim() && invite.role);
+        const validInvites = data.invites.filter((invite) => invite.email.trim() && invite.role);
         console.log('✅ Valid invites found:', validInvites);
-        
+
         if (validInvites.length === 0) {
             console.log('❌ No valid invites to send');
             toast.error('Please fill in at least one invitation with email and role');

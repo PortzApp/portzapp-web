@@ -29,22 +29,11 @@ export default function EnhancedOrganizationWizard({ businessTypes }: Props) {
     const { state, setStep, setOrganizationData, setLoading, setError, resetState } = useOnboarding();
 
     const goToPreviousStep = () => {
-        if (currentStep === 'create-organization') {
-            setStep('choose-action');
-        } else if (currentStep === 'join-organization') {
-            setStep('choose-action');
-        }
+        // No previous step from create-organization since it's now the first step
+        return;
     };
 
     const { currentStep, organizationData, isLoading, error } = state;
-
-    const handleActionChoice = (action: 'create' | 'join') => {
-        if (action === 'create') {
-            setStep('create-organization');
-        } else {
-            setStep('join-organization');
-        }
-    };
 
     const handleOrganizationCreated = (data: OrganizationFormData) => {
         console.log('Organization created data received:', data);
@@ -266,9 +255,7 @@ export default function EnhancedOrganizationWizard({ businessTypes }: Props) {
                             <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-green-100">
                                 <CheckCircle className="h-12 w-12 text-green-600" />
                             </div>
-                            <h2 className="text-3xl font-bold text-foreground">
-                                Welcome to PortzApp!
-                            </h2>
+                            <h2 className="text-3xl font-bold text-foreground">Welcome to PortzApp!</h2>
                             <p className="text-lg text-muted-foreground">
                                 Your account is set up and ready to go. You'll be redirected to your dashboard shortly.
                             </p>

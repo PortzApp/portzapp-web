@@ -1,7 +1,7 @@
 import { FormEventHandler, useEffect } from 'react';
 
 import { Head, useForm } from '@inertiajs/react';
-import { LoaderCircle, Building2, UserCheck } from 'lucide-react';
+import { Building2, LoaderCircle, UserCheck } from 'lucide-react';
 
 import AuthLayout from '@/layouts/auth-layout';
 
@@ -78,22 +78,23 @@ export default function Register({ inviteToken, invitation }: RegisterProps) {
     return (
         <AuthLayout title="Create an account" description="Enter your details below to create your account">
             <Head title="Register" />
-            
+
             {invitation && (
                 <Alert className="mb-6 border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950">
                     <UserCheck className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                     <AlertDescription className="text-blue-800 dark:text-blue-200">
-                        <div className="flex items-center gap-2 mb-1">
+                        <div className="mb-1 flex items-center gap-2">
                             <Building2 className="h-4 w-4" />
                             <span className="font-medium">{invitation.organization.name}</span>
                         </div>
                         <div className="text-sm">
-                            You've been invited to join as a <strong>{invitation.role}</strong> in their {invitation.organization.business_type.toLowerCase()} organization.
+                            You've been invited to join as a <strong>{invitation.role}</strong> in their{' '}
+                            {invitation.organization.business_type.toLowerCase()} organization.
                         </div>
                     </AlertDescription>
                 </Alert>
             )}
-            
+
             <form className="flex flex-col gap-6" onSubmit={submit}>
                 <div className="grid gap-6">
                     <div className="flex gap-4">
@@ -149,9 +150,7 @@ export default function Register({ inviteToken, invitation }: RegisterProps) {
                         />
                         <InputError message={errors.email} />
                         {invitation && (
-                            <p className="text-sm text-muted-foreground">
-                                This email is pre-filled from your invitation and cannot be changed.
-                            </p>
+                            <p className="text-sm text-muted-foreground">This email is pre-filled from your invitation and cannot be changed.</p>
                         )}
                     </div>
 

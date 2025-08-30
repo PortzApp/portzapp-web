@@ -23,7 +23,7 @@ interface MemberInvite {
     role: string;
 }
 
-type OnboardingStep = 'choose-action' | 'create-organization' | 'join-organization' | 'invite-members' | 'complete';
+type OnboardingStep = 'create-organization' | 'invite-members' | 'complete';
 
 interface OnboardingState {
     currentStep: OnboardingStep;
@@ -49,7 +49,7 @@ type OnboardingAction =
 
 // Initial state
 const initialState: OnboardingState = {
-    currentStep: 'choose-action',
+    currentStep: 'create-organization',
     user: null,
     businessTypes: [],
     organizationData: null,
@@ -115,8 +115,7 @@ const getStorageKey = (userId: string | number | null): string | null => {
 };
 
 // Step order for navigation
-const stepOrder: OnboardingStep[] = ['choose-action', 'create-organization', 'invite-members', 'complete'];
-const joinStepOrder: OnboardingStep[] = ['choose-action', 'join-organization', 'complete'];
+const stepOrder: OnboardingStep[] = ['create-organization', 'invite-members', 'complete'];
 
 interface OnboardingProviderProps {
     children: ReactNode;
@@ -171,7 +170,7 @@ export function OnboardingProvider({ children, initialUser, initialBusinessTypes
 
     // Auto-save to storage when state changes
     useEffect(() => {
-        if (state.currentStep !== 'choose-action' || state.organizationData || state.invitations.length > 0) {
+        if (state.currentStep !== 'create-organization' || state.organizationData || state.invitations.length > 0) {
             saveToStorage();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -205,7 +204,7 @@ export function OnboardingProvider({ children, initialUser, initialBusinessTypes
 
     // Navigation helpers
     const getCurrentStepOrder = () => {
-        return state.currentStep === 'join-organization' ? joinStepOrder : stepOrder;
+        return stepOrder;
     };
 
     const goToNextStep = () => {
