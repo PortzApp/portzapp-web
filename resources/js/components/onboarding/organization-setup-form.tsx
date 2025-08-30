@@ -143,23 +143,17 @@ export default function OrganizationSetupForm({ businessTypes, onSuccess, onCanc
                         {/* Organization URL/Slug */}
                         <div className="grid gap-2">
                             <Label htmlFor="slug">Organization URL</Label>
-                            <div className="flex rounded-md shadow-xs">
-                                <span className="-z-10 inline-flex items-center rounded-s-md border border-input bg-background px-3 text-sm text-muted-foreground">
-                                    portzapp.com/
-                                </span>
-                                <Input
-                                    id="slug"
-                                    type="text"
-                                    value={data.slug}
-                                    onChange={(e) => handleSlugChange(e.target.value)}
-                                    disabled={processing}
-                                    placeholder="acme-shipping-co"
-                                    className="-ms-px rounded-s-none shadow-none"
-                                    required
-                                />
-                            </div>
+                            <Input
+                                id="slug"
+                                type="text"
+                                value={data.slug}
+                                onChange={(e) => handleSlugChange(e.target.value)}
+                                disabled={processing}
+                                placeholder="acme-shipping-co"
+                                required
+                            />
                             <p className="text-xs text-muted-foreground">
-                                This will be your organization's unique URL. It can only contain lowercase letters, numbers, and hyphens.
+                                This will be your organization's unique URL (portzapp.com/{data.slug || 'your-organization'}). It can only contain lowercase letters, numbers, and hyphens.
                             </p>
                             <InputError message={errors.slug} />
                         </div>

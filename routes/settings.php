@@ -13,7 +13,7 @@ Route::middleware('auth')->group(function (): void {
     Route::get('settings/organization', [OrganizationController::class, 'edit'])->name('organization.edit');
 
     // Organization invitation routes
-    Route::prefix('settings/organization/invitations')->name('organization.invitations.')->group(function () {
+    Route::prefix('settings/organization/invitations')->name('organization.invitations.')->group(function (): void {
         Route::post('/', [InvitationController::class, 'sendInvitation'])->name('send');
         Route::get('/', [InvitationController::class, 'index'])->name('index');
         Route::delete('/{invitation}', [InvitationController::class, 'destroy'])->name('destroy');
