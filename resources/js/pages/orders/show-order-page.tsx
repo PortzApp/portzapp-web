@@ -10,7 +10,7 @@ import { Edit, LayoutGrid, MapPin, MessageSquare, Package, Ship, Trash2 } from '
 import { parseAsStringLiteral, useQueryState } from 'nuqs';
 import { toast } from 'sonner';
 
-import type { BreadcrumbItem } from '@/types';
+import type { BreadcrumbItem, SharedData } from '@/types';
 import { OrderGroup, OrderGroupService, OrderWithRelations } from '@/types/models';
 
 import AppLayout from '@/layouts/app-layout';
@@ -65,7 +65,7 @@ export default function ShowOrderPage({ order: initialOrder }: { order: OrderWit
     const [order, setOrder] = useState(initialOrder);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [selectedOrderGroupId, setSelectedOrderGroupId] = useState<string | null>(null);
-    const { auth } = usePage().props as any;
+    const { auth } = usePage<SharedData>().props;
 
     const [activeTab, setActiveTab] = useQueryState(
         'tab',

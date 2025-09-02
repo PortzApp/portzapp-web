@@ -44,7 +44,7 @@ export function ChatConversation({ orderGroup, currentUserId }: ChatConversation
     const [messages, setMessages] = useState<ChatMessage[]>(orderGroup.chat_messages || []);
     const scrollAreaRef = useRef<HTMLDivElement>(null);
 
-    const { data, setData, post, processing, reset } = useForm({
+    const { setData, post, processing, reset } = useForm({
         message: '',
     });
 
@@ -60,7 +60,7 @@ export function ChatConversation({ orderGroup, currentUserId }: ChatConversation
         // Mark messages as read when received
         if (message.user_id !== currentUserId) {
             setTimeout(() => {
-                post(route('order-groups.messages.read', orderGroup.id), {}, {
+                post(route('order-groups.messages.read', orderGroup.id), {
                     preserveState: true,
                     preserveScroll: true,
                 });
@@ -97,7 +97,6 @@ export function ChatConversation({ orderGroup, currentUserId }: ChatConversation
 
         // Submit form using Inertia
         post(route('order-groups.messages.store', orderGroup.id), {
-            data: { message },
             preserveState: true,
             preserveScroll: true,
             onSuccess: () => {

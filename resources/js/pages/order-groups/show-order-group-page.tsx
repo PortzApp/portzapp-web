@@ -5,7 +5,7 @@ import { useEcho } from '@laravel/echo-react';
 import { Copy, Eye, MessageSquare, MoreVertical, Package, Ship, Tag } from 'lucide-react';
 import { toast } from 'sonner';
 
-import type { BreadcrumbItem } from '@/types';
+import type { BreadcrumbItem, SharedData } from '@/types';
 import { OrderGroupServiceStatus, OrderGroupStatus } from '@/types/enums';
 import { OrderBase, OrderGroup, OrderGroupService, OrderWithRelations } from '@/types/models';
 
@@ -81,7 +81,7 @@ export default function ShowOrderGroupPage({
     const [orderGroup, setOrderGroup] = useState(initialOrderGroup);
     const [parentOrder, setParentOrder] = useState(initialParentOrder);
     const [siblingOrderGroups, setSiblingOrderGroups] = useState(initialSiblingOrderGroups);
-    const { auth } = usePage().props as any;
+    const { auth } = usePage<SharedData>().props;
 
     // Sync new props back to local state after server refetch
     useEffect(() => {

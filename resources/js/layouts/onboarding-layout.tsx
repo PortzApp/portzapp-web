@@ -12,10 +12,9 @@ interface OnboardingLayoutProps {
     children: ReactNode;
     user: User;
     title?: string;
-    hideNameText?: boolean;
 }
 
-export default function OnboardingLayout({ children, user, title = 'Complete Setup', hideNameText = false }: OnboardingLayoutProps) {
+export default function OnboardingLayout({ children, user, title = 'Complete Setup' }: OnboardingLayoutProps) {
     const handleLogout = () => {
         router.post(route('logout'));
     };

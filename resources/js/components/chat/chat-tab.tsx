@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { router } from '@inertiajs/react';
 import { useEcho } from '@laravel/echo-react';
 import { toast } from 'sonner';
 
@@ -47,7 +46,7 @@ export function ChatTab({ orderGroupId, currentUserId }: ChatTabProps) {
                 });
                 const data = await response.json();
                 setMessages(data.messages);
-            } catch (error) {
+            } catch {
                 toast.error('Failed to load chat messages');
             } finally {
                 setLoading(false);
@@ -123,7 +122,7 @@ export function ChatTab({ orderGroupId, currentUserId }: ChatTabProps) {
                     msg.id === optimisticMessage.id ? data.message : msg
                 )
             );
-        } catch (error) {
+        } catch {
             // Remove optimistic message on error
             setMessages((prev) => prev.filter((msg) => msg.id !== optimisticMessage.id));
             toast.error('Failed to send message');
