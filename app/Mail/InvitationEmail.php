@@ -3,14 +3,26 @@
 namespace App\Mail;
 
 use App\Models\Invitation;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class InvitationEmail extends Mailable
+class InvitationEmail extends Mailable implements ShouldQueue
 {
-    use SerializesModels;
+    use Queueable, SerializesModels;
+
+    /**
+     * The number of times the job may be attempted.
+     */
+    public int $tries = 3;
+
+    /**
+     * The maximum number of seconds the job can run before timing out.
+     */
+    public int $timeout = 60;
 
     /**
      * Create a new message instance.
