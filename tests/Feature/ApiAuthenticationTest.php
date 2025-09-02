@@ -3,8 +3,8 @@
 use App\Models\User;
 use Laravel\Sanctum\Sanctum;
 
-describe('API Authentication', function () {
-    it('can issue token with valid credentials', function () {
+describe('API Authentication', function (): void {
+    it('can issue token with valid credentials', function (): void {
         $user = User::factory()->create();
 
         $response = $this->postJson('/api/sanctum/token', [
@@ -20,7 +20,7 @@ describe('API Authentication', function () {
         expect($user->tokens()->first()->name)->toBe('expo-app');
     });
 
-    it('rejects invalid credentials', function () {
+    it('rejects invalid credentials', function (): void {
         $user = User::factory()->create();
 
         $response = $this->postJson('/api/sanctum/token', [
@@ -33,14 +33,14 @@ describe('API Authentication', function () {
         $response->assertJsonValidationErrors(['email']);
     });
 
-    it('requires all authentication fields', function () {
+    it('requires all authentication fields', function (): void {
         $response = $this->postJson('/api/sanctum/token', []);
 
         $response->assertUnprocessable();
         $response->assertJsonValidationErrors(['email', 'password', 'device_name']);
     });
 
-    it('can access user data with valid token', function () {
+    it('can access user data with valid token', function (): void {
         $user = User::factory()->create();
 
         Sanctum::actingAs($user, ['*']);
@@ -66,13 +66,13 @@ describe('API Authentication', function () {
         expect($response->json('data.email'))->toBe($user->email);
     });
 
-    it('rejects unauthenticated requests to protected routes', function () {
+    it('rejects unauthenticated requests to protected routes', function (): void {
         $response = $this->getJson('/api/user');
 
         $response->assertUnauthorized();
     });
 
-    it('can logout and revoke token', function () {
+    it('can logout and revoke token', function (): void {
         $user = User::factory()->create();
         $token = $user->createToken('expo-app')->plainTextToken;
 
@@ -85,7 +85,7 @@ describe('API Authentication', function () {
         expect($user->tokens()->count())->toBe(0);
     });
 
-    it('can create multiple tokens for different devices', function () {
+    it('can create multiple tokens for different devices', function (): void {
         $user = User::factory()->create();
 
         $response1 = $this->postJson('/api/sanctum/token', [

@@ -30,7 +30,7 @@ Route::post('/sanctum/token', function (Request $request) {
 });
 
 // Protected routes for authenticated users
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware('auth:sanctum')->group(function (): void {
     Route::get('/user', function (Request $request) {
         return new UserResource($request->user());
     });

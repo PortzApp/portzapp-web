@@ -127,7 +127,7 @@ class InvitationController extends Controller
         $validationErrors = [];
 
         // Pre-validate and create invitation records
-        foreach ($invites as $index => $inviteData) {
+        foreach ($invites as $inviteData) {
             $email = $inviteData['email'];
             $role = UserRoles::from($inviteData['role']);
 
@@ -182,19 +182,19 @@ class InvitationController extends Controller
 
         $batch = Bus::batch($jobs)
             ->name('Bulk Invitation Email Batch')
-            ->then(function () use ($organization) {
+            ->then(function () use ($organization): void {
                 Log::info('✅ Bulk invitation batch completed successfully', [
                     'organization_id' => $organization->id,
                 ]);
             })
-            ->catch(function ($batch, \Throwable $e) use ($organization) {
+            ->catch(function ($batch, \Throwable $e) use ($organization): void {
                 Log::error('❌ Bulk invitation batch failed', [
                     'organization_id' => $organization->id,
                     'error' => $e->getMessage(),
                     'failed_jobs' => $batch->failedJobs,
                 ]);
             })
-            ->finally(function () use ($organization) {
+            ->finally(function () use ($organization): void {
                 Log::info('🏁 Bulk invitation batch processing finished', [
                     'organization_id' => $organization->id,
                 ]);
