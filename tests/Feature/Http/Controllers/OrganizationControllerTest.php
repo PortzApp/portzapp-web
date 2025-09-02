@@ -516,3 +516,100 @@ describe('OrganizationController member management', function (): void {
         $response->assertForbidden();
     });
 });
+
+describe('OrganizationController current org member role management', function (): void {
+    it('allows admin to update member role in current organization', function (): void {
+        // Create a viewer user for this test
+        $shippingViewer = User::factory()->create(['current_organization_id' => $this->shippingAgencyOrg->id]);
+        $shippingViewer->organizations()->attach($this->shippingAgencyOrg, ['role' => UserRoles::VIEWER]);
+
+        $roleData = [
+            'role' => UserRoles::MANAGER->value,
+        ];
+
+        $response = $this->actingAs($this->shippingAgencyAdmin)
+            ->patch(route('organization.members.updateRole', $shippingViewer), $roleData);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('message', 'Member role updated successfully!');
+
+        $this->assertDatabaseHas('organization_user', [
+            'user_id' => $shippingViewer->id,
+            'organization_id' => $this->shippingAgencyOrg->id,
+            'role' => UserRoles::MANAGER->value,
+        ]);
+    });
+
+    it('prevents user from changing their own role', function (): void {
+        $roleData = [
+            'role' => UserRoles::VIEWER->value,
+        ];
+
+        $response = $this->actingAs($this->shippingAgencyAdmin)
+            ->patch(route('organization.members.updateRole', $this->shippingAgencyAdmin), $roleData);
+
+        $response->assertRedirect();
+        $response->assertSessionHasErrors('error');
+
+        // Ensure role wasn't changed
+        $this->assertDatabaseHas('organization_user', [
+            'user_id' => $this->shippingAgencyAdmin->id,
+            'organization_id' => $this->shippingAgencyOrg->id,
+            'role' => UserRoles::ADMIN->value,
+        ]);
+    });
+
+    it('denies non-admin users from updating member roles', function (): void {
+        // Create a viewer user for this test
+        $shippingViewer = User::factory()->create(['current_organization_id' => $this->shippingAgencyOrg->id]);
+        $shippingViewer->organizations()->attach($this->shippingAgencyOrg, ['role' => UserRoles::VIEWER]);
+
+        $roleData = [
+            'role' => UserRoles::MANAGER->value,
+        ];
+
+        $response = $this->actingAs($shippingViewer)
+            ->patch(route('organization.members.updateRole', $this->shippingAgencyAdmin), $roleData);
+
+        $response->assertForbidden();
+    });
+
+    it('validates role update data for current org', function (): void {
+        // Create a viewer user for this test
+        $shippingViewer = User::factory()->create(['current_organization_id' => $this->shippingAgencyOrg->id]);
+        $shippingViewer->organizations()->attach($this->shippingAgencyOrg, ['role' => UserRoles::VIEWER]);
+
+        $response = $this->actingAs($this->shippingAgencyAdmin)
+            ->patch(route('organization.members.updateRole', $shippingViewer), ['role' => 'invalid_role']);
+
+        $response->assertSessionHasErrors('role');
+    });
+
+    it('handles updating role for non-member in current org', function (): void {
+        $roleData = [
+            'role' => UserRoles::ADMIN->value,
+        ];
+
+        $response = $this->actingAs($this->shippingAgencyAdmin)
+            ->patch(route('organization.members.updateRole', $this->unattachedUser), $roleData);
+
+        $response->assertRedirect();
+        $response->assertSessionHasErrors('error');
+    });
+
+    it('denies user without current organization', function (): void {
+        // Create a viewer user for this test
+        $shippingViewer = User::factory()->create(['current_organization_id' => $this->shippingAgencyOrg->id]);
+        $shippingViewer->organizations()->attach($this->shippingAgencyOrg, ['role' => UserRoles::VIEWER]);
+
+        $user = User::factory()->create(['current_organization_id' => null]);
+        $roleData = [
+            'role' => UserRoles::ADMIN->value,
+        ];
+
+        $response = $this->actingAs($user)
+            ->patch(route('organization.members.updateRole', $shippingViewer), $roleData);
+
+        $response->assertForbidden();
+    });
+});
