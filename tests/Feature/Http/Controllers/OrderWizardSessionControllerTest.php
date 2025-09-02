@@ -3,6 +3,7 @@
 use App\Enums\OrderGroupStatus;
 use App\Enums\OrderStatus;
 use App\Enums\OrganizationBusinessType;
+use App\Enums\ServiceStatus;
 use App\Enums\UserRoles;
 use App\Enums\WizardStep;
 use App\Models\Order;
@@ -417,6 +418,7 @@ describe('OrderWizardSessionController setServices', function (): void {
             'organization_id' => $this->shippingAgencyOrg->id,
             'port_id' => $this->port->id,
             'service_sub_category_id' => $this->serviceSubCategory->id,
+            'status' => ServiceStatus::ACTIVE,
         ]);
 
         $data = [
