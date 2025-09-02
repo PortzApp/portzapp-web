@@ -153,7 +153,8 @@ export default function OrganizationSetupForm({ businessTypes, onSuccess, onCanc
                                 required
                             />
                             <p className="text-xs text-muted-foreground">
-                                This will be your organization's unique URL (portzapp.com/{data.slug || 'your-organization'}). It can only contain lowercase letters, numbers, and hyphens.
+                                This will be your organization's unique URL (portzapp.com/{data.slug || 'your-organization'}). It can only contain
+                                lowercase letters, numbers, and hyphens.
                             </p>
                             <InputError message={errors.slug} />
                         </div>

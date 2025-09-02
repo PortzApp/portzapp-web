@@ -188,9 +188,7 @@ export default function EnhancedOrganizationWizard({ businessTypes }: Props) {
                                 <CheckCircle className="h-12 w-12 text-green-600" />
                             </div>
                             <h2 className="text-3xl font-bold text-foreground">Welcome to PortzApp!</h2>
-                            <p className="text-lg text-muted-foreground">
-                                Your account is set up and ready to go.
-                            </p>
+                            <p className="text-lg text-muted-foreground">Your account is set up and ready to go.</p>
                         </div>
 
                         <div className="flex justify-center">

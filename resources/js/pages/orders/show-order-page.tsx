@@ -29,8 +29,8 @@ import {
 } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-import { ChatSelector } from '@/components/chat/chat-selector';
 import { ChatConversation } from '@/components/chat/chat-conversation';
+import { ChatSelector } from '@/components/chat/chat-selector';
 
 interface OrderEvent {
     message: string;
@@ -203,7 +203,7 @@ export default function ShowOrderPage({ order: initialOrder }: { order: OrderWit
             <Head title={`Order ${order.order_number}`} />
 
             <div className="flex min-h-screen flex-col gap-8 bg-neutral-50 p-8 dark:bg-neutral-950">
-                <div className="flex items-center justify-between flex-shrink-0">
+                <div className="flex flex-shrink-0 items-center justify-between">
                     <div className="flex flex-col gap-1">
                         <h1 className="text-2xl font-semibold">
                             Order: <span className="font-mono text-xl text-muted-foreground">{order.order_number}</span>
@@ -249,7 +249,7 @@ export default function ShowOrderPage({ order: initialOrder }: { order: OrderWit
                             setActiveTab(value as (typeof tabValues)[number]);
                         }
                     }}
-                    className="w-full flex-1 flex flex-col"
+                    className="flex w-full flex-1 flex-col"
                 >
                     <TabsList className="grid w-full grid-cols-4">
                         <TabsTrigger value="overview" className="flex items-center gap-2">
@@ -286,7 +286,7 @@ export default function ShowOrderPage({ order: initialOrder }: { order: OrderWit
                         </TabsTrigger> */}
                     </TabsList>
 
-                    <div className="mt-6 flex-1 flex flex-col">
+                    <div className="mt-6 flex flex-1 flex-col">
                         <TabsContent value="overview" className="space-y-4">
                             <OrderOverviewTab order={order} />
                         </TabsContent>
@@ -362,9 +362,9 @@ export default function ShowOrderPage({ order: initialOrder }: { order: OrderWit
                             </div>
                         </TabsContent>
 
-                        <TabsContent value="chat" className="flex-1 flex flex-col">
+                        <TabsContent value="chat" className="flex flex-1 flex-col">
                             {order.order_groups && order.order_groups.length > 0 ? (
-                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
+                                <div className="grid h-full grid-cols-1 gap-6 lg:grid-cols-3">
                                     <div className="lg:col-span-1">
                                         <ChatSelector
                                             orderGroups={order.order_groups}
@@ -375,14 +375,14 @@ export default function ShowOrderPage({ order: initialOrder }: { order: OrderWit
                                     <div className="lg:col-span-2">
                                         {selectedOrderGroupId ? (
                                             <ChatConversation
-                                                orderGroup={order.order_groups.find(og => og.id === selectedOrderGroupId)!}
+                                                orderGroup={order.order_groups.find((og) => og.id === selectedOrderGroupId)!}
                                                 currentUserId={auth.user.id}
                                             />
                                         ) : (
-                                            <div className="h-full flex items-center justify-center border rounded-lg bg-muted/20">
+                                            <div className="flex h-full items-center justify-center rounded-lg border bg-muted/20">
                                                 <div className="text-center text-muted-foreground">
-                                                    <MessageSquare className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                                                    <p className="text-lg font-medium mb-2">Select a chat</p>
+                                                    <MessageSquare className="mx-auto mb-4 h-12 w-12 opacity-50" />
+                                                    <p className="mb-2 text-lg font-medium">Select a chat</p>
                                                     <p className="text-sm">Choose an agency from the left to start messaging</p>
                                                 </div>
                                             </div>
@@ -390,9 +390,7 @@ export default function ShowOrderPage({ order: initialOrder }: { order: OrderWit
                                     </div>
                                 </div>
                             ) : (
-                                <div className="text-center text-muted-foreground py-8">
-                                    No order groups available for chat.
-                                </div>
+                                <div className="py-8 text-center text-muted-foreground">No order groups available for chat.</div>
                             )}
                         </TabsContent>
 

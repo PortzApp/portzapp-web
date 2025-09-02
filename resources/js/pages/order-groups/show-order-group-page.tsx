@@ -28,7 +28,6 @@ import { VesselTypeBadge } from '@/components/badges';
 import { OrderGroupServiceStatusBadge } from '@/components/badges/order-group-service-status-badge';
 import { OrderGroupStatusBadge } from '@/components/badges/order-group-status-badge';
 import { ServiceCategoryBadge } from '@/components/badges/service-category-badge';
-
 import { ChatTab } from '@/components/chat/chat-tab';
 
 interface OrderGroupEvent {

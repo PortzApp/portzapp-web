@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { useEcho } from '@laravel/echo-react';
 import { useForm } from '@inertiajs/react';
+import { useEcho } from '@laravel/echo-react';
 import { MessageSquare } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -56,7 +56,7 @@ export function ChatConversation({ orderGroup, currentUserId }: ChatConversation
     // Listen for new messages via WebSocket
     useEcho(`private-order-group-chat.${orderGroup.id}`, 'ChatMessageSent', ({ message }: { message: ChatMessage }) => {
         setMessages((prev) => [...prev, message]);
-        
+
         // Mark messages as read when received
         if (message.user_id !== currentUserId) {
             setTimeout(() => {
@@ -78,7 +78,7 @@ export function ChatConversation({ orderGroup, currentUserId }: ChatConversation
     const handleSendMessage = (message: string) => {
         // Set form data
         setData('message', message);
-        
+
         // Optimistically add the message to the UI
         const optimisticMessage: ChatMessage = {
             id: Date.now().toString(), // Temporary ID
@@ -112,22 +112,18 @@ export function ChatConversation({ orderGroup, currentUserId }: ChatConversation
     };
 
     return (
-        <Card className="h-full flex flex-col">
+        <Card className="flex h-full flex-col">
             <CardHeader className="flex-shrink-0">
                 <CardTitle className="flex items-center gap-2">
                     <MessageSquare className="h-5 w-5" />
                     Chat with {orderGroup.fulfilling_organization?.name || 'Agency'}
-                    <span className="text-sm font-normal text-muted-foreground">
-                        #{orderGroup.group_number}
-                    </span>
+                    <span className="text-sm font-normal text-muted-foreground">#{orderGroup.group_number}</span>
                 </CardTitle>
             </CardHeader>
-            <CardContent className="flex-1 flex flex-col p-0">
+            <CardContent className="flex flex-1 flex-col p-0">
                 <ScrollArea ref={scrollAreaRef} className="flex-1 p-4">
                     {messages.length === 0 ? (
-                        <div className="text-center text-muted-foreground py-8">
-                            No messages yet. Start the conversation!
-                        </div>
+                        <div className="py-8 text-center text-muted-foreground">No messages yet. Start the conversation!</div>
                     ) : (
                         <div className="space-y-4">
                             {messages.map((msg) => (

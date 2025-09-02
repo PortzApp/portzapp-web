@@ -59,7 +59,7 @@ export function ChatTab({ orderGroupId, currentUserId }: ChatTabProps) {
     // Listen for new messages via WebSocket
     useEcho(`private-order-group-chat.${orderGroupId}`, 'ChatMessageSent', ({ message }: { message: ChatMessage }) => {
         setMessages((prev) => [...prev, message]);
-        
+
         // Mark messages as read when received
         if (message.user_id !== currentUserId) {
             setTimeout(() => {
@@ -83,7 +83,7 @@ export function ChatTab({ orderGroupId, currentUserId }: ChatTabProps) {
 
     const handleSendMessage = async (message: string) => {
         setSending(true);
-        
+
         // Optimistically add the message to the UI
         const optimisticMessage: ChatMessage = {
             id: Date.now().toString(), // Temporary ID
@@ -115,13 +115,9 @@ export function ChatTab({ orderGroupId, currentUserId }: ChatTabProps) {
             }
 
             const data = await response.json();
-            
+
             // Replace optimistic message with real message from server
-            setMessages((prev) => 
-                prev.map((msg) => 
-                    msg.id === optimisticMessage.id ? data.message : msg
-                )
-            );
+            setMessages((prev) => prev.map((msg) => (msg.id === optimisticMessage.id ? data.message : msg)));
         } catch {
             // Remove optimistic message on error
             setMessages((prev) => prev.filter((msg) => msg.id !== optimisticMessage.id));
@@ -132,16 +128,16 @@ export function ChatTab({ orderGroupId, currentUserId }: ChatTabProps) {
     };
 
     return (
-        <Card className="h-[500px] flex flex-col">
+        <Card className="flex h-[500px] flex-col">
             <CardHeader className="flex-shrink-0">
                 <CardTitle>Chat</CardTitle>
             </CardHeader>
-            <CardContent className="flex-1 flex flex-col p-0">
+            <CardContent className="flex flex-1 flex-col p-0">
                 <ScrollArea ref={scrollAreaRef} className="flex-1 p-4">
                     {loading ? (
-                        <div className="text-center text-muted-foreground py-8">Loading messages...</div>
+                        <div className="py-8 text-center text-muted-foreground">Loading messages...</div>
                     ) : messages.length === 0 ? (
-                        <div className="text-center text-muted-foreground py-8">No messages yet. Start the conversation!</div>
+                        <div className="py-8 text-center text-muted-foreground">No messages yet. Start the conversation!</div>
                     ) : (
                         <div className="space-y-4">
                             {messages.map((msg) => (

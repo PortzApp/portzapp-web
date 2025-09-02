@@ -1,4 +1,6 @@
 import { useState } from 'react';
+
+import { SharedData } from '@/types';
 import { Head, router, useForm, usePage } from '@inertiajs/react';
 import { Clock, Edit3, Info, Loader2, Mail, MoreVertical, Plus } from 'lucide-react';
 import { toast } from 'sonner';
@@ -6,22 +8,30 @@ import { toast } from 'sonner';
 import { UserWithPivot } from '@/types/core';
 import { UserRoles } from '@/types/enums';
 import { Invitation, Organization } from '@/types/models';
-import { SharedData } from '@/types';
 
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 
 import { Button } from '@/components/ui/button';
-import InputError from '@/components/input-error';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuSub,
+    DropdownMenuSubContent,
+    DropdownMenuSubTrigger,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 import HeadingSmall from '@/components/heading-small';
+import InputError from '@/components/input-error';
 
 // Helper function to get human-readable role labels
 function getRoleLabel(role: UserRoles): string {
@@ -58,7 +68,7 @@ export default function OrganizationSettingsPage({ users, pendingInvitations, or
     const { auth } = usePage<SharedData>().props;
     const canUpdateOrganization = auth.permissions?.organization?.update_current ?? false;
     const canUpdateMemberRoles = auth.permissions?.organization?.updateMemberRole ?? false;
-    
+
     const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
     const [isOrgEditDialogOpen, setIsOrgEditDialogOpen] = useState(false);
     const [roleUpdateInProgress, setRoleUpdateInProgress] = useState<string | null>(null);
@@ -121,7 +131,7 @@ export default function OrganizationSettingsPage({ users, pendingInvitations, or
 
     const handleRoleChange = (userId: string, newRole: UserRoles) => {
         setRoleUpdateInProgress(userId);
-        
+
         router.patch(
             route('organization.members.updateRole', userId),
             { role: newRole },
@@ -153,7 +163,7 @@ export default function OrganizationSettingsPage({ users, pendingInvitations, or
                     <div className="space-y-4">
                         <div className="flex items-center justify-between">
                             <HeadingSmall title="Organization Information" description="Update your organization details" />
-                            
+
                             {canUpdateOrganization ? (
                                 <Dialog open={isOrgEditDialogOpen} onOpenChange={setIsOrgEditDialogOpen}>
                                     <DialogTrigger asChild>
@@ -165,9 +175,7 @@ export default function OrganizationSettingsPage({ users, pendingInvitations, or
                                     <DialogContent className="sm:max-w-[500px]">
                                         <DialogHeader>
                                             <DialogTitle>Edit Organization</DialogTitle>
-                                            <DialogDescription>
-                                                Update your organization's information and settings.
-                                            </DialogDescription>
+                                            <DialogDescription>Update your organization's information and settings.</DialogDescription>
                                         </DialogHeader>
                                         <div className="grid gap-4 py-4">
                                             <div className="grid gap-2">
@@ -216,11 +224,7 @@ export default function OrganizationSettingsPage({ users, pendingInvitations, or
                                             >
                                                 Cancel
                                             </Button>
-                                            <Button
-                                                type="button"
-                                                onClick={handleOrgSubmit}
-                                                disabled={processing}
-                                            >
+                                            <Button type="button" onClick={handleOrgSubmit} disabled={processing}>
                                                 {processing ? (
                                                     <>
                                                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -240,7 +244,7 @@ export default function OrganizationSettingsPage({ users, pendingInvitations, or
                                 <TooltipProvider>
                                     <Tooltip>
                                         <TooltipTrigger asChild>
-                                            <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 cursor-help">
+                                            <div className="flex cursor-help items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                                                 <Edit3 className="h-4 w-4" />
                                                 <span>Edit Organization</span>
                                             </div>
@@ -277,7 +281,7 @@ export default function OrganizationSettingsPage({ users, pendingInvitations, or
                     <div className="space-y-4">
                         <div className="flex items-center justify-between">
                             <HeadingSmall title="Team Members" description="Manage your organization's members" />
-                            
+
                             {canUpdateMemberRoles ? (
                                 <Dialog open={isInviteDialogOpen} onOpenChange={setIsInviteDialogOpen}>
                                     <DialogTrigger asChild>
@@ -290,8 +294,8 @@ export default function OrganizationSettingsPage({ users, pendingInvitations, or
                                         <DialogHeader>
                                             <DialogTitle>Invite Team Member</DialogTitle>
                                             <DialogDescription>
-                                                Send an invitation to join your organization. They'll receive an email with instructions to create their
-                                                account.
+                                                Send an invitation to join your organization. They'll receive an email with instructions to create
+                                                their account.
                                             </DialogDescription>
                                         </DialogHeader>
                                         <div className="grid gap-4 py-4">
@@ -336,7 +340,12 @@ export default function OrganizationSettingsPage({ users, pendingInvitations, or
                                             </div>
                                         </div>
                                         <DialogFooter>
-                                            <Button type="button" variant="outline" onClick={() => setIsInviteDialogOpen(false)} disabled={isSubmitting}>
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                onClick={() => setIsInviteDialogOpen(false)}
+                                                disabled={isSubmitting}
+                                            >
                                                 Cancel
                                             </Button>
                                             <Button type="button" onClick={handleInviteSubmit} disabled={isSubmitting}>
@@ -359,7 +368,7 @@ export default function OrganizationSettingsPage({ users, pendingInvitations, or
                                 <TooltipProvider>
                                     <Tooltip>
                                         <TooltipTrigger asChild>
-                                            <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 cursor-help">
+                                            <div className="flex cursor-help items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                                                 <Info className="h-4 w-4" />
                                                 <span>Member Management</span>
                                             </div>
@@ -373,123 +382,123 @@ export default function OrganizationSettingsPage({ users, pendingInvitations, or
                         </div>
 
                         <div className="bg-white dark:bg-gray-900">
-                        <div className="overflow-x-auto rounded-md border border-gray-200 dark:border-gray-700">
-                            <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-600">
-                                <thead className="bg-gray-50 dark:bg-gray-800">
-                                    <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400">
-                                            Name
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400">
-                                            Email
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400">
-                                            Role
-                                        </th>
-                                        {canUpdateMemberRoles && (
+                            <div className="overflow-x-auto rounded-md border border-gray-200 dark:border-gray-700">
+                                <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-600">
+                                    <thead className="bg-gray-50 dark:bg-gray-800">
+                                        <tr>
                                             <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400">
-                                                Actions
+                                                Name
                                             </th>
-                                        )}
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-600 dark:bg-gray-900">
-                                    {users.map((user) => (
-                                        <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="flex items-center">
-                                                    <div className="h-10 w-10 flex-shrink-0">
-                                                        {user.avatar ? (
-                                                            <img
-                                                                className="h-10 w-10 rounded-full"
-                                                                src={user.avatar}
-                                                                alt={`${user.first_name} ${user.last_name}`}
-                                                            />
-                                                        ) : (
-                                                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-300 dark:bg-gray-600">
-                                                                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                                                    {user.first_name.charAt(0)}
-                                                                    {user.last_name.charAt(0)}
-                                                                </span>
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                    <div className="ml-4">
-                                                        <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                                            {user.first_name} {user.last_name}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm text-gray-900 dark:text-gray-100">{user.email}</div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <span className="inline-flex rounded-full bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                                                    {getRoleLabel(user.pivot.role)}
-                                                </span>
-                                            </td>
+                                            <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400">
+                                                Email
+                                            </th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400">
+                                                Role
+                                            </th>
                                             {canUpdateMemberRoles && (
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <DropdownMenu>
-                                                        <DropdownMenuTrigger asChild>
-                                                            <Button
-                                                                variant="ghost"
-                                                                size="sm"
-                                                                className="h-8 w-8 p-0"
-                                                                disabled={roleUpdateInProgress === user.id || user.id === auth.user.id}
-                                                            >
-                                                                {roleUpdateInProgress === user.id ? (
-                                                                    <Loader2 className="h-4 w-4 animate-spin" />
-                                                                ) : (
-                                                                    <MoreVertical className="h-4 w-4" />
-                                                                )}
-                                                            </Button>
-                                                        </DropdownMenuTrigger>
-                                                        <DropdownMenuContent align="end">
-                                                            <DropdownMenuSub>
-                                                                <DropdownMenuSubTrigger disabled={user.id === auth.user.id}>
-                                                                    Change Role
-                                                                </DropdownMenuSubTrigger>
-                                                                <DropdownMenuSubContent>
-                                                                    {Object.values(UserRoles).map((role) => (
-                                                                        <DropdownMenuItem
-                                                                            key={role}
-                                                                            onClick={() => handleRoleChange(user.id, role)}
-                                                                            disabled={user.pivot.role === role}
-                                                                            className={user.pivot.role === role ? 'opacity-50' : ''}
-                                                                        >
-                                                                            {getRoleLabel(role)}
-                                                                            {user.pivot.role === role && (
-                                                                                <span className="ml-auto text-xs text-gray-500">Current</span>
-                                                                            )}
-                                                                        </DropdownMenuItem>
-                                                                    ))}
-                                                                </DropdownMenuSubContent>
-                                                            </DropdownMenuSub>
-                                                            {user.id === auth.user.id && (
-                                                                <>
-                                                                    <DropdownMenuSeparator />
-                                                                    <DropdownMenuItem disabled className="text-xs text-gray-500">
-                                                                        Cannot change own role
-                                                                    </DropdownMenuItem>
-                                                                </>
-                                                            )}
-                                                        </DropdownMenuContent>
-                                                    </DropdownMenu>
-                                                </td>
+                                                <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400">
+                                                    Actions
+                                                </th>
                                             )}
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-
-                        {users.length === 0 && (
-                            <div className="py-12 text-center">
-                                <p className="text-sm text-gray-500 dark:text-gray-400">No members found in this organization.</p>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-600 dark:bg-gray-900">
+                                        {users.map((user) => (
+                                            <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <div className="flex items-center">
+                                                        <div className="h-10 w-10 flex-shrink-0">
+                                                            {user.avatar ? (
+                                                                <img
+                                                                    className="h-10 w-10 rounded-full"
+                                                                    src={user.avatar}
+                                                                    alt={`${user.first_name} ${user.last_name}`}
+                                                                />
+                                                            ) : (
+                                                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-300 dark:bg-gray-600">
+                                                                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                                        {user.first_name.charAt(0)}
+                                                                        {user.last_name.charAt(0)}
+                                                                    </span>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                        <div className="ml-4">
+                                                            <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                                                {user.first_name} {user.last_name}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <div className="text-sm text-gray-900 dark:text-gray-100">{user.email}</div>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <span className="inline-flex rounded-full bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                                                        {getRoleLabel(user.pivot.role)}
+                                                    </span>
+                                                </td>
+                                                {canUpdateMemberRoles && (
+                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                        <DropdownMenu>
+                                                            <DropdownMenuTrigger asChild>
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="sm"
+                                                                    className="h-8 w-8 p-0"
+                                                                    disabled={roleUpdateInProgress === user.id || user.id === auth.user.id}
+                                                                >
+                                                                    {roleUpdateInProgress === user.id ? (
+                                                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                                                    ) : (
+                                                                        <MoreVertical className="h-4 w-4" />
+                                                                    )}
+                                                                </Button>
+                                                            </DropdownMenuTrigger>
+                                                            <DropdownMenuContent align="end">
+                                                                <DropdownMenuSub>
+                                                                    <DropdownMenuSubTrigger disabled={user.id === auth.user.id}>
+                                                                        Change Role
+                                                                    </DropdownMenuSubTrigger>
+                                                                    <DropdownMenuSubContent>
+                                                                        {Object.values(UserRoles).map((role) => (
+                                                                            <DropdownMenuItem
+                                                                                key={role}
+                                                                                onClick={() => handleRoleChange(user.id, role)}
+                                                                                disabled={user.pivot.role === role}
+                                                                                className={user.pivot.role === role ? 'opacity-50' : ''}
+                                                                            >
+                                                                                {getRoleLabel(role)}
+                                                                                {user.pivot.role === role && (
+                                                                                    <span className="ml-auto text-xs text-gray-500">Current</span>
+                                                                                )}
+                                                                            </DropdownMenuItem>
+                                                                        ))}
+                                                                    </DropdownMenuSubContent>
+                                                                </DropdownMenuSub>
+                                                                {user.id === auth.user.id && (
+                                                                    <>
+                                                                        <DropdownMenuSeparator />
+                                                                        <DropdownMenuItem disabled className="text-xs text-gray-500">
+                                                                            Cannot change own role
+                                                                        </DropdownMenuItem>
+                                                                    </>
+                                                                )}
+                                                            </DropdownMenuContent>
+                                                        </DropdownMenu>
+                                                    </td>
+                                                )}
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
                             </div>
-                        )}
+
+                            {users.length === 0 && (
+                                <div className="py-12 text-center">
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">No members found in this organization.</p>
+                                </div>
+                            )}
                         </div>
                     </div>
 
