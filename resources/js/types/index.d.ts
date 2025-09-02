@@ -58,6 +58,8 @@ interface PolicyAbilities {
     create: boolean;
     edit: boolean;
     delete: boolean;
+    update_current?: boolean;
+    updateMemberRole?: boolean;
 }
 
 export interface BreadcrumbItem {

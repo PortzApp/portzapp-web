@@ -51,10 +51,42 @@ class OrganizationPolicy
     }
 
     /**
+     * Determine whether the user can update their current organization.
+     */
+    public function updateCurrent(User $user): bool
+    {
+        // Allow admins to update their current organization
+        if ($user->current_organization_id &&
+            $user->isInOrganizationWithUserRole(UserRoles::ADMIN)) {
+            return true;
+        }
+
+        // Also allow PORTZAPP_TEAM admins
+        return $user->isInOrganizationWithBusinessType(OrganizationBusinessType::PORTZAPP_TEAM)
+            && $user->isInOrganizationWithUserRole(UserRoles::ADMIN);
+    }
+
+    /**
      * Determine whether the user can delete the model.
      */
     public function delete(User $user): bool
     {
+        return $user->isInOrganizationWithBusinessType(OrganizationBusinessType::PORTZAPP_TEAM)
+            && $user->isInOrganizationWithUserRole(UserRoles::ADMIN);
+    }
+
+    /**
+     * Determine whether the user can update member roles in their current organization.
+     */
+    public function updateMemberRole(User $user): bool
+    {
+        // Allow admins in their current organization to update member roles
+        if ($user->current_organization_id &&
+            $user->isInOrganizationWithUserRole(UserRoles::ADMIN)) {
+            return true;
+        }
+
+        // Also allow PORTZAPP_TEAM admins
         return $user->isInOrganizationWithBusinessType(OrganizationBusinessType::PORTZAPP_TEAM)
             && $user->isInOrganizationWithUserRole(UserRoles::ADMIN);
     }

@@ -6,6 +6,7 @@ use App\Enums\InvitationStatus;
 use App\Enums\OrganizationBusinessType;
 use App\Enums\UserRoles;
 use App\Http\Requests\StoreOrganizationRequest;
+use App\Http\Requests\UpdateOrganizationRequest;
 use App\Models\Invitation;
 use App\Models\Organization;
 use App\Models\User;
@@ -178,6 +179,32 @@ class OrganizationController extends Controller
     }
 
     /**
+     * Update the current user's organization.
+     */
+    public function updateCurrent(UpdateOrganizationRequest $request)
+    {
+        Gate::authorize('updateCurrent', Organization::class);
+
+        /** @var User $user */
+        $user = auth()->user();
+
+        $organization = $user->currentOrganization;
+        if (! $organization) {
+            return back()->withErrors(['name' => 'Current organization not found.']);
+        }
+
+        $validated = $request->validated();
+
+        $organization->update([
+            'name' => $validated['name'],
+            'registration_code' => $validated['registration_code'],
+            'description' => $validated['description'],
+        ]);
+
+        return back()->with('message', 'Organization updated successfully!');
+    }
+
+    /**
      * Remove the specified resource from storage.
      */
     public function destroy(Organization $organization)
@@ -289,6 +316,48 @@ class OrganizationController extends Controller
         ]);
 
         return redirect()->back()->with('message', 'Member role updated successfully!');
+    }
+
+    /**
+     * Update a user's role in the current organization.
+     */
+    public function updateCurrentOrgMemberRole(Request $request, User $user)
+    {
+        Gate::authorize('updateMemberRole', Organization::class);
+
+        /** @var User $currentUser */
+        $currentUser = auth()->user();
+
+        if (! $currentUser->current_organization_id) {
+            return back()->withErrors(['error' => 'No current organization found.']);
+        }
+
+        $organization = $currentUser->currentOrganization;
+        if (! $organization) {
+            return back()->withErrors(['error' => 'Current organization not found.']);
+        }
+
+        $validated = $request->validate([
+            'role' => ['required', 'in:'.implode(',', array_map(fn ($case) => $case->value, UserRoles::cases()))],
+        ]);
+
+        // Check if target user is a member of the current organization
+        if (! $organization->users()->where('user_id', $user->id)->exists()) {
+            return back()->withErrors(['error' => 'User is not a member of this organization.']);
+        }
+
+        // Prevent users from changing their own role (avoid lockout)
+        if ($user->id === $currentUser->id) {
+            return back()->withErrors(['error' => 'You cannot change your own role.']);
+        }
+
+        // Update the user's role
+        $organization->users()->updateExistingPivot($user->id, [
+            'role' => UserRoles::from($validated['role']),
+            'updated_at' => now(),
+        ]);
+
+        return back()->with('message', 'Member role updated successfully!');
     }
 
     /**

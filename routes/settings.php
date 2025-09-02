@@ -11,6 +11,7 @@ Route::middleware('auth')->group(function (): void {
     Route::redirect('settings', '/settings/profile');
 
     Route::get('settings/organization', [OrganizationController::class, 'edit'])->name('organization.edit');
+    Route::patch('settings/organization', [OrganizationController::class, 'updateCurrent'])->name('organization.update');
 
     // Organization invitation routes
     Route::prefix('settings/organization/invitations')->name('organization.invitations.')->group(function (): void {
@@ -19,6 +20,9 @@ Route::middleware('auth')->group(function (): void {
         Route::delete('/{invitation}', [InvitationController::class, 'destroy'])->name('destroy');
         Route::post('/{invitation}/resend', [InvitationController::class, 'resend'])->name('resend');
     });
+
+    // Organization member role management
+    Route::patch('settings/organization/members/{user}/role', [OrganizationController::class, 'updateCurrentOrgMemberRole'])->name('organization.members.updateRole');
 
     Route::get('settings/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('settings/profile', [ProfileController::class, 'update'])->name('profile.update');

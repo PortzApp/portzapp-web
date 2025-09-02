@@ -31,6 +31,7 @@ export interface Organization extends BaseModel {
     name: string;
     registration_code: string;
     business_type: OrganizationBusinessType;
+    description?: string;
     users_count?: number;
 }
 

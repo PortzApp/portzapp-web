@@ -112,6 +112,8 @@ class HandleInertiaRequests extends Middleware
                         'create' => $user->can('create', Organization::class),
                         'edit' => $user->can('create', Organization::class),
                         'delete' => $user->can('create', Organization::class),
+                        'update_current' => $user->can('updateCurrent', Organization::class),
+                        'updateMemberRole' => $user->can('updateMemberRole', Organization::class),
                     ],
                     'service' => [
                         'view_any' => $user->can('viewAny', Service::class),
