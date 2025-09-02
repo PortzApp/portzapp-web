@@ -40,6 +40,7 @@ class ChatMessageController extends Controller
 
         $message->load('user:id,first_name,last_name,email');
 
+        /** @var \App\Models\ChatMessage $message */
         broadcast(new ChatMessageSent($message))->toOthers();
 
         return back()->with([
