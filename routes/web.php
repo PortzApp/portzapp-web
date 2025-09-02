@@ -59,6 +59,11 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     // Order group service action routes
     Route::patch('order-group-services/{orderGroupService}/status', [OrderGroupServiceController::class, 'updateStatus'])->name('order-group-services.status.update');
 
+    // Chat routes
+    Route::get('order-groups/{orderGroup}/messages', [\App\Http\Controllers\ChatMessageController::class, 'index'])->name('order-groups.messages.index');
+    Route::post('order-groups/{orderGroup}/messages', [\App\Http\Controllers\ChatMessageController::class, 'store'])->name('order-groups.messages.store');
+    Route::patch('order-groups/{orderGroup}/messages/read', [\App\Http\Controllers\ChatMessageController::class, 'markAsRead'])->name('order-groups.messages.read');
+
     // Order wizard routes
     Route::prefix('order-wizard')->group(function (): void {
         Route::get('dashboard', [OrderWizardSessionController::class, 'dashboard'])->name('order-wizard.dashboard');

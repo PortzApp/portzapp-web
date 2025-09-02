@@ -134,4 +134,43 @@ class OrderGroupPolicy
         return $user->isInOrganizationWithBusinessType(OrganizationBusinessType::PORTZAPP_TEAM) &&
                $user->getRoleInCurrentOrganization() === UserRoles::ADMIN;
     }
+
+    /**
+     * Determine whether the user can view chat messages for this order group.
+     */
+    public function viewChat(User $user, OrderGroup $orderGroup): bool
+    {
+        // User must have a current organization
+        if (! $user->current_organization_id) {
+            return false;
+        }
+
+        // PORTZAPP_TEAM can view any order group chat
+        if ($user->isInOrganizationWithBusinessType(OrganizationBusinessType::PORTZAPP_TEAM)) {
+            return true;
+        }
+
+        // Load order if not already loaded
+        $orderGroup->loadMissing('order');
+
+        // Vessel owner (who placed the order) can view chat
+        if ($user->id === $orderGroup->order->placed_by_user_id) {
+            return true;
+        }
+
+        // Agency (fulfilling the order group) can view chat
+        if ($user->current_organization_id === $orderGroup->fulfilling_organization_id) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Determine whether the user can send messages to this order group chat.
+     */
+    public function sendMessage(User $user, OrderGroup $orderGroup): bool
+    {
+        return $this->viewChat($user, $orderGroup);
+    }
 }

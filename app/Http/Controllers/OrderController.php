@@ -171,6 +171,7 @@ class OrderController extends Controller
             'orderGroups.fulfillingOrganization',
             'orderGroups.orderGroupServices.service.organization',
             'orderGroups.orderGroupServices.service.subCategory.category',
+            'orderGroups.chatMessages.user:id,first_name,last_name,email',
         ]);
 
         // Get all services through order groups with sub-categories and categories

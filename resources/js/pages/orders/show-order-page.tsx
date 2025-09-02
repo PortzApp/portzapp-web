@@ -4,9 +4,9 @@ import OrderOverviewTab from '@/pages/orders/components/order-overview-tab';
 import OrderServicesGroupedTab from '@/pages/orders/components/order-services-grouped-tab';
 // import OrderSystemTab from '@/pages/orders/components/order-system-tab';
 import OrderVesselTab from '@/pages/orders/components/order-vessel-tab';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { useEcho } from '@laravel/echo-react';
-import { Edit, LayoutGrid, MapPin, Package, Ship, Trash2 } from 'lucide-react';
+import { Edit, LayoutGrid, MapPin, MessageSquare, Package, Ship, Trash2 } from 'lucide-react';
 import { parseAsStringLiteral, useQueryState } from 'nuqs';
 import { toast } from 'sonner';
 
@@ -28,6 +28,9 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
+import { ChatSelector } from '@/components/chat/chat-selector';
+import { ChatConversation } from '@/components/chat/chat-conversation';
 
 interface OrderEvent {
     message: string;
@@ -56,11 +59,13 @@ interface OrderGroupServiceUpdatedEvent extends OrderEvent {
     };
 }
 
-const tabValues = ['overview', 'services', 'vessel'] as const;
+const tabValues = ['overview', 'services', 'vessel', 'chat'] as const;
 
 export default function ShowOrderPage({ order: initialOrder }: { order: OrderWithRelations }) {
     const [order, setOrder] = useState(initialOrder);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+    const [selectedOrderGroupId, setSelectedOrderGroupId] = useState<string | null>(null);
+    const { auth } = usePage().props as any;
 
     const [activeTab, setActiveTab] = useQueryState(
         'tab',
@@ -74,6 +79,13 @@ export default function ShowOrderPage({ order: initialOrder }: { order: OrderWit
     useEffect(() => {
         setOrder(initialOrder);
     }, [initialOrder]);
+
+    // Auto-select first order group when chat tab is opened
+    useEffect(() => {
+        if (activeTab === 'chat' && order.order_groups && order.order_groups.length > 0 && !selectedOrderGroupId) {
+            setSelectedOrderGroupId(order.order_groups[0].id);
+        }
+    }, [activeTab, order.order_groups, selectedOrderGroupId]);
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -191,7 +203,7 @@ export default function ShowOrderPage({ order: initialOrder }: { order: OrderWit
             <Head title={`Order ${order.order_number}`} />
 
             <div className="flex min-h-screen flex-col gap-8 bg-neutral-50 p-8 dark:bg-neutral-950">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between flex-shrink-0">
                     <div className="flex flex-col gap-1">
                         <h1 className="text-2xl font-semibold">
                             Order: <span className="font-mono text-xl text-muted-foreground">{order.order_number}</span>
@@ -237,9 +249,9 @@ export default function ShowOrderPage({ order: initialOrder }: { order: OrderWit
                             setActiveTab(value as (typeof tabValues)[number]);
                         }
                     }}
-                    className="w-full"
+                    className="w-full flex-1 flex flex-col"
                 >
-                    <TabsList className="grid w-full grid-cols-3">
+                    <TabsList className="grid w-full grid-cols-4">
                         <TabsTrigger value="overview" className="flex items-center gap-2">
                             <LayoutGrid className="h-4 w-4" />
                             Overview
@@ -261,13 +273,20 @@ export default function ShowOrderPage({ order: initialOrder }: { order: OrderWit
                                 1
                             </Badge>
                         </TabsTrigger>
+                        <TabsTrigger value="chat" className="flex items-center gap-2">
+                            <MessageSquare className="h-4 w-4" />
+                            Chat
+                            <Badge variant="secondary" className="ml-1">
+                                {order.order_groups?.length || 0}
+                            </Badge>
+                        </TabsTrigger>
                         {/* <TabsTrigger value="system" className="flex items-center gap-2">
                             <Database className="h-4 w-4" />
                             System Info
                         </TabsTrigger> */}
                     </TabsList>
 
-                    <div className="mt-6">
+                    <div className="mt-6 flex-1 flex flex-col">
                         <TabsContent value="overview" className="space-y-4">
                             <OrderOverviewTab order={order} />
                         </TabsContent>
@@ -341,6 +360,40 @@ export default function ShowOrderPage({ order: initialOrder }: { order: OrderWit
                                     </div>
                                 </div>
                             </div>
+                        </TabsContent>
+
+                        <TabsContent value="chat" className="flex-1 flex flex-col">
+                            {order.order_groups && order.order_groups.length > 0 ? (
+                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
+                                    <div className="lg:col-span-1">
+                                        <ChatSelector
+                                            orderGroups={order.order_groups}
+                                            selectedOrderGroupId={selectedOrderGroupId}
+                                            onSelectOrderGroup={setSelectedOrderGroupId}
+                                        />
+                                    </div>
+                                    <div className="lg:col-span-2">
+                                        {selectedOrderGroupId ? (
+                                            <ChatConversation
+                                                orderGroup={order.order_groups.find(og => og.id === selectedOrderGroupId)!}
+                                                currentUserId={auth.user.id}
+                                            />
+                                        ) : (
+                                            <div className="h-full flex items-center justify-center border rounded-lg bg-muted/20">
+                                                <div className="text-center text-muted-foreground">
+                                                    <MessageSquare className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                                                    <p className="text-lg font-medium mb-2">Select a chat</p>
+                                                    <p className="text-sm">Choose an agency from the left to start messaging</p>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="text-center text-muted-foreground py-8">
+                                    No order groups available for chat.
+                                </div>
+                            )}
                         </TabsContent>
 
                         {/* <TabsContent value="system" className="space-y-4">

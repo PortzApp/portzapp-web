@@ -95,6 +95,14 @@ class OrderGroup extends Model
         return (float) $this->orderGroupServices()->sum('price_snapshot');
     }
 
+    /**
+     * Get all chat messages for this order group.
+     */
+    public function chatMessages(): HasMany
+    {
+        return $this->hasMany(\App\Models\ChatMessage::class, 'order_group_id');
+    }
+
     protected function casts(): array
     {
         return [

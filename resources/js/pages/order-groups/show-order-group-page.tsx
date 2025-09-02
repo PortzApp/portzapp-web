@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 
-import { Head, router } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import { useEcho } from '@laravel/echo-react';
-import { Copy, Eye, MoreVertical, Package, Ship, Tag } from 'lucide-react';
+import { Copy, Eye, MessageSquare, MoreVertical, Package, Ship, Tag } from 'lucide-react';
 import { toast } from 'sonner';
 
 import type { BreadcrumbItem } from '@/types';
@@ -28,6 +28,8 @@ import { VesselTypeBadge } from '@/components/badges';
 import { OrderGroupServiceStatusBadge } from '@/components/badges/order-group-service-status-badge';
 import { OrderGroupStatusBadge } from '@/components/badges/order-group-status-badge';
 import { ServiceCategoryBadge } from '@/components/badges/service-category-badge';
+
+import { ChatTab } from '@/components/chat/chat-tab';
 
 interface OrderGroupEvent {
     message: string;
@@ -79,6 +81,7 @@ export default function ShowOrderGroupPage({
     const [orderGroup, setOrderGroup] = useState(initialOrderGroup);
     const [parentOrder, setParentOrder] = useState(initialParentOrder);
     const [siblingOrderGroups, setSiblingOrderGroups] = useState(initialSiblingOrderGroups);
+    const { auth } = usePage().props as any;
 
     // Sync new props back to local state after server refetch
     useEffect(() => {
@@ -501,6 +504,15 @@ export default function ShowOrderGroupPage({
                             </div>
                         </CardContent>
                     </Card>
+                </div>
+
+                {/* Chat Section */}
+                <div>
+                    <h2 className="mb-4 flex items-center gap-2 text-xl font-semibold">
+                        <MessageSquare className="h-5 w-5" />
+                        Chat with Vessel Owner
+                    </h2>
+                    <ChatTab orderGroupId={orderGroup.id} currentUserId={auth.user.id} />
                 </div>
 
                 {/* Notes */}
