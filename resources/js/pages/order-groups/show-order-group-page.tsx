@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 
 import { Head, router, usePage } from '@inertiajs/react';
 import { useEcho } from '@laravel/echo-react';
-import { Copy, Eye, MessageSquare, MoreVertical, Package, Ship, Tag } from 'lucide-react';
+import { Copy, Eye, LayoutGrid, MessageSquare, MoreVertical, Package, Ship, Tag } from 'lucide-react';
+import { parseAsStringLiteral, useQueryState } from 'nuqs';
 import { toast } from 'sonner';
 
 import type { BreadcrumbItem, SharedData } from '@/types';
@@ -11,6 +12,7 @@ import { OrderBase, OrderGroup, OrderGroupService, OrderWithRelations } from '@/
 
 import AppLayout from '@/layouts/app-layout';
 
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -23,6 +25,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import { VesselTypeBadge } from '@/components/badges';
 import { OrderGroupServiceStatusBadge } from '@/components/badges/order-group-service-status-badge';
@@ -57,6 +60,8 @@ interface OrderUpdatedEvent extends OrderGroupEvent {
     order: OrderWithRelations;
 }
 
+const tabValues = ['overview', 'services', 'vessel-port', 'chat'] as const;
+
 const getBreadcrumbs = (orderGroup: OrderGroup): BreadcrumbItem[] => [
     {
         title: 'Order Groups',
@@ -72,15 +77,40 @@ export default function ShowOrderGroupPage({
     orderGroup: initialOrderGroup,
     parentOrder: initialParentOrder,
     siblingOrderGroups: initialSiblingOrderGroups,
+    conversation,
 }: {
     orderGroup: OrderGroup;
     parentOrder: OrderBase;
     siblingOrderGroups: OrderGroup[];
+    conversation: {
+        id: string;
+        messages: Array<{
+            id: string;
+            message: string;
+            user_id: string;
+            user: {
+                id: string;
+                first_name: string;
+                last_name: string;
+                email: string;
+            };
+            read_at: string | null;
+            created_at: string;
+        }>;
+    };
 }) {
     const [orderGroup, setOrderGroup] = useState(initialOrderGroup);
     const [parentOrder, setParentOrder] = useState(initialParentOrder);
     const [siblingOrderGroups, setSiblingOrderGroups] = useState(initialSiblingOrderGroups);
     const { auth } = usePage<SharedData>().props;
+
+    const [activeTab, setActiveTab] = useQueryState(
+        'tab',
+        parseAsStringLiteral(tabValues).withDefault('overview').withOptions({
+            history: 'replace',
+            shallow: false,
+        }),
+    );
 
     // Sync new props back to local state after server refetch
     useEffect(() => {
@@ -300,12 +330,13 @@ export default function ShowOrderGroupPage({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Order ${orderGroup.group_number}`} />
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto rounded-xl p-8">
-                {/* Header */}
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-2xl font-bold">{orderGroup.group_number}</h1>
-                        <p className="text-muted-foreground">Order assigned to your agency</p>
+            <div className="flex min-h-screen flex-col gap-8 bg-neutral-50 p-8 dark:bg-neutral-950">
+                <div className="flex flex-shrink-0 items-center justify-between">
+                    <div className="flex flex-col gap-1">
+                        <h1 className="text-2xl font-semibold">
+                            Order Group: <span className="font-mono text-xl text-muted-foreground">{orderGroup.group_number}</span>
+                        </h1>
+                        <p className="text-base text-muted-foreground">Order assigned to your agency</p>
                     </div>
                     <div className="flex items-center gap-2">
                         <OrderGroupStatusBadge status={orderGroup.status} />
@@ -335,196 +366,221 @@ export default function ShowOrderGroupPage({
                     </div>
                 </div>
 
-                {/* Action Buttons */}
-                <div className="flex flex-wrap gap-2">
-                    {canAccept && (
-                        <Button onClick={handleAccept} variant="default" className="bg-green-600 hover:bg-green-700">
-                            Accept Order
-                        </Button>
-                    )}
-                    {canReject && (
-                        <Button onClick={handleReject} variant="destructive">
-                            Reject Order
-                        </Button>
-                    )}
-                    {canStart && (
-                        <Button onClick={handleStart} className="bg-blue-600 hover:bg-blue-700">
-                            Start Work
-                        </Button>
-                    )}
-                    {canComplete && (
-                        <Button onClick={handleComplete} className="bg-green-600 hover:bg-green-700">
-                            Mark as Completed
-                        </Button>
-                    )}
-                </div>
+                <Tabs
+                    value={activeTab}
+                    onValueChange={(value) => {
+                        if (tabValues.includes(value as (typeof tabValues)[number])) {
+                            setActiveTab(value as (typeof tabValues)[number]);
+                        }
+                    }}
+                    className="flex w-full flex-1 flex-col"
+                >
+                    <TabsList className="grid w-full grid-cols-4">
+                        <TabsTrigger value="overview" className="flex items-center gap-2">
+                            <LayoutGrid className="h-4 w-4" />
+                            Overview
+                        </TabsTrigger>
+                        <TabsTrigger value="services" className="flex items-center gap-2">
+                            <Package className="h-4 w-4" />
+                            Services
+                            <Badge variant="secondary" className="ml-1">
+                                {orderGroup.order_group_services?.length || 0}
+                            </Badge>
+                        </TabsTrigger>
+                        <TabsTrigger value="vessel-port" className="flex items-center gap-2">
+                            <Ship className="h-4 w-4" />
+                            Vessel & Port
+                        </TabsTrigger>
+                        <TabsTrigger value="chat" className="flex items-center gap-2">
+                            <MessageSquare className="h-4 w-4" />
+                            Chat
+                        </TabsTrigger>
+                    </TabsList>
 
-                {/* Vessel & Port Information */}
-                <div>
-                    <h2 className="mb-4 flex items-center gap-2 text-xl font-semibold">
-                        <Ship className="h-5 w-5" />
-                        Vessel & Port Information
-                    </h2>
-                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                        {/* Vessel Information */}
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Vessel Information</CardTitle>
-                                <CardDescription>Details about the vessel</CardDescription>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                <div className="flex items-center justify-between">
-                                    <span className="font-medium">Vessel:</span>
-                                    <div className="flex items-center gap-2">
-                                        <VesselTypeBadge type={orderGroup.order.vessel.vessel_type} iconOnly />
-                                        <span>{orderGroup.order.vessel.name}</span>
-                                    </div>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span className="font-medium">IMO Number:</span>
-                                    <span>{orderGroup.order.vessel.imo_number}</span>
-                                </div>
-                            </CardContent>
-                        </Card>
-
-                        {/* Port Information */}
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Port Information</CardTitle>
-                                <CardDescription>Details about the destination port</CardDescription>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                <div className="flex justify-between">
-                                    <span className="font-medium">Port:</span>
-                                    <span>{orderGroup.order.port.name}</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span className="font-medium">Location:</span>
-                                    <span>
-                                        {orderGroup.order.port.city}, {orderGroup.order.port.country}
-                                    </span>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </div>
-                </div>
-
-                {/* Service Details */}
-                <div>
-                    <h2 className="mb-4 flex items-center gap-2 text-xl font-semibold">
-                        <Package className="h-5 w-5" />
-                        Service Details
-                    </h2>
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Services ({orderGroup.order_group_services?.length || 0})</CardTitle>
-                            <CardDescription>Services assigned to your agency for this order</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="space-y-3">
-                                {orderGroup.order_group_services?.map((orderGroupService) => (
-                                    <div key={orderGroupService.id} className="flex items-start justify-between rounded-lg border p-4">
-                                        <div className="flex-1">
-                                            <div className="mb-2 flex items-center gap-2">
-                                                <Tag className="h-4 w-4" />
-                                                <h4 className="font-medium">{orderGroupService.service?.sub_category?.name || 'Service'}</h4>
-                                                {orderGroupService.service?.sub_category?.category?.name && (
-                                                    <ServiceCategoryBadge categoryName={orderGroupService.service.sub_category.category.name} />
-                                                )}
-                                                <OrderGroupServiceStatusBadge status={orderGroupService.status} />
-                                            </div>
-                                            {orderGroupService.service?.description && (
-                                                <p className="mb-2 text-sm text-muted-foreground">{orderGroupService.service.description}</p>
-                                            )}
-                                            {orderGroupService.notes && (
-                                                <div className="mt-2">
-                                                    <p className="text-sm text-muted-foreground">
-                                                        <strong>Notes:</strong> {orderGroupService.notes}
-                                                    </p>
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="flex items-center gap-3">
-                                            <div className="text-right">
-                                                <div className="text-lg font-semibold tabular-nums">
-                                                    $
-                                                    {parseFloat(orderGroupService.price_snapshot.toString()).toLocaleString('en-US', {
-                                                        minimumFractionDigits: 2,
-                                                        maximumFractionDigits: 2,
-                                                    })}
-                                                </div>
-                                            </div>
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                                                        <MoreVertical className="h-4 w-4" />
-                                                        <span className="sr-only">Open menu</span>
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end">
-                                                    <DropdownMenuItem
-                                                        onClick={() => router.visit(route('services.show', orderGroupService.service_id))}
-                                                    >
-                                                        <Eye className="mr-2 h-4 w-4" />
-                                                        View details
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={() => copyToClipboard(orderGroupService.service_id, 'Service ID')}>
-                                                        <Copy className="mr-2 h-4 w-4" />
-                                                        Copy service ID
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuSub>
-                                                        <DropdownMenuSubTrigger>Update Status</DropdownMenuSubTrigger>
-                                                        <DropdownMenuSubContent>
-                                                            {Object.values(OrderGroupServiceStatus).map((status) => (
-                                                                <DropdownMenuItem
-                                                                    key={status}
-                                                                    onClick={() => handleOrderGroupServiceStatusChange(orderGroupService.id, status)}
-                                                                    disabled={status === orderGroupService.status}
-                                                                >
-                                                                    {getOrderGroupServiceStatusLabel(status)}
-                                                                </DropdownMenuItem>
-                                                            ))}
-                                                        </DropdownMenuSubContent>
-                                                    </DropdownMenuSub>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </div>
-                                    </div>
-                                ))}
-
-                                <Separator />
-
-                                <div className="flex items-center justify-between text-lg font-bold">
-                                    <span>Total Price:</span>
-                                    <span className="tabular-nums">
-                                        ${totalPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                    </span>
-                                </div>
+                    <div className="mt-6 flex flex-1 flex-col">
+                        <TabsContent value="overview" className="space-y-4">
+                            {/* Action Buttons */}
+                            <div className="flex flex-wrap gap-2">
+                                {canAccept && (
+                                    <Button onClick={handleAccept} variant="default" className="bg-green-600 hover:bg-green-700">
+                                        Accept Order
+                                    </Button>
+                                )}
+                                {canReject && (
+                                    <Button onClick={handleReject} variant="destructive">
+                                        Reject Order
+                                    </Button>
+                                )}
+                                {canStart && (
+                                    <Button onClick={handleStart} className="bg-blue-600 hover:bg-blue-700">
+                                        Start Work
+                                    </Button>
+                                )}
+                                {canComplete && (
+                                    <Button onClick={handleComplete} className="bg-green-600 hover:bg-green-700">
+                                        Mark as Completed
+                                    </Button>
+                                )}
                             </div>
-                        </CardContent>
-                    </Card>
-                </div>
 
-                {/* Chat Section */}
-                <div>
-                    <h2 className="mb-4 flex items-center gap-2 text-xl font-semibold">
-                        <MessageSquare className="h-5 w-5" />
-                        Chat with Vessel Owner
-                    </h2>
-                    <ChatTab orderGroupId={orderGroup.id} currentUserId={auth.user.id} />
-                </div>
+                            {/* Notes */}
+                            {orderGroup.notes && (
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>Notes</CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <p>{orderGroup.notes}</p>
+                                    </CardContent>
+                                </Card>
+                            )}
+                        </TabsContent>
 
-                {/* Notes */}
-                {orderGroup.notes && (
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Notes</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p>{orderGroup.notes}</p>
-                        </CardContent>
-                    </Card>
-                )}
+                        <TabsContent value="services" className="space-y-4">
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Services ({orderGroup.order_group_services?.length || 0})</CardTitle>
+                                    <CardDescription>Services assigned to your agency for this order</CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="space-y-3">
+                                        {orderGroup.order_group_services?.map((orderGroupService) => (
+                                            <div key={orderGroupService.id} className="flex items-start justify-between rounded-lg border p-4">
+                                                <div className="flex-1">
+                                                    <div className="mb-2 flex items-center gap-2">
+                                                        <Tag className="h-4 w-4" />
+                                                        <h4 className="font-medium">{orderGroupService.service?.sub_category?.name || 'Service'}</h4>
+                                                        {orderGroupService.service?.sub_category?.category?.name && (
+                                                            <ServiceCategoryBadge categoryName={orderGroupService.service.sub_category.category.name} />
+                                                        )}
+                                                        <OrderGroupServiceStatusBadge status={orderGroupService.status} />
+                                                    </div>
+                                                    {orderGroupService.service?.description && (
+                                                        <p className="mb-2 text-sm text-muted-foreground">{orderGroupService.service.description}</p>
+                                                    )}
+                                                    {orderGroupService.notes && (
+                                                        <div className="mt-2">
+                                                            <p className="text-sm text-muted-foreground">
+                                                                <strong>Notes:</strong> {orderGroupService.notes}
+                                                            </p>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="flex items-center gap-3">
+                                                    <div className="text-right">
+                                                        <div className="text-lg font-semibold tabular-nums">
+                                                            $
+                                                            {parseFloat(orderGroupService.price_snapshot.toString()).toLocaleString('en-US', {
+                                                                minimumFractionDigits: 2,
+                                                                maximumFractionDigits: 2,
+                                                            })}
+                                                        </div>
+                                                    </div>
+                                                    <DropdownMenu>
+                                                        <DropdownMenuTrigger asChild>
+                                                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                                                                <MoreVertical className="h-4 w-4" />
+                                                                <span className="sr-only">Open menu</span>
+                                                            </Button>
+                                                        </DropdownMenuTrigger>
+                                                        <DropdownMenuContent align="end">
+                                                            <DropdownMenuItem
+                                                                onClick={() => router.visit(route('services.show', orderGroupService.service_id))}
+                                                            >
+                                                                <Eye className="mr-2 h-4 w-4" />
+                                                                View details
+                                                            </DropdownMenuItem>
+                                                            <DropdownMenuItem onClick={() => copyToClipboard(orderGroupService.service_id, 'Service ID')}>
+                                                                <Copy className="mr-2 h-4 w-4" />
+                                                                Copy service ID
+                                                            </DropdownMenuItem>
+                                                            <DropdownMenuSub>
+                                                                <DropdownMenuSubTrigger>Update Status</DropdownMenuSubTrigger>
+                                                                <DropdownMenuSubContent>
+                                                                    {Object.values(OrderGroupServiceStatus).map((status) => (
+                                                                        <DropdownMenuItem
+                                                                            key={status}
+                                                                            onClick={() => handleOrderGroupServiceStatusChange(orderGroupService.id, status)}
+                                                                            disabled={status === orderGroupService.status}
+                                                                        >
+                                                                            {getOrderGroupServiceStatusLabel(status)}
+                                                                        </DropdownMenuItem>
+                                                                    ))}
+                                                                </DropdownMenuSubContent>
+                                                            </DropdownMenuSub>
+                                                        </DropdownMenuContent>
+                                                    </DropdownMenu>
+                                                </div>
+                                            </div>
+                                        ))}
+
+                                        <Separator />
+
+                                        <div className="flex items-center justify-between text-lg font-bold">
+                                            <span>Total Price:</span>
+                                            <span className="tabular-nums">
+                                                ${totalPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </TabsContent>
+
+                        <TabsContent value="vessel-port" className="space-y-4">
+                            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                                {/* Vessel Information */}
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>Vessel Information</CardTitle>
+                                        <CardDescription>Details about the vessel</CardDescription>
+                                    </CardHeader>
+                                    <CardContent className="space-y-4">
+                                        <div className="flex items-center justify-between">
+                                            <span className="font-medium">Vessel:</span>
+                                            <div className="flex items-center gap-2">
+                                                <VesselTypeBadge type={orderGroup.order.vessel.vessel_type} iconOnly />
+                                                <span>{orderGroup.order.vessel.name}</span>
+                                            </div>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="font-medium">IMO Number:</span>
+                                            <span>{orderGroup.order.vessel.imo_number}</span>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+
+                                {/* Port Information */}
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>Port Information</CardTitle>
+                                        <CardDescription>Details about the destination port</CardDescription>
+                                    </CardHeader>
+                                    <CardContent className="space-y-4">
+                                        <div className="flex justify-between">
+                                            <span className="font-medium">Port:</span>
+                                            <span>{orderGroup.order.port.name}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="font-medium">Location:</span>
+                                            <span>
+                                                {orderGroup.order.port.city}, {orderGroup.order.port.country}
+                                            </span>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </div>
+                        </TabsContent>
+
+                        <TabsContent value="chat" className="flex flex-1 flex-col">
+                            <ChatTab 
+                                conversationId={conversation.id} 
+                                initialMessages={conversation.messages}
+                                currentUserId={auth.user.id} 
+                            />
+                        </TabsContent>
+                    </div>
+                </Tabs>
             </div>
         </AppLayout>
     );
