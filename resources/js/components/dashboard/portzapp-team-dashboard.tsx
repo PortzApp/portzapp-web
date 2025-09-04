@@ -1,7 +1,8 @@
-import { router } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import { Anchor, Building, Plus, Users } from 'lucide-react';
 
 import type { PortzAppTeamDashboardData } from '@/types/dashboard';
+import type { SharedData } from '@/types';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -15,6 +16,8 @@ interface PortzAppTeamDashboardProps {
 }
 
 export function PortzAppTeamDashboard({ data }: PortzAppTeamDashboardProps) {
+    const { auth } = usePage<SharedData>().props;
+
     return (
         <div className="space-y-6">
             {/* Welcome Section */}
@@ -24,14 +27,18 @@ export function PortzAppTeamDashboard({ data }: PortzAppTeamDashboardProps) {
                     <p className="text-muted-foreground">System overview and platform management</p>
                 </div>
                 <div className="flex gap-2">
-                    <Button variant="outline" onClick={() => router.visit(route('admin.organizations.create'))}>
-                        <Building className="mr-2 h-4 w-4" />
-                        Add Organization
-                    </Button>
-                    <Button onClick={() => router.visit(route('admin.ports.create'))} size="default">
-                        <Plus className="mr-2 h-4 w-4" />
-                        Add Port
-                    </Button>
+                    {auth.permissions?.organization?.create && (
+                        <Button variant="outline" onClick={() => router.visit(route('organizations.create'))}>
+                            <Building className="mr-2 h-4 w-4" />
+                            Add Organization
+                        </Button>
+                    )}
+                    {auth.permissions?.port?.create && (
+                        <Button onClick={() => router.visit(route('ports.create'))} size="default">
+                            <Plus className="mr-2 h-4 w-4" />
+                            Add Port
+                        </Button>
+                    )}
                 </div>
             </div>
 
@@ -66,17 +73,9 @@ export function PortzAppTeamDashboard({ data }: PortzAppTeamDashboardProps) {
                                     variant="outline"
                                     size="sm"
                                     className="justify-start"
-                                    onClick={() => router.visit(route('admin.users.index'))}
+                                    onClick={() => router.visit(route('organizations.index'))}
                                 >
                                     View All Users
-                                </Button>
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    className="justify-start"
-                                    onClick={() => router.visit(route('admin.invitations.index'))}
-                                >
-                                    Manage Invitations
                                 </Button>
                             </div>
                         </div>
@@ -98,17 +97,9 @@ export function PortzAppTeamDashboard({ data }: PortzAppTeamDashboardProps) {
                                     variant="outline"
                                     size="sm"
                                     className="justify-start"
-                                    onClick={() => router.visit(route('admin.organizations.index'))}
+                                    onClick={() => router.visit(route('organizations.index'))}
                                 >
                                     All Organizations
-                                </Button>
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    className="justify-start"
-                                    onClick={() => router.visit(route('admin.join-requests.index'))}
-                                >
-                                    Join Requests
                                 </Button>
                             </div>
                         </div>
@@ -130,17 +121,9 @@ export function PortzAppTeamDashboard({ data }: PortzAppTeamDashboardProps) {
                                     variant="outline"
                                     size="sm"
                                     className="justify-start"
-                                    onClick={() => router.visit(route('admin.ports.index'))}
+                                    onClick={() => router.visit(route('ports.index'))}
                                 >
                                     Manage Ports
-                                </Button>
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    className="justify-start"
-                                    onClick={() => router.visit(route('admin.settings.index'))}
-                                >
-                                    System Settings
                                 </Button>
                             </div>
                         </div>
