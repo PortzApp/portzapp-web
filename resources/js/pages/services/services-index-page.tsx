@@ -183,7 +183,11 @@ export default function ServicesIndexPage({ services: initialServices, ports, ca
             <div className="mx-auto flex h-full w-full max-w-6xl flex-1 flex-col gap-12 overflow-x-auto rounded-xl p-8">
                 <div className="flex items-center justify-between">
                     <h1 className="text-2xl font-bold">
-                        {auth.user.current_organization?.business_type === 'shipping_agency' ? 'My Services' : 'Services'}
+                        {auth.user.current_organization?.business_type === 'shipping_agency' 
+                            ? 'My Services' 
+                            : auth.user.current_organization?.business_type === 'portzapp_team'
+                            ? 'All Services'
+                            : 'Services'}
                     </h1>
 
                     <div className="flex items-center gap-3">
