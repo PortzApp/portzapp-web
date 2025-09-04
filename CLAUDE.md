@@ -96,8 +96,10 @@ Access control patterns:
 **Key patterns:**
 
 - Inertia.js for SPA-like experience without API
-- **Always prefer using Inertia.js router helpers** (`router.get()`, `router.post()`, `router.patch()`, `router.delete()`) to make requests to Laravel backend controllers instead of manual `fetch()` calls
+- **CRITICAL: NEVER use `fetch()` for backend requests** - Always use Inertia.js router helpers instead
+- **Always use Inertia.js router methods** (`router.get()`, `router.post()`, `router.patch()`, `router.delete()`) to make requests to Laravel backend controllers
 - **Always use Ziggy route helpers** (`route('route.name')`) instead of hardcoded URLs when making requests with Inertia router
+- **Data should be passed as props** from controllers, not fetched via API calls
 - **Prefer `unknown` type over `any`** when dealing with type issues - `unknown` is safer and forces type checking
 - **NEVER use `any` type** - it defeats TypeScript's purpose and should be avoided at all costs. Use proper typing or `unknown` instead
 - Radix UI components with custom styling
@@ -343,8 +345,15 @@ When implementing Laravel policies for RBAC:
 - Even when using FormRequests with `authorize()` methods, still use `Gate::authorize()` in the controller
 - This ensures consistent authorization patterns across all controller methods regardless of whether they use FormRequests
 
-**Inertia.js Response Guidelines:**
+### Inertia.js Request/Response Guidelines
 
+**Frontend Requirements:**
+- **CRITICAL: NEVER use `fetch()` for backend requests** - Always use Inertia router helpers
+- **ALWAYS use Inertia router methods**: `router.get()`, `router.post()`, `router.patch()`, `router.delete()`
+- **Data comes via props**: Controllers should pass data as props to Inertia pages, not through API endpoints
+- **No manual API calls**: Avoid `fetch()`, `axios`, or any manual HTTP client usage for backend communication
+
+**Controller Response Requirements:**
 - **CRITICAL**: All Laravel controllers MUST return Inertia-compatible responses when the frontend uses Inertia.js router helpers
 - **NEVER return `JsonResponse`** from controllers when using Inertia router - this breaks the Inertia flow
 - **Use proper Inertia responses**:
@@ -352,9 +361,18 @@ When implementing Laravel policies for RBAC:
   - Redirect responses: `return to_route('route.name')->with(['data' => $data])`
   - Error responses: `return back()->withErrors(['field' => 'error message'])`
   - Validation errors: `return back()->withErrors($validator->errors())`
+  - Page renders: `return Inertia::render('PageName', ['prop' => $data])`
 - **Avoid manual JSON responses** like `response()->json()` in controllers serving Inertia pages
 - **Frontend expectation**: When using `router.post()`, `router.patch()`, `router.delete()`, etc., Laravel must respond with Inertia-compatible responses
 - **Error pattern**: "All Inertia requests must receive a valid Inertia response, however a plain JSON response was received" indicates improper response type
+
+**Architecture Benefits:**
+- Maintains Inertia's SPA-like experience
+- Preserves scroll position and component state
+- Type-safe prop passing from backend to frontend
+- Consistent error handling across the application
+- No CSRF token management needed
+- Proper browser history handling
 
 ## Important Files
 
