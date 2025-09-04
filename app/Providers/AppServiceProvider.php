@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\ChatConversation;
 use App\Models\Invitation;
 use App\Models\Order;
 use App\Models\OrderGroup;
@@ -14,6 +15,7 @@ use App\Models\User;
 use App\Observers\OrderGroupObserver;
 use App\Observers\OrderGroupServiceObserver;
 use App\Observers\OrderObserver;
+use App\Policies\ChatConversationPolicy;
 use App\Policies\InvitationPolicy;
 use App\Policies\OrderGroupPolicy;
 use App\Policies\OrderPolicy;
@@ -52,6 +54,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(OrganizationJoinRequest::class, OrganizationJoinRequestPolicy::class);
         Gate::policy(Invitation::class, InvitationPolicy::class);
         Gate::policy(User::class, UserPolicy::class);
+        Gate::policy(ChatConversation::class, ChatConversationPolicy::class);
 
         // Register model observers
         Order::observe(OrderObserver::class);
