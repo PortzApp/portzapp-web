@@ -103,7 +103,7 @@ export default function ShowServicePage({ service: initialService }: { service: 
             href: route('services.index'),
         },
         {
-            title: `Service #${service.id}`,
+            title: service.sub_category?.name || 'Service Details',
             href: `/services/${service.id}`,
         },
     ];
@@ -120,13 +120,21 @@ export default function ShowServicePage({ service: initialService }: { service: 
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`Service #${service.id}`} />
+            <Head title={service.sub_category?.name || 'Service Details'} />
 
             <div className="flex flex-col gap-8 p-8">
                 <div className="flex items-center justify-between">
                     <div className="flex flex-col gap-1">
-                        <h1 className="text-2xl font-semibold">Service #{service.id}</h1>
-                        <p className="text-base text-muted-foreground">Service details and information</p>
+                        <h1 className="text-2xl font-semibold">{service.sub_category?.name || 'Service Details'}</h1>
+                        <p className="text-base text-muted-foreground">
+                            {(service as Service & { port?: { name: string; country: string; city: string } }).port?.name && (
+                                <>
+                                    {(service as Service & { port?: { name: string; country: string; city: string } }).port?.name}{' '}
+                                    ({(service as Service & { port?: { name: string; country: string; city: string } }).port?.country},{' '}
+                                    {(service as Service & { port?: { name: string; country: string; city: string } }).port?.city})
+                                </>
+                            )}
+                        </p>
                     </div>
                     <div className="flex gap-2">
                         <Link href={route('services.edit', service.id)} className={buttonVariants({ variant: 'outline', size: 'sm' })}>
@@ -160,127 +168,133 @@ export default function ShowServicePage({ service: initialService }: { service: 
                     </div>
                 </div>
 
-                <div className="grid gap-6 md:grid-cols-2">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Basic Information</CardTitle>
-                            <CardDescription>Core service details</CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="flex justify-between">
-                                <span className="text-sm font-medium text-muted-foreground">ID:</span>
-                                <span className="text-sm font-medium">#{service.id}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-sm font-medium text-muted-foreground">Description:</span>
-                                <span className="max-w-xs text-right text-sm font-medium">{service.description || 'No description'}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-sm font-medium text-muted-foreground">Price:</span>
-                                <span className="text-sm font-medium tabular-nums">${service.price}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-sm font-medium text-muted-foreground">Status:</span>
-                                <Badge
-                                    className={cn(
-                                        service.status === 'active' && 'bg-blue-200 text-blue-950 uppercase dark:bg-blue-900 dark:text-blue-50',
-                                        service.status === 'inactive' && 'bg-red-200 text-red-950 uppercase dark:bg-red-900 dark:text-red-50',
+                <div className="grid gap-6 lg:grid-cols-3">
+                    {/* Main Content */}
+                    <div className="lg:col-span-2 space-y-6">
+                        {/* Service Overview */}
+                        <Card>
+                            <CardContent>
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between">
+                                        <div className="text-3xl font-bold text-primary">
+                                            {new Intl.NumberFormat('en-US', {
+                                                style: 'currency',
+                                                currency: 'USD',
+                                            }).format(Number(service.price))}
+                                        </div>
+                                        <Badge
+                                            className={cn(
+                                                service.status === 'active' && 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100',
+                                                service.status === 'inactive' && 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100',
+                                            )}
+                                        >
+                                            <Dot className="mr-1" />
+                                            {service.status === 'active' ? 'Active' : 'Inactive'}
+                                        </Badge>
+                                    </div>
+                                    
+                                    {service.description && (
+                                        <div>
+                                            <h3 className="text-lg font-semibold mb-2">Description</h3>
+                                            <p className="text-muted-foreground leading-relaxed">
+                                                {service.description}
+                                            </p>
+                                        </div>
                                     )}
-                                >
-                                    <Dot />
-                                    {service.status}
-                                </Badge>
-                            </div>
-                        </CardContent>
-                    </Card>
+                                </div>
+                            </CardContent>
+                        </Card>
 
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Associated Information</CardTitle>
-                            <CardDescription>Related entities and assignments</CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="flex justify-between">
-                                <span className="text-sm font-medium text-muted-foreground">Port:</span>
-                                <span className="text-sm font-medium">
-                                    {(
-                                        service as Service & {
-                                            port?: { name: string };
-                                        }
-                                    ).port?.name || 'No port assigned'}
-                                </span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-sm font-medium text-muted-foreground">Organization:</span>
-                                <span className="text-sm font-medium">
-                                    {(
-                                        service as Service & {
-                                            organization?: { name: string };
-                                        }
-                                    ).organization?.name || 'No organization'}
-                                </span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-sm font-medium text-muted-foreground">Category:</span>
-                                <span className="text-sm font-medium">
-                                    {(
-                                        service as Service & {
-                                            sub_category?: { category?: { name: string } };
-                                        }
-                                    ).sub_category?.category?.name || 'No category'}
-                                </span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-sm font-medium text-muted-foreground">Sub-Category:</span>
-                                <span className="text-sm font-medium">
-                                    {(
-                                        service as Service & {
-                                            sub_category?: { name: string };
-                                        }
-                                    ).sub_category?.name || 'No sub-category'}
-                                </span>
-                            </div>
-                        </CardContent>
-                    </Card>
+                        {/* Service Provider */}
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Service Provider</CardTitle>
+                                <CardDescription>Information about the organization providing this service</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="flex items-center space-x-3">
+                                    <div className="h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center">
+                                        <div className="h-6 w-6 rounded-full bg-gray-400" />
+                                    </div>
+                                    <div>
+                                        <p className="font-medium">
+                                            {(service as Service & { organization?: { name: string } }).organization?.name || 'Unknown Organization'}
+                                        </p>
+                                        <p className="text-sm text-muted-foreground">Service Provider</p>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
 
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>System Information</CardTitle>
-                            <CardDescription>Record metadata</CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="flex justify-between">
-                                <span className="text-sm font-medium text-muted-foreground">Service ID:</span>
-                                <span className="text-sm font-medium tabular-nums">#{service.id}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-sm font-medium text-muted-foreground">Created:</span>
-                                <span className="text-sm font-medium tabular-nums">
-                                    {new Date(service.created_at).toLocaleDateString('en-US', {
-                                        year: 'numeric',
-                                        month: 'long',
-                                        day: 'numeric',
-                                        hour: '2-digit',
-                                        minute: '2-digit',
-                                        hour12: false,
-                                    })}
-                                </span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-sm font-medium text-muted-foreground">Last Updated:</span>
-                                <span className="text-sm font-medium tabular-nums">
-                                    {new Date(service.updated_at).toLocaleDateString('en-US', {
-                                        year: 'numeric',
-                                        month: 'long',
-                                        day: 'numeric',
-                                        hour: '2-digit',
-                                        minute: '2-digit',
-                                        hour12: false,
-                                    })}
-                                </span>
-                            </div>
-                        </CardContent>
-                    </Card>
+                    {/* Sidebar */}
+                    <div className="space-y-4">
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="text-base">Quick Info</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-3">
+                                <div>
+                                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Category</p>
+                                    <p className="text-sm">
+                                        {(service as Service & { sub_category?: { category?: { name: string } } }).sub_category?.category?.name || 'Not specified'}
+                                    </p>
+                                </div>
+                                
+                                <div>
+                                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Service Type</p>
+                                    <p className="text-sm">
+                                        {(service as Service & { sub_category?: { name: string } }).sub_category?.name || 'Not specified'}
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Port Location</p>
+                                    <p className="text-sm">
+                                        {(service as Service & { port?: { name: string; country: string; city: string } }).port ? (
+                                            <>
+                                                {(service as Service & { port?: { name: string; country: string; city: string } }).port?.name}
+                                                <br />
+                                                <span className="text-xs text-muted-foreground">
+                                                    {(service as Service & { port?: { name: string; country: string; city: string } }).port?.city}, {(service as Service & { port?: { name: string; country: string; city: string } }).port?.country}
+                                                </span>
+                                            </>
+                                        ) : (
+                                            'Not specified'
+                                        )}
+                                    </p>
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="text-base">Service Details</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-3 text-xs">
+                                <div>
+                                    <p className="text-muted-foreground">Added on</p>
+                                    <p>
+                                        {new Date(service.created_at).toLocaleDateString('en-US', {
+                                            year: 'numeric',
+                                            month: 'short',
+                                            day: 'numeric',
+                                        })}
+                                    </p>
+                                </div>
+                                <div>
+                                    <p className="text-muted-foreground">Last updated</p>
+                                    <p>
+                                        {new Date(service.updated_at).toLocaleDateString('en-US', {
+                                            year: 'numeric',
+                                            month: 'short',
+                                            day: 'numeric',
+                                        })}
+                                    </p>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
                 </div>
             </div>
         </AppLayout>
