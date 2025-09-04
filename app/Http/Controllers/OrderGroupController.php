@@ -6,11 +6,16 @@ use App\Enums\OrderGroupStatus;
 use App\Enums\OrganizationBusinessType;
 use App\Http\Requests\UpdateOrderGroupRequest;
 use App\Models\OrderGroup;
+use App\Services\ChatService;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class OrderGroupController extends Controller
 {
+    public function __construct(
+        private ChatService $chatService
+    ) {}
+
     /**
      * Display a listing of order groups for shipping agencies.
      */
@@ -68,10 +73,21 @@ class OrderGroupController extends Controller
             ->with(['fulfillingOrganization', 'orderGroupServices.service.subCategory.category'])
             ->get();
 
+        // Get or create conversation for this order group and load messages
+        $conversation = $this->chatService->getOrCreateConversation($orderGroup);
+        $messages = $conversation->messages()
+            ->with(['user', 'reads'])
+            ->orderBy('created_at')
+            ->get();
+
         return Inertia::render('order-groups/show-order-group-page', [
             'orderGroup' => $orderGroup,
             'parentOrder' => $orderGroup->order,
             'siblingOrderGroups' => $siblingOrderGroups,
+            'conversation' => [
+                'id' => $conversation->id,
+                'messages' => $messages,
+            ],
         ]);
     }
 

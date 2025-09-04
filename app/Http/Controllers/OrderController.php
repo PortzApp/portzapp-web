@@ -171,8 +171,29 @@ class OrderController extends Controller
             'orderGroups.fulfillingOrganization',
             'orderGroups.orderGroupServices.service.organization',
             'orderGroups.orderGroupServices.service.subCategory.category',
-            'orderGroups.chatMessages.user:id,first_name,last_name,email',
+            'orderGroups.chatConversation.messages.user:id,first_name,last_name,email',
+            'orderGroups.chatConversation.messages.reads',
+            'orderGroups.chatConversation.participants.user:id,first_name,last_name,email',
+            'orderGroups.chatConversation.participants.organization:id,name',
         ]);
+
+        // Ensure chat conversations exist for each order group
+        $chatService = app(\App\Services\ChatService::class);
+        foreach ($order->orderGroups as $orderGroup) {
+            if (! $orderGroup->chatConversation) {
+                // Only create conversation if user has permission to view chat
+                if (auth()->user()->can('viewChat', $orderGroup)) {
+                    $chatService->getOrCreateConversation($orderGroup);
+                    // Reload the conversation with its relationships
+                    $orderGroup->load([
+                        'chatConversation.messages.user:id,first_name,last_name,email',
+                        'chatConversation.messages.reads',
+                        'chatConversation.participants.user:id,first_name,last_name,email',
+                        'chatConversation.participants.organization:id,name',
+                    ]);
+                }
+            }
+        }
 
         // Get all services through order groups with sub-categories and categories
         $allServices = $order->allServices()->with(['subCategory.category', 'organization'])->get();
