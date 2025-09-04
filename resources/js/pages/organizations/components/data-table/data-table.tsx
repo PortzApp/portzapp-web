@@ -29,8 +29,9 @@ interface DataTableProps<TData, TValue> {
 export function OrganizationsPageDataTable<TData, TValue>({ columns, data }: DataTableProps<TData, TValue>) {
     const [sorting, setSorting] = useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-    const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+    const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({ id: false });
     const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+    const [globalFilter, setGlobalFilter] = useState<string>('');
 
     const table = useReactTable({
         data,
@@ -43,11 +44,14 @@ export function OrganizationsPageDataTable<TData, TValue>({ columns, data }: Dat
         getFilteredRowModel: getFilteredRowModel(),
         onColumnVisibilityChange: setColumnVisibility,
         onRowSelectionChange: setRowSelection,
+        onGlobalFilterChange: setGlobalFilter,
+        globalFilterFn: 'includesString',
         state: {
             sorting,
             columnFilters,
             columnVisibility,
             rowSelection,
+            globalFilter,
         },
     });
 
@@ -55,9 +59,9 @@ export function OrganizationsPageDataTable<TData, TValue>({ columns, data }: Dat
         <div>
             <div className="flex items-center py-4">
                 <Input
-                    placeholder="Search by organization ID..."
-                    value={(table.getColumn('id')?.getFilterValue() as string) ?? ''}
-                    onChange={(event) => table.getColumn('id')?.setFilterValue(event.target.value)}
+                    placeholder="Search organizations..."
+                    value={globalFilter ?? ''}
+                    onChange={(event) => setGlobalFilter(event.target.value)}
                     className="max-w-sm"
                 />
 
