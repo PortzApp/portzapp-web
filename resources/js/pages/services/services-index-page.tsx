@@ -182,14 +182,11 @@ export default function ServicesIndexPage({ services: initialServices, ports, ca
             <Head title="Services Page" />
             <div className="mx-auto flex h-full w-full max-w-6xl flex-1 flex-col gap-12 overflow-x-auto rounded-xl p-8">
                 <div className="flex items-center justify-between">
-                    <h1 className="text-2xl font-bold">Services</h1>
+                    <h1 className="text-2xl font-bold">
+                        {auth.user.current_organization?.business_type === 'shipping_agency' ? 'My Services' : 'Services'}
+                    </h1>
 
                     <div className="flex items-center gap-3">
-                        <Link href={route('order-wizard.dashboard')} className={buttonVariants({ variant: 'default' })}>
-                            <ClipboardList className="mr-2 h-4 w-4" />
-                            New Order
-                        </Link>
-
                         {auth.user.current_organization?.business_type === 'shipping_agency' && (
                             <Link href={route('services.create')} className={buttonVariants({ variant: 'outline' })}>
                                 <Plus className="mr-2 h-4 w-4" />
@@ -225,20 +222,24 @@ export default function ServicesIndexPage({ services: initialServices, ports, ca
                                             router.reload({ only: ['services'] });
                                         }}
                                     >
-                                        <div className="flex items-center gap-2">
-                                            <RadioGroupItem value="active" id="active" />
-                                            <Label htmlFor="active">
-                                                Active
-                                                <span className="ml-1 text-muted-foreground">({status_counts.active})</span>
-                                            </Label>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <RadioGroupItem value="inactive" id="inactive" />
-                                            <Label htmlFor="inactive">
-                                                Inactive
-                                                <span className="ml-1 text-muted-foreground">({status_counts.inactive})</span>
-                                            </Label>
-                                        </div>
+                                        {status_counts.active > 0 && (
+                                            <div className="flex items-center gap-2">
+                                                <RadioGroupItem value="active" id="active" />
+                                                <Label htmlFor="active">
+                                                    Active
+                                                    <span className="ml-1 text-muted-foreground">({status_counts.active})</span>
+                                                </Label>
+                                            </div>
+                                        )}
+                                        {status_counts.inactive > 0 && (
+                                            <div className="flex items-center gap-2">
+                                                <RadioGroupItem value="inactive" id="inactive" />
+                                                <Label htmlFor="inactive">
+                                                    Inactive
+                                                    <span className="ml-1 text-muted-foreground">({status_counts.inactive})</span>
+                                                </Label>
+                                            </div>
+                                        )}
                                     </RadioGroup>
                                 </AccordionContent>
                             </AccordionItem>
@@ -256,17 +257,17 @@ export default function ServicesIndexPage({ services: initialServices, ports, ca
                                             router.reload({ only: ['services'] });
                                         }}
                                     >
-                                        {ports.map((port) => (
-                                            <div className="flex items-center gap-2" key={port.id}>
-                                                <RadioGroupItem value={port.name} id={port.id} />
-                                                <Label htmlFor={port.id}>
-                                                    {port.name}
-                                                    {typeof port.services_count === 'number' && (
+                                        {ports
+                                            .filter((port) => typeof port.services_count === 'number' && port.services_count > 0)
+                                            .map((port) => (
+                                                <div className="flex items-center gap-2" key={port.id}>
+                                                    <RadioGroupItem value={port.name} id={port.id} />
+                                                    <Label htmlFor={port.id}>
+                                                        {port.name}
                                                         <span className="ml-1 text-muted-foreground">({port.services_count})</span>
-                                                    )}
-                                                </Label>
-                                            </div>
-                                        ))}
+                                                    </Label>
+                                                </div>
+                                            ))}
                                     </RadioGroup>
                                 </AccordionContent>
                             </AccordionItem>
@@ -285,22 +286,28 @@ export default function ServicesIndexPage({ services: initialServices, ports, ca
                                         }}
                                     >
                                         <div className="flex flex-col gap-4">
-                                            {categories_with_subcategories.map((category) => (
-                                                <div key={category.id} className="flex flex-col gap-2">
-                                                    <div className="text-sm font-medium text-foreground">{category.name}</div>
-                                                    <div className="flex flex-col gap-2">
-                                                        {category.sub_categories.map((subCategory) => (
-                                                            <div className="flex items-center gap-1" key={subCategory.id}>
-                                                                <RadioGroupItem value={subCategory.id} id={subCategory.id} />
-                                                                <Label htmlFor={subCategory.id}>
-                                                                    {subCategory.name}
-                                                                    <span className="ml-1 text-muted-foreground">({subCategory.services_count})</span>
-                                                                </Label>
-                                                            </div>
-                                                        ))}
+                                            {categories_with_subcategories
+                                                .map((category) => ({
+                                                    ...category,
+                                                    sub_categories: category.sub_categories.filter((subCategory) => subCategory.services_count > 0),
+                                                }))
+                                                .filter((category) => category.sub_categories.length > 0)
+                                                .map((category) => (
+                                                    <div key={category.id} className="flex flex-col gap-2">
+                                                        <div className="text-sm font-medium text-foreground">{category.name}</div>
+                                                        <div className="flex flex-col gap-2">
+                                                            {category.sub_categories.map((subCategory) => (
+                                                                <div className="flex items-center gap-1" key={subCategory.id}>
+                                                                    <RadioGroupItem value={subCategory.id} id={subCategory.id} />
+                                                                    <Label htmlFor={subCategory.id}>
+                                                                        {subCategory.name}
+                                                                        <span className="ml-1 text-muted-foreground">({subCategory.services_count})</span>
+                                                                    </Label>
+                                                                </div>
+                                                            ))}
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            ))}
+                                                ))}
                                         </div>
                                     </RadioGroup>
                                 </AccordionContent>
