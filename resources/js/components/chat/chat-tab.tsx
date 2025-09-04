@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
+import { router } from '@inertiajs/react';
 import { useEcho } from '@laravel/echo-react';
 import { toast } from 'sonner';
 
@@ -24,51 +25,27 @@ interface ChatMessage {
 }
 
 interface ChatTabProps {
-    orderGroupId: string;
+    conversationId: string;
+    initialMessages: ChatMessage[];
     currentUserId: string;
 }
 
-export function ChatTab({ orderGroupId, currentUserId }: ChatTabProps) {
-    const [messages, setMessages] = useState<ChatMessage[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [sending, setSending] = useState(false);
+export function ChatTab({ conversationId, initialMessages, currentUserId }: ChatTabProps) {
+    const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
     const scrollAreaRef = useRef<HTMLDivElement>(null);
 
-    // Load initial messages
-    useEffect(() => {
-        const loadMessages = async () => {
-            try {
-                const response = await fetch(route('order-groups.messages.index', orderGroupId), {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-                    },
-                });
-                const data = await response.json();
-                setMessages(data.messages);
-            } catch {
-                toast.error('Failed to load chat messages');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        loadMessages();
-    }, [orderGroupId]);
+    const [processing, setProcessing] = useState(false);
 
     // Listen for new messages via WebSocket
-    useEcho(`private-order-group-chat.${orderGroupId}`, 'ChatMessageSent', ({ message }: { message: ChatMessage }) => {
+    useEcho(`private-conversation-chat.${conversationId}`, 'ChatMessageSent', ({ message }: { message: ChatMessage }) => {
         setMessages((prev) => [...prev, message]);
 
         // Mark messages as read when received
         if (message.user_id !== currentUserId) {
             setTimeout(() => {
-                fetch(route('order-groups.messages.read', orderGroupId), {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-                    },
+                router.patch(route('chat.messages.read', conversationId), {}, {
+                    preserveState: true,
+                    preserveScroll: true,
                 });
             }, 1000);
         }
@@ -81,9 +58,9 @@ export function ChatTab({ orderGroupId, currentUserId }: ChatTabProps) {
         }
     }, [messages]);
 
-    const handleSendMessage = async (message: string) => {
-        setSending(true);
-
+    const handleSendMessage = (message: string) => {
+        setProcessing(true);
+        
         // Optimistically add the message to the UI
         const optimisticMessage: ChatMessage = {
             id: Date.now().toString(), // Temporary ID
@@ -100,31 +77,23 @@ export function ChatTab({ orderGroupId, currentUserId }: ChatTabProps) {
         };
         setMessages((prev) => [...prev, optimisticMessage]);
 
-        try {
-            const response = await fetch(route('order-groups.messages.store', orderGroupId), {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-                },
-                body: JSON.stringify({ message }),
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to send message');
-            }
-
-            const data = await response.json();
-
-            // Replace optimistic message with real message from server
-            setMessages((prev) => prev.map((msg) => (msg.id === optimisticMessage.id ? data.message : msg)));
-        } catch {
-            // Remove optimistic message on error
-            setMessages((prev) => prev.filter((msg) => msg.id !== optimisticMessage.id));
-            toast.error('Failed to send message');
-        } finally {
-            setSending(false);
-        }
+        // Send message using Inertia router
+        router.post(route('chat.messages.send', conversationId), { message }, {
+            preserveState: true,
+            preserveScroll: true,
+            onSuccess: () => {
+                setProcessing(false);
+                // Remove optimistic message - real message will come via WebSocket
+                setMessages((prev) => prev.filter((msg) => msg.id !== optimisticMessage.id));
+                toast.success('Message sent');
+            },
+            onError: () => {
+                setProcessing(false);
+                // Remove optimistic message on error
+                setMessages((prev) => prev.filter((msg) => msg.id !== optimisticMessage.id));
+                toast.error('Failed to send message');
+            },
+        });
     };
 
     return (
@@ -134,9 +103,7 @@ export function ChatTab({ orderGroupId, currentUserId }: ChatTabProps) {
             </CardHeader>
             <CardContent className="flex flex-1 flex-col p-0">
                 <ScrollArea ref={scrollAreaRef} className="flex-1 p-4">
-                    {loading ? (
-                        <div className="py-8 text-center text-muted-foreground">Loading messages...</div>
-                    ) : messages.length === 0 ? (
+                    {messages.length === 0 ? (
                         <div className="py-8 text-center text-muted-foreground">No messages yet. Start the conversation!</div>
                     ) : (
                         <div className="space-y-4">
@@ -153,7 +120,7 @@ export function ChatTab({ orderGroupId, currentUserId }: ChatTabProps) {
                         </div>
                     )}
                 </ScrollArea>
-                <ChatInput onSendMessage={handleSendMessage} disabled={sending} />
+                <ChatInput onSendMessage={handleSendMessage} disabled={processing} />
             </CardContent>
         </Card>
     );

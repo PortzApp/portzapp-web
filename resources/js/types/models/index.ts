@@ -167,6 +167,62 @@ export interface OrderGroup extends OrderGroupBase {
     order_group_services: OrderGroupService[];
     services: Service[]; // Kept for backward compatibility during transition
     total_price: number;
+    chat_conversation?: ChatConversation;
+}
+
+// Chat system interfaces
+export interface ChatMessageRead extends BaseModel {
+    message_id: string;
+    user_id: string;
+    read_at: string;
+}
+
+export interface ChatMessage extends BaseModel {
+    conversation_id: string;
+    user_id: string;
+    parent_message_id: string | null;
+    message: string;
+    message_type: string;
+    delivered_at: string;
+    edited_at: string | null;
+    deleted_at: string | null;
+    user?: {
+        id: string;
+        first_name: string;
+        last_name: string;
+        email: string;
+    };
+    reads?: ChatMessageRead[];
+    parent_message?: ChatMessage;
+}
+
+export interface ChatParticipant extends BaseModel {
+    conversation_id: string;
+    user_id: string;
+    organization_id: string;
+    joined_at: string;
+    left_at: string | null;
+    last_read_at: string | null;
+    unread_count: number;
+    user?: {
+        id: string;
+        first_name: string;
+        last_name: string;
+        email: string;
+    };
+    organization?: {
+        id: string;
+        name: string;
+    };
+}
+
+export interface ChatConversation extends BaseModel {
+    order_group_id: string;
+    last_message_id: string | null;
+    last_message_at: string | null;
+    messages?: ChatMessage[];
+    participants?: ChatParticipant[];
+    last_message?: ChatMessage;
 }
 
 export interface OrderWithRelations extends OrderBase {
