@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             ServiceSubCategorySeeder::class,
             ServiceSeeder::class,
             OrderSeeder::class,
+            ChatSeeder::class,
         ]);
     }
 }
