@@ -59,10 +59,10 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     // Order group service action routes
     Route::patch('order-group-services/{orderGroupService}/status', [OrderGroupServiceController::class, 'updateStatus'])->name('order-group-services.status.update');
 
-    // Chat routes
-    Route::get('order-groups/{orderGroup}/messages', [\App\Http\Controllers\ChatMessageController::class, 'index'])->name('order-groups.messages.index');
-    Route::post('order-groups/{orderGroup}/messages', [\App\Http\Controllers\ChatMessageController::class, 'store'])->name('order-groups.messages.store');
-    Route::patch('order-groups/{orderGroup}/messages/read', [\App\Http\Controllers\ChatMessageController::class, 'markAsRead'])->name('order-groups.messages.read');
+    // Chat routes - Inertia-based chat system
+    Route::get('chat/conversations/order-group/{orderGroup}', [\App\Http\Controllers\ChatController::class, 'getOrCreateConversation'])->name('chat.conversation.get');
+    Route::post('chat/conversations/{conversation}/messages', [\App\Http\Controllers\ChatController::class, 'sendMessage'])->name('chat.messages.send');
+    Route::patch('chat/conversations/{conversation}/read', [\App\Http\Controllers\ChatController::class, 'markAsRead'])->name('chat.messages.read');
 
     // Order wizard routes
     Route::prefix('order-wizard')->group(function (): void {
