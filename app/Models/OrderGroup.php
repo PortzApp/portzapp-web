@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 
 /**
@@ -88,6 +90,14 @@ class OrderGroup extends Model
     }
 
     /**
+     * Get the chat conversation for this order group.
+     */
+    public function chatConversation(): HasOne
+    {
+        return $this->hasOne(\App\Models\ChatConversation::class, 'order_group_id');
+    }
+
+    /**
      * Calculate the total price for this order group from all OrderGroupServices.
      */
     public function getTotalPriceAttribute(): float
@@ -96,11 +106,18 @@ class OrderGroup extends Model
     }
 
     /**
-     * Get all chat messages for this order group.
+     * Get all chat messages for this order group through conversation.
      */
-    public function chatMessages(): HasMany
+    public function chatMessages(): HasManyThrough
     {
-        return $this->hasMany(\App\Models\ChatMessage::class, 'order_group_id');
+        return $this->hasManyThrough(
+            \App\Models\ChatMessage::class,
+            \App\Models\ChatConversation::class,
+            'order_group_id', // Foreign key on conversations table
+            'conversation_id', // Foreign key on messages table
+            'id', // Local key on order_groups table
+            'id' // Local key on conversations table
+        )->whereNull('chat_messages.deleted_at')->orderBy('chat_messages.created_at');
     }
 
     protected function casts(): array
