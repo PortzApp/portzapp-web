@@ -50,6 +50,9 @@ tests/Browser/screenshots/
 .taskmaster/tasks/tasks.json
 test_output.xml
 
+# MCP configuration (Claude Code)
+.mcp.json
+
 # Task files
 # tasks.json
 # tasks/
