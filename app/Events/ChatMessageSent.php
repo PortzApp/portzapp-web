@@ -2,8 +2,8 @@
 
 namespace App\Events;
 
-use App\Models\ChatMessage;
 use App\Models\ChatConversation;
+use App\Models\ChatMessage;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
@@ -30,6 +30,7 @@ class ChatMessageSent implements ShouldBroadcastNow
     {
         /** @var ChatConversation $conversation */
         $conversation = $this->chatMessage->conversation;
+
         return new PrivateChannel('order-group-chat.'.$conversation->order_group_id);
     }
 

@@ -72,12 +72,13 @@ class ChatMessage extends Model
         /** @var ChatMessageRead|null $read */
         $read = $this->reads()->where('user_id', $userId)->first();
 
-        if (!$read || !$read->read_at) {
+        if (! $read || ! $read->read_at) {
             return null;
         }
 
         /** @var Carbon $readAt */
         $readAt = $read->read_at;
+
         return $readAt->format('H:i');
     }
 

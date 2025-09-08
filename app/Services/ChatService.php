@@ -103,11 +103,11 @@ class ChatService
      */
     public function markMessagesAsRead(ChatConversation $conversation, User $user): void
     {
-        DB::transaction(function () use ($conversation, $user) {
+        DB::transaction(function () use ($conversation, $user): void {
             // Get unread messages for this user in the conversation
             $unreadMessages = ChatMessage::where('conversation_id', $conversation->id)
                 ->where('user_id', '!=', $user->id)
-                ->whereDoesntHave('reads', function ($query) use ($user) {
+                ->whereDoesntHave('reads', function ($query) use ($user): void {
                     $query->where('user_id', $user->id);
                 })
                 ->whereNull('deleted_at')
@@ -152,7 +152,7 @@ class ChatService
      */
     public function getUserConversations(User $user): \Illuminate\Database\Eloquent\Collection
     {
-        return ChatConversation::whereHas('participants', function ($query) use ($user) {
+        return ChatConversation::whereHas('participants', function ($query) use ($user): void {
             $query->where('user_id', $user->id);
         })
             ->with([
