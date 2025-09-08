@@ -38,6 +38,11 @@ class AppServiceProvider extends ServiceProvider
             $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
             $this->app->register(TelescopeServiceProvider::class);
         }
+
+        // Only register Nightwatch after the app is fully booted
+        if (class_exists(\Laravel\Nightwatch\NightwatchServiceProvider::class)) {
+            $this->app->register(\Laravel\Nightwatch\NightwatchServiceProvider::class);
+        }
     }
 
     /**
