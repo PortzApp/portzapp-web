@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { useEcho } from '@laravel/echo-react';
-import { Box, ClipboardList, MapPin, Plus, RotateCcw, Star } from 'lucide-react';
+import { Box, MapPin, Plus, RotateCcw, Star } from 'lucide-react';
 import { parseAsInteger, parseAsString, useQueryState, useQueryStates } from 'nuqs';
 import { toast } from 'sonner';
 
@@ -183,11 +183,11 @@ export default function ServicesIndexPage({ services: initialServices, ports, ca
             <div className="mx-auto flex h-full w-full max-w-6xl flex-1 flex-col gap-12 overflow-x-auto rounded-xl p-8">
                 <div className="flex items-center justify-between">
                     <h1 className="text-2xl font-bold">
-                        {auth.user.current_organization?.business_type === 'shipping_agency' 
-                            ? 'My Services' 
+                        {auth.user.current_organization?.business_type === 'shipping_agency'
+                            ? 'My Services'
                             : auth.user.current_organization?.business_type === 'portzapp_team'
-                            ? 'All Services'
-                            : 'Services'}
+                              ? 'All Services'
+                              : 'Services'}
                     </h1>
 
                     <div className="flex items-center gap-3">
@@ -305,7 +305,9 @@ export default function ServicesIndexPage({ services: initialServices, ports, ca
                                                                     <RadioGroupItem value={subCategory.id} id={subCategory.id} />
                                                                     <Label htmlFor={subCategory.id}>
                                                                         {subCategory.name}
-                                                                        <span className="ml-1 text-muted-foreground">({subCategory.services_count})</span>
+                                                                        <span className="ml-1 text-muted-foreground">
+                                                                            ({subCategory.services_count})
+                                                                        </span>
                                                                     </Label>
                                                                 </div>
                                                             ))}

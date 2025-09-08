@@ -129,8 +129,8 @@ export default function ShowServicePage({ service: initialService }: { service: 
                         <p className="text-base text-muted-foreground">
                             {(service as Service & { port?: { name: string; country: string; city: string } }).port?.name && (
                                 <>
-                                    {(service as Service & { port?: { name: string; country: string; city: string } }).port?.name}{' '}
-                                    ({(service as Service & { port?: { name: string; country: string; city: string } }).port?.country},{' '}
+                                    {(service as Service & { port?: { name: string; country: string; city: string } }).port?.name} (
+                                    {(service as Service & { port?: { name: string; country: string; city: string } }).port?.country},{' '}
                                     {(service as Service & { port?: { name: string; country: string; city: string } }).port?.city})
                                 </>
                             )}
@@ -170,7 +170,7 @@ export default function ShowServicePage({ service: initialService }: { service: 
 
                 <div className="grid gap-6 lg:grid-cols-3">
                     {/* Main Content */}
-                    <div className="lg:col-span-2 space-y-6">
+                    <div className="space-y-6 lg:col-span-2">
                         {/* Service Overview */}
                         <Card>
                             <CardContent>
@@ -192,13 +192,11 @@ export default function ShowServicePage({ service: initialService }: { service: 
                                             {service.status === 'active' ? 'Active' : 'Inactive'}
                                         </Badge>
                                     </div>
-                                    
+
                                     {service.description && (
                                         <div>
-                                            <h3 className="text-lg font-semibold mb-2">Description</h3>
-                                            <p className="text-muted-foreground leading-relaxed">
-                                                {service.description}
-                                            </p>
+                                            <h3 className="mb-2 text-lg font-semibold">Description</h3>
+                                            <p className="leading-relaxed text-muted-foreground">{service.description}</p>
                                         </div>
                                     )}
                                 </div>
@@ -213,7 +211,7 @@ export default function ShowServicePage({ service: initialService }: { service: 
                             </CardHeader>
                             <CardContent>
                                 <div className="flex items-center space-x-3">
-                                    <div className="h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center">
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-200">
                                         <div className="h-6 w-6 rounded-full bg-gray-400" />
                                     </div>
                                     <div>
@@ -235,28 +233,30 @@ export default function ShowServicePage({ service: initialService }: { service: 
                             </CardHeader>
                             <CardContent className="space-y-3">
                                 <div>
-                                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Category</p>
+                                    <p className="mb-1 text-xs font-medium tracking-wide text-muted-foreground uppercase">Category</p>
                                     <p className="text-sm">
-                                        {(service as Service & { sub_category?: { category?: { name: string } } }).sub_category?.category?.name || 'Not specified'}
+                                        {(service as Service & { sub_category?: { category?: { name: string } } }).sub_category?.category?.name ||
+                                            'Not specified'}
                                     </p>
                                 </div>
-                                
+
                                 <div>
-                                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Service Type</p>
+                                    <p className="mb-1 text-xs font-medium tracking-wide text-muted-foreground uppercase">Service Type</p>
                                     <p className="text-sm">
                                         {(service as Service & { sub_category?: { name: string } }).sub_category?.name || 'Not specified'}
                                     </p>
                                 </div>
 
                                 <div>
-                                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Port Location</p>
+                                    <p className="mb-1 text-xs font-medium tracking-wide text-muted-foreground uppercase">Port Location</p>
                                     <p className="text-sm">
                                         {(service as Service & { port?: { name: string; country: string; city: string } }).port ? (
                                             <>
                                                 {(service as Service & { port?: { name: string; country: string; city: string } }).port?.name}
                                                 <br />
                                                 <span className="text-xs text-muted-foreground">
-                                                    {(service as Service & { port?: { name: string; country: string; city: string } }).port?.city}, {(service as Service & { port?: { name: string; country: string; city: string } }).port?.country}
+                                                    {(service as Service & { port?: { name: string; country: string; city: string } }).port?.city},{' '}
+                                                    {(service as Service & { port?: { name: string; country: string; city: string } }).port?.country}
                                                 </span>
                                             </>
                                         ) : (
