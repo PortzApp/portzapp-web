@@ -122,7 +122,7 @@ export default function ShowServicePage({ service: initialService }: { service: 
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={service.sub_category?.name || 'Service Details'} />
 
-            <div className="flex flex-col gap-8 p-8">
+            <div className="mx-auto flex h-full w-full max-w-6xl flex-1 flex-col gap-8 p-8">
                 <div className="flex items-center justify-between">
                     <div className="flex flex-col gap-1">
                         <h1 className="text-2xl font-semibold">{service.sub_category?.name || 'Service Details'}</h1>
