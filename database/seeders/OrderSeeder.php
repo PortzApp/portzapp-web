@@ -341,8 +341,8 @@ class OrderSeeder extends Seeder
         // Get services from shipping1 organization
         $shipping1Services = $servicesByOrg[$shipping1Org->id];
 
-        // Create orders for each month in the last 6 months
-        for ($monthsAgo = 5; $monthsAgo >= 0; $monthsAgo--) {
+        // Create orders for each month in the last 6 months (excluding current month to avoid future dates)
+        for ($monthsAgo = 6; $monthsAgo >= 1; $monthsAgo--) {
             $startOfMonth = now()->subMonths($monthsAgo)->startOfMonth();
             $endOfMonth = now()->subMonths($monthsAgo)->endOfMonth();
 
@@ -362,8 +362,9 @@ class OrderSeeder extends Seeder
                 // Get a random port
                 $port = Port::inRandomOrder()->first() ?? Port::factory()->create();
 
-                // Generate a random date within the month
-                $orderDate = fake()->dateTimeBetween($startOfMonth, $endOfMonth);
+                // Generate a random date within the month, ensuring it's never in the future
+                $maxDate = min($endOfMonth, now());
+                $orderDate = fake()->dateTimeBetween($startOfMonth, $maxDate);
 
                 // Create the order
                 $order = Order::create([

@@ -54,7 +54,7 @@ export function OrderGroupsPageColumnActions({ orderGroup }: OrderGroupsPageColu
                     <DropdownMenuItem>View details</DropdownMenuItem>
                 </Link>
 
-                <DropdownMenuSeparator />
+                {(canAccept || canReject || canStart || canComplete) && <DropdownMenuSeparator />}
 
                 {canAccept && (
                     <DropdownMenuItem onClick={handleAccept} className="text-green-600">

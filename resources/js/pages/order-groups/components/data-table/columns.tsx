@@ -108,6 +108,16 @@ export const columns: ColumnDef<OrderGroup>[] = [
                         const created = new Date(orderGroup.created_at);
                         const diff = Math.floor((now.getTime() - created.getTime()) / 1000);
 
+                        // If the date is in the future, display the formatted date
+                        if (diff < 0) {
+                            return created.toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric',
+                            });
+                        }
+
+                        // For past dates, show relative time for recent dates
                         if (diff < 60) return `${diff} seconds ago`;
                         if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;
                         if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
