@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -68,9 +69,16 @@ class ChatMessage extends Model
 
     public function getReadAt(string $userId): ?string
     {
+        /** @var ChatMessageRead|null $read */
         $read = $this->reads()->where('user_id', $userId)->first();
 
-        return $read ? $read->read_at->format('H:i') : null;
+        if (!$read || !$read->read_at) {
+            return null;
+        }
+
+        /** @var Carbon $readAt */
+        $readAt = $read->read_at;
+        return $readAt->format('H:i');
     }
 
     public function isOwnMessage(string $userId): bool

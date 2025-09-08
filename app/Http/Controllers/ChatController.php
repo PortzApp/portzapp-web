@@ -19,11 +19,11 @@ class ChatController extends Controller
      */
     public function getOrCreateConversation(OrderGroup $orderGroup)
     {
-        // Authorize: user must have access to this order group
-        Gate::authorize('view', $orderGroup);
+        // Authorize: user must have access to this order group's chat
+        Gate::authorize('viewChat', $orderGroup);
 
         $conversation = $this->chatService->getOrCreateConversation($orderGroup);
-        
+
         // Load messages with relationships
         $messages = $conversation->messages()
             ->with(['user', 'reads'])

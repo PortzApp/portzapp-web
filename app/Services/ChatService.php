@@ -7,6 +7,7 @@ use App\Models\ChatMessage;
 use App\Models\ChatMessageRead;
 use App\Models\ChatParticipant;
 use App\Models\OrderGroup;
+use App\Models\Organization;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
@@ -33,6 +34,7 @@ class ChatService
                 );
 
                 // Add fulfilling organization's first user (if any)
+                /** @var User|null $fulfillingOrgUser */
                 $fulfillingOrgUser = $orderGroup->fulfillingOrganization->users()->first();
                 if ($fulfillingOrgUser) {
                     $this->addParticipant(
@@ -50,7 +52,7 @@ class ChatService
     /**
      * Add a participant to a conversation.
      */
-    public function addParticipant(ChatConversation $conversation, User $user, $organization): ChatParticipant
+    public function addParticipant(ChatConversation $conversation, User $user, Organization $organization): ChatParticipant
     {
         return ChatParticipant::firstOrCreate([
             'conversation_id' => $conversation->id,
@@ -73,8 +75,8 @@ class ChatService
     ): ChatMessage {
         return DB::transaction(function () use ($conversation, $user, $message, $parentMessageId) {
             $chatMessage = new ChatMessage;
-            $chatMessage->conversation_id = $conversation->id;
-            $chatMessage->user_id = $user->id;
+            $chatMessage->conversation_id = (string) $conversation->id;
+            $chatMessage->user_id = (string) $user->id;
             $chatMessage->parent_message_id = $parentMessageId;
             $chatMessage->message = $message;
             $chatMessage->message_type = 'text';
