@@ -134,7 +134,7 @@ export function ChatConversation({ orderGroup, currentUserId }: ChatConversation
                                 <ChatMessage
                                     key={msg.id}
                                     message={msg.message}
-                                    senderName={`${msg.user.first_name} ${msg.user.last_name}`.trim()}
+                                    senderName={`${msg.user?.first_name || ''} ${msg.user?.last_name || ''}`.trim()}
                                     timestamp={msg.delivered_at}
                                     isOwnMessage={msg.user_id === currentUserId}
                                     isRead={msg.reads?.some((read) => read.user_id === currentUserId) || false}

@@ -120,7 +120,7 @@ export function ChatConversationImproved({ conversation, currentUserId, classNam
                 last_name: '',
                 email: '',
             },
-            parent_message_id: data.parent_message_id,
+            parent_message_id: data.parent_message_id || undefined,
             parent_message: replyToMessage
                 ? {
                       id: replyToMessage.id,
@@ -137,10 +137,6 @@ export function ChatConversationImproved({ conversation, currentUserId, classNam
 
         // Submit message
         post(route('chat.conversations.messages.store', conversation.id), {
-            data: {
-                message: data.message,
-                parent_message_id: data.parent_message_id,
-            },
             preserveState: true,
             preserveScroll: true,
             onSuccess: () => {
