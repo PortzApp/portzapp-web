@@ -451,7 +451,9 @@ export default function ShowOrderGroupPage({
                                                         <Tag className="h-4 w-4" />
                                                         <h4 className="font-medium">{orderGroupService.service?.sub_category?.name || 'Service'}</h4>
                                                         {orderGroupService.service?.sub_category?.category?.name && (
-                                                            <ServiceCategoryBadge categoryName={orderGroupService.service.sub_category.category.name} />
+                                                            <ServiceCategoryBadge
+                                                                categoryName={orderGroupService.service.sub_category.category.name}
+                                                            />
                                                         )}
                                                         <OrderGroupServiceStatusBadge status={orderGroupService.status} />
                                                     </div>
@@ -490,7 +492,9 @@ export default function ShowOrderGroupPage({
                                                                 <Eye className="mr-2 h-4 w-4" />
                                                                 View details
                                                             </DropdownMenuItem>
-                                                            <DropdownMenuItem onClick={() => copyToClipboard(orderGroupService.service_id, 'Service ID')}>
+                                                            <DropdownMenuItem
+                                                                onClick={() => copyToClipboard(orderGroupService.service_id, 'Service ID')}
+                                                            >
                                                                 <Copy className="mr-2 h-4 w-4" />
                                                                 Copy service ID
                                                             </DropdownMenuItem>
@@ -500,7 +504,9 @@ export default function ShowOrderGroupPage({
                                                                     {Object.values(OrderGroupServiceStatus).map((status) => (
                                                                         <DropdownMenuItem
                                                                             key={status}
-                                                                            onClick={() => handleOrderGroupServiceStatusChange(orderGroupService.id, status)}
+                                                                            onClick={() =>
+                                                                                handleOrderGroupServiceStatusChange(orderGroupService.id, status)
+                                                                            }
                                                                             disabled={status === orderGroupService.status}
                                                                         >
                                                                             {getOrderGroupServiceStatusLabel(status)}
@@ -573,11 +579,7 @@ export default function ShowOrderGroupPage({
                         </TabsContent>
 
                         <TabsContent value="chat" className="flex flex-1 flex-col">
-                            <ChatTab 
-                                conversationId={conversation.id} 
-                                initialMessages={conversation.messages}
-                                currentUserId={auth.user.id} 
-                            />
+                            <ChatTab conversationId={conversation.id} initialMessages={conversation.messages} currentUserId={auth.user.id} />
                         </TabsContent>
                     </div>
                 </Tabs>

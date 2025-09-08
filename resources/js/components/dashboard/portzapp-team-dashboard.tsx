@@ -1,8 +1,8 @@
 import { router, usePage } from '@inertiajs/react';
 import { Anchor, Building, Plus, Users } from 'lucide-react';
 
-import type { PortzAppTeamDashboardData } from '@/types/dashboard';
 import type { SharedData } from '@/types';
+import type { PortzAppTeamDashboardData } from '@/types/dashboard';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -117,12 +117,7 @@ export function PortzAppTeamDashboard({ data }: PortzAppTeamDashboardProps) {
                                 <p className="text-sm text-muted-foreground">Manage ports and system configuration</p>
                             </div>
                             <div className="grid gap-2">
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    className="justify-start"
-                                    onClick={() => router.visit(route('ports.index'))}
-                                >
+                                <Button variant="outline" size="sm" className="justify-start" onClick={() => router.visit(route('ports.index'))}>
                                     Manage Ports
                                 </Button>
                             </div>
