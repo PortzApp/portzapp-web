@@ -5,10 +5,10 @@ import { useEcho } from '@laravel/echo-react';
 import { MessageSquare } from 'lucide-react';
 import { toast } from 'sonner';
 
+import type { ChatMessage as ChatMessageType, OrderGroup } from '@/types/models';
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-
-import type { ChatMessage as ChatMessageType, OrderGroup } from '@/types/models';
 
 import { ChatInput } from './chat-input';
 import { ChatMessage } from './chat-message';
@@ -23,7 +23,7 @@ export function ChatConversation({ orderGroup, currentUserId }: ChatConversation
     const scrollAreaRef = useRef<HTMLDivElement>(null);
     const conversation = orderGroup.chat_conversation;
 
-    const { data, setData, processing, reset } = useForm({
+    const { processing, reset } = useForm({
         message: '',
     });
 
@@ -43,10 +43,14 @@ export function ChatConversation({ orderGroup, currentUserId }: ChatConversation
         // Mark messages as read when received
         if (message.user_id !== currentUserId && conversation?.id) {
             setTimeout(() => {
-                router.patch(route('chat.messages.read', conversation.id), {}, {
-                    preserveState: true,
-                    preserveScroll: true,
-                });
+                router.patch(
+                    route('chat.messages.read', conversation.id),
+                    {},
+                    {
+                        preserveState: true,
+                        preserveScroll: true,
+                    },
+                );
             }, 1000);
         }
     });
@@ -87,8 +91,9 @@ export function ChatConversation({ orderGroup, currentUserId }: ChatConversation
         setMessages((prev) => [...prev, optimisticMessage]);
 
         // Send message using Inertia router
-        router.post(route('chat.messages.send', conversation.id), 
-            { message }, 
+        router.post(
+            route('chat.messages.send', conversation.id),
+            { message },
             {
                 preserveState: true,
                 preserveScroll: true,
@@ -101,8 +106,8 @@ export function ChatConversation({ orderGroup, currentUserId }: ChatConversation
                     // Remove optimistic message on error
                     setMessages((prev) => prev.filter((msg) => msg.id !== optimisticMessage.id));
                     toast.error('Failed to send message');
-                }
-            }
+                },
+            },
         );
     };
 
@@ -132,7 +137,7 @@ export function ChatConversation({ orderGroup, currentUserId }: ChatConversation
                                     senderName={`${msg.user.first_name} ${msg.user.last_name}`.trim()}
                                     timestamp={msg.delivered_at}
                                     isOwnMessage={msg.user_id === currentUserId}
-                                    isRead={msg.reads?.some(read => read.user_id === currentUserId) || false}
+                                    isRead={msg.reads?.some((read) => read.user_id === currentUserId) || false}
                                 />
                             ))}
                         </div>

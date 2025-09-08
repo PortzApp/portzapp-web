@@ -5,11 +5,12 @@ import { useEcho } from '@laravel/echo-react';
 import { MessageSquare, X } from 'lucide-react';
 import { toast } from 'sonner';
 
+import { cn } from '@/lib/utils';
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
-import { cn } from '@/lib/utils';
 
 import { ChatMessageBubble } from './chat-message-bubble';
 
@@ -120,11 +121,13 @@ export function ChatConversationImproved({ conversation, currentUserId, classNam
                 email: '',
             },
             parent_message_id: data.parent_message_id,
-            parent_message: replyToMessage ? {
-                id: replyToMessage.id,
-                message: replyToMessage.message,
-                user: replyToMessage.user,
-            } : undefined,
+            parent_message: replyToMessage
+                ? {
+                      id: replyToMessage.id,
+                      message: replyToMessage.message,
+                      user: replyToMessage.user,
+                  }
+                : undefined,
             delivered_at: new Date().toISOString(),
             created_at: new Date().toISOString(),
         };
@@ -166,24 +169,20 @@ export function ChatConversationImproved({ conversation, currentUserId, classNam
     };
 
     return (
-        <Card className={cn("flex h-full flex-col", className)}>
+        <Card className={cn('flex h-full flex-col', className)}>
             <CardHeader className="flex-shrink-0 pb-3">
                 <CardTitle className="flex items-center gap-2">
                     <MessageSquare className="h-5 w-5" />
-                    <div className="flex-1 min-w-0">
-                        <div className="font-semibold truncate">
-                            {conversation.order_group.fulfilling_organization.name}
-                        </div>
+                    <div className="min-w-0 flex-1">
+                        <div className="truncate font-semibold">{conversation.order_group.fulfilling_organization.name}</div>
                         <div className="text-sm font-normal text-muted-foreground">
                             Order: {conversation.order_group.group_number}
-                            {conversation.order_group.order?.vessel?.name && 
-                                ` • Vessel: ${conversation.order_group.order.vessel.name}`
-                            }
+                            {conversation.order_group.order?.vessel?.name && ` • Vessel: ${conversation.order_group.order.vessel.name}`}
                         </div>
                     </div>
                 </CardTitle>
             </CardHeader>
-            
+
             <CardContent className="flex flex-1 flex-col p-0">
                 {/* Messages */}
                 <ScrollArea ref={scrollAreaRef} className="flex-1 px-4">
@@ -198,12 +197,7 @@ export function ChatConversationImproved({ conversation, currentUserId, classNam
                     ) : (
                         <div className="space-y-4 py-4">
                             {messages.map((message) => (
-                                <ChatMessageBubble
-                                    key={message.id}
-                                    message={message}
-                                    currentUserId={currentUserId}
-                                    onReply={handleReply}
-                                />
+                                <ChatMessageBubble key={message.id} message={message} currentUserId={currentUserId} onReply={handleReply} />
                             ))}
                         </div>
                     )}
@@ -213,13 +207,11 @@ export function ChatConversationImproved({ conversation, currentUserId, classNam
                 {replyToMessage && (
                     <div className="border-t bg-muted/50 px-4 py-2">
                         <div className="flex items-start gap-2">
-                            <div className="flex-1 min-w-0">
+                            <div className="min-w-0 flex-1">
                                 <div className="text-xs font-medium text-muted-foreground">
                                     Replying to {replyToMessage.user.first_name} {replyToMessage.user.last_name}
                                 </div>
-                                <div className="text-sm truncate">
-                                    {replyToMessage.message}
-                                </div>
+                                <div className="truncate text-sm">{replyToMessage.message}</div>
                             </div>
                             <Button
                                 size="sm"
@@ -244,14 +236,10 @@ export function ChatConversationImproved({ conversation, currentUserId, classNam
                             onChange={(e) => setData('message', e.target.value)}
                             onKeyDown={handleKeyDown}
                             placeholder="Type a message..."
-                            className="min-h-[40px] max-h-[120px] resize-none"
+                            className="max-h-[120px] min-h-[40px] resize-none"
                             disabled={processing}
                         />
-                        <Button 
-                            onClick={handleSendMessage}
-                            disabled={processing || !data.message.trim()}
-                            size="sm"
-                        >
+                        <Button onClick={handleSendMessage} disabled={processing || !data.message.trim()} size="sm">
                             Send
                         </Button>
                     </div>

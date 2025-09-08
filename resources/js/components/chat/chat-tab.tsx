@@ -43,10 +43,14 @@ export function ChatTab({ conversationId, initialMessages, currentUserId }: Chat
         // Mark messages as read when received
         if (message.user_id !== currentUserId) {
             setTimeout(() => {
-                router.patch(route('chat.messages.read', conversationId), {}, {
-                    preserveState: true,
-                    preserveScroll: true,
-                });
+                router.patch(
+                    route('chat.messages.read', conversationId),
+                    {},
+                    {
+                        preserveState: true,
+                        preserveScroll: true,
+                    },
+                );
             }, 1000);
         }
     });
@@ -60,7 +64,7 @@ export function ChatTab({ conversationId, initialMessages, currentUserId }: Chat
 
     const handleSendMessage = (message: string) => {
         setProcessing(true);
-        
+
         // Optimistically add the message to the UI
         const optimisticMessage: ChatMessage = {
             id: Date.now().toString(), // Temporary ID
@@ -78,22 +82,26 @@ export function ChatTab({ conversationId, initialMessages, currentUserId }: Chat
         setMessages((prev) => [...prev, optimisticMessage]);
 
         // Send message using Inertia router
-        router.post(route('chat.messages.send', conversationId), { message }, {
-            preserveState: true,
-            preserveScroll: true,
-            onSuccess: () => {
-                setProcessing(false);
-                // Remove optimistic message - real message will come via WebSocket
-                setMessages((prev) => prev.filter((msg) => msg.id !== optimisticMessage.id));
-                toast.success('Message sent');
+        router.post(
+            route('chat.messages.send', conversationId),
+            { message },
+            {
+                preserveState: true,
+                preserveScroll: true,
+                onSuccess: () => {
+                    setProcessing(false);
+                    // Remove optimistic message - real message will come via WebSocket
+                    setMessages((prev) => prev.filter((msg) => msg.id !== optimisticMessage.id));
+                    toast.success('Message sent');
+                },
+                onError: () => {
+                    setProcessing(false);
+                    // Remove optimistic message on error
+                    setMessages((prev) => prev.filter((msg) => msg.id !== optimisticMessage.id));
+                    toast.error('Failed to send message');
+                },
             },
-            onError: () => {
-                setProcessing(false);
-                // Remove optimistic message on error
-                setMessages((prev) => prev.filter((msg) => msg.id !== optimisticMessage.id));
-                toast.error('Failed to send message');
-            },
-        });
+        );
     };
 
     return (
