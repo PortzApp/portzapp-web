@@ -40,8 +40,9 @@ class ChatMessageController extends Controller
 
         $message->load('user:id,first_name,last_name,email');
 
-        /** @var \App\Models\ChatMessage $message */
-        broadcast(new ChatMessageSent($message))->toOthers();
+        // TEMPORARILY DISABLED - WebSocket functionality disabled in production
+        // /** @var \App\Models\ChatMessage $message */
+        // broadcast(new ChatMessageSent($message))->toOthers();
 
         return back()->with([
             'success' => 'Message sent successfully',

@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { useEcho } from '@laravel/echo-react';
+// TEMPORARILY DISABLED - WebSocket functionality disabled in production
+// import { useEcho } from '@laravel/echo-react';
 import { toast } from 'sonner';
 
 import type { BreadcrumbItem, SharedData } from '@/types';
@@ -44,36 +45,37 @@ export default function OrdersIndexPage({ orders: initialOrders }: { orders: Arr
         setOrders(initialOrders);
     }, [initialOrders]);
 
-    // Listen for order updated events on static channel
-    useEcho<OrderUpdatedEvent>('orders.updated', 'OrderUpdated', ({ order: updatedOrder }) => {
-        // Only update orders that belong to the current organization
-        const belongsToCurrentOrganization = updatedOrder.placed_by_organization_id === auth.user.current_organization?.id;
-        if (!belongsToCurrentOrganization) return;
-        setOrders((prevOrders) =>
-            prevOrders.map((prevOrder) =>
-                prevOrder.id === updatedOrder.id
-                    ? {
-                          ...prevOrder,
-                          status: updatedOrder.status,
-                          updated_at: updatedOrder.updated_at,
-                      }
-                    : prevOrder,
-            ),
-        );
-
-        toast('Order updated', {
-            description: `Order #${updatedOrder.order_number} status changed to ${updatedOrder.status?.replace(/_/g, ' ')}`,
-            classNames: {
-                description: '!text-muted-foreground',
-            },
-            action: {
-                label: 'View Order',
-                onClick: () => {
-                    router.visit(route('orders.show', updatedOrder.id));
-                },
-            },
-        });
-    });
+    // TEMPORARILY DISABLED - WebSocket functionality disabled in production
+    // // Listen for order updated events on static channel
+    // useEcho<OrderUpdatedEvent>('orders.updated', 'OrderUpdated', ({ order: updatedOrder }) => {
+    //     // Only update orders that belong to the current organization
+    //     const belongsToCurrentOrganization = updatedOrder.placed_by_organization_id === auth.user.current_organization?.id;
+    //     if (!belongsToCurrentOrganization) return;
+    //     setOrders((prevOrders) =>
+    //         prevOrders.map((prevOrder) =>
+    //             prevOrder.id === updatedOrder.id
+    //                 ? {
+    //                       ...prevOrder,
+    //                       status: updatedOrder.status,
+    //                       updated_at: updatedOrder.updated_at,
+    //                   }
+    //                 : prevOrder,
+    //         ),
+    //     );
+    //
+    //     toast('Order updated', {
+    //         description: `Order #${updatedOrder.order_number} status changed to ${updatedOrder.status?.replace(/_/g, ' ')}`,
+    //         classNames: {
+    //             description: '!text-muted-foreground',
+    //         },
+    //         action: {
+    //             label: 'View Order',
+    //             onClick: () => {
+    //                 router.visit(route('orders.show', updatedOrder.id));
+    //             },
+    //         },
+    //     });
+    // });
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>

@@ -5,7 +5,8 @@ import OrderServicesGroupedTab from '@/pages/orders/components/order-services-gr
 // import OrderSystemTab from '@/pages/orders/components/order-system-tab';
 import OrderVesselTab from '@/pages/orders/components/order-vessel-tab';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { useEcho } from '@laravel/echo-react';
+// TEMPORARILY DISABLED - WebSocket functionality disabled in production
+// import { useEcho } from '@laravel/echo-react';
 import { Edit, LayoutGrid, MapPin, MessageSquare, Package, Ship, Trash2 } from 'lucide-react';
 import { parseAsStringLiteral, useQueryState } from 'nuqs';
 import { toast } from 'sonner';
@@ -98,94 +99,97 @@ export default function ShowOrderPage({ order: initialOrder }: { order: OrderWit
         },
     ];
 
-    // Listen for order updated events on static channel
-    useEcho<OrderUpdatedEvent>('orders.updated', 'OrderUpdated', ({ order: updatedOrder }) => {
-        if (updatedOrder.id === order.id) {
-            setOrder((prevOrder) => ({
-                ...prevOrder,
-                status: updatedOrder.status,
-                updated_at: updatedOrder.updated_at,
-            }));
+    // TEMPORARILY DISABLED - WebSocket functionality disabled in production
+    // // Listen for order updated events on static channel
+    // useEcho<OrderUpdatedEvent>('orders.updated', 'OrderUpdated', ({ order: updatedOrder }) => {
+    //     if (updatedOrder.id === order.id) {
+    //         setOrder((prevOrder) => ({
+    //             ...prevOrder,
+    //             status: updatedOrder.status,
+    //             updated_at: updatedOrder.updated_at,
+    //         }));
+    //
+    //         toast('Order updated', {
+    //             description: `Order #${updatedOrder.order_number} status changed to ${updatedOrder.status?.replace(/_/g, ' ')}`,
+    //             classNames: {
+    //                 description: '!text-muted-foreground',
+    //             },
+    //         });
+    //     }
+    // });
 
-            toast('Order updated', {
-                description: `Order #${updatedOrder.order_number} status changed to ${updatedOrder.status?.replace(/_/g, ' ')}`,
-                classNames: {
-                    description: '!text-muted-foreground',
-                },
-            });
-        }
-    });
+    // TEMPORARILY DISABLED - WebSocket functionality disabled in production
+    // // Listen for order group updated events on static channel
+    // useEcho<OrderGroupUpdatedEvent>('order-groups.updated', 'OrderGroupUpdated', ({ orderGroup: updatedOrderGroup }) => {
+    //     // Check if this order group belongs to the current order by checking both order_id and group ID
+    //     const belongsToCurrentOrder = updatedOrderGroup.order_id === order.id || order.order_groups?.some((og) => og.id === updatedOrderGroup.id);
+    //
+    //     if (belongsToCurrentOrder) {
+    //         setOrder((prevOrder) => ({
+    //             ...prevOrder,
+    //             order_groups: prevOrder.order_groups?.map((orderGroup) =>
+    //                 orderGroup.id === updatedOrderGroup.id
+    //                     ? {
+    //                           ...orderGroup,
+    //                           status: updatedOrderGroup.status,
+    //                           updated_at: updatedOrderGroup.updated_at,
+    //                       }
+    //                     : orderGroup,
+    //             ),
+    //         }));
+    //
+    //         toast('Order group updated', {
+    //             description: `Order group #${updatedOrderGroup.group_number} status changed to ${updatedOrderGroup.status?.replace(/_/g, ' ')}`,
+    //             classNames: {
+    //                 description: '!text-muted-foreground',
+    //             },
+    //             action: {
+    //                 label: 'View Order Group',
+    //                 onClick: () => {
+    //                     router.visit(route('order-groups.show', updatedOrderGroup.id));
+    //                 },
+    //             },
+    //         });
+    //     }
+    // });
 
-    // Listen for order group updated events on static channel
-    useEcho<OrderGroupUpdatedEvent>('order-groups.updated', 'OrderGroupUpdated', ({ orderGroup: updatedOrderGroup }) => {
-        // Check if this order group belongs to the current order by checking both order_id and group ID
-        const belongsToCurrentOrder = updatedOrderGroup.order_id === order.id || order.order_groups?.some((og) => og.id === updatedOrderGroup.id);
-
-        if (belongsToCurrentOrder) {
-            setOrder((prevOrder) => ({
-                ...prevOrder,
-                order_groups: prevOrder.order_groups?.map((orderGroup) =>
-                    orderGroup.id === updatedOrderGroup.id
-                        ? {
-                              ...orderGroup,
-                              status: updatedOrderGroup.status,
-                              updated_at: updatedOrderGroup.updated_at,
-                          }
-                        : orderGroup,
-                ),
-            }));
-
-            toast('Order group updated', {
-                description: `Order group #${updatedOrderGroup.group_number} status changed to ${updatedOrderGroup.status?.replace(/_/g, ' ')}`,
-                classNames: {
-                    description: '!text-muted-foreground',
-                },
-                action: {
-                    label: 'View Order Group',
-                    onClick: () => {
-                        router.visit(route('order-groups.show', updatedOrderGroup.id));
-                    },
-                },
-            });
-        }
-    });
-
-    // Listen for order group service updated events on static channel
-    useEcho<OrderGroupServiceUpdatedEvent>(
-        'order-group-services.updated',
-        'OrderGroupServiceUpdated',
-        ({ orderGroupService: updatedOrderGroupService }) => {
-            // Check if this service belongs to the current order by checking both order_id and service ID
-            const belongsToCurrentOrder =
-                updatedOrderGroupService.order_id === order.id ||
-                order.order_groups?.some((og) => og.order_group_services?.some((ogs) => ogs.id === updatedOrderGroupService.id));
-
-            if (belongsToCurrentOrder) {
-                setOrder((prevOrder) => ({
-                    ...prevOrder,
-                    order_groups: prevOrder.order_groups?.map((orderGroup) => ({
-                        ...orderGroup,
-                        order_group_services: orderGroup.order_group_services?.map((service) =>
-                            service.id === updatedOrderGroupService.id
-                                ? {
-                                      ...service,
-                                      status: updatedOrderGroupService.status,
-                                      updated_at: updatedOrderGroupService.updated_at,
-                                  }
-                                : service,
-                        ),
-                    })),
-                }));
-
-                toast('Service updated', {
-                    description: `Service status changed to ${updatedOrderGroupService.status?.replace(/_/g, ' ')}`,
-                    classNames: {
-                        description: '!text-muted-foreground',
-                    },
-                });
-            }
-        },
-    );
+    // TEMPORARILY DISABLED - WebSocket functionality disabled in production
+    // // Listen for order group service updated events on static channel
+    // useEcho<OrderGroupServiceUpdatedEvent>(
+    //     'order-group-services.updated',
+    //     'OrderGroupServiceUpdated',
+    //     ({ orderGroupService: updatedOrderGroupService }) => {
+    //         // Check if this service belongs to the current order by checking both order_id and service ID
+    //         const belongsToCurrentOrder =
+    //             updatedOrderGroupService.order_id === order.id ||
+    //             order.order_groups?.some((og) => og.order_group_services?.some((ogs) => ogs.id === updatedOrderGroupService.id));
+    //
+    //         if (belongsToCurrentOrder) {
+    //             setOrder((prevOrder) => ({
+    //                 ...prevOrder,
+    //                 order_groups: prevOrder.order_groups?.map((orderGroup) => ({
+    //                     ...orderGroup,
+    //                     order_group_services: orderGroup.order_group_services?.map((service) =>
+    //                         service.id === updatedOrderGroupService.id
+    //                             ? {
+    //                                   ...service,
+    //                                   status: updatedOrderGroupService.status,
+    //                                   updated_at: updatedOrderGroupService.updated_at,
+    //                               }
+    //                             : service,
+    //                     ),
+    //                 })),
+    //             }));
+    //
+    //             toast('Service updated', {
+    //                 description: `Service status changed to ${updatedOrderGroupService.status?.replace(/_/g, ' ')}`,
+    //                 classNames: {
+    //                     description: '!text-muted-foreground',
+    //                 },
+    //             });
+    //         }
+    //     },
+    // );
 
     function handleDeleteOrder() {
         setOpenDeleteDialog(false);

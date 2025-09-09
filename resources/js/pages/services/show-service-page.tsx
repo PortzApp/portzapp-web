@@ -1,7 +1,8 @@
 import { useState } from 'react';
 
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { useEcho } from '@laravel/echo-react';
+// TEMPORARILY DISABLED - WebSocket functionality disabled in production
+// import { useEcho } from '@laravel/echo-react';
 import { Dot, Edit, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -53,49 +54,52 @@ export default function ShowServicePage({ service: initialService }: { service: 
     const [service, setService] = useState(initialService);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
-    // Listen for service created events on organization-scoped channel
-    useEcho<ServiceCreatedEvent>(`services.organization.${auth.user.current_organization?.id}`, 'ServiceCreated', ({ service: newService }) => {
-        toast('Service created', {
-            description: `Service #${newService.id} created`,
-            action: {
-                label: 'View Service',
-                onClick: () => {
-                    router.visit(route('services.show', newService.id));
-                },
-            },
-        });
-    });
+    // TEMPORARILY DISABLED - WebSocket functionality disabled in production
+    // // Listen for service created events on organization-scoped channel
+    // useEcho<ServiceCreatedEvent>(`services.organization.${auth.user.current_organization?.id}`, 'ServiceCreated', ({ service: newService }) => {
+    //     toast('Service created', {
+    //         description: `Service #${newService.id} created`,
+    //         action: {
+    //             label: 'View Service',
+    //             onClick: () => {
+    //                 router.visit(route('services.show', newService.id));
+    //             },
+    //         },
+    //     });
+    // });
 
-    useEcho<ServiceUpdatedEvent>(`services.${service.id}`, 'ServiceUpdated', ({ service: updatedService }) => {
-        if (updatedService.id === service.id) {
-            setService({ ...service, ...updatedService });
-        }
+    // TEMPORARILY DISABLED - WebSocket functionality disabled in production
+    // useEcho<ServiceUpdatedEvent>(`services.${service.id}`, 'ServiceUpdated', ({ service: updatedService }) => {
+    //     if (updatedService.id === service.id) {
+    //         setService({ ...service, ...updatedService });
+    //     }
+    //
+    //     toast('Service updated', {
+    //         description: `Service #${updatedService.id} updated`,
+    //         action: {
+    //             label: 'View Service',
+    //             onClick: () => {
+    //                 router.visit(route('services.show', updatedService.id));
+    //             },
+    //         },
+    //     });
+    // });
 
-        toast('Service updated', {
-            description: `Service #${updatedService.id} updated`,
-            action: {
-                label: 'View Service',
-                onClick: () => {
-                    router.visit(route('services.show', updatedService.id));
-                },
-            },
-        });
-    });
-
-    // Listen for service deleted events on resource-specific channel
-    useEcho<ServiceDeletedEvent>(`services.${service.id}`, 'ServiceDeleted', ({ serviceId }) => {
-        if (serviceId === service.id) {
-            toast('Service deleted', {
-                description: `Service #${serviceId} deleted`,
-                action: {
-                    label: 'View All',
-                    onClick: () => {
-                        router.visit(route('services.index'));
-                    },
-                },
-            });
-        }
-    });
+    // TEMPORARILY DISABLED - WebSocket functionality disabled in production
+    // // Listen for service deleted events on resource-specific channel
+    // useEcho<ServiceDeletedEvent>(`services.${service.id}`, 'ServiceDeleted', ({ serviceId }) => {
+    //     if (serviceId === service.id) {
+    //         toast('Service deleted', {
+    //             description: `Service #${serviceId} deleted`,
+    //             action: {
+    //                 label: 'View All',
+    //                 onClick: () => {
+    //                     router.visit(route('services.index'));
+    //                 },
+    //             },
+    //         });
+    //     }
+    // });
 
     const breadcrumbs: BreadcrumbItem[] = [
         {

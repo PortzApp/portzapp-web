@@ -59,8 +59,9 @@ class ChatController extends Controller
         // Load message with relationships for broadcasting
         $message->load('user', 'parentMessage.user', 'reads');
 
-        // Broadcast message to other participants
-        broadcast(new \App\Events\ChatMessageSent($message))->toOthers();
+        // TEMPORARILY DISABLED - WebSocket functionality disabled in production
+        // // Broadcast message to other participants
+        // broadcast(new \App\Events\ChatMessageSent($message))->toOthers();
 
         return back()->with('success', 'Message sent successfully');
     }

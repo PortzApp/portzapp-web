@@ -36,7 +36,8 @@ class OrderGroupServiceObserver
                 }
             }
             if ($user) {
-                OrderGroupServiceUpdated::dispatch($user, $orderGroupService);
+                // TEMPORARILY DISABLED - WebSocket functionality disabled in production
+                // OrderGroupServiceUpdated::dispatch($user, $orderGroupService);
             }
         }
     }
@@ -112,7 +113,8 @@ class OrderGroupServiceObserver
                 }
             }
             if ($user) {
-                \App\Events\OrderGroupUpdated::dispatch($user, $orderGroup->fresh());
+                // TEMPORARILY DISABLED - WebSocket functionality disabled in production
+                // \App\Events\OrderGroupUpdated::dispatch($user, $orderGroup->fresh());
             }
         }
     }

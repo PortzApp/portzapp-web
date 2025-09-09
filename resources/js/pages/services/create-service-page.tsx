@@ -1,7 +1,8 @@
 import { FormEventHandler } from 'react';
 
 import { Head, router, useForm } from '@inertiajs/react';
-import { useEcho } from '@laravel/echo-react';
+// TEMPORARILY DISABLED - WebSocket functionality disabled in production
+// import { useEcho } from '@laravel/echo-react';
 import { LoaderCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -67,42 +68,45 @@ export default function CreateServicePage({ ports, serviceCategories }: { ports:
         service_sub_category_id: '',
     });
 
-    // Listen for service events to show real-time updates
-    useEcho<ServiceCreatedEvent>('services', 'ServiceCreated', ({ service }) => {
-        toast('Service created', {
-            description: `Service #${service.id} created`,
-            action: {
-                label: 'View Service',
-                onClick: () => {
-                    router.visit(route('services.show', service.id));
-                },
-            },
-        });
-    });
+    // TEMPORARILY DISABLED - WebSocket functionality disabled in production
+    // // Listen for service events to show real-time updates
+    // useEcho<ServiceCreatedEvent>('services', 'ServiceCreated', ({ service }) => {
+    //     toast('Service created', {
+    //         description: `Service #${service.id} created`,
+    //         action: {
+    //             label: 'View Service',
+    //             onClick: () => {
+    //                 router.visit(route('services.show', service.id));
+    //             },
+    //         },
+    //     });
+    // });
 
-    useEcho<ServiceUpdatedEvent>('services', 'ServiceUpdated', ({ service }) => {
-        toast('Service updated', {
-            description: `Service #${service.id} updated`,
-            action: {
-                label: 'View Service',
-                onClick: () => {
-                    router.visit(route('services.show', service.id));
-                },
-            },
-        });
-    });
+    // TEMPORARILY DISABLED - WebSocket functionality disabled in production
+    // useEcho<ServiceUpdatedEvent>('services', 'ServiceUpdated', ({ service }) => {
+    //     toast('Service updated', {
+    //         description: `Service #${service.id} updated`,
+    //         action: {
+    //             label: 'View Service',
+    //             onClick: () => {
+    //                 router.visit(route('services.show', service.id));
+    //             },
+    //         },
+    //     });
+    // });
 
-    useEcho<ServiceDeletedEvent>('services', 'ServiceDeleted', ({ serviceId }) => {
-        toast('Service deleted', {
-            description: `Service #${serviceId} deleted`,
-            action: {
-                label: 'View All',
-                onClick: () => {
-                    router.visit(route('services.index'));
-                },
-            },
-        });
-    });
+    // TEMPORARILY DISABLED - WebSocket functionality disabled in production
+    // useEcho<ServiceDeletedEvent>('services', 'ServiceDeleted', ({ serviceId }) => {
+    //     toast('Service deleted', {
+    //         description: `Service #${serviceId} deleted`,
+    //         action: {
+    //             label: 'View All',
+    //             onClick: () => {
+    //                 router.visit(route('services.index'));
+    //             },
+    //         },
+    //     });
+    // });
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
