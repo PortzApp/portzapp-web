@@ -70,10 +70,14 @@ class RegisteredUserController extends Controller
             }
         }
 
+        $request->merge([
+            'email' => strtolower($request->input('email')),
+        ]);
+
         $validated = $request->validate([
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class],
             'phone_number' => ['required', 'string', 'max:25'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'invite_token' => ['nullable', 'string'],

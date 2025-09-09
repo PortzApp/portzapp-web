@@ -105,6 +105,14 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
+    /**
+     * Set the email attribute and ensure it's always lowercase.
+     */
+    public function setEmailAttribute(string $value): void
+    {
+        $this->attributes['email'] = strtolower($value);
+    }
+
     public function currentOrganization(): BelongsTo
     {
         return $this->belongsTo(Organization::class, 'current_organization_id');
