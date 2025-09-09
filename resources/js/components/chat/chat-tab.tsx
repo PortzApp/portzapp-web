@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { router } from '@inertiajs/react';
-import { useEcho } from '@laravel/echo-react';
+// TEMPORARILY DISABLED - WebSocket functionality disabled in production
+// import { useEcho } from '@laravel/echo-react';
 import { toast } from 'sonner';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -36,24 +37,25 @@ export function ChatTab({ conversationId, initialMessages, currentUserId }: Chat
 
     const [processing, setProcessing] = useState(false);
 
-    // Listen for new messages via WebSocket
-    useEcho(`private-conversation-chat.${conversationId}`, 'ChatMessageSent', ({ message }: { message: ChatMessage }) => {
-        setMessages((prev) => [...prev, message]);
-
-        // Mark messages as read when received
-        if (message.user_id !== currentUserId) {
-            setTimeout(() => {
-                router.patch(
-                    route('chat.messages.read', conversationId),
-                    {},
-                    {
-                        preserveState: true,
-                        preserveScroll: true,
-                    },
-                );
-            }, 1000);
-        }
-    });
+    // TEMPORARILY DISABLED - WebSocket functionality disabled in production
+    // // Listen for new messages via WebSocket
+    // useEcho(`private-conversation-chat.${conversationId}`, 'ChatMessageSent', ({ message }: { message: ChatMessage }) => {
+    //     setMessages((prev) => [...prev, message]);
+    //
+    //     // Mark messages as read when received
+    //     if (message.user_id !== currentUserId) {
+    //         setTimeout(() => {
+    //             router.patch(
+    //                 route('chat.messages.read', conversationId),
+    //                 {},
+    //                 {
+    //                     preserveState: true,
+    //                     preserveScroll: true,
+    //                 },
+    //             );
+    //         }, 1000);
+    //     }
+    // });
 
     // Auto-scroll to bottom when new messages arrive
     useEffect(() => {

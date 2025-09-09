@@ -1,7 +1,8 @@
 import { FormEventHandler, useState } from 'react';
 
 import { Head, router, useForm } from '@inertiajs/react';
-import { useEcho } from '@laravel/echo-react';
+// TEMPORARILY DISABLED - WebSocket functionality disabled in production
+// import { useEcho } from '@laravel/echo-react';
 import { LoaderCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -81,54 +82,57 @@ export default function EditServicePage({
         service_sub_category_id: service.service_sub_category_id || '',
     });
 
-    // Listen for service events
-    useEcho<ServiceCreatedEvent>('services', 'ServiceCreated', ({ service: newService }) => {
-        toast('Service created', {
-            description: `Service #${newService.id} created`,
-            action: {
-                label: 'View Service',
-                onClick: () => {
-                    router.visit(route('services.show', newService.id));
-                },
-            },
-        });
-    });
+    // TEMPORARILY DISABLED - WebSocket functionality disabled in production
+    // // Listen for service events
+    // useEcho<ServiceCreatedEvent>('services', 'ServiceCreated', ({ service: newService }) => {
+    //     toast('Service created', {
+    //         description: `Service #${newService.id} created`,
+    //         action: {
+    //             label: 'View Service',
+    //             onClick: () => {
+    //                 router.visit(route('services.show', newService.id));
+    //             },
+    //         },
+    //     });
+    // });
 
-    useEcho<ServiceUpdatedEvent>('services', 'ServiceUpdated', ({ service: updatedService }) => {
-        if (updatedService.id === service.id) {
-            setService({ ...service, ...updatedService });
-            // Update form data if this service was updated
-            setData({
-                description: updatedService.description || '',
-                price: typeof updatedService.price === 'string' ? parseFloat(updatedService.price) : updatedService.price,
-                status: updatedService.status,
-                port_id: updatedService.port_id,
-                service_sub_category_id: updatedService.service_sub_category_id || '',
-            });
-        }
+    // TEMPORARILY DISABLED - WebSocket functionality disabled in production
+    // useEcho<ServiceUpdatedEvent>('services', 'ServiceUpdated', ({ service: updatedService }) => {
+    //     if (updatedService.id === service.id) {
+    //         setService({ ...service, ...updatedService });
+    //         // Update form data if this service was updated
+    //         setData({
+    //             description: updatedService.description || '',
+    //             price: typeof updatedService.price === 'string' ? parseFloat(updatedService.price) : updatedService.price,
+    //             status: updatedService.status,
+    //             port_id: updatedService.port_id,
+    //             service_sub_category_id: updatedService.service_sub_category_id || '',
+    //         });
+    //     }
+    //
+    //     toast('Service updated', {
+    //         description: `Service #${updatedService.id} updated`,
+    //         action: {
+    //             label: 'View Service',
+    //             onClick: () => {
+    //                 router.visit(route('services.show', updatedService.id));
+    //             },
+    //         },
+    //     });
+    // });
 
-        toast('Service updated', {
-            description: `Service #${updatedService.id} updated`,
-            action: {
-                label: 'View Service',
-                onClick: () => {
-                    router.visit(route('services.show', updatedService.id));
-                },
-            },
-        });
-    });
-
-    useEcho<ServiceDeletedEvent>('services', 'ServiceDeleted', ({ serviceId }) => {
-        toast('Service deleted', {
-            description: `Service #${serviceId} deleted`,
-            action: {
-                label: 'View All',
-                onClick: () => {
-                    router.visit(route('services.index'));
-                },
-            },
-        });
-    });
+    // TEMPORARILY DISABLED - WebSocket functionality disabled in production
+    // useEcho<ServiceDeletedEvent>('services', 'ServiceDeleted', ({ serviceId }) => {
+    //     toast('Service deleted', {
+    //         description: `Service #${serviceId} deleted`,
+    //         action: {
+    //             label: 'View All',
+    //             onClick: () => {
+    //                 router.visit(route('services.index'));
+    //             },
+    //         },
+    //     });
+    // });
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();

@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { useForm } from '@inertiajs/react';
-import { useEcho } from '@laravel/echo-react';
+// TEMPORARILY DISABLED - WebSocket functionality disabled in production
+// import { useEcho } from '@laravel/echo-react';
 import { MessageSquare, X } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -81,20 +82,21 @@ export function ChatConversationImproved({ conversation, currentUserId, classNam
         setMessages(conversation.messages || []);
     }, [conversation.messages]);
 
-    // Listen for new messages via WebSocket
-    useEcho(`private-chat-conversation.${conversation.id}`, 'ChatMessageSent', ({ message }: { message: ChatMessage }) => {
-        setMessages((prev) => [...prev, message]);
-
-        // Mark messages as read when received from other users
-        if (message.user_id !== currentUserId) {
-            setTimeout(() => {
-                post(route('chat.conversations.messages.read', conversation.id), {
-                    preserveState: true,
-                    preserveScroll: true,
-                });
-            }, 1000);
-        }
-    });
+    // TEMPORARILY DISABLED - WebSocket functionality disabled in production
+    // // Listen for new messages via WebSocket
+    // useEcho(`private-chat-conversation.${conversation.id}`, 'ChatMessageSent', ({ message }: { message: ChatMessage }) => {
+    //     setMessages((prev) => [...prev, message]);
+    //
+    //     // Mark messages as read when received from other users
+    //     if (message.user_id !== currentUserId) {
+    //         setTimeout(() => {
+    //             post(route('chat.conversations.messages.read', conversation.id), {
+    //                 preserveState: true,
+    //                 preserveScroll: true,
+    //             });
+    //         }, 1000);
+    //     }
+    // });
 
     // Auto-scroll to bottom when new messages arrive
     useEffect(() => {

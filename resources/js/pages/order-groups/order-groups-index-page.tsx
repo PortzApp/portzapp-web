@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 
 import { Head, router, usePage } from '@inertiajs/react';
-import { useEcho } from '@laravel/echo-react';
+// TEMPORARILY DISABLED - WebSocket functionality disabled in production
+// import { useEcho } from '@laravel/echo-react';
 import { toast } from 'sonner';
 
 import type { BreadcrumbItem, SharedData } from '@/types';
@@ -42,36 +43,37 @@ export default function OrderGroupsIndexPage({ orderGroups: initialOrderGroups }
         setOrderGroups(initialOrderGroups);
     }, [initialOrderGroups]);
 
-    // Listen for order group updated events on static channel
-    useEcho<OrderGroupUpdatedEvent>('order-groups.updated', 'OrderGroupUpdated', ({ orderGroup: updatedOrderGroup }) => {
-        // Only update order groups that belong to the current organization
-        const belongsToCurrentOrganization = updatedOrderGroup.fulfilling_organization_id === auth.user.current_organization?.id;
-        if (!belongsToCurrentOrganization) return;
-        setOrderGroups((prevOrderGroups) =>
-            prevOrderGroups.map((prevOrderGroup) =>
-                prevOrderGroup.id === updatedOrderGroup.id
-                    ? {
-                          ...prevOrderGroup,
-                          status: updatedOrderGroup.status,
-                          updated_at: updatedOrderGroup.updated_at,
-                      }
-                    : prevOrderGroup,
-            ),
-        );
-
-        toast('Order group updated', {
-            description: `Order group #${updatedOrderGroup.group_number} status changed to ${updatedOrderGroup.status?.replace(/_/g, ' ')}`,
-            classNames: {
-                description: '!text-muted-foreground',
-            },
-            action: {
-                label: 'View Order Group',
-                onClick: () => {
-                    router.visit(route('order-groups.show', updatedOrderGroup.id));
-                },
-            },
-        });
-    });
+    // TEMPORARILY DISABLED - WebSocket functionality disabled in production
+    // // Listen for order group updated events on static channel
+    // useEcho<OrderGroupUpdatedEvent>('order-groups.updated', 'OrderGroupUpdated', ({ orderGroup: updatedOrderGroup }) => {
+    //     // Only update order groups that belong to the current organization
+    //     const belongsToCurrentOrganization = updatedOrderGroup.fulfilling_organization_id === auth.user.current_organization?.id;
+    //     if (!belongsToCurrentOrganization) return;
+    //     setOrderGroups((prevOrderGroups) =>
+    //         prevOrderGroups.map((prevOrderGroup) =>
+    //             prevOrderGroup.id === updatedOrderGroup.id
+    //                 ? {
+    //                       ...prevOrderGroup,
+    //                       status: updatedOrderGroup.status,
+    //                       updated_at: updatedOrderGroup.updated_at,
+    //                   }
+    //                 : prevOrderGroup,
+    //         ),
+    //     );
+    //
+    //     toast('Order group updated', {
+    //         description: `Order group #${updatedOrderGroup.group_number} status changed to ${updatedOrderGroup.status?.replace(/_/g, ' ')}`,
+    //         classNames: {
+    //             description: '!text-muted-foreground',
+    //         },
+    //         action: {
+    //             label: 'View Order Group',
+    //             onClick: () => {
+    //                 router.visit(route('order-groups.show', updatedOrderGroup.id));
+    //             },
+    //         },
+    //     });
+    // });
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Order Groups" />

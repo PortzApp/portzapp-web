@@ -30,7 +30,8 @@ class OrderObserver
             }
 
             if ($user) {
-                OrderUpdated::dispatch($user, $order);
+                // TEMPORARILY DISABLED - WebSocket functionality disabled in production
+                // OrderUpdated::dispatch($user, $order);
             }
         }
     }

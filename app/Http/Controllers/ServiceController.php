@@ -120,7 +120,8 @@ class ServiceController extends Controller
         // Load relationships for the created service
         $service->load(['organization:id,name', 'port:id,name,city,country', 'subCategory.category:id,name']);
 
-        ServiceCreated::dispatch($request->user(), $service);
+        // TEMPORARILY DISABLED - WebSocket functionality disabled in production
+        // ServiceCreated::dispatch($request->user(), $service);
 
         return to_route('services.index')->with('message', 'Service created successfully!');
     }
@@ -188,7 +189,8 @@ class ServiceController extends Controller
         // Refresh the service with relationships to get the latest data
         $service->refresh()->load(['organization:id,name', 'port:id,name', 'subCategory.category:id,name']);
 
-        ServiceUpdated::dispatch($request->user(), $service);
+        // TEMPORARILY DISABLED - WebSocket functionality disabled in production
+        // ServiceUpdated::dispatch($request->user(), $service);
 
         return to_route('services.index')->with('message', 'Service updated successfully!');
     }
@@ -204,7 +206,8 @@ class ServiceController extends Controller
 
         $service->delete();
 
-        ServiceDeleted::dispatch(request()->user(), $serviceId);
+        // TEMPORARILY DISABLED - WebSocket functionality disabled in production
+        // ServiceDeleted::dispatch(request()->user(), $serviceId);
 
         return to_route('services.index')->with('message', 'Service deleted successfully!');
     }

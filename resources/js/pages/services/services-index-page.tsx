@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { useEcho } from '@laravel/echo-react';
+// TEMPORARILY DISABLED - WebSocket functionality disabled in production
+// import { useEcho } from '@laravel/echo-react';
 import { Box, MapPin, Plus, RotateCcw, Star } from 'lucide-react';
 import { parseAsInteger, parseAsString, useQueryState, useQueryStates } from 'nuqs';
 import { toast } from 'sonner';
@@ -130,52 +131,55 @@ export default function ServicesIndexPage({ services: initialServices, ports, ca
         setServices(initialServices.data);
     }, [initialServices]);
 
-    // Listen for service created events on organization-scoped channel
-    useEcho<ServiceCreatedEvent>(`services.organization.${auth.user.current_organization?.id}`, 'ServiceCreated', ({ service: newService }) => {
-        setServices((prevServices) => [newService, ...prevServices]);
+    // TEMPORARILY DISABLED - WebSocket functionality disabled in production
+    // // Listen for service created events on organization-scoped channel
+    // useEcho<ServiceCreatedEvent>(`services.organization.${auth.user.current_organization?.id}`, 'ServiceCreated', ({ service: newService }) => {
+    //     setServices((prevServices) => [newService, ...prevServices]);
+    //
+    //     toast('Service created', {
+    //         description: `Service #${newService.id} created`,
+    //         action: {
+    //             label: 'View Service',
+    //             onClick: () => {
+    //                 router.visit(route('services.show', newService.id));
+    //             },
+    //         },
+    //     });
+    // });
 
-        toast('Service created', {
-            description: `Service #${newService.id} created`,
-            action: {
-                label: 'View Service',
-                onClick: () => {
-                    router.visit(route('services.show', newService.id));
-                },
-            },
-        });
-    });
+    // TEMPORARILY DISABLED - WebSocket functionality disabled in production
+    // // Listen for service updated events on organization-scoped channel
+    // useEcho<ServiceUpdatedEvent>(`services.organization.${auth.user.current_organization?.id}`, 'ServiceUpdated', ({ service: updatedService }) => {
+    //     setServices((prevServices) =>
+    //         prevServices.map((prevService) => (prevService.id === updatedService.id ? { ...prevService, ...updatedService } : prevService)),
+    //     );
+    //
+    //     toast('Service updated', {
+    //         description: `Service #${updatedService.id} updated`,
+    //         action: {
+    //             label: 'View Service',
+    //             onClick: () => {
+    //                 router.visit(route('services.show', updatedService.id));
+    //             },
+    //         },
+    //     });
+    // });
 
-    // Listen for service updated events on organization-scoped channel
-    useEcho<ServiceUpdatedEvent>(`services.organization.${auth.user.current_organization?.id}`, 'ServiceUpdated', ({ service: updatedService }) => {
-        setServices((prevServices) =>
-            prevServices.map((prevService) => (prevService.id === updatedService.id ? { ...prevService, ...updatedService } : prevService)),
-        );
-
-        toast('Service updated', {
-            description: `Service #${updatedService.id} updated`,
-            action: {
-                label: 'View Service',
-                onClick: () => {
-                    router.visit(route('services.show', updatedService.id));
-                },
-            },
-        });
-    });
-
-    // Listen for service deleted events on organization-scoped channel
-    useEcho<ServiceDeletedEvent>(`services.organization.${auth.user.current_organization?.id}`, 'ServiceDeleted', ({ serviceId }) => {
-        setServices((prevServices) => prevServices.filter((service) => service.id !== serviceId));
-
-        toast('Service deleted', {
-            description: `ID: #${serviceId}`,
-            action: {
-                label: 'View All',
-                onClick: () => {
-                    router.visit(route('services.index'));
-                },
-            },
-        });
-    });
+    // TEMPORARILY DISABLED - WebSocket functionality disabled in production
+    // // Listen for service deleted events on organization-scoped channel
+    // useEcho<ServiceDeletedEvent>(`services.organization.${auth.user.current_organization?.id}`, 'ServiceDeleted', ({ serviceId }) => {
+    //     setServices((prevServices) => prevServices.filter((service) => service.id !== serviceId));
+    //
+    //     toast('Service deleted', {
+    //         description: `ID: #${serviceId}`,
+    //         action: {
+    //             label: 'View All',
+    //             onClick: () => {
+    //                 router.visit(route('services.index'));
+    //             },
+    //         },
+    //     });
+    // });
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
