@@ -15,17 +15,16 @@ import { Textarea } from '@/components/ui/textarea';
 
 import InputError from '@/components/input-error';
 
-interface SubCategoryForm {
+type SubCategoryForm = {
     id?: string;
     name: string;
     description?: string;
-    [key: string]: unknown;
-}
+};
 
-interface CategoryForm {
+type CategoryForm = {
     name: string;
     sub_categories: SubCategoryForm[];
-}
+};
 
 interface EditCategoryPageProps {
     category: ServiceCategory;

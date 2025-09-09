@@ -102,6 +102,14 @@ Access control patterns:
 - **Data should be passed as props** from controllers, not fetched via API calls
 - **Prefer `unknown` type over `any`** when dealing with type issues - `unknown` is safer and forces type checking
 - **NEVER use `any` type** - it defeats TypeScript's purpose and should be avoided at all costs. Use proper typing or `unknown` instead
+
+**Form Type Definitions:**
+
+- **Always use `type` declarations for form data** - Use `type FormName = { ... }` instead of `interface FormName { ... }`
+- **NEVER add index signatures** to form types for `useForm()` - TypeScript's structural typing handles the `FormDataConvertible` constraint automatically
+- **Follow the pattern**: Simple type declarations without index signatures work best with Inertia's `useForm<T>()` hook
+- **Example**: `type CategoryForm = { name: string; sub_categories: SubCategoryForm[]; }` instead of interfaces with `[key: string]: unknown`
+
 - Radix UI components with custom styling
 - Tailwind CSS with custom design system
 - TypeScript for type safety

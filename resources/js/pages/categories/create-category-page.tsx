@@ -25,16 +25,15 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-interface SubCategoryForm {
+type SubCategoryForm = {
     name: string;
     description?: string;
-    [key: string]: unknown;
-}
+};
 
-interface CategoryForm {
+type CategoryForm = {
     name: string;
     sub_categories: SubCategoryForm[];
-}
+};
 
 export default function CreateCategoryPage() {
     const { data, setData, post, processing, errors, reset } = useForm<CategoryForm>({
