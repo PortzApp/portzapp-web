@@ -22,6 +22,7 @@ interface Auth {
         vessel: PolicyAbilities;
         port: PolicyAbilities;
         organization: PolicyAbilities;
+        serviceCategory: PolicyAbilities;
     };
 }
 
@@ -57,6 +58,7 @@ interface PolicyAbilities {
     view: boolean;
     create: boolean;
     edit: boolean;
+    update: boolean;
     delete: boolean;
     update_current?: boolean;
     updateMemberRole?: boolean;

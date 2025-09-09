@@ -112,6 +112,7 @@ export interface Service extends BaseModel {
 export interface ServiceCategory extends BaseModel {
     name: string;
     services_count?: number;
+    sub_categories_count?: number;
     sub_categories?: ServiceSubCategory[];
 }
 

@@ -8,6 +8,7 @@ use App\Models\OrderGroup;
 use App\Models\Organization;
 use App\Models\Port;
 use App\Models\Service;
+use App\Models\ServiceCategory;
 use App\Models\Vessel;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Inspiring;
@@ -121,6 +122,12 @@ class HandleInertiaRequests extends Middleware
                         'create' => $user->can('create', Service::class),
                         'edit' => $user->can('create', Service::class), // For generic edit permission, use create check
                         'delete' => $user->can('create', Service::class), // For generic delete permission, use create check
+                    ],
+                    'serviceCategory' => [
+                        'view' => $user->can('viewAny', ServiceCategory::class),
+                        'create' => $user->can('create', ServiceCategory::class),
+                        'update' => $user->can('create', ServiceCategory::class),
+                        'delete' => $user->can('create', ServiceCategory::class),
                     ],
                     'order' => [
                         'view_any' => $user->can('viewAny', Order::class),

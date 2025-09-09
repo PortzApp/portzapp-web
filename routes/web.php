@@ -8,6 +8,7 @@ use App\Http\Controllers\OrderGroupServiceController;
 use App\Http\Controllers\OrderWizardSessionController;
 use App\Http\Controllers\OrganizationController;
 use App\Http\Controllers\PortController;
+use App\Http\Controllers\ServiceCategoryController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\SwitchOrganization;
 use App\Http\Controllers\VesselController;
@@ -105,6 +106,7 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     // Ports management routes (restricted to portzapp_team business type)
     Route::middleware('portzapp.team')->group(function (): void {
         Route::resource('ports', PortController::class);
+        Route::resource('categories', ServiceCategoryController::class);
     });
 
     // Organization management routes (restricted to portzapp_team business type)
