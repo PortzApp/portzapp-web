@@ -28,6 +28,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 interface SubCategoryForm {
     name: string;
     description?: string;
+    [key: string]: unknown;
 }
 
 interface CategoryForm {
@@ -36,16 +37,13 @@ interface CategoryForm {
 }
 
 export default function CreateCategoryPage() {
-    const { data, setData, post, processing, errors, reset } = useForm({
+    const { data, setData, post, processing, errors, reset } = useForm<CategoryForm>({
         name: '',
         sub_categories: [],
     });
 
     const addSubCategory = () => {
-        setData('sub_categories', [
-            ...data.sub_categories,
-            { name: '', description: '' }
-        ]);
+        setData('sub_categories', [...data.sub_categories, { name: '', description: '' }]);
     };
 
     const updateSubCategory = (index: number, field: keyof SubCategoryForm, value: string) => {
@@ -55,7 +53,7 @@ export default function CreateCategoryPage() {
     };
 
     const removeSubCategory = (index: number) => {
-        const filteredSubCategories = data.sub_categories.filter((_: any, i: number) => i !== index);
+        const filteredSubCategories = data.sub_categories.filter((_: SubCategoryForm, i: number) => i !== index);
         setData('sub_categories', filteredSubCategories);
     };
 
@@ -85,7 +83,7 @@ export default function CreateCategoryPage() {
                     {/* Category Information */}
                     <div className="flex flex-col gap-4">
                         <h2 className="text-lg font-medium">Category Information</h2>
-                        
+
                         <div className="flex flex-col gap-2">
                             <Label htmlFor="name">Category Name</Label>
                             <Input
@@ -105,33 +103,20 @@ export default function CreateCategoryPage() {
                     <div className="flex flex-col gap-4">
                         <div className="flex items-center justify-between">
                             <h2 className="text-lg font-medium">Sub-Categories</h2>
-                            <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                onClick={addSubCategory}
-                                disabled={processing}
-                            >
+                            <Button type="button" variant="outline" size="sm" onClick={addSubCategory} disabled={processing}>
                                 <Plus className="mr-2 h-4 w-4" />
                                 Add Sub-Category
                             </Button>
                         </div>
 
                         {data.sub_categories.length === 0 ? (
-                            <p className="text-sm text-muted-foreground">
-                                No sub-categories added yet. Click "Add Sub-Category" to create one.
-                            </p>
+                            <p className="text-sm text-muted-foreground">No sub-categories added yet. Click "Add Sub-Category" to create one.</p>
                         ) : (
                             <div className="space-y-4">
                                 {data.sub_categories.map((subCategory: SubCategoryForm, index: number) => (
-                                    <div
-                                        key={index}
-                                        className="rounded-lg border p-4 space-y-4"
-                                    >
+                                    <div key={index} className="space-y-4 rounded-lg border p-4">
                                         <div className="flex items-center justify-between">
-                                            <Label className="text-sm font-medium">
-                                                Sub-Category {index + 1}
-                                            </Label>
+                                            <Label className="text-sm font-medium">Sub-Category {index + 1}</Label>
                                             <Button
                                                 type="button"
                                                 variant="ghost"
@@ -162,9 +147,7 @@ export default function CreateCategoryPage() {
                                             </div>
 
                                             <div className="flex flex-col gap-2">
-                                                <Label htmlFor={`sub_category_description_${index}`}>
-                                                    Description
-                                                </Label>
+                                                <Label htmlFor={`sub_category_description_${index}`}>Description</Label>
                                                 <Textarea
                                                     id={`sub_category_description_${index}`}
                                                     value={subCategory.description || ''}
@@ -188,13 +171,8 @@ export default function CreateCategoryPage() {
                         {processing && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
                         Create Category
                     </Button>
-                    
-                    <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => router.visit(route('categories.index'))}
-                        disabled={processing}
-                    >
+
+                    <Button type="button" variant="outline" onClick={() => router.visit(route('categories.index'))} disabled={processing}>
                         Cancel
                     </Button>
                 </div>

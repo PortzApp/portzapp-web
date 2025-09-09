@@ -54,17 +54,15 @@ export default function ShowCategoryPage({ category }: ShowCategoryPageProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Category: ${category.name}`} />
-            
+
             <div className="flex h-full flex-1 flex-col gap-6 rounded-xl p-6">
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-2xl font-bold">{category.name}</h1>
-                        <p className="text-muted-foreground">
-                            Created on {new Date(category.created_at).toLocaleDateString()}
-                        </p>
+                        <p className="text-muted-foreground">Created on {new Date(category.created_at).toLocaleDateString()}</p>
                     </div>
-                    
+
                     <div className="flex gap-2">
                         {auth.permissions.serviceCategory?.update && (
                             <Button asChild>
@@ -74,7 +72,7 @@ export default function ShowCategoryPage({ category }: ShowCategoryPageProps) {
                                 </Link>
                             </Button>
                         )}
-                        
+
                         {auth.permissions.serviceCategory?.delete && (
                             <Dialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
                                 <DialogTrigger asChild>
@@ -137,9 +135,7 @@ export default function ShowCategoryPage({ category }: ShowCategoryPageProps) {
                         <h2 className="text-lg font-semibold">Sub-Categories</h2>
                         {auth.permissions.serviceCategory?.update && (
                             <Button variant="outline" size="sm" asChild>
-                                <Link href={route('categories.edit', category.id)}>
-                                    Manage Sub-Categories
-                                </Link>
+                                <Link href={route('categories.edit', category.id)}>Manage Sub-Categories</Link>
                             </Button>
                         )}
                     </div>
@@ -150,9 +146,7 @@ export default function ShowCategoryPage({ category }: ShowCategoryPageProps) {
                                 <Card key={subCategory.id}>
                                     <CardHeader>
                                         <CardTitle className="text-base">{subCategory.name}</CardTitle>
-                                        {subCategory.description && (
-                                            <CardDescription>{subCategory.description}</CardDescription>
-                                        )}
+                                        {subCategory.description && <CardDescription>{subCategory.description}</CardDescription>}
                                     </CardHeader>
                                     <CardContent>
                                         <div className="flex items-center justify-between">
@@ -168,12 +162,10 @@ export default function ShowCategoryPage({ category }: ShowCategoryPageProps) {
                     ) : (
                         <Card>
                             <CardContent className="flex flex-col items-center justify-center py-8">
-                                <p className="text-muted-foreground mb-4">No sub-categories found</p>
+                                <p className="mb-4 text-muted-foreground">No sub-categories found</p>
                                 {auth.permissions.serviceCategory?.update && (
                                     <Button asChild>
-                                        <Link href={route('categories.edit', category.id)}>
-                                            Add Sub-Categories
-                                        </Link>
+                                        <Link href={route('categories.edit', category.id)}>Add Sub-Categories</Link>
                                     </Button>
                                 )}
                             </CardContent>

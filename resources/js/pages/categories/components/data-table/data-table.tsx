@@ -35,10 +35,8 @@ export function CategoriesPageDataTable<TData, TValue>({ columns, data }: Catego
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
     const [rowSelection, setRowSelection] = useState({});
-    const [tableData, setTableData] = useState<TData[]>(data);
-
     const table = useReactTable({
-        data: tableData,
+        data,
         columns,
         onSortingChange: setSorting,
         onColumnFiltersChange: setColumnFilters,

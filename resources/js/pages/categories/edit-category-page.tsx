@@ -19,6 +19,7 @@ interface SubCategoryForm {
     id?: string;
     name: string;
     description?: string;
+    [key: string]: unknown;
 }
 
 interface CategoryForm {
@@ -46,20 +47,18 @@ export default function EditCategoryPage({ category }: EditCategoryPageProps) {
         },
     ];
 
-    const { data, setData, patch, processing, errors } = useForm({
+    const { data, setData, patch, processing, errors } = useForm<CategoryForm>({
         name: category.name,
-        sub_categories: category.sub_categories?.map(sub => ({
-            id: sub.id,
-            name: sub.name,
-            description: sub.description || '',
-        })) || [],
+        sub_categories:
+            category.sub_categories?.map((sub) => ({
+                id: sub.id,
+                name: sub.name,
+                description: sub.description || '',
+            })) || [],
     });
 
     const addSubCategory = () => {
-        setData('sub_categories', [
-            ...data.sub_categories,
-            { name: '', description: '' }
-        ]);
+        setData('sub_categories', [...data.sub_categories, { name: '', description: '' }]);
     };
 
     const updateSubCategory = (index: number, field: keyof SubCategoryForm, value: string) => {
@@ -69,7 +68,7 @@ export default function EditCategoryPage({ category }: EditCategoryPageProps) {
     };
 
     const removeSubCategory = (index: number) => {
-        const filteredSubCategories = data.sub_categories.filter((_: any, i: number) => i !== index);
+        const filteredSubCategories = data.sub_categories.filter((_: SubCategoryForm, i: number) => i !== index);
         setData('sub_categories', filteredSubCategories);
     };
 
@@ -89,16 +88,14 @@ export default function EditCategoryPage({ category }: EditCategoryPageProps) {
             <form onSubmit={submit} className="flex flex-col gap-8 p-8">
                 <div className="flex flex-col gap-1">
                     <h1 className="text-xl font-semibold">Edit Category</h1>
-                    <p className="text-base text-muted-foreground">
-                        Update the category information and manage its sub-categories.
-                    </p>
+                    <p className="text-base text-muted-foreground">Update the category information and manage its sub-categories.</p>
                 </div>
 
                 <div className="grid max-w-4xl gap-8">
                     {/* Category Information */}
                     <div className="flex flex-col gap-4">
                         <h2 className="text-lg font-medium">Category Information</h2>
-                        
+
                         <div className="flex flex-col gap-2">
                             <Label htmlFor="name">Category Name</Label>
                             <Input
@@ -118,43 +115,26 @@ export default function EditCategoryPage({ category }: EditCategoryPageProps) {
                     <div className="flex flex-col gap-4">
                         <div className="flex items-center justify-between">
                             <h2 className="text-lg font-medium">Sub-Categories</h2>
-                            <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                onClick={addSubCategory}
-                                disabled={processing}
-                            >
+                            <Button type="button" variant="outline" size="sm" onClick={addSubCategory} disabled={processing}>
                                 <Plus className="mr-2 h-4 w-4" />
                                 Add Sub-Category
                             </Button>
                         </div>
 
                         {data.sub_categories.length === 0 ? (
-                            <p className="text-sm text-muted-foreground">
-                                No sub-categories added yet. Click "Add Sub-Category" to create one.
-                            </p>
+                            <p className="text-sm text-muted-foreground">No sub-categories added yet. Click "Add Sub-Category" to create one.</p>
                         ) : (
                             <div className="space-y-4">
                                 {data.sub_categories.map((subCategory: SubCategoryForm, index: number) => (
-                                    <div
-                                        key={subCategory.id || `new-${index}`}
-                                        className="rounded-lg border p-4 space-y-4"
-                                    >
+                                    <div key={subCategory.id || `new-${index}`} className="space-y-4 rounded-lg border p-4">
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-2">
-                                                <Label className="text-sm font-medium">
-                                                    Sub-Category {index + 1}
-                                                </Label>
+                                                <Label className="text-sm font-medium">Sub-Category {index + 1}</Label>
                                                 {subCategory.id && (
-                                                    <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded-full">
-                                                        Existing
-                                                    </span>
+                                                    <span className="rounded-full bg-blue-100 px-2 py-1 text-xs text-blue-800">Existing</span>
                                                 )}
                                                 {!subCategory.id && (
-                                                    <span className="text-xs px-2 py-1 bg-green-100 text-green-800 rounded-full">
-                                                        New
-                                                    </span>
+                                                    <span className="rounded-full bg-green-100 px-2 py-1 text-xs text-green-800">New</span>
                                                 )}
                                             </div>
                                             <Button
@@ -187,9 +167,7 @@ export default function EditCategoryPage({ category }: EditCategoryPageProps) {
                                             </div>
 
                                             <div className="flex flex-col gap-2">
-                                                <Label htmlFor={`sub_category_description_${index}`}>
-                                                    Description
-                                                </Label>
+                                                <Label htmlFor={`sub_category_description_${index}`}>Description</Label>
                                                 <Textarea
                                                     id={`sub_category_description_${index}`}
                                                     value={subCategory.description || ''}
@@ -213,13 +191,8 @@ export default function EditCategoryPage({ category }: EditCategoryPageProps) {
                         {processing && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
                         Update Category
                     </Button>
-                    
-                    <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => router.visit(route('categories.index'))}
-                        disabled={processing}
-                    >
+
+                    <Button type="button" variant="outline" onClick={() => router.visit(route('categories.index'))} disabled={processing}>
                         Cancel
                     </Button>
                 </div>
