@@ -2,11 +2,12 @@ import React from 'react';
 
 import { User } from '@/types';
 import { router } from '@inertiajs/react';
-import { ArrowRight, CheckCircle } from 'lucide-react';
+import { ArrowRight, CheckCircle, Info } from 'lucide-react';
 import { toast } from 'sonner';
 
 import OnboardingLayout from '@/layouts/onboarding-layout';
 
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 
 import MemberInviteForm from '@/components/onboarding/member-invite-form';
@@ -81,7 +82,13 @@ export default function Invite({ user, currentOrganization, availableRoles }: Pr
                             <p className="text-lg text-muted-foreground">Your organization "{currentOrganization.name}" is ready to use</p>
                         </div>
 
-                        <div className="mx-auto w-full max-w-md">
+                        <div className="mx-auto w-full max-w-md space-y-6">
+                            <Alert>
+                                <Info className="h-4 w-4" />
+                                <AlertTitle>Invite team members from your dashboard</AlertTitle>
+                                <AlertDescription>You can invite team members from settings after completing setup.</AlertDescription>
+                            </Alert>
+
                             <MemberInviteForm
                                 organizationId={currentOrganization.id}
                                 availableRoles={availableRoles}

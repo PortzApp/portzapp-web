@@ -117,13 +117,13 @@ export default function MemberInviteForm({ organizationId, onSuccess, onSkip, av
         <LoadingOverlay isLoading={processing} message="Sending invitations...">
             <div className="space-y-6">
                 <form onSubmit={submit} className="space-y-6">
-                    <div className="space-y-4">
+                    <div className="pointer-events-none space-y-4 opacity-50">
                         {data.invites.map((invite, index) => (
                             <div key={index} className="grid gap-4 rounded-lg border p-4">
                                 <div className="flex items-center justify-between">
                                     <Label className="font-medium">Invite #{index + 1}</Label>
                                     {data.invites.length > 1 && (
-                                        <Button type="button" variant="ghost" size="sm" onClick={() => removeInvite(index)} disabled={processing}>
+                                        <Button type="button" variant="ghost" size="sm" onClick={() => removeInvite(index)} disabled={true}>
                                             <X className="h-4 w-4" />
                                         </Button>
                                     )}
@@ -136,7 +136,7 @@ export default function MemberInviteForm({ organizationId, onSuccess, onSkip, av
                                         type="email"
                                         value={invite.email}
                                         onChange={(e) => updateInvite(index, 'email', e.target.value)}
-                                        disabled={processing}
+                                        disabled={true}
                                         placeholder="colleague@company.com"
                                     />
                                     <InputError message={getEmailError(index)} />
@@ -144,7 +144,7 @@ export default function MemberInviteForm({ organizationId, onSuccess, onSkip, av
 
                                 <div className="grid gap-2">
                                     <Label htmlFor={`role-${index}`}>Role</Label>
-                                    <Select value={invite.role} onValueChange={(value) => updateInvite(index, 'role', value)} disabled={processing}>
+                                    <Select value={invite.role} onValueChange={(value) => updateInvite(index, 'role', value)} disabled={true}>
                                         <SelectTrigger>
                                             <SelectValue placeholder="Select a role" />
                                         </SelectTrigger>
@@ -162,7 +162,7 @@ export default function MemberInviteForm({ organizationId, onSuccess, onSkip, av
                         ))}
                     </div>
 
-                    <Button type="button" variant="outline" onClick={addInvite} disabled={processing || data.invites.length >= 10} className="w-full">
+                    <Button type="button" variant="outline" onClick={addInvite} disabled={true} className="w-full opacity-50">
                         <Plus className="mr-2 h-4 w-4" />
                         Add Another Invite
                         {data.invites.length >= 10 && ' (Maximum reached)'}
@@ -174,16 +174,16 @@ export default function MemberInviteForm({ organizationId, onSuccess, onSkip, av
 
                     {/* Form Actions */}
                     <div className="flex gap-4 pt-6">
-                        <Button type="button" variant="outline" onClick={onSkip} disabled={processing} className="flex-1 py-3">
-                            Skip for Now
+                        <Button type="button" onClick={onSkip} disabled={processing} className="flex-1 py-3">
+                            Continue to Dashboard
                         </Button>
-                        <Button type="submit" disabled={processing} className="flex-1 py-3">
-                            {processing ? 'Sending...' : 'Send Invitations'}
+                        <Button type="submit" disabled={true} variant="outline" className="flex-1 py-3 opacity-50">
+                            Send Invitations
                         </Button>
                     </div>
 
                     <p className="text-center text-xs text-muted-foreground">
-                        Invitations will expire in 7 days. You can resend or manage invitations from your organization settings.
+                        You'll be able to invite team members from your organization settings in just a moment.
                     </p>
                 </form>
             </div>
