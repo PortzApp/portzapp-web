@@ -17,7 +17,7 @@ class ServiceCategoryController extends Controller
     {
         Gate::authorize('viewAny', ServiceCategory::class);
 
-        $categories = ServiceCategory::with(['subCategories' => function ($query) {
+        $categories = ServiceCategory::with(['subCategories' => function ($query): void {
             $query->orderBy('sort_order')->withCount('services');
         }])
             ->withCount(['subCategories', 'services'])
@@ -70,7 +70,7 @@ class ServiceCategoryController extends Controller
         Gate::authorize('view', $category);
 
         $category->load([
-            'subCategories' => function ($query) {
+            'subCategories' => function ($query): void {
                 $query->orderBy('sort_order')->withCount('services');
             },
         ])->loadCount(['subCategories', 'services']);
@@ -88,7 +88,7 @@ class ServiceCategoryController extends Controller
         Gate::authorize('update', $category);
 
         $category->load([
-            'subCategories' => function ($query) {
+            'subCategories' => function ($query): void {
                 $query->orderBy('sort_order');
             },
         ]);
