@@ -2,6 +2,8 @@
 
 namespace App\Policies;
 
+use App\Enums\OrganizationBusinessType;
+use App\Enums\UserRoles;
 use App\Models\ServiceCategory;
 use App\Models\User;
 
@@ -12,7 +14,8 @@ class ServiceCategoryPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return $user->isInOrganizationWithBusinessType(OrganizationBusinessType::PORTZAPP_TEAM)
+            && $user->isInOrganizationWithUserRole(UserRoles::ADMIN);
     }
 
     /**
@@ -20,7 +23,8 @@ class ServiceCategoryPolicy
      */
     public function view(User $user, ServiceCategory $serviceCategory): bool
     {
-        return false;
+        return $user->isInOrganizationWithBusinessType(OrganizationBusinessType::PORTZAPP_TEAM)
+            && $user->isInOrganizationWithUserRole(UserRoles::ADMIN);
     }
 
     /**
@@ -28,7 +32,8 @@ class ServiceCategoryPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return $user->isInOrganizationWithBusinessType(OrganizationBusinessType::PORTZAPP_TEAM)
+            && $user->isInOrganizationWithUserRole(UserRoles::ADMIN);
     }
 
     /**
@@ -36,7 +41,8 @@ class ServiceCategoryPolicy
      */
     public function update(User $user, ServiceCategory $serviceCategory): bool
     {
-        return false;
+        return $user->isInOrganizationWithBusinessType(OrganizationBusinessType::PORTZAPP_TEAM)
+            && $user->isInOrganizationWithUserRole(UserRoles::ADMIN);
     }
 
     /**
@@ -44,7 +50,8 @@ class ServiceCategoryPolicy
      */
     public function delete(User $user, ServiceCategory $serviceCategory): bool
     {
-        return false;
+        return $user->isInOrganizationWithBusinessType(OrganizationBusinessType::PORTZAPP_TEAM)
+            && $user->isInOrganizationWithUserRole(UserRoles::ADMIN);
     }
 
     /**

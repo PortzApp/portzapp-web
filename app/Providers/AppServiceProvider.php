@@ -11,6 +11,7 @@ use App\Models\OrderWizardSession;
 use App\Models\OrganizationJoinRequest;
 use App\Models\Port;
 use App\Models\Service;
+use App\Models\ServiceCategory;
 use App\Models\User;
 use App\Observers\OrderGroupObserver;
 use App\Observers\OrderGroupServiceObserver;
@@ -22,6 +23,7 @@ use App\Policies\OrderPolicy;
 use App\Policies\OrderWizardSessionPolicy;
 use App\Policies\OrganizationJoinRequestPolicy;
 use App\Policies\PortPolicy;
+use App\Policies\ServiceCategoryPolicy;
 use App\Policies\ServicePolicy;
 use App\Policies\UserPolicy;
 use Illuminate\Support\Facades\Gate;
@@ -46,6 +48,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::policy(Service::class, ServicePolicy::class);
+        Gate::policy(ServiceCategory::class, ServiceCategoryPolicy::class);
         Gate::policy(Order::class, OrderPolicy::class);
         Gate::policy(OrderGroup::class, OrderGroupPolicy::class);
         Gate::policy(OrderWizardSession::class, OrderWizardSessionPolicy::class);
