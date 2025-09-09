@@ -24,7 +24,7 @@ class UpdateServiceCategoryRequest extends FormRequest
         $categoryId = $this->route('category')->id ?? null;
 
         return [
-            'name' => 'required|string|max:255|unique:service_categories,name,' . $categoryId,
+            'name' => 'required|string|max:255|unique:service_categories,name,'.$categoryId,
             'sub_categories' => 'nullable|array',
             'sub_categories.*.id' => 'nullable|exists:service_sub_categories,id',
             'sub_categories.*.name' => 'required|string|max:255',

@@ -20,9 +20,9 @@ class ServiceCategoryController extends Controller
         $categories = ServiceCategory::with(['subCategories' => function ($query) {
             $query->orderBy('sort_order')->withCount('services');
         }])
-        ->withCount(['subCategories', 'services'])
-        ->orderBy('name')
-        ->get();
+            ->withCount(['subCategories', 'services'])
+            ->orderBy('name')
+            ->get();
 
         return Inertia::render('categories/categories-index-page', [
             'categories' => $categories,
@@ -72,7 +72,7 @@ class ServiceCategoryController extends Controller
         $category->load([
             'subCategories' => function ($query) {
                 $query->orderBy('sort_order')->withCount('services');
-            }
+            },
         ])->loadCount(['subCategories', 'services']);
 
         return Inertia::render('categories/show-category-page', [
@@ -90,7 +90,7 @@ class ServiceCategoryController extends Controller
         $category->load([
             'subCategories' => function ($query) {
                 $query->orderBy('sort_order');
-            }
+            },
         ]);
 
         return Inertia::render('categories/edit-category-page', [
@@ -124,6 +124,7 @@ class ServiceCategoryController extends Controller
                     $updatedSubCategoryIds[] = $subCategoryData['id'];
                 } else {
                     // Create new sub-category
+                    /** @var \App\Models\ServiceSubCategory $newSubCategory */
                     $newSubCategory = $category->subCategories()->create([
                         'name' => $subCategoryData['name'],
                         'description' => $subCategoryData['description'] ?? null,
@@ -135,7 +136,7 @@ class ServiceCategoryController extends Controller
 
             // Delete sub-categories that were removed
             $subCategoriesToDelete = array_diff($existingSubCategoryIds, $updatedSubCategoryIds);
-            if (!empty($subCategoriesToDelete)) {
+            if (! empty($subCategoriesToDelete)) {
                 $category->subCategories()->whereIn('id', $subCategoriesToDelete)->delete();
             }
         }
