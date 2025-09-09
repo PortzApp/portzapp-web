@@ -20,7 +20,7 @@ export default function OnboardingLayout({ children, user, title = 'Complete Set
     };
 
     return (
-        <div className="relative min-h-screen bg-background">
+        <div className="relative flex min-h-screen flex-col bg-background">
             <Head title={title} />
 
             {/* Minimal height header with centered logo */}
@@ -34,9 +34,7 @@ export default function OnboardingLayout({ children, user, title = 'Complete Set
             </div>
 
             {/* Main content area */}
-            <div className="mt-0 px-6 md:px-12">
-                <div className="mx-auto w-full max-w-4xl">{children}</div>
-            </div>
+            <div className="mx-auto mt-0 flex w-full max-w-7xl flex-1 flex-col px-6 md:px-12">{children}</div>
 
             {/* User email and logout at bottom-right */}
             <div className="fixed right-4 bottom-4 z-10">
