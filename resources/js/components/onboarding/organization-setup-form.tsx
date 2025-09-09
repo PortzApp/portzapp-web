@@ -1,4 +1,4 @@
-import { FormEventHandler, useId } from 'react';
+import { FormEventHandler, useId, useState } from 'react';
 
 import { useForm, usePage } from '@inertiajs/react';
 import { Building2, Ship } from 'lucide-react';
@@ -40,10 +40,14 @@ export default function OrganizationSetupForm({ businessTypes, onSuccess, onCanc
         description: '',
     });
 
+    // Track whether slug has been manually edited by user
+    const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(false);
+    const [lastNameUsedForSlug, setLastNameUsedForSlug] = useState('');
+
     // Get page props at the top level to avoid hooks violations
     const { props } = usePage();
 
-    // Format slug input (lowercase, replace spaces/special chars with hyphens)
+    // Format slug for auto-generation from organization name (full formatting)
     const formatSlug = (input: string): string => {
         return input
             .toLowerCase()
@@ -53,20 +57,42 @@ export default function OrganizationSetupForm({ businessTypes, onSuccess, onCanc
             .replace(/^-|-$/g, '');
     };
 
-    // Handle name change and auto-generate slug
+    // Minimal formatting for manual input (allows natural typing with hyphens)
+    const formatSlugForManualInput = (input: string): string => {
+        return input.toLowerCase().replace(/[^a-z0-9-]/g, ''); // Only remove truly invalid characters, keep hyphens
+    };
+
+    // Handle name change - reset manual edit flag when name changes
     const handleNameChange = (value: string) => {
         setData('name', value);
 
-        // Auto-generate slug if slug is empty
-        if (!data.slug && value.trim()) {
-            const formattedSlug = formatSlug(value);
+        // Reset the manual edit flag when name changes
+        // This allows slug to be auto-generated again on next focus
+        setIsSlugManuallyEdited(false);
+    };
+
+    // Handle slug focus - auto-populate if not manually edited and name exists
+    const handleSlugFocus = () => {
+        if (!isSlugManuallyEdited && data.name.trim() && data.name !== lastNameUsedForSlug) {
+            const formattedSlug = formatSlug(data.name);
             setData('slug', formattedSlug);
+            setLastNameUsedForSlug(data.name);
         }
     };
 
+    // Handle slug change - mark as manually edited
     const handleSlugChange = (value: string) => {
-        const formattedSlug = formatSlug(value);
+        const formattedSlug = formatSlugForManualInput(value);
         setData('slug', formattedSlug);
+        setIsSlugManuallyEdited(true);
+    };
+
+    // Clean up slug when user finishes editing (optional final cleanup)
+    const handleSlugBlur = () => {
+        if (data.slug) {
+            const cleanedSlug = formatSlug(data.slug);
+            setData('slug', cleanedSlug);
+        }
     };
 
     const submit: FormEventHandler = (e) => {
@@ -148,13 +174,14 @@ export default function OrganizationSetupForm({ businessTypes, onSuccess, onCanc
                                 type="text"
                                 value={data.slug}
                                 onChange={(e) => handleSlugChange(e.target.value)}
+                                onFocus={handleSlugFocus}
+                                onBlur={handleSlugBlur}
                                 disabled={processing}
                                 placeholder="acme-shipping-co"
                                 required
                             />
                             <p className="text-xs text-muted-foreground">
-                                This will be your organization's unique URL (portzapp.com/{data.slug || 'your-organization'}). It can only contain
-                                lowercase letters, numbers, and hyphens.
+                                This will be your organization's unique URL. It can only contain lowercase letters, numbers, and hyphens.
                             </p>
                             <InputError message={errors.slug} />
                         </div>
@@ -198,7 +225,7 @@ export default function OrganizationSetupForm({ businessTypes, onSuccess, onCanc
 
                         {/* Registration Code */}
                         <div className="grid gap-2">
-                            <Label htmlFor="registration_code">Registration Code</Label>
+                            <Label htmlFor="registration_code">Official Government ID Number</Label>
                             <Input
                                 id="registration_code"
                                 type="text"
@@ -206,9 +233,12 @@ export default function OrganizationSetupForm({ businessTypes, onSuccess, onCanc
                                 value={data.registration_code}
                                 onChange={(e) => setData('registration_code', e.target.value)}
                                 disabled={processing}
-                                placeholder="REG123456"
+                                placeholder="100123456789012"
                             />
-                            <p className="text-xs text-muted-foreground">Your official business registration code or license number</p>
+                            <p className="text-xs text-muted-foreground">
+                                Your official company registration number (e.g., Trade License Number, Business Registration Number, or in UAE: TRN -
+                                100123456789012)
+                            </p>
                             <InputError message={errors.registration_code} />
                         </div>
                     </div>
