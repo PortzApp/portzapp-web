@@ -143,24 +143,24 @@ if (app()->environment('local', 'testing')) {
 // Public invitation routes (accessible without authentication)
 Route::get('api/invitations', [InvitationController::class, 'show'])->name('invitations.show');
 
-Route::get('/debug-auth', function() {
+Route::get('/debug-auth', function () {
     $output = [
         'authenticated' => auth()->check(),
         'user_id' => auth()->id(),
         'session_driver' => config('session.driver'),
         'broadcast_driver' => config('broadcasting.default'),
     ];
-    
+
     if (auth()->check()) {
         $output['user_email'] = auth()->user()->email;
         // Test loading relations if any
         $output['user_relations'] = array_keys(auth()->user()->getRelations());
     }
-    
+
     return response()->json($output);
 })->middleware('auth');
 
-Route::get('/debug-simple', function() {
+Route::get('/debug-simple', function () {
     return 'Simple authenticated route works';
 })->middleware('auth');
 
